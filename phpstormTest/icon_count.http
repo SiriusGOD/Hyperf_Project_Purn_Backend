@@ -1,0 +1,5 @@
+###
+GET {{host}}/api/icon_count/click?site_id=1&icon_id=1
+Content-Type: application/json
+User-Agent: idea
+###

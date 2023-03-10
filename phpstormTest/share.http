@@ -1,0 +1,11 @@
+### 前端生成分享網址 API
+GET {{host}}/api/share/getUri?site_id=1&fingerprint=5994d90acb81
+Content-Type: application/json
+User-Agent: idea
+###
+
+### 測試 分享網址點擊 API
+GET {{host}}/api/share/click?site_id=1&share_code=7bb4290610453dc681ad23bb6f9cdaf7
+Content-Type: application/json
+User-Agent: idea
+###

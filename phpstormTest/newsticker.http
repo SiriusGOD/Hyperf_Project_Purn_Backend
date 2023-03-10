@@ -1,0 +1,5 @@
+###
+GET {{host}}/api/news_ticker/list?site_id=1
+Content-Type: application/json
+User-Agent: idea
+###

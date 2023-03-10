@@ -1,0 +1,330 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "My First API",
+        "version": "0.1"
+    },
+    "paths": {
+        "/api/demo/indexGet": {
+            "get": {
+                "tags": [
+                    "Demo"
+                ],
+                "summary": "",
+                "description": "Demo Get 測試",
+                "operationId": "",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "JWT Token",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "Bearer {{Authorization}}"
+                        }
+                    },
+                    {
+                        "name": "site_id",
+                        "in": "query",
+                        "description": "",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回響應資料",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "required": [
+                                        "errcode",
+                                        "timestamp",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "errcode": {
+                                            "description": "錯誤碼",
+                                            "type": "integer"
+                                        },
+                                        "timestamp": {
+                                            "description": "",
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "description": "返回資料",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/demo/indexPost": {
+            "post": {
+                "tags": [
+                    "Demo"
+                ],
+                "summary": "",
+                "description": "Demo Post 測試",
+                "operationId": "",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "JWT Token",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "Bearer {{Authorization}}"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "請求body",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "site_id"
+                                ],
+                                "properties": {
+                                    "site_id": {
+                                        "description": "網站ID",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "返回響應資料",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "required": [
+                                        "errcode",
+                                        "timestamp",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "errcode": {
+                                            "description": "錯誤碼",
+                                            "type": "integer"
+                                        },
+                                        "timestamp": {
+                                            "description": "",
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "description": "返回資料",
+                                            "required": [
+                                                "msg",
+                                                "site_id"
+                                            ],
+                                            "properties": {
+                                                "msg": {
+                                                    "description": "",
+                                                    "type": "string"
+                                                },
+                                                "site_id": {
+                                                    "description": "網站ID",
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/demo/indexPut": {
+            "put": {
+                "tags": [
+                    "Demo"
+                ],
+                "summary": "",
+                "description": "Demo Put 測試",
+                "operationId": "",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "JWT Token",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "Bearer {{Authorization}}"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "請求body",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "site_id"
+                                ],
+                                "properties": {
+                                    "site_id": {
+                                        "description": "",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "返回響應資料",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "required": [
+                                        "errcode",
+                                        "timestamp",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "errcode": {
+                                            "description": "錯誤碼",
+                                            "type": "integer"
+                                        },
+                                        "timestamp": {
+                                            "description": "",
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "description": "返回資料",
+                                            "required": [
+                                                "msg",
+                                                "site_id"
+                                            ],
+                                            "properties": {
+                                                "msg": {
+                                                    "description": "",
+                                                    "type": "string"
+                                                },
+                                                "site_id": {
+                                                    "description": "網站ID",
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/demo/indexDelete": {
+            "delete": {
+                "tags": [
+                    "Demo"
+                ],
+                "summary": "",
+                "description": "Demo Delete 測試",
+                "operationId": "",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "JWT Token",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "Bearer {{Authorization}}"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "請求body",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "site_id"
+                                ],
+                                "properties": {
+                                    "site_id": {
+                                        "description": "",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "返回響應資料",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "required": [
+                                        "errcode",
+                                        "timestamp",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "errcode": {
+                                            "description": "錯誤碼",
+                                            "type": "integer"
+                                        },
+                                        "timestamp": {
+                                            "description": "",
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "description": "返回資料",
+                                            "required": [
+                                                "msg",
+                                                "site_id"
+                                            ],
+                                            "properties": {
+                                                "msg": {
+                                                    "description": "",
+                                                    "type": "string"
+                                                },
+                                                "site_id": {
+                                                    "description": "網站ID",
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

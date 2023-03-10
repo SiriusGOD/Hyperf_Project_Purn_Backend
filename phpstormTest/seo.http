@@ -1,0 +1,5 @@
+###
+GET {{host}}/api/seo/keywords?site_id=1
+Content-Type: application/json
+User-Agent: idea
+###
