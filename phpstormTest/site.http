@@ -1,7 +1,0 @@
-###
-GET {{host}}/api/site/list
-Content-Type: application/json
-User-Agent: idea
-
-
-###
