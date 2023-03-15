@@ -47,6 +47,14 @@ class PermissionSeed implements BaseInterface
                 'site-delete',
                 'site-store',
             ],
+            # 廣告管理
+            'advertisement' => [
+                'advertisement-index',
+                'advertisement-create',
+                'advertisement-edit',
+                'advertisement-expire',
+                'advertisement-store',
+            ],
         ];
 
         foreach ($permissions as $main => $permission) {

@@ -124,6 +124,16 @@
                     </a>
                 </li>
                 @endif
+                @if(authPermission('advertisement-index'))
+                <li class="nav-item">
+                    <a href="/admin/advertisement/index" class="nav-link {{$advertisement_active ?? ''}}">
+                        <i class="nav-icon fas fa-ad"></i>
+                        <p>
+                        {{trans('default.leftbox.advertisement') ?? '廣告管理'}}
+                        </p>
+                    </a>
+                </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

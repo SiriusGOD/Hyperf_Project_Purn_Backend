@@ -27,6 +27,7 @@ return [
         'manager' => '管理者',
         'usersite' => '用戶對應多站',
         'site' => '多站管理',
+        'advertisement' => '廣告',
     ],
 
     'list' => '列表',
@@ -95,6 +96,7 @@ return [
         'role' => '角色管理',
         'site' => '多站管理',
         'user_site' => '用戶對應多站管理',
+        'advertisement' => '廣告管理',
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -134,6 +136,24 @@ return [
         'user_id' => '用戶序號',
         'user_name' => '用戶名稱',
         'user_id_def' => '請輸入用戶序號',
+    ],
+    // -------------------------------------------------------------------
+    // AdvertisementController
+    'ad_control' => [
+        'ad_control' => '廣告管理',
+        'ad_insert' => '新增廣告',
+        'ad_update' => '更新廣告',
+        'ad_place' => '廣告位置',
+        'ad_connect_url' => '連結網址',
+        'ad_def_connect_url' => 'www.google.com.tw',
+        'ad_input_name' => '請輸入廣告名稱',
+        'ad_banner_up' => '上 banner',
+        'ad_banner_down' => '下 banner',
+        'ad_banner_pop' => '彈窗 banner',
+        'ad_id' => '廣告序號',
+        'ad_name' => '廣告名稱',
+        'ad_image' => '圖片廣告',
+        'ad_link' => '友情鏈接'
     ],
     // -------------------------------------------------------------------
 ];
