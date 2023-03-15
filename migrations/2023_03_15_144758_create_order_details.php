@@ -15,7 +15,7 @@ class CreateOrderDetails extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('order_id')->unsigned()->comment('訂單 id');
             $table->bigInteger('product_id')->unsigned()->comment('產品 id');
-            $table->string('product_name')->unsigned()->comment('產品名稱');
+            $table->string('product_name')->comment('產品名稱');
             $table->string('product_currency')->comment('產品幣別');
             $table->decimal('product_selling_price')->comment('產品當時價格');
             $table->timestamps();

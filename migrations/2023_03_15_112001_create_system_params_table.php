@@ -14,7 +14,7 @@ class CreateSystemParamsTable extends Migration
         Schema::create('system_params', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('description')->default('')->comment('描述');
-            $table->text('param')->default('')->comment('參數');
+            $table->text('param')->comment('參數');
             $table->timestamps();
         });
     }
