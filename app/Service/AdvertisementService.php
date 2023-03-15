@@ -70,6 +70,7 @@ class AdvertisementService
     public function storeAdvertisement(array $data): void
     {
         $model = Advertisement::findOrNew($data['id']);
+        $model->user_id = $data['user_id'];
         $model->name = $data['name'];
         if (! empty($data['image_url'])) {
             $model->image_url = $data['image_url'];

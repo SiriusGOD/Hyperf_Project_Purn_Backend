@@ -35,6 +35,7 @@ class AdvertisementRequest extends FormRequest
     {
         $rules = [
             'id' => 'numeric',
+            'user_id' => 'numeric',
             'name' => 'required|max:255',
             'url' => 'required|max:255',
             'position' => ['required', Rule::in([

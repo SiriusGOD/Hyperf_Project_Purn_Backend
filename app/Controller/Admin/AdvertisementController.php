@@ -120,6 +120,7 @@ class AdvertisementController extends AbstractController
             $file->moveTo(BASE_PATH . '/public' . $imageUrl);
         }
         $data['id'] = $request->input('id') ? $request->input('id') : null;
+        $data['user_id'] = auth('session')->user()->id;
         $data['name'] = $request->input('name');
         if (! empty($imageUrl)) {
             $data['image_url'] = $imageUrl;
