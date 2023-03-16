@@ -44,3 +44,7 @@ ex. php bin/hyperf.php swagger:format Post '{"errcode":0,"errmsg":"success","dat
 
 產生 OpenApi json 格式資料: swagger:gen
 ex. php bin/hyperf.php swagger:gen -f json
+
+### 前端套件
+
+https://adminlte.io/docs/3.2/dependencies.html
