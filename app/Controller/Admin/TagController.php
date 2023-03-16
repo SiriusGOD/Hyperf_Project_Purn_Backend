@@ -82,8 +82,8 @@ class TagController extends AbstractController
         if ($total == 0) {
             $data['last_page'] = 1;
         }
-        $data['navbar'] = trans('default.site_control.site_control');
-        $data['site_active'] = 'active';
+        $data['navbar'] = trans('default.tag_control.tag_control');
+        $data['tag_active'] = 'active';
         $data['total'] = $total;
         $data['datas'] = $models;
         $data['page'] = $page;
