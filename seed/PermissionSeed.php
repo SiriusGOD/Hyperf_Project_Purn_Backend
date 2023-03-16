@@ -31,14 +31,6 @@ class PermissionSeed implements BaseInterface
                 'manager-store',
                 'manager-googleAuth'
             ],
-            # 用戶對應多站管理
-            'usersite' => [
-                'usersite-index',
-                'usersite-create',
-                'usersite-edit',
-                'usersite-delete',
-                'usersite-store',
-            ],
             # 多站管理
             'site' => [
                 'site-index',
