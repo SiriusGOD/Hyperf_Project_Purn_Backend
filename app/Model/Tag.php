@@ -14,6 +14,9 @@ use Carbon\Carbon;
  */
 class Tag extends Model
 {
+    // 每頁筆數
+    public const PAGE_PER = 10;
+
     /**
      * The table associated with the model.
      *
