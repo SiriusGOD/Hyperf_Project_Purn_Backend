@@ -7,25 +7,25 @@ use Carbon\Carbon;
 
 /**
  * @property int $id 
- * @property string $main 
- * @property string $name 
+ * @property string $description 
+ * @property string $param 
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-class Permission extends Model
+class SystemParam extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'permissions';
+    protected $table = 'system_params';
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['main', 'name'];
+    protected $fillable = [];
     /**
      * The attributes that should be cast to native types.
      *

@@ -7,29 +7,32 @@ use Carbon\Carbon;
 
 /**
  * @property int $id 
- * @property string $main 
- * @property string $name 
+ * @property int $order_id 
+ * @property int $product_id 
+ * @property string $product_name 
+ * @property string $product_currency 
+ * @property string $product_selling_price 
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-class Permission extends Model
+class OrderDetail extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'permissions';
+    protected $table = 'order_details';
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['main', 'name'];
+    protected $fillable = [];
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected $casts = ['id' => 'integer', 'order_id' => 'integer', 'product_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

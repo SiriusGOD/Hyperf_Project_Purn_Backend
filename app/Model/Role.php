@@ -3,9 +3,13 @@
 declare (strict_types=1);
 namespace App\Model;
 
+use Carbon\Carbon;
+
 /**
- * @property int $id
- * @property string $keywords
+ * @property int $id 
+ * @property string $name 
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 class Role extends Model
 {
@@ -27,5 +31,5 @@ class Role extends Model
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer'];
+    protected $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

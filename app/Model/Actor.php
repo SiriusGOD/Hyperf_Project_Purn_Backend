@@ -7,29 +7,30 @@ use Carbon\Carbon;
 
 /**
  * @property int $id 
- * @property string $main 
+ * @property int $user_id 
+ * @property int $sex 
  * @property string $name 
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-class Permission extends Model
+class Actor extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'permissions';
+    protected $table = 'actors';
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['main', 'name'];
+    protected $fillable = [];
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected $casts = ['id' => 'integer', 'user_id' => 'integer', 'sex' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }
