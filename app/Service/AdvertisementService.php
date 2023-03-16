@@ -28,22 +28,21 @@ class AdvertisementService
     }
 
     // 取得廣告
-    public function getAdvertisements(int $siteId): array
+    public function getAdvertisements(): array
     {
-        if ($this->redis->exists(self::CACHE_KEY . ':' . $siteId)) {
-            $jsonResult = $this->redis->get(self::CACHE_KEY . ':' . $siteId);
+        if ($this->redis->exists(self::CACHE_KEY)) {
+            $jsonResult = $this->redis->get(self::CACHE_KEY);
             return json_decode($jsonResult, true);
         }
 
         $now = Carbon::now()->toDateTimeString();
-        $result = Advertisement::select('id', 'name', 'image_url', 'url', 'position', 'start_time', 'end_time', 'buyer', 'expire', 'site_id', 'created_at', 'updated_at')
+        $result = Advertisement::select('id', 'name', 'image_url', 'url', 'position', 'start_time', 'end_time', 'buyer', 'expire', 'created_at', 'updated_at')
             ->where('start_time', '<=', $now)
-            ->where('site_id', $siteId)
             ->where('end_time', '>=', $now)
             ->get()
             ->toArray();
 
-        $this->redis->set(self::CACHE_KEY . ':' . $siteId, json_encode($result));
+        $this->redis->set(self::CACHE_KEY, json_encode($result));
 
         return $result;
     }

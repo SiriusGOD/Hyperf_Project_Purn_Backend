@@ -28,8 +28,7 @@ class AdvertisementController
      */
     public function list(RequestInterface $request, AdvertisementService $service, ObfuscationService $response)
     {
-        $siteId = (int) $request->input('site_id', 1);
-        $data = $service->getAdvertisements($siteId);
+        $data = $service->getAdvertisements();
         $result = [];
         // 取得網址前綴
         $url = $request->url();
