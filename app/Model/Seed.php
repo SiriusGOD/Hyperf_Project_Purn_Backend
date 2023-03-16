@@ -11,12 +11,14 @@ declare(strict_types=1);
  */
 namespace App\Model;
 
+use Carbon\Carbon;
+
 /**
  * @property int $id
  * @property string $seed
  * @property int $batch
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 class Seed extends Model
 {
