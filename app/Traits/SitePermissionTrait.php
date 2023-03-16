@@ -51,12 +51,4 @@ trait SitePermissionTrait
 
         return $siteIds;
     }
-
-    // 只用在 view siteSelect.blade.php
-    public function getSiteModels()
-    {
-        $siteIds = $this->getSiteIds();
-
-        return Site::whereIn('id', $siteIds)->get();
-    }
 }
