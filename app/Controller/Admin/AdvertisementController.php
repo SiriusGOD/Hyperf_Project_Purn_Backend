@@ -76,11 +76,9 @@ class AdvertisementController extends AbstractController
         $query = Advertisement::with('site')
             ->offset(($page - 1) * $step)
             ->limit($step);
-        $query = $this->attachQueryBuilder($query);
         $advertisements = $query->get();
 
         $query = Advertisement::select('*');
-        $query = $this->attachQueryBuilder($query);
         $total = $query->count();
 
         $data['last_page'] = ceil($total / $step);
@@ -167,7 +165,6 @@ class AdvertisementController extends AbstractController
     public function expire(RequestInterface $request, ResponseInterface $response, AdvertisementService $service): PsrResponseInterface
     {
         $query = Advertisement::where('id', $request->input('id'));
-        $query = $this->attachQueryBuilder($query);
         $record = $query->first();
 
         if (empty($record)) {
