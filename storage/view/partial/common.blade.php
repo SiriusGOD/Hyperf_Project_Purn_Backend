@@ -104,16 +104,6 @@
                         </a>
                     </li>
                 @endif
-                @if(authPermission('site-index'))
-                <li class="nav-item">
-                    <a href="/admin/site/index" class="nav-link {{$site_active ?? ''}}">
-                        <i class="nav-icon fas fa-sitemap"></i>
-                        <p>
-                        {{trans('default.leftbox.site') ?? '多站管理'}}
-                        </p>
-                    </a>
-                </li>
-                @endif
                 @if(authPermission('advertisement-index'))
                 <li class="nav-item">
                     <a href="/admin/advertisement/index" class="nav-link {{$advertisement_active ?? ''}}">
