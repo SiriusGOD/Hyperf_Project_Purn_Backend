@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Advertisement;
-use App\Model\Site;
 use Carbon\Carbon;
 use Hyperf\Redis\Redis;
 
@@ -50,19 +49,14 @@ class AdvertisementService
     // 更新快取
     public function updateCache(): void
     {
-        $sites = Site::all();
+        $now = Carbon::now()->toDateTimeString();
+        $result = Advertisement::where('start_time', '<=', $now)
+            ->where('end_time', '>=', $now)
+            ->where('expire', Advertisement::EXPIRE['no'])
+            ->get()
+            ->toArray();
 
-        foreach ($sites as $site) {
-            $now = Carbon::now()->toDateTimeString();
-            $result = Advertisement::where('start_time', '<=', $now)
-                ->where('end_time', '>=', $now)
-                ->where('expire', Advertisement::EXPIRE['no'])
-                ->where('site_id', $site->id)
-                ->get()
-                ->toArray();
-
-            $this->redis->set(self::CACHE_KEY . ':' . $site->id, json_encode($result));
-        }
+        $this->redis->set(self::CACHE_KEY, json_encode($result));
     }
 
     // 新增或更新廣告
