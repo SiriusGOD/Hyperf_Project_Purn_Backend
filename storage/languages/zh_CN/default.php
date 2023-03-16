@@ -25,8 +25,6 @@ return [
         'roles' => '角色',
         'user' => '使用者',
         'manager' => '管理者',
-        'usersite' => '用戶對應多站',
-        'site' => '多站管理',
         'advertisement' => '廣告',
     ],
 
@@ -94,8 +92,6 @@ return [
         'tittle' => '入口網站後台控制',
         'manager' => '使用者管理',
         'role' => '角色管理',
-        'site' => '多站管理',
-        'user_site' => '用戶對應多站管理',
         'advertisement' => '廣告管理',
     ],
     // -------------------------------------------------------------------
@@ -119,23 +115,6 @@ return [
         'role_update' => '更新角色',
         'role_name' => '角色名稱',
         'role_permission' => '角色權限',
-    ],
-    // -------------------------------------------------------------------
-    // SiteController
-    'site_control' => [
-        'site_control' => '多站管理',
-        'site_insert' => '新增網站',
-        'site_update' => '更新網站',
-    ],
-    // -------------------------------------------------------------------
-    // UserSiteController
-    'usersite_control' => [
-        'usersite_control' => '用戶對應多站管理',
-        'usersite_insert' => '新增用戶對應多站',
-        'usersite_update' => '更新用戶對應多站',
-        'user_id' => '用戶序號',
-        'user_name' => '用戶名稱',
-        'user_id_def' => '請輸入用戶序號',
     ],
     // -------------------------------------------------------------------
     // AdvertisementController
