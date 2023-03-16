@@ -9,14 +9,16 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-class Permission20221115Seed implements BaseInterface
+class PermissionTagSeed implements BaseInterface
 {
     public function up(): void
     {
         $permissions = [
-            # 用戶活躍數圖表管理
-            'retentionrate' => [
-                'retentionrate-list',
+            # 標籤管理
+            'tag' => [
+                'tag-index',
+                'tag-create',
+                'tag-list'
             ],
         ];
 
@@ -32,8 +34,7 @@ class Permission20221115Seed implements BaseInterface
 
     public function down(): void
     {
-        \App\Model\Permission::where('main', 'Retentionrate')
-            ->where('name', 'Retentionrate-index')
+        \App\Model\Permission::where('main', 'tag')
             ->delete();
     }
 

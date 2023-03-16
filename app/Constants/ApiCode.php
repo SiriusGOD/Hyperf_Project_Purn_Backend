@@ -27,4 +27,6 @@ class ApiCode
 
     // 該時間區間與key已有相同IP資料
     public const BAD_INPUT_IP = 403;
+
+    public const FATAL_ERROR = 500;
 }

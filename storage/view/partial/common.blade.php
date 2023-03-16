@@ -114,6 +114,16 @@
                     </a>
                 </li>
                 @endif
+                @if(authPermission('tag-index'))
+                    <li class="nav-item">
+                        <a href="/admin/tag/index" class="nav-link {{$tag_active ?? ''}}">
+                            <i class="nav-icon fas fa-tag"></i>
+                            <p>
+                                {{trans('default.leftbox.tag') ?? '標籤管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

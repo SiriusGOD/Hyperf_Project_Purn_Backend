@@ -30,17 +30,6 @@ class UserService
         $this->logger = $loggerFactory->get('reply');
     }
 
-    // 取得 user
-    public function getUserById(int $id)
-    {
-        if ($this->redis->exists(self::CACHE_KEY)) {
-            return $this->redis->get(self::CACHE_KEY);
-        }
-        $user = User::find($id);
-        $this->redis->set(self::CACHE_KEY . $id, $user);
-        return $user->id;
-    }
-
     // 搜尋用戶
     public function findUser(int $id)
     {

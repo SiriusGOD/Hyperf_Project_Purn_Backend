@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Exception\Handler;
 
+use App\Constants\ApiCode;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\Logger\LoggerFactory;
@@ -35,7 +36,14 @@ class AppExceptionHandler extends ExceptionHandler
         $this->logger->error($throwable->getTraceAsString());
         $this->loggerFactory->error(sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
         $this->loggerFactory->error($throwable->getTraceAsString());
-        return $this->response->redirect('/');
+        $message = '';
+        if (env('APP_ENV') != 'product') {
+            $message = $throwable->getTraceAsString();
+        }
+        return $this->response->json([
+            'code' => ApiCode::FATAL_ERROR,
+            'msg'  => $message,
+        ]);
     }
 
     public function isValid(Throwable $throwable): bool
