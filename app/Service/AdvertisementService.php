@@ -81,9 +81,6 @@ class AdvertisementService
         $model->end_time = $data['end_time'];
         $model->buyer = $data['buyer'];
         $model->expire = $data['expire'];
-        if(!env('Single_Site')){
-            $model->site_id = $data['site_id'];
-        }
         $model->save();
         $this->updateCache();
     }

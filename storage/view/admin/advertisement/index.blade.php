@@ -67,11 +67,6 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Engine version: activate to sort column ascending">
-                                            {{trans('default.attribution_web')?? '歸屬網站'}}
-                                        </th>
-                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1"
                                             aria-label="CSS grade: activate to sort column ascending">{{trans('default.action') ?? '動作'}}
                                         </th>
                                     </tr>
@@ -114,7 +109,6 @@
                                             <td>{{ $model->end_time}}</td>
                                             <td>{{ $model->buyer}}</td>
                                             <td>{{ $model->expire == 0 ? trans('default.take_up') : trans('default.take_down')}}</td>
-                                            <td>{{ $model->site->name ?? trans('default.unattribution_web')}}</td>
                                             <td>
                                                 @if(authPermission('advertisement-edit'))
                                                     <div class="row mb-1">
@@ -155,7 +149,6 @@
                                         <th rowspan="1" colspan="1">{{trans('default.end_time') ?? '結束時間'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.buyer') ?? '購買人'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.take_msg')?? '上下架'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.attribution_web')?? '歸屬網站'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>
                                     </tfoot>

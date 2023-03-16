@@ -129,10 +129,7 @@ class AdvertisementController extends AbstractController
         $data['position'] = $request->input('position');
         $data['start_time'] = $request->input('start_time');
         $data['end_time'] = $request->input('end_time');
-        $data['buyer'] = $request->input('buyer');
-        if(!env('Single_Site')){
-            $data['site_id'] = $request->input('site_id');
-        }
+        $data['buyer'] = $request->input('buyer');  
         $data['expire'] = $request->input('expire');
         $service->storeAdvertisement($data);
         return $response->redirect('/admin/advertisement/index');

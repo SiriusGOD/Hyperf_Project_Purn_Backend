@@ -73,9 +73,6 @@
                                         </option>
                                     </select>
                                 </div>
-                                @if(!env('Single_Site'))
-                                    @include("partial.admin.siteSelect")
-                                @endif
                                 <button type="submit" class="btn btn-primary">{{trans('default.submit') ?? '送出'}}</button>
                             </form>
                         </div>

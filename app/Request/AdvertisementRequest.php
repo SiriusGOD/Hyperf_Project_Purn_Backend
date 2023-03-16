@@ -54,20 +54,8 @@ class AdvertisementRequest extends FormRequest
                     Advertisement::EXPIRE['no'],
                     Advertisement::EXPIRE['yes'],
                 ]),
-            ],
-            // 'site_id' => [
-            //     'required',
-            //     'numeric',
-            //     Rule::exists('sites', 'id'),
-            // ],
+            ]
         ];
-        if(!env('Single_Site')){
-            $rules['site_id'] = [
-                'required',
-                'numeric',
-                Rule::exists('sites', 'id'),
-            ];
-        }
         $siteIds = $this->getSiteIds();
         if (! empty($siteIds)) {
             $rules['site_id'][] = Rule::in($siteIds);
