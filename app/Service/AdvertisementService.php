@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Advertisement;
-use App\Model\Icon;
 use App\Model\Site;
 use Carbon\Carbon;
 use Hyperf\Redis\Redis;
@@ -37,7 +36,8 @@ class AdvertisementService
         }
 
         $now = Carbon::now()->toDateTimeString();
-        $result = Advertisement::where('start_time', '<=', $now)
+        $result = Advertisement::select('id', 'name', 'image_url', 'url', 'position', 'start_time', 'end_time', 'buyer', 'expire', 'site_id', 'created_at', 'updated_at')
+            ->where('start_time', '<=', $now)
             ->where('site_id', $siteId)
             ->where('end_time', '>=', $now)
             ->get()
@@ -57,7 +57,7 @@ class AdvertisementService
             $now = Carbon::now()->toDateTimeString();
             $result = Advertisement::where('start_time', '<=', $now)
                 ->where('end_time', '>=', $now)
-                ->where('expire', Icon::EXPIRE['no'])
+                ->where('expire', Advertisement::EXPIRE['no'])
                 ->where('site_id', $site->id)
                 ->get()
                 ->toArray();
