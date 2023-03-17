@@ -14,9 +14,7 @@ namespace App\Controller\Admin;
 use App\Controller\AbstractController;
 use App\Model\Site;
 use App\Model\Tag;
-use App\Request\SiteRequest;
 use App\Request\TagRequest;
-use App\Service\SiteService;
 use App\Service\TagService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -74,7 +72,8 @@ class TagController extends AbstractController
         // 顯示幾筆
         $step = Tag::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $models = Tag::offset(($page - 1) * $step)
+        $models = Tag::with('user')
+            ->offset(($page - 1) * $step)
             ->limit($step)
             ->get();
         $total = Tag::count();

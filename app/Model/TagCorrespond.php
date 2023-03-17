@@ -7,7 +7,7 @@ use Carbon\Carbon;
 
 /**
  * @property int $id 
- * @property string $type 
+ * @property string $correspond_type
  * @property int $correspond_id 
  * @property int $tag_id 
  * @property Carbon $created_at

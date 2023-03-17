@@ -18,6 +18,7 @@
         "96qbhy/hyperf-auth": "*",
         "96qbhy/simple-jwt": "^1.4",
         "bacon/bacon-qr-code": "*",
+        "doctrine/dbal": "^3.6",
         "gokure/hyperf-cors": "^1.1",
         "hyperf-ext/auth": "2.2.*",
         "hyperf-ext/hashing": "^2.2",
@@ -44,6 +45,7 @@
         "hyperf/tracer": "~2.2.0",
         "hyperf/validation": "2.2.*",
         "hyperf/view-engine": "^2.2",
+        "intervention/image": "^2.7",
         "nesbot/carbon": "^2.62",
         "pragmarx/google2fa": "^8.0"
     },

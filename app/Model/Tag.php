@@ -35,4 +35,9 @@ class Tag extends Model
      * @var array
      */
     protected $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

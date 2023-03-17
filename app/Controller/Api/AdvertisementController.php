@@ -11,8 +11,8 @@ declare(strict_types=1);
  */
 namespace App\Controller\Api;
 
+use App\Controller\AbstractController;
 use App\Service\AdvertisementService;
-use App\Service\ObfuscationService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -21,12 +21,12 @@ use App\Constants\ApiCode;
 /**
  * @Controller
  */
-class AdvertisementController
+class AdvertisementController extends AbstractController
 {
     /**
      * @RequestMapping(path="list", methods="get")
      */
-    public function list(RequestInterface $request, AdvertisementService $service, ObfuscationService $response)
+    public function list(RequestInterface $request, AdvertisementService $service)
     {
         $data = $service->getAdvertisements();
         $result = [];
@@ -40,6 +40,6 @@ class AdvertisementController
             $result[] = $item;
         }
 
-        return $response->replyData($result);
+        return $this->success($result);
     }
 }

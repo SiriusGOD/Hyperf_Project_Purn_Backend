@@ -124,6 +124,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('image-index'))
+                    <li class="nav-item">
+                        <a href="/admin/image/index" class="nav-link {{$image_active ?? ''}}">
+                            <i class="nav-icon fas fa-image"></i>
+                            <p>
+                                {{trans('default.leftbox.image') ?? '圖片管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

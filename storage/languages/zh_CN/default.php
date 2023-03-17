@@ -27,7 +27,7 @@ return [
         'manager' => '管理者',
         'advertisement' => '廣告',
     ],
-
+    'user_name' => '使用者名稱',
     'list' => '列表',
     'index' => '列表',
     'store' => '儲存',
@@ -86,6 +86,9 @@ return [
     'googleAuth'=> 'Googlg Auth 驗證 ',
     'role'=> '角色',
     'isopen' => ' GOOGLE AUTH驗證',
+    'id_msg_def' => '請輸入id',
+    'description_msg_def' => '請輸入描述',
+    'name_msg_def' => '請輸入名稱',
     // -------------------------------------------------------------------
     // left box
     'leftbox' => [
@@ -93,7 +96,8 @@ return [
         'manager' => '使用者管理',
         'role' => '角色管理',
         'advertisement' => '廣告管理',
-        'tag' => '標籤管理'
+        'tag' => '標籤管理',
+        'image' => '圖片管理'
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -141,6 +145,19 @@ return [
         'tag_control' => '標籤管理',
         'tag_insert' => '新增標籤',
         'tag_name' => '標籤名稱',
+    ],
+    // -------------------------------------------------------------------
+    // ImageController
+    'image_control' => [
+        'image_control' => '圖片管理',
+        'image_insert' => '新增圖片',
+        'image_update' => '圖片更新',
+        'image_name' => '圖片名稱',
+        'image_thumbnail' => '圖片縮圖',
+        'image_url' => '圖片網址',
+        'image_likes' => '圖片按讚數',
+        'image_group_id' => '圖片群組序號',
+        'image_description' => '圖片描述',
     ],
     // -------------------------------------------------------------------
 ];
