@@ -5,6 +5,7 @@ namespace App\Model;
 
 use Carbon\Carbon;
 use Hyperf\Database\Model\SoftDeletes;
+use App\Model\Video;
 
 /**
  * @property int $id 
@@ -42,4 +43,10 @@ class Product extends Model
      * @var array
      */
     protected $casts = ['id' => 'integer', 'user_id' => 'integer', 'correspond_id' => 'integer', 'position' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    //影片關連
+    public function video()
+    {
+        return $this->hasOne(Video::class, 'id','correspond_id');
+    }
 }
