@@ -134,6 +134,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('order-index'))
+                    <li class="nav-item">
+                        <a href="/admin/order/index" class="nav-link {{$order_active ?? ''}}">
+                            <i class="nav-icon fas fa-file"></i>
+                            <p>
+                                {{trans('default.leftbox.order') ?? '訂單管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

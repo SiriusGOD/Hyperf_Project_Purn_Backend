@@ -97,7 +97,8 @@ return [
         'role' => '角色管理',
         'advertisement' => '廣告管理',
         'tag' => '標籤管理',
-        'image' => '圖片管理'
+        'image' => '圖片管理',
+        'order' => '訂單管理',
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -158,6 +159,23 @@ return [
         'image_likes' => '圖片按讚數',
         'image_group_id' => '圖片群組序號',
         'image_description' => '圖片描述',
+    ],
+    // -------------------------------------------------------------------
+    // OrderController
+    'order_control' => [
+        'order_control' => '訂單管理',
+        'order_insert' => '新增訂單',
+        'order_num' => '訂單編號',
+        'order_status' => '訂單狀態',
+        'order_create_time' => '訂單成立時間',
+        'order_edit' => '編輯訂單',
+        'order_buyer_email' => 'email',
+        'order_buyer_telephone' => '手機',
+        'order_status_create' => '訂單成立',
+        'order_status_delete' => '訂單取消',
+        'order_status_finish' => '訂單完成',
+        'order_price' => '訂單金額',
+        'order_details' => '訂單明細',
     ],
     // -------------------------------------------------------------------
 ];

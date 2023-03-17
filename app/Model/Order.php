@@ -22,6 +22,12 @@ use Carbon\Carbon;
  */
 class Order extends Model
 {
+    public const PAGE_PER = 10;
+    public const ORDER_STATUS = [
+        'create' => 1,
+        'delete' => 11,
+        'finish' => 21
+    ];
     /**
      * The table associated with the model.
      *
