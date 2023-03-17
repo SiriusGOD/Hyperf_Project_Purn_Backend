@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 /**
  * This file is part of Hyperf.
@@ -57,6 +56,40 @@ class VideoService
       $result = self::videoCount(); 
       $this->redis->set(self::COUNT_KEY, $result, self::COUNT_EXPIRE);
       return $result;
+    }
+
+    /**
+     * 搜尋影片
+     * $compare  = 0  ===>    null 
+     * $compare  = 1  ===>    >= 
+     * $compare  = 2  ===>    <= 
+     **/
+    public function searchVideo($name ,$compare ,$length, $offset, $limit){
+      #if ($this->redis->exists(self::CACHE_KEY.$name)) {
+      #    $jsonResult = $this->redis->get(self::CACHE_KEY.$name);
+      #    return json_decode($jsonResult, true);
+      #}
+
+      $model = Product::select("videos.*")
+            ->join('videos', 'products.correspond_id', '=', 'videos.id')
+            ->where('products.type','video')
+            ->where('videos.name','like',"%$name%")
+            ->with('video');
+      if($compare > 0 && $length >0){
+        if($compare == 1){
+          $model = $model->where("videos.lenght" , ">=" ,$length); 
+        }else{
+          $model = $model->where("videos.lenght" , "<=" ,$length); 
+        }
+      }
+
+      $model=$model->offset($offset)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+      //$this->redis->set(self::COUNT_KEY, $model, self::COUNT_EXPIRE);
+      return $model;
     }
 
     // 共用自取
