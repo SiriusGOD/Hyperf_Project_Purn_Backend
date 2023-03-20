@@ -65,27 +65,14 @@ class OrderController extends AbstractController
         // 顯示幾筆
         $step = Order::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $order_number = $request->input('order_number');
-        $order_status = $request->input('order_status');
 
         $query = Order::join('users','orders.user_id','users.id')
-            ->select('orders.*','users.name');
-        if(!empty($order_number)){
-            $query = $query -> where('orders.order_number', '=', $order_number);
-        }else if(!empty($order_status)){
-            $query = $query -> where('orders.status', '=', $order_status);
-        }
-        $query = $query ->offset(($page - 1) * $step)
-            ->orderByDesc('orders.id')
+            ->select('orders.*','users.name')
+            ->offset(($page - 1) * $step)
             ->limit($step);
         $orders = $query->get();
 
         $query = Order::select('*');
-        if(!empty($order_number)){
-            $query = $query -> where('orders.order_number', '=', $order_number);
-        }else if(!empty($order_status)){
-            $query = $query -> where('orders.status', '=', $order_status);
-        }
         $total = $query->count();
 
         $data['last_page'] = ceil($total / $step);
@@ -100,13 +87,9 @@ class OrderController extends AbstractController
         $data['page'] = $page;
         $data['step'] = $step;
         $path = '/admin/order/index';
-        if(!empty($order_status)){
-            $data['next'] = $path . '?page=' . ($page + 1) . '&order_status=' . $order_status;
-            $data['prev'] = $path . '?page=' . ($page - 1) . '&order_status=' . $order_status;
-        }else{
-            $data['next'] = $path . '?page=' . ($page + 1);
-            $data['prev'] = $path . '?page=' . ($page - 1);
-        }
+        $data['next'] = $path . '?page=' . ($page + 1);
+        $data['prev'] = $path . '?page=' . ($page - 1);
+
         $paginator = new Paginator($orders, $step, $page);
 
         $data['paginator'] = $paginator->toArray();
@@ -148,6 +131,46 @@ class OrderController extends AbstractController
         $record->save();
         $service->updateCache();
         return $response->redirect('/admin/order/index');
+    }
+
+    /**
+     * @RequestMapping(path="search", methods={"GET"})
+     */
+    public function search(RequestInterface $request, ResponseInterface $response, OrderService $service)
+    {
+        // 顯示幾筆
+        $step = Order::PAGE_PER;
+        $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
+        $order_number = $request->input('order_number');
+        $order_status = $request->input('order_status');
+
+        $orders = $service->searchOrders($order_number, $order_status, $page);
+        $total = $service->getOrdersCount($order_number, $order_status);
+
+        $data['last_page'] = ceil($total / $step);
+        if ($total == 0) {
+            $data['last_page'] = 1;
+        }
+
+        $data['navbar'] = trans('default.order_control.order_control');
+        $data['order_active'] = 'active';
+        $data['total'] = $total;
+        $data['datas'] = $orders;
+        $data['page'] = $page;
+        $data['step'] = $step;
+        $path = '/admin/order/search';
+        if(!empty($order_status)){
+            $data['next'] = $path . '?page=' . ($page + 1) . '&order_status=' . $order_status;
+            $data['prev'] = $path . '?page=' . ($page - 1) . '&order_status=' . $order_status;
+        }else{
+            $data['next'] = $path . '?page=' . ($page + 1);
+            $data['prev'] = $path . '?page=' . ($page - 1);
+        }
+        $paginator = new Paginator($orders, $step, $page);
+
+        $data['paginator'] = $paginator->toArray();
+
+        return $this->render->render('admin.order.index', $data);
     }
 
     /**

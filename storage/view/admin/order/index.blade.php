@@ -8,7 +8,7 @@
                     <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                         <div class="row">
                             <div class="col-sm-12 col-md-12 mb-1">
-                                <form action="/admin/order/index" method="get">
+                                <form action="/admin/order/search" method="get">
                                     <label for="exampleInputEmail1">{{trans('default.order_control.order_num') ?? '訂單編號'}}: </label>
                                     <input type="text" name="order_number" id="order_number" value="" placeholder="請輸入訂單編號">
                                     <label for="exampleInputEmail1">{{trans('default.order_control.order_status') ?? '訂單狀態'}}: </label>

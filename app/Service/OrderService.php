@@ -26,25 +26,38 @@ class OrderService
         $this->redis = $redis;
     }
 
-    // 取得廣告
-    // public function getAdvertisements(): array
-    // {
-    //     if ($this->redis->exists(self::CACHE_KEY)) {
-    //         $jsonResult = $this->redis->get(self::CACHE_KEY);
-    //         return json_decode($jsonResult, true);
-    //     }
+    // 取得訂單
+    public function searchOrders($order_number, $order_status, $page = 1): object
+    {
+        // 顯示幾筆
+        $step = Order::PAGE_PER;
+        $query = Order::join('users','orders.user_id','users.id')
+            ->select('orders.*','users.name');
+        if(!empty($order_number)){
+            $query = $query -> where('orders.order_number', '=', $order_number);
+        }else if(!empty($order_status)){
+            $query = $query -> where('orders.status', '=', $order_status);
+        }
+        $query = $query ->offset(($page - 1) * $step)
+            ->orderByDesc('orders.id')
+            ->limit($step);
+        $orders = $query->get();
+        return $orders;
+    }
 
-    //     $now = Carbon::now()->toDateTimeString();
-    //     $result = Advertisement::select('id', 'name', 'image_url', 'url', 'position', 'start_time', 'end_time', 'buyer', 'expire', 'created_at', 'updated_at')
-    //         ->where('start_time', '<=', $now)
-    //         ->where('end_time', '>=', $now)
-    //         ->get()
-    //         ->toArray();
+    // 取得訂單
+    public function getOrdersCount($order_number, $order_status): int
+    {
+        $query = Order::select('*');
+        if(!empty($order_number)){
+            $query = $query -> where('orders.order_number', '=', $order_number);
+        }else if(!empty($order_status)){
+            $query = $query -> where('orders.status', '=', $order_status);
+        }
+        $total = $query->count();
+        return $total;
+    }
 
-    //     $this->redis->set(self::CACHE_KEY, json_encode($result));
-
-    //     return $result;
-    // }
 
     // 更新快取
     public function updateCache(): void
