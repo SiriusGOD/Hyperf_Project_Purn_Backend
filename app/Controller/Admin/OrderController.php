@@ -65,29 +65,49 @@ class OrderController extends AbstractController
         // 顯示幾筆
         $step = Order::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
+        $order_number = $request->input('order_number');
+        $order_status = $request->input('order_status');
+
         $query = Order::join('users','orders.user_id','users.id')
-            ->select('orders.*','users.name')
-            ->offset(($page - 1) * $step)
+            ->select('orders.*','users.name');
+        if(!empty($order_number)){
+            $query = $query -> where('orders.order_number', '=', $order_number);
+        }else if(!empty($order_status)){
+            $query = $query -> where('orders.status', '=', $order_status);
+        }
+        $query = $query ->offset(($page - 1) * $step)
+            ->orderByDesc('orders.id')
             ->limit($step);
-        $advertisements = $query->get();
+        $orders = $query->get();
 
         $query = Order::select('*');
+        if(!empty($order_number)){
+            $query = $query -> where('orders.order_number', '=', $order_number);
+        }else if(!empty($order_status)){
+            $query = $query -> where('orders.status', '=', $order_status);
+        }
         $total = $query->count();
 
         $data['last_page'] = ceil($total / $step);
         if ($total == 0) {
             $data['last_page'] = 1;
         }
+
         $data['navbar'] = trans('default.order_control.order_control');
         $data['order_active'] = 'active';
         $data['total'] = $total;
-        $data['datas'] = $advertisements;
+        $data['datas'] = $orders;
         $data['page'] = $page;
         $data['step'] = $step;
         $path = '/admin/order/index';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . ($page - 1);
-        $paginator = new Paginator($advertisements, $step, $page);
+        if(!empty($order_status)){
+            $data['next'] = $path . '?page=' . ($page + 1) . '&order_status=' . $order_status;
+            $data['prev'] = $path . '?page=' . ($page - 1) . '&order_status=' . $order_status;
+        }else{
+            $data['next'] = $path . '?page=' . ($page + 1);
+            $data['prev'] = $path . '?page=' . ($page - 1);
+        }
+        $paginator = new Paginator($orders, $step, $page);
 
         $data['paginator'] = $paginator->toArray();
 

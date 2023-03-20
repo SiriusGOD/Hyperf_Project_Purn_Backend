@@ -6,13 +6,31 @@
                 <!-- /.card-header -->
                 <div class="card-body">
                     <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
-                        <!-- <div class="row">
-                            @if(authPermission('order-create'))
+                        <div class="row">
                             <div class="col-sm-12 col-md-12 mb-1">
-                                <a class="btn badge-info" href="/admin/order/create">{{trans('default.order_control.order_insert') ?? '新增訂單'}}</a>
+                                <form action="/admin/order/index" method="get">
+                                    <label for="exampleInputEmail1">{{trans('default.order_control.order_num') ?? '訂單編號'}}: </label>
+                                    <input type="text" name="order_number" id="order_number" value="" placeholder="請輸入訂單編號">
+                                    <label for="exampleInputEmail1">{{trans('default.order_control.order_status') ?? '訂單狀態'}}: </label>
+                                    <select name="order_status" id="order_status" class="form-control-sm">
+                                            <option value="">
+                                                {{trans('default.order_control.order_choose_status') ?? '選擇訂單狀態'}}
+                                            </option>
+                                            <option value="{{\App\Model\Order::ORDER_STATUS['create']}}">
+                                                {{trans('default.order_control.order_status_create') ?? '訂單成立'}}
+                                            </option>
+                                            <option value="{{\App\Model\Order::ORDER_STATUS['delete']}}">
+                                                {{trans('default.order_control.order_status_delete') ?? '訂單取消'}}
+                                            </option>
+                                            <option value="{{\App\Model\Order::ORDER_STATUS['finish']}}">
+                                                {{trans('default.order_control.order_status_finish') ?? '訂單完成'}}
+                                            </option>
+                                        </select>
+                                    <button type="submit" class="btn btn-primary">查詢訂單</button>
+                                    <label>{{trans('default.order_control.order_search_msg') ?? '訂單編號或訂單狀態請擇一，如兩者都選則以訂單編號為主'}}</label>
+                                </form>
                             </div>
-                            @endif
-                        </div> -->
+                        </div>
                         <div class="row">
                             <div class="col-sm-12">
                                 <table id="example2" class="table table-bordered table-hover dataTable dtr-inline"
