@@ -22,6 +22,14 @@ class PermissionSeed implements BaseInterface
                 'role-delete',
                 'role-store',
             ],
+            # 演員
+            'actors' => [
+                'actor-index',
+                'actor-create',
+                'actor-edit',
+                'actor-delete',
+                'actor-store',
+            ],
             # 後台管理員
             'manager' => [
                 'manager-index',
