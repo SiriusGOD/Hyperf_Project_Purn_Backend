@@ -39,7 +39,7 @@
                         </div>
                     </div>
                 </div>
-                @if(env('GOOGLE_AUTH_VALID'))
+                @if(env('GOOGLE_AUTH_VALID')==1)
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" placeholder="Google Auth" name="secret" >
                     <div class="input-group-append">

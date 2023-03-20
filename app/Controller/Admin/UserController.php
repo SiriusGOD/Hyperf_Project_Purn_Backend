@@ -106,7 +106,7 @@ class UserController extends AbstractController
         $credentials = $request->inputs(['name', 'password']);
         $user = $service->checkUser($credentials);
         if ($user) {
-            if (env('GOOGLE_AUTH_VALID')) {
+            if (env('GOOGLE_AUTH_VALID')==1) {
                 $secret = $request->input('secret');
                 $valid = $google2FA->verifyKey($user->avatar, $secret);
                 if ($valid == 1) {
