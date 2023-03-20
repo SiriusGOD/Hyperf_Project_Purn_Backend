@@ -15,6 +15,7 @@ use Carbon\Carbon;
  */
 class Actor extends Model
 {
+    public const PAGE_PER = 10;
     /**
      * The table associated with the model.
      *
@@ -33,4 +34,9 @@ class Actor extends Model
      * @var array
      */
     protected $casts = ['id' => 'integer', 'user_id' => 'integer', 'sex' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+  
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
