@@ -24,16 +24,25 @@ use Qbhy\HyperfAuth\Authenticatable;
  * @property string $email 
  * @property string $phone 
  * @property int $status 
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
  * @property int $role_id 
+ * @property string $uuid 
  * @property-read \Hyperf\Database\Model\Collection|Site[] $sites 
  */
 class User extends Model implements Authenticatable
 {
-    public const STATUS_NORMAL = 1;
-    public const STATUS_DISABLE = 2;
-    public const STATUS_DELETE = 3;
+    public const STATUS = [
+        'NORMAL' => 1,
+        'DISABLE' => 2,
+        'DELETE' => 3
+    ];
+
+    public const SEX = [
+        'DEFAULT' => 0,
+        'MALE' => 1,
+        'FEMALE' => 2
+    ];
     public const PAGE_PER = 10;
     /**
      * The table associated with the model.
@@ -70,9 +79,5 @@ class User extends Model implements Authenticatable
     public function getJwtCustomClaims() : array
     {
         return ['guard' => 'api'];
-    }
-    protected function sites()
-    {
-        return $this->belongsToMany(Site::class, 'user_site');
     }
 }

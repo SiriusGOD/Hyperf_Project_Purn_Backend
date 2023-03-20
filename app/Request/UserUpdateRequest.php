@@ -12,9 +12,8 @@ declare(strict_types=1);
 namespace App\Request;
 use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
-use Hyperf\Validation\UnauthorizedException;
 
-class ImageRequest extends BaseRequest
+class UserUpdateRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -37,15 +36,32 @@ class ImageRequest extends BaseRequest
      */
     public function rules(): array
     {
+        $id = 0;
+        if(auth()->check()) {
+            $id = auth()->user()->getId();
+        }
+        if (!empty($this->input('id'))) {
+            $id = $this->input('id');
+        }
+
         $rules = [
-            'title' => 'required|string|between:1,50',
-            'group_id' => 'numeric',
-            'id' => 'numeric',
-            'image' => [
-                Rule::requiredIf(function() {
-                    return empty($this->input('id'));
-                }),
-                'image'
+            'id' => 'numeric|exists:users',
+            'name' => [
+                'string',
+                Rule::unique('users')->ignore($id)
+            ],
+            'password' => 'string',
+            'email' => [
+                'string',
+                Rule::unique('users')->ignore($id)
+            ],
+            'sex' => 'numeric',
+            'age' => 'numeric|between:18,130',
+            'phone' => 'numeric',
+            'address' => 'string',
+            'uuid' => [
+                'string',
+                Rule::unique('users')->ignore($id)
             ]
         ];
 

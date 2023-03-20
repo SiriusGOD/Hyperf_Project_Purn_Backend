@@ -25,8 +25,8 @@ class ApiCode
     // 新增資料失敗
     public const BAD_INSERT_DB = 402;
 
-    // 該時間區間與key已有相同IP資料
-    public const BAD_INPUT_IP = 403;
+    // 未登入
+    public const BAD_LOGIN = 403;
 
     public const FATAL_ERROR = 500;
 }

@@ -12,13 +12,15 @@ declare(strict_types=1);
 namespace App\Exception\Handler;
 
 use App\Constants\ApiCode;
+use App\Constants\ErrorCode;
+use App\Exception\UnauthorizedException;
 use Hyperf\Validation\ValidationExceptionHandler;
 use Hyperf\View\RenderInterface;
 use Psr\Http\Message\ResponseInterface;
 use Hyperf\Di\Annotation\Inject;
 use Throwable;
 
-class ValidationException extends ValidationExceptionHandler
+class ValidationAuthorizeException extends ValidationExceptionHandler
 {
     /**
      * @Inject
@@ -32,18 +34,25 @@ class ValidationException extends ValidationExceptionHandler
 
     public function handle(Throwable $throwable, ResponseInterface $response)
     {
+        if (!$throwable instanceof UnauthorizedException) {
+            return $response;
+        }
+
         $this->stopPropagation();
-        /** @var \Hyperf\Validation\ValidationException $throwable */
-        $errors = $throwable->validator->errors()->all();
         $url = request()->getUri()->getPath();
         if (str_contains($url, "api")) {
-            return $this->response->withStatus(ApiCode::BAD_REQUEST)->json([
-                'code' => ApiCode::BAD_REQUEST,
-                'msg'  => $errors,
+            return $this->response->withStatus(ApiCode::BAD_LOGIN)->json([
+                'code' => ApiCode::BAD_LOGIN,
+                'msg'  => $throwable->getMessage(),
             ]);
         }
         return $this->render->render('error', [
-            'errors' => $errors
+            'errors' => $throwable->getMessage()
         ]);
+    }
+
+    public function isValid(Throwable $throwable): bool
+    {
+        return true;
     }
 }

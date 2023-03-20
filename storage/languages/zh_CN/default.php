@@ -111,6 +111,12 @@ return [
         'manager_update' => '更新管理者',
         'manager_acc' => '管理者帳號',
         'manager_pass' => '密碼',
+        'manager_sex' => '性別',
+        'manager_age' => '年齡',
+        'manager_avatar' => '大頭照',
+        'manager_email' => '電子郵件',
+        'manager_phone' => '手機',
+        'manager_status' => '狀態',
         'GoogleAtuh'=> 'GOOGLE 驗證碼',
     ],
     // -------------------------------------------------------------------

@@ -14,6 +14,8 @@ use Carbon\Carbon;
 class Role extends Model
 {
     public const SUPER_ADMIN = 1;
+
+    public const API_USER_ROLE = 0;
     /**
      * The table associated with the model.
      *

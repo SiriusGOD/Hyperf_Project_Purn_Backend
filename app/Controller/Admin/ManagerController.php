@@ -13,6 +13,7 @@ namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Model\User;
+use App\Request\UserUpdateRequest;
 use App\Service\UserService;
 use App\Service\RoleService;
 use App\Request\ManagerRequest;
@@ -97,11 +98,20 @@ class ManagerController extends AbstractController
     /**
      * @RequestMapping(path="store", methods={"POST"})
      */
-    public function store(ManagerRequest $request, ResponseInterface $response, UserService $service): PsrResponseInterface
+    public function store(UserUpdateRequest $request, ResponseInterface $response, UserService $service): PsrResponseInterface
     {
         $data['id'] = $request->input('id') ? $request->input('id') : null;
-        $data['avatar'] = $request->input('avatar','');
+        $path = '';
+        if ($request->hasFile('avatar')) {
+            $path = $service->moveUserAvatar($request->file('avatar'));
+        }
+        $data['avatar'] = $path;
         $data['name'] = $request->input('name');
+        $data['sex'] = $request->input('sex');
+        $data['age'] = $request->input('age');
+        $data['email'] = $request->input('email');
+        $data['phone'] = $request->input('phone');
+        $data['status'] = $request->input('status');
         $data['role_id'] = $request->input('role_id');
         $data['password'] = $request->input('password');
         $service->storeUser($data);

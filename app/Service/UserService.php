@@ -11,7 +11,9 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\Role;
 use App\Model\User;
+use Carbon\Carbon;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 use HyperfExt\Hashing\Hash;
@@ -39,27 +41,33 @@ class UserService
     // 更新或新增 User
     public function storeUser(array $data)
     {
-        if ($data['id']) {
-            $record = $this->findUser(intval($data['id']));
-        } else {
-            $record = new User();
-            $record->name = $data['name'];
-            $record->email = $data['name'] . '@gmail.com';
-            $record->phone = rand(123111, 123456789);
+        $model = new User();
+
+        if(!empty($data['id']) and User::where('id', $data['id'])->exists()) {
+            $model = User::find($data['id']);
         }
-        if (! empty($data['password'])) {
-            $record->password = Hash::make($data['password']);
+
+        if (!empty($data['name']) and empty($model->name)) {
+            $model->name = $data['name'];
         }
-        $record->role_id = isset($data['role_id']) ? $data['role_id'] : $record->role_id;
-        $record->avatar = $data['avatar'];
-        $record->save();
+        if (!empty($data['password'])) {
+            $model->password = Hash::make($data['password']);
+        }
+        $model->sex = $data['sex'];
+        $model->age = $data['age'];
+        $model->avatar = $data['avatar'];
+        $model->email = $data['email'];
+        $model->phone = $data['phone'];
+        $model->status = User::STATUS['NORMAL'];
+        $model->role_id = Role::API_USER_ROLE;
+        $model->save();
     }
 
     // 刪除 User
     public function deleteUser($id)
     {
         $record = $this->findUser(intval($id));
-        $record->status = User::STATUS_DELETE;
+        $record->status = User::STATUS['DELETE'];
         $record->save();
     }
 
@@ -84,7 +92,7 @@ class UserService
     //登入驗證
     public function checkUser(array $userInfo)
     {
-        $user = User::where('name',$userInfo['name'])->first();
+        $user = User::where('name',$userInfo['name'])->orWhere('uuid', $userInfo['uuid'] ?? null)->first();
         if(!$user){
             return false;
         }else{
@@ -96,5 +104,78 @@ class UserService
         }
     }
 
+    public function apiRegisterUser(array $data) : User
+    {
+        $model = new User();
+        $model->name = $data['name'];
+        $model->password = Hash::make($data['password']);
+        $model->sex = $data['sex'];
+        $model->age = $data['age'];
+        $model->avatar = $model->avatar ?? '';
+        if (!empty($data['avatar'])) {
+            $model->avatar = $data['avatar'];
+        }
+        $model->email = $data['email'];
+        $model->phone = $data['phone'];
+        $model->status = User::STATUS['NORMAL'];
+        $model->role_id = Role::API_USER_ROLE;
+        $model->uuid = $data['uuid'];
+        $model->save();
 
+        return $model;
+    }
+
+    public function moveUserAvatar($file) : string
+    {
+        $extension = $file->getExtension();
+        $filename = sha1(Carbon::now()->toDateTimeString());
+        if(!file_exists(BASE_PATH.'/public/avatar')){
+            mkdir(BASE_PATH.'/public/avatar', 0755);
+        }
+        $imageUrl = '/image/' . $filename . '.' . $extension;
+        $path = BASE_PATH . '/public' . $imageUrl;
+        $file->moveTo($path);
+
+        return $imageUrl;
+    }
+
+    public function updateUser(int $id, array $data) : void
+    {
+        $model = User::find($id);
+        if (!empty($data['name']) and empty($model->name)) {
+            $model->name = $data['name'];
+        }
+
+        if (!empty($data['password'])) {
+            $model->password = Hash::make($data['password']);
+        }
+
+        if (!empty($data['sex'])) {
+            $model->sex = $data['sex'];
+        }
+
+        if (!empty($data['age'])) {
+            $model->age = $data['age'];
+        }
+
+        if (!empty($data['avatar'])) {
+            $model->avatar = $data['avatar'];
+        }
+
+        if (!empty($data['email'])) {
+            $model->email = $data['email'];
+        }
+
+        if (!empty($data['phone'])) {
+            $model->phone = $data['phone'];
+        }
+
+        if (!empty($data['uuid'])) {
+            $model->uuid = $data['uuid'];
+        }
+
+        $model->status = User::STATUS['NORMAL'];
+        $model->role_id = Role::API_USER_ROLE;
+        $model->save();
+    }
 }

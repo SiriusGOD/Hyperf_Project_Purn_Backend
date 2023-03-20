@@ -186,7 +186,7 @@ class UserController extends AbstractController
     public function delete(RequestInterface $request): PsrResponseInterface
     {
         $record = User::findOrFail($request->input('id'));
-        $record->status = User::STATUS_DELETE;
+        $record->status = User::STATUS['DELETE'];
         $record->save();
         return $this->success();
     }

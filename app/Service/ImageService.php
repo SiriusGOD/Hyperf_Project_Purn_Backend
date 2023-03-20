@@ -54,7 +54,7 @@ class ImageService
         return $imageUrl;
     }
 
-    public function getImages(?array $tagIds)
+    public function getImages(?array $tagIds, int $page)
     {
         $imageIds = [];
         if (!empty($tagIds)) {
@@ -66,7 +66,9 @@ class ImageService
 
         $query = Image::with([
             'tags'
-        ]);
+        ])
+        ->offset(Image::PAGE_PER * $page)
+        ->limit(Image::PAGE_PER);
 
         if (!empty($imageIds)) {
             $query = $query->whereIn('id', $imageIds);

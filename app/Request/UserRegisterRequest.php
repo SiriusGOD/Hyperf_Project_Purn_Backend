@@ -13,7 +13,7 @@ namespace App\Request;
 use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
 
-class ManagerRequest extends FormRequest
+class UserRegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,12 +29,14 @@ class ManagerRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'id' => 'numeric',
-            'name' => [
-                'unique:users,name',
-                Rule::unique('users')->ignore($this->id, 'id')
-            ],
-            'role_id' => 'numeric',
+            'name' => 'string|unique:users',
+            'password' => 'required|string',
+            'email' => 'email|unique:users',
+            'sex' => 'numeric',
+            'age' => 'numeric|between:18,130',
+            'phone' => 'numeric',
+            'address' => 'string',
+            'uuid' => 'required_without:name|string|unique:users'
         ];
 
         return $rules;
