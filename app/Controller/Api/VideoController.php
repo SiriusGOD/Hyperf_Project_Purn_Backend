@@ -15,36 +15,48 @@ use App\Service\ObfuscationService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use App\Controller\AbstractController;
 
 /**
  * @Controller
  */
-class VideoController
+class VideoController extends AbstractController
 {
     /**
      * @RequestMapping(path="list", methods="get")
      */
-    public function list(RequestInterface $request, VideoService $service, ObfuscationService $response)
+    public function list(RequestInterface $request, VideoService $service)
     {
       $offset = $request->input('offset',0);
       $limit = $request->input('limit',0);
       $result = $service->getVideos($offset ,$limit);
-      return $response->replyData($result);
+      return $this->success($result);
     }
 
     /**
      * @RequestMapping(path="count", methods="get")
      */
-    public function count(VideoService $service, ObfuscationService $response)
+    public function count(VideoService $service)
     {
       $result = $service->getVideoCount();
-      return $response->replyData($result);
+      return $this->success([$result]);
+    }
+
+    /**
+     * 回調匯入資料 
+     * @RequestMapping(path="data", methods="post")
+     */
+    public function data(RequestInterface $request, VideoService $service)
+    {
+      $data = $request->all();
+      $result = $service->createVideo($data);
+      return $this->success([$result]);
     }
 
     /**
      * @RequestMapping(path="search", methods="get")
      */
-    public function search(RequestInterface $request, VideoService $service, ObfuscationService $response)
+    public function search(RequestInterface $request, VideoService $service)
     {
       $offset = $request->input('offset',0);
       $limit = $request->input('limit',10);
@@ -53,10 +65,10 @@ class VideoController
       $compare = $request->input('compare',0);
       if(empty($name) || strlen($name) ==0){
         $result = ['message'=>'name 不得為空']; 
-        return $response->replyData($result);
+        return $this->success($result);
       }else{
         $result = $service->searchVideo($name ,$compare ,$length ,$offset ,$limit);
-        return $response->replyData($result);
+        return $this->success([$result]);
       }
     }
 }

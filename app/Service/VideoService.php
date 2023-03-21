@@ -14,6 +14,7 @@ namespace App\Service;
 use App\Model\Product;
 use App\Model\Video;
 use Hyperf\Redis\Redis;
+use Hyperf\Logger\LoggerFactory;
 
 class VideoService
 {
@@ -21,12 +22,13 @@ class VideoService
     public const COUNT_KEY = 'video_count';
     public const EXPIRE = 600;
     public const COUNT_EXPIRE = 180;
-
+    
     protected Redis $redis;
 
-    public function __construct(Redis $redis)
+    public function __construct(Redis $redis, LoggerFactory $loggerFactory)
     {
-      $this->redis = $redis;
+        $this->redis = $redis;
+        $this->logger = $loggerFactory->get('reply');
     }
 
     // 取得影片
@@ -39,6 +41,24 @@ class VideoService
       $result = self::selfGet($offset , $limit); 
       $this->redis->set(self::CACHE_KEY."$offset,$limit", json_encode($result),self::EXPIRE);
       return $result;
+    }
+
+    //新增影片
+    public function createVideo($insertData)
+    {
+
+      $this->logger->info("...qweqwe");
+      $this->logger->info(print_r($insertData,true));
+
+      try {
+        $model = new Video();
+        foreach($insertData as $key=>$val){
+            $model->$key = "$val";
+        }
+        $model->save();
+      } catch (\Exception $e) {
+          echo "91lu-error:" . $e->getMessage();
+      }
     }
 
     // 計算Video總數
