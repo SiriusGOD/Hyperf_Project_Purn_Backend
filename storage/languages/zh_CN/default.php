@@ -91,7 +91,21 @@ return [
     'id_msg_def' => '請輸入id',
     'description_msg_def' => '請輸入描述',
     'name_msg_def' => '請輸入名稱',
+    'sex' => '性別',
+    'created_at'=>"建立時間",
+    'user_id'=>"建立者",
     // -------------------------------------------------------------------
+    // left box
+    'actor' => [
+        'insert' => '新增',
+        'title' => '演員',
+        'name' => '演員名',
+        'role' => '角色管理',
+        'advertisement' => '廣告管理',
+        'tag' => '標籤管理',
+        'image' => '圖片管理',
+        'order' => '訂單管理',
+    ],
     // left box
     'leftbox' => [
         'tittle' => '入口網站後台控制',
