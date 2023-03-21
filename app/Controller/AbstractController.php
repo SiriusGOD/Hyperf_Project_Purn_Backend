@@ -94,7 +94,6 @@ abstract class AbstractController
             'code' => ApiCode::OK,
             'msg'  => $message,
             'data' => $data,
-            'd' =>env('ENCRYPT_FLAG'),
         ];
         if(env('ENCRYPT_FLAG')){
           $en = self::encrypt(json_encode($data));
