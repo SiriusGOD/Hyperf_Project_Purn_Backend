@@ -36,7 +36,7 @@ class AddUserTagRequest extends BaseRequest
     public function rules(): array
     {
         $rules = [
-            'tags' => 'required|array',
+            'tags.*' => 'required|numeric',
         ];
 
         return $rules;

@@ -59,6 +59,8 @@ class User extends Model implements Authenticatable
      * @var array
      */
     protected $casts = ['id' => 'integer', 'sex' => 'integer', 'age' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'role_id' => 'integer'];
+
+    protected $hidden = ['password'];
     public function getJwtIdentifier()
     {
         return $this->getKey();

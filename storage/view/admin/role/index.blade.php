@@ -21,14 +21,16 @@
                                     <tr>
                                         <th>{{trans('default.id') ?? '序號'}}</th>
                                         <th>{{trans('default.role_control.role') ?? '角色'}}</th>
+                                        <th>{{trans('default.role_control.role_type') ?? '種類'}}</th>
                                         <th>{{trans('default.action') ?? '動作'}}</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach($datas as $role)
                                         <tr class="odd">
-                                            <td class="sorting_1 dtr-control">{{ $role->id}}</td>
-                                            <td>{{ $role->name}}</td>
+                                            <td class="sorting_1 dtr-control">{{ $role->id }}</td>
+                                            <td>{{ $role->name }}</td>
+                                            <td>{{ trans('default.role_control.role_type_name.'.\App\Model\Role::getTypeNameByType($role->type)) }}</td>
                                             <td>
                                                 @if(authPermission('role-edit'))
                                                     <a href="/admin/role/edit?id={{$role->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>

@@ -8,6 +8,7 @@ use App\Controller\AbstractController;
 use App\Model\User;
 use App\Model\UserTag;
 use App\Request\AddUserTagRequest;
+use App\Request\UserDetailRequest;
 use App\Request\UserLoginRequest;
 use App\Request\UserRegisterRequest;
 use App\Request\UserUpdateRequest;
@@ -133,5 +134,14 @@ class UserController extends AbstractController
         ]);
 
         return $this->success();
+    }
+    /**
+     * @RequestMapping(path="detail", methods="get")
+     */
+    public function detail(UserDetailRequest $request)
+    {
+       $id = $request->input('id');
+
+       return $this->success(User::find($id)->toArray());
     }
 }

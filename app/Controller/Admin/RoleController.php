@@ -73,6 +73,7 @@ class RoleController extends AbstractController
     {
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['name'] = $request->input('name');
+        $data['type'] = $request->input('type', 0);
         $role = $service->storeRole($data);
         $permissions = $request->input('permissions');
         $permissionService->storePermission($permissions, $role->id);

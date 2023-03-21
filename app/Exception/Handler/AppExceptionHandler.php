@@ -15,6 +15,7 @@ use App\Constants\ApiCode;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\Logger\LoggerFactory;
+use Hyperf\View\RenderInterface;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
@@ -23,6 +24,11 @@ class AppExceptionHandler extends ExceptionHandler
     protected \Hyperf\HttpServer\Contract\ResponseInterface $response;
 
     protected \Psr\Log\LoggerInterface $loggerFactory;
+
+    /**
+     * @Inject
+     */
+    protected RenderInterface $render;
 
     public function __construct(protected StdoutLoggerInterface $logger, \Hyperf\HttpServer\Contract\ResponseInterface $response, LoggerFactory $loggerFactory)
     {
@@ -40,11 +46,13 @@ class AppExceptionHandler extends ExceptionHandler
         $message = '';
         if (env('APP_ENV') != 'product') {
             $message = $throwable->getTraceAsString();
+            return $this->response->withStatus(ApiCode::FATAL_ERROR)->json([
+                'code' => ApiCode::FATAL_ERROR,
+                'msg'  => $message,
+            ]);
         }
-        return $this->response->withStatus(ApiCode::FATAL_ERROR)->json([
-            'code' => ApiCode::FATAL_ERROR,
-            'msg'  => $message,
-        ]);
+
+        return $this->response->redirect('/');
     }
 
     public function isValid(Throwable $throwable): bool

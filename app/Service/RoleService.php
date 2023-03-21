@@ -53,6 +53,7 @@ class RoleService
             $record = new Role();
         }
         $record->name = $data['name'];
+        $record->type = $data['type'];
         $record->save();
         return $record;
     }

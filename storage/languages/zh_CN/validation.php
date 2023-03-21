@@ -151,6 +151,12 @@ return [
     |
     */
 
+    'custom' => [
+        'person.*.email' => [
+            'unique' => '每個人的郵箱地址必須是唯一的',
+        ]
+    ],
+
     'authorize' => '尚未登入，或權限不足',
 
     /*

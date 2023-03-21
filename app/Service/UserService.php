@@ -59,7 +59,7 @@ class UserService
         $model->email = $data['email'];
         $model->phone = $data['phone'];
         $model->status = User::STATUS['NORMAL'];
-        $model->role_id = Role::API_USER_ROLE;
+        $model->role_id = Role::API_DEFAULT_USER_ROLE_ID;
         $model->save();
     }
 
@@ -118,7 +118,7 @@ class UserService
         $model->email = $data['email'];
         $model->phone = $data['phone'];
         $model->status = User::STATUS['NORMAL'];
-        $model->role_id = Role::API_USER_ROLE;
+        $model->role_id = Role::API_DEFAULT_USER_ROLE_ID;
         $model->uuid = $data['uuid'];
         $model->save();
 
@@ -175,7 +175,7 @@ class UserService
         }
 
         $model->status = User::STATUS['NORMAL'];
-        $model->role_id = Role::API_USER_ROLE;
+        $model->role_id = Role::API_DEFAULT_USER_ROLE_ID;
         $model->save();
     }
 }

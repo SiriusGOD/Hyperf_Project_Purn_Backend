@@ -7,7 +7,8 @@ use Carbon\Carbon;
 
 /**
  * @property int $id 
- * @property string $name 
+ * @property string $name
+ * @property int $type
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -15,7 +16,12 @@ class Role extends Model
 {
     public const SUPER_ADMIN = 1;
 
-    public const API_USER_ROLE = 0;
+    public const API_DEFAULT_USER_ROLE_ID = 0;
+
+    public const TYPE = [
+        'ADMIN' => 0,
+        'API' => 1
+    ];
     /**
      * The table associated with the model.
      *
@@ -34,4 +40,10 @@ class Role extends Model
      * @var array
      */
     protected $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    static public function getTypeNameByType(int $type)
+    {
+        $typeFlip = array_flip(self::TYPE);
+        return strtolower($typeFlip[$type]);
+    }
 }

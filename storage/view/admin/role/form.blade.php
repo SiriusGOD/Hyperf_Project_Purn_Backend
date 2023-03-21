@@ -21,6 +21,17 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label for="exampleInputEmail1">
+                                        {{trans('default.role_control.role_type') ?? '角色種類'}}
+                                    </label>
+                                    <select name="type" id="type" class="form-control">
+                                        @foreach(\App\Model\Role::TYPE as $key => $value)
+                                            <option value="{{$value}}">{{trans('default.role_control.role_type_name.'.strtolower($key))}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
                                     <div class="col-md-12">
                                         <b>
                                             <lable>

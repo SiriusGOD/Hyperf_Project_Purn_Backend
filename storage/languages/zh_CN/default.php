@@ -26,6 +26,8 @@ return [
         'user' => '使用者',
         'manager' => '管理者',
         'advertisement' => '廣告',
+        'tag' => '標籤',
+        'image' => '圖片'
     ],
     'user_name' => '使用者名稱',
     'list' => '列表',
@@ -126,7 +128,12 @@ return [
         'role_insert' => '新增角色',
         'role_update' => '更新角色',
         'role_name' => '角色名稱',
+        'role_type' => '角色種類',
         'role_permission' => '角色權限',
+        'role_type_name' => [
+            'admin' => '後台',
+            'api' => '前台'
+        ]
     ],
     // -------------------------------------------------------------------
     // AdvertisementController
