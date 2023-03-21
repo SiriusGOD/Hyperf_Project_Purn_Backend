@@ -12,12 +12,17 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Order;
+use App\Model\OrderDetail;
+use App\Model\Product;
+use App\Model\User;
 use Carbon\Carbon;
 use Hyperf\Redis\Redis;
+use Hyperf\DbConnection\Db;
 
 class OrderService
 {
     public const CACHE_KEY = 'order';
+    public const TTL_30_Min = 1800;
 
     protected Redis $redis;
 
@@ -45,7 +50,7 @@ class OrderService
         return $orders;
     }
 
-    // 取得訂單
+    // 取得訂單數
     public function getOrdersCount($order_number, $order_status): int
     {
         $query = Order::select('*');
@@ -58,34 +63,145 @@ class OrderService
         return $total;
     }
 
-
-    // 更新快取
-    public function updateCache(): void
+    // 取得訂單 By User Id
+    public function searchUserOrder($user_id, $order_status, $offset = 0, $limit = 0)
     {
-        $now = Carbon::now()->toDateTimeString();
-        $result = Order::where('created_at', '<=', $now)
-            ->get()
-            ->toArray();
+        $checkRedisKey = self::CACHE_KEY . ':' . $user_id . ':' . $order_status . ':' . $offset . ':' . $limit;
 
-        $this->redis->set(self::CACHE_KEY, json_encode($result));
+        if ($this->redis->exists($checkRedisKey)) {
+            $jsonResult = $this->redis->get($checkRedisKey);
+            return json_decode($jsonResult, true);
+        }
+
+        $query = Order::join('users','orders.user_id','users.id')
+            ->select('orders.*','users.name')
+            ->where('users.id', '=', $user_id);
+        if(!empty($order_status))$query = $query -> where('orders.status', '=', $order_status);
+        if(!empty($offset))$query = $query -> offset($offset);
+        if(!empty($limit))$query = $query -> limit($limit);
+        $orders = $query->get()->toArray();
+
+        $this->redis->set($checkRedisKey, json_encode($orders));
+        $this->redis->expire($checkRedisKey, self::TTL_30_Min);
+
+        return $orders;
     }
 
-    // 新增或更新訂單
-    // public function storeOrder(array $data): void
-    // {
-    //     $model = Order::findOrNew($data['id']);
-    //     $model->user_id = $data['user_id'];
-    //     $model->name = $data['name'];
-    //     if (! empty($data['image_url'])) {
-    //         $model->image_url = $data['image_url'];
-    //     }
-    //     $model->url = $data['url'];
-    //     $model->position = $data['position'];
-    //     $model->start_time = $data['start_time'];
-    //     $model->end_time = $data['end_time'];
-    //     $model->buyer = $data['buyer'];
-    //     $model->expire = $data['expire'];
-    //     $model->save();
-    //     $this->updateCache();
-    // }
+    // 建立訂單
+    public function createOrder($user_id, $prod_id, $payment_type)
+    {
+        // 撈取會員資料
+        $user = User::find($user_id)->toArray();
+        // 撈取商品資料
+        $product = Product::find($prod_id)->toArray();
+
+        $data['order'] = array(
+            'user_id' => $user['id'],
+            'email' => $user['email'],
+            'telephone' => $user['phone'],
+            'payment_type' => $payment_type,
+            'currency' => $product['currency'],
+            'total_price' => $product['selling_price'],
+        );
+        $data['product'] = array(
+            'product_id' => $prod_id,
+            'product_name' => $product['name'],
+            'product_currency' => $product['currency'],
+            'product_selling_price' => $product['selling_price']
+        );
+        $re = $this -> storeOrder($data);
+        return $re;
+    }
+    
+    // 新增訂單
+    public function storeOrder(array $data)
+    {
+        Db::beginTransaction();
+        try{
+            $order_number = self::getSn();
+            // insert orders table
+            $model = new Order;
+            $model->user_id = $data['order']['user_id'];
+            $model->order_number = $order_number;
+            $model->address = '';
+            $model->email = $data['order']['email'];
+            $model->mobile = '';
+            $model->telephone = $data['order']['telephone'];
+            $model->payment_type = $data['order']['payment_type'];
+            $model->currency = $data['order']['currency'];
+            $model->total_price = $data['order']['total_price'];
+            $model->save();
+
+            // get order id
+            $res = Order::select('id')->where('order_number',$order_number)->get()->toArray();
+            $id = $res[0]['id'];
+
+            // insert orders_details table
+            $model = new OrderDetail;
+            $model->order_id = $id;
+            $model->product_id = $data['product']['product_id'];
+            $model->product_name = $data['product']['product_name'];
+            $model->product_currency = $data['product']['product_currency'];
+            $model->product_selling_price = $data['product']['product_selling_price'];
+            $model->save();
+            Db::commit();
+            $this -> updateCache($data['order']['user_id']);
+            return true;
+        } catch(\Throwable $ex){
+            Db::rollBack();
+            return false;
+        }
+    }
+
+    // 更新訂單狀態
+    public function updateOrderStatus($user_id, $order_num, $order_status)
+    {
+        $query = Order::where([
+            ['user_id', '=', $user_id],
+            ['order_number', '=', $order_num]
+        ]);
+        $record = $query->first();
+
+        // 查無訂單或該訂單已是取消／刪除狀態
+        if (empty($record) || $record -> status == Order::ORDER_STATUS['delete']) {
+            return false;
+        }
+
+        $record->status = $order_status;
+        $record->save();
+        return true;
+    }
+
+    // 更新快取
+    public function updateCache($user_id): void
+    {
+        $checkRedisKey = self::CACHE_KEY . ':' . $user_id . '::0:0';
+        $query = Order::join('users','orders.user_id','users.id')
+            ->select('orders.*','users.name')
+            ->where('users.id', '=', $user_id);
+        $result = $query->get()->toArray();
+
+        $this->redis->set($checkRedisKey, json_encode($result));
+        $this->redis->expire($checkRedisKey, self::TTL_30_Min);
+    }
+
+    // 產生當天訂單流水號
+    function getSn()
+    {
+        $sql = 'SELECT o.order_number '
+            . 'FROM orders AS o '
+            . 'ORDER BY o.order_number DESC LIMIT 1';
+        $res = Db::select($sql);
+
+        if(!isset($res[0]->order_number)){
+            $lastNum = 0;
+        }else{
+            $lastNum = (int)mb_substr($res[0]->order_number, -5, 5);
+        }
+
+        $orderSn = 'PO' . date('Ymd', $_SERVER['REQUEST_TIME']) . str_pad((string)($lastNum + 1), 5, '0', STR_PAD_LEFT);
+
+        return $orderSn;
+    }
+
 }

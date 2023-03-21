@@ -23,8 +23,6 @@ use HyperfExt\Jwt\Contracts\JwtFactoryInterface;
 use HyperfExt\Jwt\Contracts\ManagerInterface;
 use HyperfExt\Jwt\Jwt;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
-use Hyperf\DbConnection\Db;
-
 
 /**
  * @Controller
@@ -129,7 +127,7 @@ class OrderController extends AbstractController
 
         $record->status = $request->input('order_status', 1);
         $record->save();
-        $service->updateCache();
+        // $service->updateCache();
         return $response->redirect('/admin/order/index');
     }
 
@@ -171,31 +169,5 @@ class OrderController extends AbstractController
         $data['paginator'] = $paginator->toArray();
 
         return $this->render->render('admin.order.index', $data);
-    }
-
-    /**
-     * 產生當天訂單流水號
-     *
-     * @return    string
-     */
-    function getSn()
-    {
-        $sql = 'SELECT o.order_number '
-            . 'FROM orders AS o '
-            . 'ORDER BY o.order_number DESC LIMIT 1';
-        $res = Db::select($sql);
-
-        var_dump($res[0]->order_number);
-
-        if(!isset($res[0]->order_number)){
-            $lastNum = 0;
-        }else{
-            var_dump(mb_substr($res[0]->order_number, -5, 5));
-            $lastNum = (int)mb_substr($res[0]->order_number, -5, 5);
-        }
-
-        $orderSn = 'PO' . date('Ymd', $_SERVER['REQUEST_TIME']) . str_pad((string)($lastNum + 1), 5, '0', STR_PAD_LEFT);
-
-        return $orderSn;
     }
 }
