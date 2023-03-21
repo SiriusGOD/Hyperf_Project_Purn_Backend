@@ -27,7 +27,9 @@ use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\Middlewares;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use App\Middleware\AllowIPMiddleware;
+use Hyperf\Logger\LoggerFactory;
 
+define('ENCRYPTION_KEY', 'your-encryption-key');
 /**
  * @Middlewares({
  *     @Middleware(AllowIPMiddleware::class)
@@ -52,6 +54,40 @@ abstract class AbstractController
      * @var Response
      */
     protected $response;
+    protected $ENCRYPTION_KEY;
+    // 定义加密密钥
+  
+    public function __construct(LoggerFactory $loggerFactory)
+    {
+        $this->logger = $loggerFactory->get('reply');
+        $this->ENCRYPTION_KEY = 'scb37537f85ext23766194765b9epa51';
+    }
+
+    // 加密函数
+    public function encrypt($plaintext) {
+        $cipher = 'AES-256-CBC'; // 加密算法
+        $ivlen = openssl_cipher_iv_length($cipher); // 获取初始化向量长度
+        $iv = openssl_random_pseudo_bytes($ivlen); // 生成随机初始化向量
+        $ciphertext_raw = openssl_encrypt($plaintext, $cipher, $this->ENCRYPTION_KEY, $options=OPENSSL_RAW_DATA, $iv);
+        $hmac = hash_hmac('sha256', $ciphertext_raw, $this->ENCRYPTION_KEY, $as_binary=true); // 计算 HMAC
+        $ciphertext = base64_encode($iv.$hmac.$ciphertext_raw); // 对 HMAC 和密文进行编码
+        return $ciphertext;
+    }
+    //解密
+    public function decrypt($ciphertext) {
+        $cipher = 'AES-256-CBC'; // 加密算法
+        $c = base64_decode($ciphertext); // 解码密文
+        $ivlen = openssl_cipher_iv_length($cipher); // 获取初始化向量长度
+        $iv = substr($c, 0, $ivlen); // 从密文中提取初始化向量
+        $hmac = substr($c, $ivlen, $sha2len=32); // 从密文中提取 HMAC
+        $ciphertext_raw = substr($c, $ivlen+$sha2len); // 从密文中提取加密后的原始数据
+        $original_plaintext = openssl_decrypt($ciphertext_raw, $cipher, $this->ENCRYPTION_KEY, $options=OPENSSL_RAW_DATA, $iv); // 使用加密密钥和初始化向量解密密文
+        $calcmac = hash_hmac('sha256', $ciphertext_raw, $this->ENCRYPTION_KEY, $as_binary=true); // 计算 HMAC
+        if (hash_equals($hmac, $calcmac)) { // 比较 HMAC 是否一致
+            return $original_plaintext;
+        }
+    }
+
 
     public function success(array $data = [], string $message = 'success'): PsrResponseInterface
     {
@@ -60,7 +96,9 @@ abstract class AbstractController
             'msg'  => $message,
             'data' => $data,
         ];
-
+        //$en = self::encrypt(json_encode($data));
+        //$de = self::decrypt($en);
+        //return $this->response->json($de);
         return $this->response->json($data);
     }
 
