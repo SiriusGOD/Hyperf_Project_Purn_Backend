@@ -11,8 +11,8 @@ declare(strict_types=1);
  */
 namespace App\Controller\Api;
 
+use App\Controller\AbstractController;
 use App\Service\ActorService;
-use App\Service\ObfuscationService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -20,25 +20,29 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 /**
  * @Controller
  */
-class ActorController
+class ActorController extends AbstractController
 {
     /**
      * @RequestMapping(path="list", methods="get")
      */
-    public function list(RequestInterface $request, ActorService $service, ObfuscationService $response)
+    public function list(RequestInterface $request, ActorService $service )
     {
         $offset = $request->input('offset',0);   
         $limit = $request->input('limit',0);   
         $result = $service->getActors($offset ,$limit);
-        return $response->replyData($result);
+        return $this->success([
+            'result' => $result
+        ]);
     }
 
     /**
      * @RequestMapping(path="count", methods="get")
      */
-    public function count(ActorService $service, ObfuscationService $response)
+    public function count(ActorService $service)
     {
         $result = $service->getActorCount();
-        return $response->replyData($result);
+        return $this->success([
+            'count' => $result
+        ]);
     }
 }
