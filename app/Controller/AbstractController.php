@@ -29,7 +29,6 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 use App\Middleware\AllowIPMiddleware;
 use Hyperf\Logger\LoggerFactory;
 
-define('ENCRYPTION_KEY', 'your-encryption-key');
 /**
  * @Middlewares({
  *     @Middleware(AllowIPMiddleware::class)
@@ -60,7 +59,7 @@ abstract class AbstractController
     public function __construct(LoggerFactory $loggerFactory)
     {
         $this->logger = $loggerFactory->get('reply');
-        $this->ENCRYPTION_KEY = 'scb37537f85ext23766194765b9epa51';
+        $this->ENCRYPTION_KEY = env('ENCRYPT_KEY');
     }
 
     // 加密函数
@@ -95,21 +94,33 @@ abstract class AbstractController
             'code' => ApiCode::OK,
             'msg'  => $message,
             'data' => $data,
+            'd' =>env('ENCRYPT_FLAG'),
         ];
-        //$en = self::encrypt(json_encode($data));
-        //$de = self::decrypt($en);
-        //return $this->response->json($de);
-        return $this->response->json($data);
+        if(env('ENCRYPT_FLAG')){
+          $en = self::encrypt(json_encode($data));
+          //$de = self::decrypt($en);
+          return $this->response->json($en);
+        }else{
+          return $this->response->json($data);
+        }
     }
 
     public function error(string $message = '', int $code = ErrorCode::SERVER_ERROR): PsrResponseInterface
     {
-        return $this->response->json(
+        $data = $this->response->json(
             [
                 'code' => $code,
                 'msg'  => $message,
             ]
         );
+
+        if(env('ENCRYPT_FLAG')){
+          $en = self::encrypt(json_encode($data));
+          $de = self::decrypt($en);
+          return $this->response->json($en);
+        }else{
+          return $this->response->json($data);
+        }
     }
 
     public function paginator($total, $data): PsrResponseInterface
