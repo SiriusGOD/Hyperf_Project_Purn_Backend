@@ -73,7 +73,7 @@ class User extends Model implements Authenticatable
     public static function retrieveById($key) : ?Authenticatable
     {
         // 通过id查找用户
-        return self::query()->find($key);
+        return User::find($key);
     }
     /**
      * JWT自定义载荷.

@@ -13,7 +13,7 @@ namespace App\Request;
 use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
 
-class ImageApiRequest extends FormRequest
+class ImageApiSearchRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,7 +29,7 @@ class ImageApiRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'tags.*' => 'required|numeric'
+            'keyword' => 'required|string'
         ];
 
         return $rules;

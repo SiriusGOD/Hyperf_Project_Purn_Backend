@@ -25,11 +25,6 @@ class AppExceptionHandler extends ExceptionHandler
 
     protected \Psr\Log\LoggerInterface $loggerFactory;
 
-    /**
-     * @Inject
-     */
-    protected RenderInterface $render;
-
     public function __construct(protected StdoutLoggerInterface $logger, \Hyperf\HttpServer\Contract\ResponseInterface $response, LoggerFactory $loggerFactory)
     {
         $this->response = $response;
@@ -43,7 +38,6 @@ class AppExceptionHandler extends ExceptionHandler
         $this->logger->error($throwable->getTraceAsString());
         $this->loggerFactory->error(sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
         $this->loggerFactory->error($throwable->getTraceAsString());
-        $message = '';
         if (env('APP_ENV') != 'product') {
             $message = $throwable->getTraceAsString();
             return $this->response->withStatus(ApiCode::FATAL_ERROR)->json([

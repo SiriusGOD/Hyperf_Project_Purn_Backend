@@ -3,8 +3,10 @@
 namespace App\Service;
 
 use App\Model\Image;
+use App\Model\Tag;
 use App\Model\TagCorrespond;
 use Carbon\Carbon;
+use Hyperf\Database\Model\Collection;
 use Intervention\Image\ImageManager;
 
 class ImageService
@@ -54,7 +56,7 @@ class ImageService
         return $imageUrl;
     }
 
-    public function getImages(?array $tagIds, int $page)
+    public function getImages(?array $tagIds, int $page) : Collection
     {
         $imageIds = [];
         if (!empty($tagIds)) {
@@ -72,6 +74,31 @@ class ImageService
 
         if (!empty($imageIds)) {
             $query = $query->whereIn('id', $imageIds);
+        }
+
+        return $query->get();
+    }
+
+    public function getImagesByKeyword(string $keyword, int $page) : Collection
+    {
+        $tagIds = Tag::where('name', 'like', '%'.$keyword.'%')->get()->pluck('id')->toArray();
+        $imageIds = [];
+        if (!empty($tagIds)) {
+            $imageIds = TagCorrespond::where('correspond_type', Image::class)
+                ->whereIn('tag_id', $tagIds)
+                ->get()
+                ->pluck('correspond_id');
+        }
+
+        $query = Image::with([
+            'tags'
+        ])
+        ->orWhere('title', 'like', '%'.$keyword.'%')
+        ->offset(Image::PAGE_PER * $page)
+        ->limit(Image::PAGE_PER);
+
+        if (!empty($imageIds)) {
+            $query = $query->orWhereIn('id', $imageIds);
         }
 
         return $query->get();
