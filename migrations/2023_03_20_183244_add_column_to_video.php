@@ -39,7 +39,6 @@ class AddColumnToVideo extends Migration
           $table->integer('onshelf_tm')->nullable()->comment('影片上映时间');
           $table->integer('rating')->nullable()->comment('总历史点击数');
           $table->integer('refresh_at')->nullable()->comment('刷新时间');
-          $table->integer('created_at')->nullable()->comment('创建时间');
           $table->integer('is_free')->nullable()->comment('是否限免 0 免费视频 1vip视频 2金币视频');
           $table->integer('like')->nullable()->comment('喜欢点击数');
           $table->integer('comment')->nullable()->comment('评论数');
@@ -87,7 +86,6 @@ class AddColumnToVideo extends Migration
           $table->dropColumn('onshelf_tm');
           $table->dropColumn('rating');
           $table->dropColumn('refresh_at');
-          $table->dropColumn('created_at');
           $table->dropColumn('is_free');
           $table->dropColumn('like');
           $table->dropColumn('comment');
