@@ -36,7 +36,7 @@ class UserRegisterRequest extends FormRequest
             'age' => 'numeric|between:18,130',
             'phone' => 'numeric',
             'address' => 'string',
-            'uuid' => 'required_without:name|string|unique:users'
+            'uuid' => 'required|string|unique:users'
         ];
 
         return $rules;

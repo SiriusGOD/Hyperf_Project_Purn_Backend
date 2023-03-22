@@ -29,8 +29,8 @@ class UserLoginRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'name' => 'string',
-            'uuid' => 'required_without:name|string',
+            'email' => 'string',
+            'uuid' => 'required|string',
             'password' => 'required|string',
         ];
 

@@ -16,7 +16,6 @@ use App\Model\User;
 use App\Request\UserUpdateRequest;
 use App\Service\UserService;
 use App\Service\RoleService;
-use App\Request\ManagerRequest;
 use Hyperf\Validation\Rule;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;

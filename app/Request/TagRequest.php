@@ -13,24 +13,8 @@ namespace App\Request;
 use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
 
-class TagRequest extends FormRequest
+class TagRequest extends AuthBaseRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        if (auth('jwt')->check()) {
-            return true;
-        }
-
-        if (auth('session')->check()) {
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      */

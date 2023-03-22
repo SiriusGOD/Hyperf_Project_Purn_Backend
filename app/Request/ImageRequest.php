@@ -16,27 +16,8 @@ use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
 use Hyperf\Validation\UnauthorizedException;
 
-class ImageRequest extends BaseRequest
+class ImageRequest extends AuthBaseRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        $redis = make(Redis::class);
-        $token = $redis->get(UserService::CACHE_KEY . auth()->user()->getId());
-
-        if (auth('jwt')->check() and $this->header('Authorization') == 'Bearer ' . $token) {
-            return true;
-        }
-
-        if (auth('session')->check()) {
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      */

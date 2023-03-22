@@ -15,7 +15,7 @@ use Hyperf\Redis\Redis;
 use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
 
-class UserUpdateRequest extends BaseRequest
+class UserUpdateRequest extends AuthBaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
