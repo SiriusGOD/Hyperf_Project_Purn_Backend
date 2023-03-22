@@ -28,11 +28,6 @@ use Hyperf\HttpServer\Annotation\Middlewares;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use App\Middleware\AllowIPMiddleware;
 
-/**
- * @Middlewares({
- *     @Middleware(AllowIPMiddleware::class)
- * })
- */
 abstract class AbstractController
 {
     /**
@@ -83,41 +78,33 @@ abstract class AbstractController
         if (hash_equals($hmac, $calcmac)) { // 比较 HMAC 是否一致
             return $original_plaintext;
         }
+
+        return null;
     }
 
 
     public function success(array $data = [], string $message = 'success'): PsrResponseInterface
     {
-        $data = [
+        $result = [
             'code' => ApiCode::OK,
             'msg'  => $message,
             'data' => $data,
         ];
         if(env('ENCRYPT_FLAG')){
-          $en = self::encrypt(json_encode($data));
-          //$de = self::decrypt($en);
-          return $this->response->json($en);
-        }else{
-          return $this->response->json($data);
+            $result['data'] = self::encrypt(json_encode($data));
         }
+
+        return $this->response->json($result);
     }
 
     public function error(string $message = '', int $code = ErrorCode::SERVER_ERROR): PsrResponseInterface
     {
-        $data = $this->response->json(
+        return $this->response->json(
             [
                 'code' => $code,
                 'msg'  => $message,
             ]
         );
-
-        if(env('ENCRYPT_FLAG')){
-          $en = self::encrypt(json_encode($data));
-          $de = self::decrypt($en);
-          return $this->response->json($en);
-        }else{
-          return $this->response->json($data);
-        }
     }
 
     public function paginator($total, $data): PsrResponseInterface
