@@ -95,7 +95,22 @@ return [
     'created_at'=>"建立時間",
     'user_id'=>"建立者",
     // -------------------------------------------------------------------
-    // left box
+    // video
+    'video' => [
+        'insert' => '新增',
+        'title' => '影片',
+        'name' => '演員名',
+        'role' => '角色管理',
+        'tag' => '標籤管理',
+        'category' => '分類',
+        'is_free' => '是否限免',
+        'is_hide' => '隐藏',
+        'm3u8' => 'M3u8',
+        'fan_id' => '番号',
+        'update_video'=>'更新影片',
+    ],
+
+    // actor
     'actor' => [
         'insert' => '新增',
         'title' => '演員',
