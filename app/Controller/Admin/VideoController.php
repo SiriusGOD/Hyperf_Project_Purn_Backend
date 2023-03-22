@@ -10,12 +10,11 @@ declare(strict_types=1);
  */
 namespace App\Controller\Admin;
 
-use App\Middleware\PermissionMiddleware;
 use App\Controller\AbstractController;
+use App\Middleware\PermissionMiddleware;
 use App\Model\Video;
 use App\Request\VideoRequest;
 use App\Service\VideoService;
-//use App\Traits\SitePermissionTrait;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -23,9 +22,9 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Paginator\Paginator;
-use Hyperf\Validation\Contract\ValidatorFvideoyInterface;
+use Hyperf\Validation\Contract\ValidatorFactoryInterface;
 use Hyperf\View\RenderInterface;
-use HyperfExt\Jwt\Contracts\JwtFvideoyInterface;
+use HyperfExt\Jwt\Contracts\JwtFactoryInterface;
 use HyperfExt\Jwt\Contracts\ManagerInterface;
 use HyperfExt\Jwt\Jwt;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
@@ -36,8 +35,6 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
  */
 class VideoController extends AbstractController
 {
-    //use SitePermissionTrait;
-
     /**
      * 提供了对 JWT 编解码、刷新和失活的能力。
      */
@@ -53,13 +50,13 @@ class VideoController extends AbstractController
     /**
      * @Inject
      */
-    protected ValidatorFvideoyInterface $validationFvideoy;
+    protected ValidatorFactoryInterface $validationFactory;
 
-    public function __construct(ManagerInterface $manager, JwtFvideoyInterface $jwtFvideoy, RenderInterface $render)
+    public function __construct(ManagerInterface $manager, JwtFactoryInterface $jwtFactory, RenderInterface $render)
     {
         parent::__construct();
         $this->manager = $manager;
-        $this->jwt = $jwtFvideoy->make();
+        $this->jwt = $jwtFactory->make();
         $this->render = $render;
     }
 
@@ -73,25 +70,25 @@ class VideoController extends AbstractController
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
         $query = Video::offset(($page - 1) * $step)
             ->limit($step);
-        $videos = $query->get();
+        $actors = $query->get();
         $query = Video::select('*');
         $total = $query->count();
         $data['last_page'] = ceil($total / $step);
         if ($total == 0) {
             $data['last_page'] = 1;
         }
-        $data['navbar'] = trans('default.video.title');
-        $data['video_active'] = 'active';
+        $data['navbar'] = trans('default.actor.title');
+        $data['actor_active'] = 'active';
         $data['total'] = $total;
-        $data['datas'] = $videos;
+        $data['datas'] = $actors;
         $data['page'] = $page;
         $data['step'] = $step;
-        $path = '/admin/video/index';
+        $path = '/admin/actor/index';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . ($page - 1);
-        $paginator = new Paginator($videos, $step, $page);
+        $paginator = new Paginator($actors, $step, $page);
         $data['paginator'] = $paginator->toArray();
-        return $this->render->render('admin.video.index', $data);
+        return $this->render->render('admin.actor.index', $data);
     }
 
     /**
@@ -99,12 +96,11 @@ class VideoController extends AbstractController
      */
     public function store(VideoRequest $request, ResponseInterface $response, VideoService $service): PsrResponseInterface
     {
+        $data = $request->all();
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = auth('session')->user()->id;
-        $data['name'] = $request->input('name');
-        $data['sex'] = $request->input('sex');
         $service->storeVideo($data);
-        return $response->redirect('/admin/video/index');
+        return $response->redirect('/admin/actor/index');
     }
 
     /**
@@ -112,11 +108,11 @@ class VideoController extends AbstractController
      */
     public function create()
     {
-        $data['navbar'] = trans('default.video.insert');
-        $data['video_active'] = 'active';
+        $data['navbar'] = trans('default.actor.insert');
+        $data['actor_active'] = 'active';
         $model = new Video();
         $data['model'] = $model;
-        return $this->render->render('admin.video.form', $data);
+        return $this->render->render('admin.actor.form', $data);
     }
 
     /**
@@ -127,26 +123,25 @@ class VideoController extends AbstractController
         $id = $request->input('id');
         $data['model'] = Video::findOrFail($id);
         $data['navbar'] = trans('default.ad_control.ad_update');
-        $data['video_active'] = 'active';
-        return $this->render->render('admin.video.form', $data);
+        $data['actor_active'] = 'active';
+        return $this->render->render('admin.actor.form', $data);
     }
 
     /**
      * @RequestMapping(path="expire", methods={"POST"})
      */
-    public function expire(RequestInterface $request, ResponseInterface $response, VideoService $service): PsrResponseInterface
+    public function expire(RequestInterface $request, ResponseInterface $response, ActorService $service): PsrResponseInterface
     {
         $query = Video::where('id', $request->input('id'));
         $record = $query->first();
 
         if (empty($record)) {
-            return $response->redirect('/admin/video/index');
+            return $response->redirect('/admin/actor/index');
         }
 
         $record->expire = $request->input('expire', 1);
         $record->save();
         $service->updateCache();
-        return $response->redirect('/admin/video/index');
+        return $response->redirect('/admin/actor/index');
     }
 }
-

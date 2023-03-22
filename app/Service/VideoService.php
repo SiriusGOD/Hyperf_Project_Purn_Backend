@@ -44,17 +44,21 @@ class VideoService
     }
 
     //新增影片
-    public function createVideo($insertData)
+    public function storeVideo($data)
     {
-      $this->logger->info(print_r($insertData,true));
+      $this->logger->info(print_r($data,true));
       try {
-        $model = new Video();
-        foreach($insertData as $key=>$val){
+        if(!empty($data['id']) and Video::where('id', $data['id'])->exists()) {
+            $model = Video::find($data['id']);
+        }else{
+            $model = new Video();
+        }
+        foreach($data as $key=>$val){
             $model->$key = "$val";
         }
         $model->save();
       } catch (\Exception $e) {
-          $this->logger->info( $e->getMessage() );
+          $this->logger->info($e->getMessage() );
           echo $e->getMessage();
       }
     }

@@ -124,6 +124,26 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('video-index'))
+                    <li class="nav-item">
+                        <a href="/admin/video/index" class="nav-link {{$video_active ?? ''}}">
+                            <i class="nav-icon fas fa-video"></i>
+                            <p>
+                                {{trans('default.leftbox.video') ?? '影片管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
+                @if(authPermission('actor-index'))
+                    <li class="nav-item">
+                        <a href="/admin/actor/index" class="nav-link {{$actor_active ?? ''}}">
+                            <i class="nav-icon fas fa-child"></i>
+                            <p>
+                                {{trans('default.leftbox.actor') ?? '演員管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
                 @if(authPermission('image-index'))
                     <li class="nav-item">
                         <a href="/admin/image/index" class="nav-link {{$image_active ?? ''}}">
