@@ -15,7 +15,6 @@ use App\Middleware\PermissionMiddleware;
 use App\Model\Actor;
 use App\Request\ActorRequest;
 use App\Service\ActorService;
-use App\Traits\SitePermissionTrait;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -36,8 +35,6 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
  */
 class ActorController extends AbstractController
 {
-    use SitePermissionTrait;
-
     /**
      * 提供了对 JWT 编解码、刷新和失活的能力。
      */

@@ -27,21 +27,25 @@ class UserController extends AbstractController
      */
     public function login(UserLoginRequest $request, UserService $service)
     {
-        $user = $service->checkUser([
-            'name' => $request->input('name'),
+        $user = $service->apiCheckUser([
+            'email' => $request->input('email'),
             'password' => $request->input('password'),
             'uuid' => $request->input('uuid')
         ]);
 
-
-        if ($user) {
-            $token = auth()->login($user);
-            return $this->success([
-                'token' => $token
-            ]);
+        if (empty($user)) {
+            return $this->error(trans('validation.authorize'),401);
         }
 
-        return $this->error('',401);
+        if (!$service->checkAndSaveDevice($user->id, $request->input('uuid'))) {
+            return $this->error(trans('validation.authorize'),401);
+        }
+
+        $token = auth()->login($user);
+        $service->saveToken($user->id, $token);
+        return $this->success([
+            'token' => $token
+        ]);
     }
 
     /**

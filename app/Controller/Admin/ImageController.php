@@ -21,7 +21,6 @@ use App\Request\ImageRequest;
 use App\Service\AdvertisementService;
 use App\Service\ImageService;
 use App\Service\TagService;
-use App\Traits\SitePermissionTrait;
 use Carbon\Carbon;
 use Hyperf\Database\Model\Relations\MorphTo;
 use Hyperf\Di\Annotation\Inject;
@@ -44,7 +43,6 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
  */
 class ImageController extends AbstractController
 {
-    use SitePermissionTrait;
 
     /**
      * 提供了对 JWT 编解码、刷新和失活的能力。

@@ -12,20 +12,31 @@ declare(strict_types=1);
 namespace App\Request;
 
 use App\Model\Order;
-use App\Traits\SitePermissionTrait;
+use App\Service\UserService;
+use Hyperf\Redis\Redis;
 use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
 
-class OrderRequest extends FormRequest
+class OrderRequest extends BaseRequest
 {
-    use SitePermissionTrait;
 
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        $redis = make(Redis::class);
+        $token = $redis->get(UserService::CACHE_KEY . auth()->user()->getId());
+
+        if (auth('jwt')->check() and $this->header('Authorization') == 'Bearer ' . $token) {
+            return true;
+        }
+
+        if (auth('session')->check()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

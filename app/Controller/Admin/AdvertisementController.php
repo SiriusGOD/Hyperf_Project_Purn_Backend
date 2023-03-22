@@ -16,7 +16,6 @@ use App\Middleware\PermissionMiddleware;
 use App\Model\Advertisement;
 use App\Request\AdvertisementRequest;
 use App\Service\AdvertisementService;
-use App\Traits\SitePermissionTrait;
 use Carbon\Carbon;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -38,8 +37,6 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
  */
 class AdvertisementController extends AbstractController
 {
-    use SitePermissionTrait;
-
     /**
      * 提供了对 JWT 编解码、刷新和失活的能力。
      */

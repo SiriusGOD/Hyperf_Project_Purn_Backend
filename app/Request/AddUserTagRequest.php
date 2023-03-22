@@ -10,6 +10,8 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Request;
+use App\Service\UserService;
+use Hyperf\Redis\Redis;
 use Hyperf\Validation\Rule;
 
 class AddUserTagRequest extends BaseRequest
@@ -19,7 +21,11 @@ class AddUserTagRequest extends BaseRequest
      */
     public function authorize(): bool
     {
-        if (auth('jwt')->check()) {
+        $redis = make(Redis::class);
+
+        $token = $redis->get(UserService::CACHE_KEY . auth()->user()->getId());
+
+        if (auth('jwt')->check() and $this->header('Authorization') == 'Bearer ' . $token) {
             return true;
         }
 

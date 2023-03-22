@@ -40,7 +40,7 @@ class AppExceptionHandler extends ExceptionHandler
         $this->loggerFactory->error($throwable->getTraceAsString());
         if (env('APP_ENV') != 'product') {
             $message = $throwable->getTraceAsString();
-            return $this->response->withStatus(ApiCode::FATAL_ERROR)->json([
+            return $this->response->json([
                 'code' => ApiCode::FATAL_ERROR,
                 'msg'  => $message,
             ]);

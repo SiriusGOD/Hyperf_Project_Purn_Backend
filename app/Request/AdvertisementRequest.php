@@ -12,13 +12,11 @@ declare(strict_types=1);
 namespace App\Request;
 
 use App\Model\Advertisement;
-use App\Traits\SitePermissionTrait;
 use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
 
 class AdvertisementRequest extends FormRequest
 {
-    use SitePermissionTrait;
 
     /**
      * Determine if the user is authorized to make this request.

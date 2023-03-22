@@ -10,12 +10,9 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Request;
-use App\Traits\SitePermissionTrait;
 use Hyperf\Validation\Request\FormRequest;
 class ActorRequest extends FormRequest
 {
-    use SitePermissionTrait;
-
     /**
      * Determine if the user is authorized to make this request.
      */

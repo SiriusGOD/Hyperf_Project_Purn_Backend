@@ -41,7 +41,7 @@ class ValidationAuthorizeException extends ValidationExceptionHandler
         $this->stopPropagation();
         $url = request()->getUri()->getPath();
         if (str_contains($url, "api")) {
-            return $this->response->withStatus(ApiCode::BAD_LOGIN)->json([
+            return $this->response->json([
                 'code' => ApiCode::BAD_LOGIN,
                 'msg'  => $throwable->getMessage(),
             ]);
