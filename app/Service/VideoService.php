@@ -46,10 +46,7 @@ class VideoService
     //新增影片
     public function createVideo($insertData)
     {
-
-      $this->logger->info("...qweqwe");
       $this->logger->info(print_r($insertData,true));
-
       try {
         $model = new Video();
         foreach($insertData as $key=>$val){
@@ -57,7 +54,8 @@ class VideoService
         }
         $model->save();
       } catch (\Exception $e) {
-          echo "91lu-error:" . $e->getMessage();
+          $this->logger->info( $e->getMessage() );
+          echo $e->getMessage();
       }
     }
 

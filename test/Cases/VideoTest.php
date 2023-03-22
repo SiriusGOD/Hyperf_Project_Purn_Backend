@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace HyperfTest\Cases;
-
+use Hyperf\DbConnection\Db;
 use HyperfTest\HttpTestCase;
 use App\Service\VideoService;
 /**
@@ -75,6 +75,30 @@ class VideoTest extends HttpTestCase
         ];
         $res = $service->createVideo($insertData);
         $this->assertSame(2, (int)$res->type);
+    }
+
+    public function testDb()
+    {
+        $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
+        $db  = \Hyperf\Utils\ApplicationContext::getContainer()->get(DB::class);
+        $res1 = $db->select("select * from ks_mv "); 
+        $d = [];
+        foreach($res1 as $kk => $res){
+          echo "$kk";
+          foreach($res as $k => $v){
+            $d[$k] = "$v";  
+            $d['user_id'] = 1;
+            $d['name'] = 'name';
+            $d['thumbnail'] ='thumbnail'; 
+            $d['url'] = 'url';
+            $d['length'] = 11;
+            $d['likes'] = 123;
+            $d['description'] = 'description';
+            $d['refreshed_at']= date("Y-m-d H:i:s");
+            $service->createVideo($d);
+          }
+        }
+        $this->assertSame(2, 2);
     }
 }
 
