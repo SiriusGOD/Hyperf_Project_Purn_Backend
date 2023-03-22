@@ -15,7 +15,7 @@ use App\Controller\AbstractController;
 use App\Model\Video;
 use App\Request\VideoRequest;
 use App\Service\VideoService;
-use App\Traits\SitePermissionTrait;
+//use App\Traits\SitePermissionTrait;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -36,7 +36,7 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
  */
 class VideoController extends AbstractController
 {
-    use SitePermissionTrait;
+    //use SitePermissionTrait;
 
     /**
      * 提供了对 JWT 编解码、刷新和失活的能力。
