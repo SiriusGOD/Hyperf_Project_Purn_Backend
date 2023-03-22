@@ -21,6 +21,8 @@ use Hyperf\Database\Model\SoftDeletes;
  */
 class Video extends Model
 {
+    public const PAGE_PER = 10;
+  
     use SoftDeletes;
     /**
      * The table associated with the model.
