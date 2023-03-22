@@ -77,28 +77,45 @@ class VideoTest extends HttpTestCase
         $this->assertSame(2, (int)$res->type);
     }
 
-    public function testDb()
+    public function testStore()
     {
         $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
         $db  = \Hyperf\Utils\ApplicationContext::getContainer()->get(DB::class);
-        $res1 = $db->select("select * from ks_mv "); 
-        $d = [];
-        foreach($res1 as $kk => $res){
-          echo "$kk";
-          foreach($res as $k => $v){
-            $d[$k] = "$v";  
-            $d['user_id'] = 1;
-            $d['name'] = 'name';
-            $d['thumbnail'] ='thumbnail'; 
-            $d['url'] = 'url';
-            $d['length'] = 11;
-            $d['likes'] = 123;
-            $d['description'] = 'description';
-            $d['refreshed_at']= date("Y-m-d H:i:s");
-            $service->createVideo($d);
-          }
+        $res = $db->select("select * from ks_mv   order by id asc limit 3  "); 
+        foreach($res as $kk => $row){
+          $arr = (array) $row;
+          $arr['user_id'] = 1;
+          $arr['name'] = 'name';
+          $arr['thumbnail'] ='thumbnail'; 
+          $arr['url'] = 'url';
+          $arr['length'] = 11;
+          $arr['likes'] = 123;
+          $arr['description'] = 'description';
+          $arr['refreshed_at']= date("Y-m-d H:i:s");
+          unset($arr['id']);
+          $service->storeVideo($arr);
         }
         $this->assertSame(2, 2);
+    }
+
+    public function testUpdateVideo()
+    {
+      $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
+      $db  = \Hyperf\Utils\ApplicationContext::getContainer()->get(DB::class);
+      $res1 = $db->select("select * from ks_mv order by id asc limit 1"); 
+      foreach($res1 as $kk => $res){
+        $arr = (array) $res;
+        $arr['user_id'] = 1;
+        $arr['name'] = 'name1qqq';
+        $arr['thumbnail'] ='thumbnail'; 
+        $arr['url'] = 'test';
+        $arr['length'] = 11;
+        $arr['likes'] = 123;
+        $arr['description'] = 'description';
+        $arr['refreshed_at']= date("Y-m-d H:i:s");
+        $service->storeVideo($arr);
+      }
+      $this->assertSame(2, 2);
     }
 }
 
