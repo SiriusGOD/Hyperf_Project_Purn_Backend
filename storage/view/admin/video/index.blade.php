@@ -7,10 +7,10 @@
                 <div class="card-body">
                     <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                         <div class="row">
-                            @if(authPermission('manager-create'))
-                                <div class="col-sm-12 col-md-12">
+                            @if(authPermission('video-create'))
+                                <div class="col-sm-12 col-md-12" style="display:none;">
                                     <a class="btn badge-info"
-                                       href="/admin/manager/create">{{trans('default.manager_control.manager_insert') ?? '新增管理者'}}</a>
+                                       href="/admin/video/create">{{trans('default.video.create') ?? '新增影片'}}</a>
                                 </div>
                             @endif
                         </div>
@@ -27,22 +27,19 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.account') ?? '帳號'}}
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.video.title') ?? '影片名稱'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.role') ?? '角色 '}}
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.video.category') ?? '分類'}}
                                         </th>
-                                        @if(env('GOOGLE_AUTH_VALID'))
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.googleAuth') ?? '開啟GOOGLE AUTH驗證 '}}
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.video.is_free') ?? '是否限免'}}
                                         </th>
-                                        @endif
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Engine version: activate to sort column ascending">
-                                            {{trans('default.enable_user') ?? '啟用'}}
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.video.is_hide') ?? '隐藏'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
@@ -51,31 +48,24 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach($datas as $user)
+                                    @foreach($datas as $video)
                                         <tr class="odd">
-                                            <td class="sorting_1 dtr-control">{{ $user->id}}</td>
-                                            <td>{{ $user->name}}</td>
+                                            <td class="sorting_1 dtr-control">{{ $video->id}}</td>
+                                            <td> {{ $video->title}}</td>
+                                            <td> {{ $const::CATEGORY[$video->category]}}</td>
+                                            <td> {{ $const::IS_FREE[$video->is_free]}}</td>
+                                            <td> {{ $const::IS_HIDE[$video->is_hide]}}</td>
                                             <td>
-                                                {{ isset($roles[$user->role_id-1])?$roles[$user->role_id-1]['name']:""}} </td>
-
-                                            @if(env('GOOGLE_AUTH_VALID'))
-                                                <td>{!!  strlen($user->avatar)>3 ?  "<b >己啟用</b>" : "<b color=red>未啟用</b>"  !!}</td>
-                                            @endif
-                                            <td>{{ $user->status}}</td>
-                                            <td>
-                                                @if(authPermission('manager-edit'))
-                                                    <a href="/admin/manager/edit?id={{$user->id}}"
+                                                @if(authPermission('video-edit'))
+                                                    <a href="/admin/video/edit?id={{$video->id}}"
                                                        class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
                                                 @endif
 
-                                                @if(authPermission('manager-google-auth') && strlen($user->avatar)==0 && env('GOOGLE_AUTH_VALID'))
-                                                    <a href="/admin/manager/googleAuth?id={{$user->id}}"  class="btn btn-info">{{trans('default.googleAuth') ?? '設定google auth'}}</a>
-                                                @endif
 
-                                                @if(authPermission('manager-delete'))
-                                                    <form action="/admin/manager/delete" method="post" _method="delete">
+                                                @if(authPermission('video-delete'))
+                                                    <form action="/admin/video/delete" method="post" _method="delete">
                                                         <input type="hidden" name="_method" value="delete">
-                                                        <input type="hidden" name="id" value="{{$user->id}}">
+                                                        <input type="hidden" name="id" value="{{$video->id}}">
                                                         <input type="submit" class="btn btn-danger"
                                                                value="{{trans('default.delete') ?? '刪除'}}">
                                                     </form>

@@ -13,6 +13,7 @@ namespace App\Controller\Admin;
 use App\Controller\AbstractController;
 use App\Middleware\PermissionMiddleware;
 use App\Model\Video;
+use App\Constants\VideoCode;
 use App\Request\VideoRequest;
 use App\Service\VideoService;
 use Hyperf\Di\Annotation\Inject;
@@ -68,39 +69,41 @@ class VideoController extends AbstractController
         // 顯示幾筆
         $step = Video::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = Video::offset(($page - 1) * $step)
-            ->limit($step);
-        $actors = $query->get();
+        $query = Video::offset(($page - 1) * $step)->limit($step);
+        $videos = $query->get();
         $query = Video::select('*');
         $total = $query->count();
         $data['last_page'] = ceil($total / $step);
         if ($total == 0) {
             $data['last_page'] = 1;
         }
-        $data['navbar'] = trans('default.actor.title');
-        $data['actor_active'] = 'active';
+        $data['navbar'] = trans('default.video.title');
+        $data['video_active'] = 'active';
         $data['total'] = $total;
-        $data['datas'] = $actors;
+        $data['const'] = VideoCode::class;
+        $data['datas'] = $videos;
         $data['page'] = $page;
         $data['step'] = $step;
-        $path = '/admin/actor/index';
+        $path = '/admin/video/index';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . ($page - 1);
-        $paginator = new Paginator($actors, $step, $page);
+        $paginator = new Paginator($videos, $step, $page);
         $data['paginator'] = $paginator->toArray();
-        return $this->render->render('admin.actor.index', $data);
+        return $this->render->render('admin.video.index', $data);
     }
 
+    //public function store(VideoRequest $request, ResponseInterface $response, VideoService $service): PsrResponseInterface
     /**
      * @RequestMapping(path="store", methods={"POST"})
      */
-    public function store(VideoRequest $request, ResponseInterface $response, VideoService $service): PsrResponseInterface
+    public function store(VideoRequest $request, ResponseInterface $response, VideoService $service)
     {
         $data = $request->all();
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = auth('session')->user()->id;
+        print_r($data); 
         $service->storeVideo($data);
-        return $response->redirect('/admin/actor/index');
+        return $response->redirect('/admin/video/index');
     }
 
     /**
@@ -108,11 +111,12 @@ class VideoController extends AbstractController
      */
     public function create()
     {
-        $data['navbar'] = trans('default.actor.insert');
-        $data['actor_active'] = 'active';
+        $data['navbar'] = trans('default.video.insert');
+        $data['video_active'] = 'active';
         $model = new Video();
-        $data['model'] = $model;
-        return $this->render->render('admin.actor.form', $data);
+        $data['video'] = $model;
+        $data['const'] = VideoCode::class;
+        return $this->render->render('admin.video.form', $data);
     }
 
     /**
@@ -121,27 +125,11 @@ class VideoController extends AbstractController
     public function edit(RequestInterface $request)
     {
         $id = $request->input('id');
-        $data['model'] = Video::findOrFail($id);
-        $data['navbar'] = trans('default.ad_control.ad_update');
-        $data['actor_active'] = 'active';
-        return $this->render->render('admin.actor.form', $data);
+        $data['video'] = Video::findOrFail($id);
+        $data['navbar'] = trans('default.video.update_video');
+        $data['video_active'] = 'active';
+        $data['const'] = VideoCode::class;
+        return $this->render->render('admin.video.form', $data);
     }
 
-    /**
-     * @RequestMapping(path="expire", methods={"POST"})
-     */
-    public function expire(RequestInterface $request, ResponseInterface $response, ActorService $service): PsrResponseInterface
-    {
-        $query = Video::where('id', $request->input('id'));
-        $record = $query->first();
-
-        if (empty($record)) {
-            return $response->redirect('/admin/actor/index');
-        }
-
-        $record->expire = $request->input('expire', 1);
-        $record->save();
-        $service->updateCache();
-        return $response->redirect('/admin/actor/index');
-    }
 }

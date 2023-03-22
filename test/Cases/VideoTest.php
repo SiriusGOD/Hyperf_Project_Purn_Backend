@@ -85,11 +85,11 @@ class VideoTest extends HttpTestCase
         foreach($res as $kk => $row){
           $arr = (array) $row;
           $arr['user_id'] = 1;
-          $arr['name'] = 'name';
+          $arr['name'] = $arr['title'];
           $arr['thumbnail'] ='thumbnail'; 
-          $arr['url'] = 'url';
-          $arr['length'] = 11;
-          $arr['likes'] = 123;
+          $arr['url'] = $arr['cover_thumb'];
+          $arr['length'] = $arr['duration'];
+          $arr['likes'] = $arr['like'];
           $arr['description'] = 'description';
           $arr['refreshed_at']= date("Y-m-d H:i:s");
           unset($arr['id']);
