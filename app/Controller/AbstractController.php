@@ -27,7 +27,6 @@ use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\Middlewares;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use App\Middleware\AllowIPMiddleware;
-use Hyperf\Logger\LoggerFactory;
 
 /**
  * @Middlewares({
@@ -56,9 +55,8 @@ abstract class AbstractController
     protected $ENCRYPTION_KEY;
     // 定义加密密钥
   
-    public function __construct(LoggerFactory $loggerFactory)
+    public function __construct()
     {
-        $this->logger = $loggerFactory->get('reply');
         $this->ENCRYPTION_KEY = env('ENCRYPT_KEY');
     }
 
