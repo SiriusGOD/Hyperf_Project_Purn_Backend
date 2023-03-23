@@ -8,8 +8,10 @@ use App\Controller\AbstractController;
 use App\Model\Image;
 use App\Request\ImageApiListRequest;
 use App\Request\ImageApiSearchRequest;
+use App\Request\ImageApiSuggestRequest;
 use App\Request\TagRequest;
 use App\Service\ImageService;
+use App\Service\SuggestService;
 use App\Service\TagService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
@@ -56,6 +58,27 @@ class ImageController extends AbstractController
         $path = '/api/image/search';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        return $this->success($data);
+    }
+
+    /**
+     * @RequestMapping(path="suggest", methods="get")
+     */
+    public function suggest(ImageApiSuggestRequest $request, SuggestService $suggestService, ImageService $service)
+    {
+        $page = (int) $request->input('page', 0);
+        $userId = (int) auth()->user()->getId();
+        $suggest = $suggestService->getTagProportionByUser($userId);
+        $models = $service->getImagesBySuggest($suggest, $page);
+
+        $data = [];
+        $data['models'] = $models;
+        $data['page'] = $page;
+        $data['step'] = Image::PAGE_PER;
+        $path = '/api/image/suggest';
+        $data['next'] = $path . '?page=' . ($page + 1);
+        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+
         return $this->success($data);
     }
 }

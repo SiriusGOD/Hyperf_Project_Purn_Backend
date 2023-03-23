@@ -103,4 +103,38 @@ class ImageService
 
         return $query->get();
     }
+
+    public function getImagesBySuggest(array $suggest, int $page) : array
+    {
+        $result = [];
+        $useImageIds = [];
+        foreach ($suggest as $value) {
+            $limit = $value['proportion'] * Image::PAGE_PER;
+            if ($limit < 1) {
+                break;
+            }
+
+            $imageIds = TagCorrespond::where('correspond_type', Image::class)
+                ->where('tag_id', $value['tag_id'])
+                ->whereNotIn('correspond_id', $useImageIds)
+                ->get()
+                ->pluck('correspond_id')
+                ->toArray();
+
+            $useImageIds = array_unique(array_merge($imageIds, $useImageIds));
+
+            $models = Image::with([
+                'tags'
+            ])
+            ->whereIn('id', $imageIds)
+            ->offset(Image::PAGE_PER * $page)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+            $result = array_merge($models, $result);
+        }
+
+        return $result;
+    }
 }

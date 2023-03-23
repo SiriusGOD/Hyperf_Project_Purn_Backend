@@ -13,7 +13,7 @@ class CreateUserTagsTable extends Migration
     {
         Schema::create('user_tags', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('user_id')->comment('用戶id');
+            $table->bigInteger('user_id')->comment('用戶id')->index();
             $table->bigInteger('tag_id')->comment('標籤id');
             $table->bigInteger('count')->default(0)->comment('點擊次數');
             $table->timestamps();

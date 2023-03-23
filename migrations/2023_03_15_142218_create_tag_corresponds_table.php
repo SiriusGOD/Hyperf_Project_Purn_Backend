@@ -15,7 +15,7 @@ class CreateTagCorrespondsTable extends Migration
             $table->bigIncrements('id');
             $table->string('type');
             $table->bigInteger('correspond_id')->unsigned();
-            $table->bigInteger('tag_id')->unsigned();
+            $table->bigInteger('tag_id')->unsigned()->index();
             $table->timestamps();
         });
     }
