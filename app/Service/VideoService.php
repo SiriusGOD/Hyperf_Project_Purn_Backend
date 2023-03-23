@@ -14,6 +14,8 @@ namespace App\Service;
 
 use App\Model\Product;
 use App\Model\Video;
+use App\Model\TagCorrespond;
+use App\Model\ActorCorrespond;
 use Hyperf\Redis\Redis;
 use Hyperf\Logger\LoggerFactory;
 
@@ -50,6 +52,10 @@ class VideoService
       try {
         if(!empty($data['id']) and Video::where('id', $data['id'])->exists()) {
             $model = Video::find($data['id']);
+            //del tvideo'tag   
+            self::delVideoCorrespond($model->id, "tags");
+            //del video'actor   
+            self::delVideoCorrespond($model->id, "actor");
         }else{
             $model = new Video();
         }
@@ -62,6 +68,16 @@ class VideoService
           $this->logger->info($e->getMessage() );
           echo $e->getMessage();
       }
+    }
+    
+    //刪除Video tag&& actor關係
+    public function delVideoCorrespond(int $videoId, string $type){
+      if($type=="tags"){
+          $model = new TagCorrespond();
+      }else{
+          $model = new ActorCorrespond();
+      }
+      $model->where('correspond_type',"video")->where("correspond_id",$videoId)->delete();
     }
 
     // 計算Video總數

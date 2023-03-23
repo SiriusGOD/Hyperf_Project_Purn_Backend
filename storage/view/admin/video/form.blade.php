@@ -27,20 +27,22 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.video.m3u8') ?? 'M3U8'}}</label>
+                                    
                                     <input type="text" class="form-control" name="m3u8" id="m3u8"
                                            disabled="true" 
                                            placeholder="{{trans('default.video.m3u8') ?? 'm3u8'}}"
                                            value="{{$video->m3u8}}">
+                                    <input type="hidden" name="m3u8" value="{{$video->m3u8}}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.video.input_tags') ?? '標籤'}}</label>
-                                    <input type="text" class="form-control" name="tag" id="tag"
+                                    <input type="text" class="form-control" name="tags" id="tag"
                                            placeholder="{{trans('default.video.m3u8') ?? '標籤'}}"
                                            value="{{$video->tags}}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.video.input_actors') ?? '演員'}}</label>
-                                    <input type="text" class="form-control" name="actor" id="actor"
+                                    <input type="text" class="form-control" name="actors" id="actor"
                                            placeholder="{{trans('default.video.actor') ?? '演員'}}"
                                            value="{{$video->actors}}">
                                 </div>

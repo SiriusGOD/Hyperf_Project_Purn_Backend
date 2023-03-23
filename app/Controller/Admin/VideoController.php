@@ -16,6 +16,8 @@ use App\Model\Video;
 use App\Constants\VideoCode;
 use App\Request\VideoRequest;
 use App\Service\VideoService;
+use App\Service\TagService;
+use App\Service\ActorService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -95,12 +97,14 @@ class VideoController extends AbstractController
     /**
      * @RequestMapping(path="store", methods={"POST"})
      */
-    public function store(VideoRequest $request, ResponseInterface $response, VideoService $service)
+    public function store(VideoRequest $request, ResponseInterface $response, VideoService $videoService, TagService $tagService, ActorService $actorService)
     {
         $data = $request->all();
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = auth('session')->user()->id;
-        $service->storeVideo($data);
+        $video = $videoService->storeVideo($data);
+        $tagService->videoCorrespondTag($data,$video->id);
+        $actorService->videoCorrespondActor($data,$video->id);
         return $response->redirect('/admin/video/index');
     }
 
