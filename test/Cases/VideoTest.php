@@ -27,24 +27,18 @@ class VideoTest extends HttpTestCase
         // 插入数据
         $insertData = [
             'type'             => 2,
-            'length'           => 2,
             'fan_id'           => 1,
             'p_id'             => 1,
             'user_id'          => 1,
-            'uid'              => 1,
             'music_id'         => 1,
             'title'            => "三上2",
-            'name'             => "三上1",
             'coins'            => 20,
-            'likes'            => 20,
             'm3u8'             => "/qwe",
             'description'      => "/qwe",
             'refreshed_at'     => date("Y-m-d H:i:s"),
             'full_m3u8'        => '',
             'v_ext'            => 'm3u8',
             'duration'         => 111,
-            'thumbnail'        => 'qwe',
-            'url'              => 'qwe',
             'cover_thumb'      => 'cover_thumb',//封面
             'thumb_width'      => 0,
             'thumb_height'     => 0,
@@ -81,18 +75,14 @@ class VideoTest extends HttpTestCase
     {
         $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
         $db  = \Hyperf\Utils\ApplicationContext::getContainer()->get(DB::class);
-        $res = $db->select("select * from ks_mv   order by id asc limit 3  "); 
+        $res = $db->select("select * from ks_mv order by id asc limit 5000  "); 
         foreach($res as $kk => $row){
           $arr = (array) $row;
           $arr['user_id'] = 1;
-          $arr['name'] = $arr['title'];
-          $arr['thumbnail'] ='thumbnail'; 
-          $arr['url'] = $arr['cover_thumb'];
-          $arr['length'] = $arr['duration'];
-          $arr['likes'] = $arr['like'];
           $arr['description'] = 'description';
           $arr['refreshed_at']= date("Y-m-d H:i:s");
           unset($arr['id']);
+          unset($arr['uid']);
           $service->storeVideo($arr);
         }
         $this->assertSame(2, 2);
@@ -105,12 +95,8 @@ class VideoTest extends HttpTestCase
       $res1 = $db->select("select * from ks_mv order by id asc limit 1"); 
       foreach($res1 as $kk => $res){
         $arr = (array) $res;
+        unset($arr['uid']);
         $arr['user_id'] = 1;
-        $arr['name'] = 'name1qqq';
-        $arr['thumbnail'] ='thumbnail'; 
-        $arr['url'] = 'test';
-        $arr['length'] = 11;
-        $arr['likes'] = 123;
         $arr['description'] = 'description';
         $arr['refreshed_at']= date("Y-m-d H:i:s");
         $service->storeVideo($arr);
