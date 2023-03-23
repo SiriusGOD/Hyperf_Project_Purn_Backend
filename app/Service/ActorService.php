@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Actor;
+use App\Model\ActorCorrespond;
 use Hyperf\Redis\Redis;
 
 class ActorService
@@ -82,5 +83,31 @@ class ActorService
         $model->save();
         $this->updateCache();
     }
+
+    // 新增或更新演員
+    public function storeActorByName(array $data)
+    {
+      if(Actor::where('name', $data['name'])->exists()) {
+          $model = Actor::where("name",$data['name'])->first();
+      }else{
+          $model = new Actor();
+      }
+      $model->user_id = $data['user_id'];
+      $model->name = $data['name'];
+      $model->sex = $data['sex'];
+      $model->save();
+      return $model;
+    }
+
+    //新熷 演員關係
+    public function createActorRelationship(string $className, int $classId, int $actorId) : void
+    {
+        $model = new ActorCorrespond();
+        $model->correspond_type = $className;
+        $model->correspond_id = $classId;
+        $model->actor_id = $actorId;
+        $model->save();
+    }
+
 }
 

@@ -46,7 +46,6 @@ class VideoService
     //新增影片
     public function storeVideo($data)
     {
-      $this->logger->info(print_r($data,true));
       try {
         if(!empty($data['id']) and Video::where('id', $data['id'])->exists()) {
             $model = Video::find($data['id']);
@@ -57,6 +56,7 @@ class VideoService
             $model->$key = "$val";
         }
         $model->save();
+        return $model;
       } catch (\Exception $e) {
           $this->logger->info($e->getMessage() );
           echo $e->getMessage();

@@ -92,7 +92,6 @@ class VideoController extends AbstractController
         return $this->render->render('admin.video.index', $data);
     }
 
-    //public function store(VideoRequest $request, ResponseInterface $response, VideoService $service): PsrResponseInterface
     /**
      * @RequestMapping(path="store", methods={"POST"})
      */
@@ -101,7 +100,6 @@ class VideoController extends AbstractController
         $data = $request->all();
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = auth('session')->user()->id;
-        print_r($data); 
         $service->storeVideo($data);
         return $response->redirect('/admin/video/index');
     }
@@ -131,5 +129,4 @@ class VideoController extends AbstractController
         $data['const'] = VideoCode::class;
         return $this->render->render('admin.video.form', $data);
     }
-
 }

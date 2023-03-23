@@ -21,6 +21,20 @@ class TagService
         $model->user_id = $userId;
         $model->save();
     }
+    
+    //新增時以name為主 有重覆不新增
+    public function createTagByName(string $name, int $userId)
+    {
+        if(Tag::where('name', $name)->exists()) {
+            $model = Tag::where('name', $name)->first();
+        }else{
+            $model = new Tag();
+        }
+        $model->name = $name;
+        $model->user_id = $userId;
+        $model->save();
+        return $model;
+    }
 
     public function createTagRelationship(string $className, int $classId, int $tagId) : void
     {

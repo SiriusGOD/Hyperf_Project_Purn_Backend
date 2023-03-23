@@ -13,6 +13,8 @@ namespace HyperfTest\Cases;
 use Hyperf\DbConnection\Db;
 use HyperfTest\HttpTestCase;
 use App\Service\VideoService;
+use App\Service\TagService;
+use App\Service\ActorService;
 /**
  * @internal
  * @coversNothing
@@ -71,21 +73,45 @@ class VideoTest extends HttpTestCase
         $this->assertSame(2, (int)$res->type);
     }
 
-    public function testStore()
+    public function testVideoStore()
     {
         $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
         $db  = \Hyperf\Utils\ApplicationContext::getContainer()->get(DB::class);
-        $res = $db->select("select * from ks_mv order by id asc limit 5000  "); 
-        foreach($res as $kk => $row){
+        $res = $db->select("select * from ks_mv order by id asc limit 1150  "); 
+        foreach($res as  $row){
           $arr = (array) $row;
           $arr['user_id'] = 1;
           $arr['description'] = 'description';
           $arr['refreshed_at']= date("Y-m-d H:i:s");
           unset($arr['id']);
           unset($arr['uid']);
-          $service->storeVideo($arr);
+          $model = $service->storeVideo($arr);
+          self::storeVideoTag($arr ,$model->id);
+          self::storeVideoActor($arr ,$model->id);
         }
         $this->assertSame(2, 2);
+    }
+
+    public function storeVideoTag($arr ,$videoId){
+        $sTag = \Hyperf\Utils\ApplicationContext::getContainer()->get(TagService::class);
+        $tags = explode(",",$arr['tags']);
+        foreach($tags as $v){
+          if(strlen($v)>1){
+            $actorData['name'] = $v; 
+            $actorData['user_id'] = 1; 
+            $tag = $sTag->createTagByName($v ,1);
+            $sTag->createTagRelationship("video" ,$videoId ,$tag->id);
+          }
+        }
+    }
+
+    public function storeVideoActor($arr, $videoId){
+        $sActor = \Hyperf\Utils\ApplicationContext::getContainer()->get(ActorService::class);
+        $data['name'] = $arr['actors']; 
+        $data['user_id'] = 1; 
+        $data['sex'] = 0; 
+        $actor = $sActor->storeActorByName($data);
+        $sActor->createActorRelationship("video", $videoId, $actor->id);
     }
 
     public function testUpdateVideo()

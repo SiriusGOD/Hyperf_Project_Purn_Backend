@@ -29,6 +29,7 @@ class VideoRequest extends FormRequest
         $rules = [
             'user_id' => 'numeric',
             'title' => 'required|max:255',
+            'm3u8' => 'required|max:255',
         ];
 
         return $rules;
