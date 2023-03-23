@@ -13,6 +13,7 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 use App\Request\OrderRequest;
 use App\Constants\ApiCode;
 use App\Constants\ErrorCode;
+use App\Service\PayService;
 
 /**
  * @Controller
@@ -37,15 +38,28 @@ class OrderController extends AbstractController
      * @RequestMapping(path="create", methods="post")
      * 新增使用者訂單
      */
-    public function create(OrderRequest $request, OrderService $service)
+    public function create(OrderRequest $request, OrderService $service, PayService $pay_service)
     {
         $user_id = $request->input('user_id',0);
         $prod_id = $request->input('product_id', 0);
         if(empty($prod_id))return $this->error('product id 字段是必须的', ErrorCode::BAD_REQUEST);
         $payment_type = $request->input('product_id', 1);
-        $result = $service->createOrder($user_id, $prod_id, $payment_type);
-        if($result)return $this->success([], '訂單新增成功');
-        return $this->error('訂單新增失敗', ErrorCode::BAD_REQUEST );
+        $oauth_type = $request->input('oauth_type', 'web');
+        $pay_proxy = $request->input('pay_proxy', 'online'); // agent or online
+
+        $base_service = di(\App\Service\BaseService::class);
+        $ip = $base_service->getIp($request->getHeaders(), $request->getServerParams());
+
+        // 生成支付鏈接(測試)
+        $pay_res = $pay_service -> getPayUrl($user_id, $prod_id, $payment_type, $oauth_type, $pay_proxy, $ip);
+        if(isset($pay_res['success']) && $pay_res['success'] == true){
+            // 建立訂單
+            $result = $service->createOrder($user_id, $prod_id, $payment_type, str_replace('&amp;', '&', $pay_res['data']['pay_url']), $pay_proxy);
+            $pay_res['data']['order_num'] = $result;
+            if($result != false)return $this->success($pay_res['data'], '訂單新增成功');
+            return $this->error('訂單新增失敗', ErrorCode::BAD_REQUEST );
+        }
+        return $this->error('生成支付鏈接失敗', ErrorCode::BAD_REQUEST );
     }
 
     /**

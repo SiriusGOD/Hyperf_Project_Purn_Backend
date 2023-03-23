@@ -88,7 +88,7 @@ class OrderService
     }
 
     // 建立訂單
-    public function createOrder($user_id, $prod_id, $payment_type)
+    public function createOrder($user_id, $prod_id, $payment_type, $pay_url, $pay_proxy)
     {
         // 撈取會員資料
         $user = User::find($user_id)->toArray();
@@ -102,6 +102,9 @@ class OrderService
             'payment_type' => $payment_type,
             'currency' => $product['currency'],
             'total_price' => $product['selling_price'],
+            'pay_way' => Order::PAY_WAY_MAP_NEW[$payment_type],
+            'pay_url' => $pay_url,
+            'pay_proxy' => $pay_proxy
         );
         $data['product'] = array(
             'product_id' => $prod_id,
@@ -109,6 +112,8 @@ class OrderService
             'product_currency' => $product['currency'],
             'product_selling_price' => $product['selling_price']
         );
+
+        // 新增訂單
         $re = $this -> storeOrder($data);
         return $re;
     }
@@ -130,6 +135,9 @@ class OrderService
             $model->payment_type = $data['order']['payment_type'];
             $model->currency = $data['order']['currency'];
             $model->total_price = $data['order']['total_price'];
+            $model->pay_way = $data['order']['pay_way'];
+            $model->pay_url = $data['order']['pay_url'];
+            $model->pay_proxy = $data['order']['pay_proxy'];
             $model->save();
 
             // get order id
@@ -146,7 +154,7 @@ class OrderService
             $model->save();
             Db::commit();
             $this -> updateCache($data['order']['user_id']);
-            return true;
+            return $order_number;
         } catch(\Throwable $ex){
             Db::rollBack();
             return false;

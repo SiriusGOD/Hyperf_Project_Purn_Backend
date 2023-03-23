@@ -28,6 +28,25 @@ class Order extends Model
         'delete' => 11,
         'finish' => 21
     ];
+
+    const PAY_WAY_MAP_NEW = array(
+        1 => 'wechat',
+        2 => 'bankcard',
+        3 => 'alipay',
+        4 => 'ecny',
+        5 => 'visa',
+        6 => 'agent'
+    );
+
+    const PAY_WAY_TEXT = array(
+        'wechat'   => '微信支付',
+        'bankcard' => '银联支付',
+        'alipay'   => '支付宝支付',
+        'ecny'     => '数字人民币支付',
+        'visa'     => 'VISA支付',
+        'agent'    => '商家代理支付'
+    );
+
     /**
      * The table associated with the model.
      *
