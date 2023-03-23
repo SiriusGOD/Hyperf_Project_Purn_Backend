@@ -28,6 +28,19 @@ class ActorService
     {
         $this->redis = $redis;
     }
+    //影片演員關聯
+    public function videoCorrespondActor(array $data ,int $videoId){
+      if($data['tags']!=""){
+        $tags = explode(",",$data['tags']);
+        foreach($tags as $v){
+          $d['name'] = $v; 
+          $d['user_id'] = 1; 
+          $d['sex'] = 0; 
+          $actor = self::storeActorByName($d);
+          self::createActorRelationship("video", $videoId, $actor->id);
+        }
+      }
+    }
 
     // 取得演員
     public function getActors($offset=0 ,$limit=0): array

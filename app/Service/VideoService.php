@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 /**
  * This file is part of Hyperf.
  *
@@ -92,11 +93,7 @@ class VideoService
       #    return json_decode($jsonResult, true);
       #}
 
-      $model = Product::select("videos.*")
-            ->join('videos', 'products.correspond_id', '=', 'videos.id')
-            ->where('products.type','video')
-            ->where('videos.name','like',"%$name%")
-            ->with('video');
+      $model = Video::where('name','like',"%$name%");
       if($compare > 0 && $length >0){
         if($compare == 1){
           $model = $model->where("videos.lenght" , ">=" ,$length); 
@@ -115,12 +112,9 @@ class VideoService
     }
 
     // 共用自取
-    public function selfGet($offset=0 ,$limit=0){
-      return Product::select("videos.*")
-            ->join('videos', 'products.correspond_id', '=', 'videos.id')
-            ->where('type','video')
-            ->with('video')
-            ->offset($offset)
+    public function selfGet($offset=0 ,$limit=0)
+    {
+      return Video::offset($offset)
             ->limit($limit)
             ->get()
             ->toArray();

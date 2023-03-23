@@ -11,7 +11,8 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Service\VideoService;
-use App\Service\ObfuscationService;
+use App\Service\TagService;
+use App\Service\ActorService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -46,11 +47,13 @@ class VideoController extends AbstractController
      * 回調匯入資料 
      * @RequestMapping(path="data", methods="post")
      */
-    public function data(RequestInterface $request, VideoService $service)
+    public function data(RequestInterface $request, VideoService $VideoService, TagService $tagService, ActorService $actorService)
     {
       $data = $request->all();
-      $result = $service->createVideo($data);
-      return $this->success([$result]);
+      $video = $VideoService->storeVideo($data);
+      $tagService->videoCorrespondTag($data,$video->id);
+      $actorService->videoCorrespondActor($data,$video->id);
+      return $this->success([$video]);
     }
 
     /**

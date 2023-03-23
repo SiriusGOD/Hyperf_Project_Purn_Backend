@@ -97,8 +97,6 @@ class VideoTest extends HttpTestCase
         $tags = explode(",",$arr['tags']);
         foreach($tags as $v){
           if(strlen($v)>1){
-            $actorData['name'] = $v; 
-            $actorData['user_id'] = 1; 
             $tag = $sTag->createTagByName($v ,1);
             $sTag->createTagRelationship("video" ,$videoId ,$tag->id);
           }
@@ -119,7 +117,7 @@ class VideoTest extends HttpTestCase
       $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
       $db  = \Hyperf\Utils\ApplicationContext::getContainer()->get(DB::class);
       $res1 = $db->select("select * from ks_mv order by id asc limit 1"); 
-      foreach($res1 as $kk => $res){
+      foreach($res1 as  $res){
         $arr = (array) $res;
         unset($arr['uid']);
         $arr['user_id'] = 1;

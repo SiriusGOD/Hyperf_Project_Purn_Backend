@@ -21,7 +21,18 @@ class TagService
         $model->user_id = $userId;
         $model->save();
     }
-    
+    //影片TAG關聯
+    public function videoCorrespondTag(array $data ,int $videoId){
+      if($data['tags']!=""){
+        $tags = explode(",",$data['tags']);
+        foreach($tags as $v){
+          if(strlen($v)>1){
+            $tag = self::createTagByName($v ,1);
+            self::createTagRelationship("video" ,$videoId ,$tag->id);
+          }
+        }
+      }
+    }    
     //新增時以name為主 有重覆不新增
     public function createTagByName(string $name, int $userId)
     {
