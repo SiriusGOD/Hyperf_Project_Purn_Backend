@@ -136,7 +136,7 @@ class ImageService
                 'tags',
             ])
                 ->whereIn('id', $imageIds)
-                ->offset(Image::PAGE_PER * $page)
+                ->offset($limit * $page)
                 ->limit($limit)
                 ->get()
                 ->toArray();

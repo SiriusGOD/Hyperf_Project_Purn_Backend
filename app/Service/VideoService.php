@@ -154,27 +154,27 @@ class VideoService
     public function getVideosBySuggest(array $suggest, int $page): array
     {
         $result = [];
-        $useImageIds = [];
+        $useIds = [];
         foreach ($suggest as $value) {
             $limit = $value['proportion'] * Video::PAGE_PER;
             if ($limit < 1) {
                 break;
             }
 
-            $imageIds = TagCorrespond::where('correspond_type', Video::class)
+            $ids = TagCorrespond::where('correspond_type', Video::class)
                 ->where('tag_id', $value['tag_id'])
-                ->whereNotIn('correspond_id', $useImageIds)
+                ->whereNotIn('correspond_id', $useIds)
                 ->get()
                 ->pluck('correspond_id')
                 ->toArray();
 
-            $useImageIds = array_unique(array_merge($imageIds, $useImageIds));
+            $useIds = array_unique(array_merge($ids, $useIds));
 
             $models = Video::with([
                 'tags',
             ])
-                ->whereIn('id', $imageIds)
-                ->offset(Video::PAGE_PER * $page)
+                ->whereIn('id', $ids)
+                ->offset($limit * $page)
                 ->limit($limit)
                 ->get()
                 ->toArray();
