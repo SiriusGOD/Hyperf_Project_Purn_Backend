@@ -10,9 +10,6 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Request;
-use App\Service\UserService;
-use Hyperf\Redis\Redis;
-use Hyperf\Validation\Rule;
 
 class AddUserTagRequest extends AuthBaseRequest
 {
@@ -21,10 +18,8 @@ class AddUserTagRequest extends AuthBaseRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'tags.*' => 'required|numeric',
         ];
-
-        return $rules;
     }
 }

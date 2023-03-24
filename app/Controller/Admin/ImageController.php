@@ -13,16 +13,11 @@ namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Middleware\PermissionMiddleware;
-use App\Model\Advertisement;
 use App\Model\Image;
 use App\Model\TagCorrespond;
-use App\Request\AdvertisementRequest;
 use App\Request\ImageRequest;
-use App\Service\AdvertisementService;
 use App\Service\ImageService;
 use App\Service\TagService;
-use Carbon\Carbon;
-use Hyperf\Database\Model\Relations\MorphTo;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -43,7 +38,6 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
  */
 class ImageController extends AbstractController
 {
-
     /**
      * 提供了对 JWT 编解码、刷新和失活的能力。
      */

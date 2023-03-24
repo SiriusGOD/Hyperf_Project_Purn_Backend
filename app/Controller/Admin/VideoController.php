@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * This file is part of Hyperf.
@@ -10,14 +11,14 @@ declare(strict_types=1);
  */
 namespace App\Controller\Admin;
 
+use App\Constants\VideoCode;
 use App\Controller\AbstractController;
 use App\Middleware\PermissionMiddleware;
 use App\Model\Video;
-use App\Constants\VideoCode;
 use App\Request\VideoRequest;
-use App\Service\VideoService;
-use App\Service\TagService;
 use App\Service\ActorService;
+use App\Service\TagService;
+use App\Service\VideoService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -30,7 +31,6 @@ use Hyperf\View\RenderInterface;
 use HyperfExt\Jwt\Contracts\JwtFactoryInterface;
 use HyperfExt\Jwt\Contracts\ManagerInterface;
 use HyperfExt\Jwt\Jwt;
-use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
 /**
  * @Controller
@@ -103,8 +103,8 @@ class VideoController extends AbstractController
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = auth('session')->user()->id;
         $video = $videoService->storeVideo($data);
-        $tagService->videoCorrespondTag($data,$video->id);
-        $actorService->videoCorrespondActor($data,$video->id);
+        $tagService->videoCorrespondTag($data, $video->id);
+        $actorService->videoCorrespondActor($data, $video->id);
         return $response->redirect('/admin/video/index');
     }
 

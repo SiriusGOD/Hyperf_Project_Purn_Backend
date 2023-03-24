@@ -16,7 +16,6 @@ use App\Service\AdvertisementService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use App\Constants\ApiCode;
 
 /**
  * @Controller

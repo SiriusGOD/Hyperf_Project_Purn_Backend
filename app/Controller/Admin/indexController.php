@@ -12,17 +12,11 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
-use App\Model\Role;
-use App\Model\User;
-use App\Service\PermissionService;
 use App\Service\RoleService;
-use App\Service\UserService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\View\RenderInterface;
-use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
 /**
  * @Controller

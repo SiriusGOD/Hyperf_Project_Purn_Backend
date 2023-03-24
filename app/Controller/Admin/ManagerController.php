@@ -12,13 +12,18 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
+use App\Middleware\PermissionMiddleware;
 use App\Model\User;
 use App\Request\UserUpdateRequest;
-use App\Service\UserService;
 use App\Service\RoleService;
-use Hyperf\Validation\Rule;
+use App\Service\UserService;
+use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
@@ -27,15 +32,9 @@ use Hyperf\View\RenderInterface;
 use HyperfExt\Jwt\Contracts\JwtFactoryInterface;
 use HyperfExt\Jwt\Contracts\ManagerInterface;
 use HyperfExt\Jwt\Jwt;
-use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
-use Hyperf\HttpServer\Annotation\Middleware;
-use Hyperf\HttpServer\Annotation\Middlewares;
-use App\Middleware\PermissionMiddleware;
 use PragmaRX\Google2FA\Google2FA;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
+
 /**
  * @Controller
  * @Middleware(PermissionMiddleware::class)
@@ -71,7 +70,7 @@ class ManagerController extends AbstractController
     /**
      * @RequestMapping(path="index", methods={"GET"})
      */
-    public function index(RequestInterface $request, UserService $service,RoleService $roleService)
+    public function index(RequestInterface $request, UserService $service, RoleService $roleService)
     {
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
         $users = $service->getList($page, User::PAGE_PER);
@@ -130,6 +129,7 @@ class ManagerController extends AbstractController
         $data['user_active'] = 'active';
         return $this->render->render('admin.manager.form', $data);
     }
+
     /**
      * @RequestMapping(path="googleAuth", methods={"get"})
      */
@@ -137,7 +137,7 @@ class ManagerController extends AbstractController
     {
         $avatar = $this->google2FA->generateSecretKey();
         $data['id'] = $request->input('id') ? $request->input('id') : null;
-        $data['avatar'] =$avatar;
+        $data['avatar'] = $avatar;
         $service->storeUser($data);
         return $response->redirect('/admin/manager/index');
     }
@@ -145,15 +145,15 @@ class ManagerController extends AbstractController
     /**
      * @RequestMapping(path="edit", methods={"get"})
      */
-    public function edit(RequestInterface $request, UserService $service,RoleService $roleService)
+    public function edit(RequestInterface $request, UserService $service, RoleService $roleService)
     {
         $id = $request->input('id');
         $user = $service->findUser(intval($id));
         $data['user'] = $user;
         $data['google2fa_url'] = '';
         $data['qrcode_image'] = '';
-        //如果 還沒設定GOOGLE 驗證碼
-        if (strlen($user->avatar) > 1 ) {
+        // 如果 還沒設定GOOGLE 驗證碼
+        if (strlen($user->avatar) > 1) {
             $g2faUrl = $this->google2FA->getQRCodeUrl(
                 env('APP_NAME', 'CompanyName'),
                 $user->name,

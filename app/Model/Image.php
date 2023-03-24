@@ -1,20 +1,28 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Model;
 
 use Carbon\Carbon;
 use Hyperf\Database\Model\SoftDeletes;
 
 /**
- * @property int $id 
- * @property int $user_id 
- * @property string $title 
- * @property string $title_thumbnail 
- * @property string $thumbnail 
- * @property string $url 
- * @property int $likes 
- * @property int $group_id 
+ * @property int $id
+ * @property int $user_id
+ * @property string $title
+ * @property string $title_thumbnail
+ * @property string $thumbnail
+ * @property string $url
+ * @property int $likes
+ * @property int $group_id
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon $deleted_at
@@ -22,20 +30,24 @@ use Hyperf\Database\Model\SoftDeletes;
  */
 class Image extends Model
 {
-    public const PAGE_PER = 15;
     use SoftDeletes;
+
+    public const PAGE_PER = 15;
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $table = 'images';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [];
+
     /**
      * The attributes that should be cast to native types.
      *

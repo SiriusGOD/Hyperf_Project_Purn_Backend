@@ -15,13 +15,13 @@ use App\Model\Order;
 use App\Model\OrderDetail;
 use App\Model\Product;
 use App\Model\User;
-use Carbon\Carbon;
-use Hyperf\Redis\Redis;
 use Hyperf\DbConnection\Db;
+use Hyperf\Redis\Redis;
 
 class OrderService
 {
     public const CACHE_KEY = 'order';
+
     public const TTL_30_Min = 1800;
 
     protected Redis $redis;
@@ -36,31 +36,29 @@ class OrderService
     {
         // 顯示幾筆
         $step = Order::PAGE_PER;
-        $query = Order::join('users','orders.user_id','users.id')
-            ->select('orders.*','users.name');
-        if(!empty($order_number)){
-            $query = $query -> where('orders.order_number', '=', $order_number);
-        }else if(!empty($order_status)){
-            $query = $query -> where('orders.status', '=', $order_status);
+        $query = Order::join('users', 'orders.user_id', 'users.id')
+            ->select('orders.*', 'users.name');
+        if (! empty($order_number)) {
+            $query = $query->where('orders.order_number', '=', $order_number);
+        } elseif (! empty($order_status)) {
+            $query = $query->where('orders.status', '=', $order_status);
         }
-        $query = $query ->offset(($page - 1) * $step)
+        $query = $query->offset(($page - 1) * $step)
             ->orderByDesc('orders.id')
             ->limit($step);
-        $orders = $query->get();
-        return $orders;
+        return $query->get();
     }
 
     // 取得訂單數
     public function getOrdersCount($order_number, $order_status): int
     {
         $query = Order::select('*');
-        if(!empty($order_number)){
-            $query = $query -> where('orders.order_number', '=', $order_number);
-        }else if(!empty($order_status)){
-            $query = $query -> where('orders.status', '=', $order_status);
+        if (! empty($order_number)) {
+            $query = $query->where('orders.order_number', '=', $order_number);
+        } elseif (! empty($order_status)) {
+            $query = $query->where('orders.status', '=', $order_status);
         }
-        $total = $query->count();
-        return $total;
+        return $query->count();
     }
 
     // 取得訂單 By User Id
@@ -73,12 +71,18 @@ class OrderService
             return json_decode($jsonResult, true);
         }
 
-        $query = Order::join('users','orders.user_id','users.id')
-            ->select('orders.*','users.name')
+        $query = Order::join('users', 'orders.user_id', 'users.id')
+            ->select('orders.*', 'users.name')
             ->where('users.id', '=', $user_id);
-        if(!empty($order_status))$query = $query -> where('orders.status', '=', $order_status);
-        if(!empty($offset))$query = $query -> offset($offset);
-        if(!empty($limit))$query = $query -> limit($limit);
+        if (! empty($order_status)) {
+            $query = $query->where('orders.status', '=', $order_status);
+        }
+        if (! empty($offset)) {
+            $query = $query->offset($offset);
+        }
+        if (! empty($limit)) {
+            $query = $query->limit($limit);
+        }
         $orders = $query->get()->toArray();
 
         $this->redis->set($checkRedisKey, json_encode($orders));
@@ -95,7 +99,7 @@ class OrderService
         // 撈取商品資料
         $product = Product::find($prod_id)->toArray();
 
-        $data['order'] = array(
+        $data['order'] = [
             'user_id' => $user['id'],
             'email' => $user['email'],
             'telephone' => $user['phone'],
@@ -104,28 +108,27 @@ class OrderService
             'total_price' => $product['selling_price'],
             'pay_way' => Order::PAY_WAY_MAP_NEW[$payment_type],
             'pay_url' => $pay_url,
-            'pay_proxy' => $pay_proxy
-        );
-        $data['product'] = array(
+            'pay_proxy' => $pay_proxy,
+        ];
+        $data['product'] = [
             'product_id' => $prod_id,
             'product_name' => $product['name'],
             'product_currency' => $product['currency'],
-            'product_selling_price' => $product['selling_price']
-        );
+            'product_selling_price' => $product['selling_price'],
+        ];
 
         // 新增訂單
-        $re = $this -> storeOrder($data);
-        return $re;
+        return $this->storeOrder($data);
     }
-    
+
     // 新增訂單
     public function storeOrder(array $data)
     {
         Db::beginTransaction();
-        try{
+        try {
             $order_number = self::getSn();
             // insert orders table
-            $model = new Order;
+            $model = new Order();
             $model->user_id = $data['order']['user_id'];
             $model->order_number = $order_number;
             $model->address = '';
@@ -141,11 +144,11 @@ class OrderService
             $model->save();
 
             // get order id
-            $res = Order::select('id')->where('order_number',$order_number)->get()->toArray();
+            $res = Order::select('id')->where('order_number', $order_number)->get()->toArray();
             $id = $res[0]['id'];
 
             // insert orders_details table
-            $model = new OrderDetail;
+            $model = new OrderDetail();
             $model->order_id = $id;
             $model->product_id = $data['product']['product_id'];
             $model->product_name = $data['product']['product_name'];
@@ -153,9 +156,9 @@ class OrderService
             $model->product_selling_price = $data['product']['product_selling_price'];
             $model->save();
             Db::commit();
-            $this -> updateCache($data['order']['user_id']);
+            $this->updateCache($data['order']['user_id']);
             return $order_number;
-        } catch(\Throwable $ex){
+        } catch (\Throwable $ex) {
             Db::rollBack();
             return false;
         }
@@ -166,12 +169,12 @@ class OrderService
     {
         $query = Order::where([
             ['user_id', '=', $user_id],
-            ['order_number', '=', $order_num]
+            ['order_number', '=', $order_num],
         ]);
         $record = $query->first();
 
         // 查無訂單或該訂單已是取消／刪除狀態
-        if (empty($record) || $record -> status == Order::ORDER_STATUS['delete']) {
+        if (empty($record) || $record->status == Order::ORDER_STATUS['delete']) {
             return false;
         }
 
@@ -184,8 +187,8 @@ class OrderService
     public function updateCache($user_id): void
     {
         $checkRedisKey = self::CACHE_KEY . ':' . $user_id . '::0:0';
-        $query = Order::join('users','orders.user_id','users.id')
-            ->select('orders.*','users.name')
+        $query = Order::join('users', 'orders.user_id', 'users.id')
+            ->select('orders.*', 'users.name')
             ->where('users.id', '=', $user_id);
         $result = $query->get()->toArray();
 
@@ -194,22 +197,21 @@ class OrderService
     }
 
     // 產生當天訂單流水號
-    function getSn()
+    public function getSn()
     {
         $sql = 'SELECT o.order_number '
             . 'FROM orders AS o '
             . 'ORDER BY o.order_number DESC LIMIT 1';
         $res = Db::select($sql);
 
-        if(!isset($res[0]->order_number)){
+        if (! isset($res[0]->order_number)) {
             $lastNum = 0;
-        }else{
-            $lastNum = (int)mb_substr($res[0]->order_number, -5, 5);
+        } else {
+            $lastNum = (int) mb_substr($res[0]->order_number, -5, 5);
         }
 
-        $orderSn = 'PO' . date('Ymd', $_SERVER['REQUEST_TIME']) . str_pad((string)($lastNum + 1), 5, '0', STR_PAD_LEFT);
+        $orderSn = 'PO' . date('Ymd', $_SERVER['REQUEST_TIME']) . str_pad((string) ($lastNum + 1), 5, '0', STR_PAD_LEFT);
 
         return $orderSn;
     }
-
 }

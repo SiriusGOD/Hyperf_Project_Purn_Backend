@@ -10,8 +10,8 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Request;
+
 use Hyperf\Validation\Request\FormRequest;
-use Hyperf\Validation\Rule;
 
 class UserRegisterRequest extends FormRequest
 {
@@ -28,7 +28,7 @@ class UserRegisterRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'name' => 'string|unique:users',
             'password' => 'required|string',
             'email' => 'email|unique:users',
@@ -36,9 +36,7 @@ class UserRegisterRequest extends FormRequest
             'age' => 'numeric|between:18,130',
             'phone' => 'numeric',
             'address' => 'string',
-            'uuid' => 'required|string|unique:users'
+            'uuid' => 'required|string|unique:users',
         ];
-
-        return $rules;
     }
 }

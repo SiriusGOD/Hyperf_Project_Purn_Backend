@@ -1,10 +1,19 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Service;
 
 class BaseService
 {
-    //是否允許IP
+    // 是否允許IP
     public function allowIp($ip)
     {
         setLog()->info('record ip = ' . $ip);
@@ -13,8 +22,8 @@ class BaseService
             setLog()->info(' env APP_ENV true ' . env('APP_ENV'));
             return true;
         }
-        if (!$ip) {
-            setLog()->info("Line:" . __LINE__ . ' not deny ip ' . $ip);
+        if (! $ip) {
+            setLog()->info('Line:' . __LINE__ . ' not deny ip ' . $ip);
             return false;
         }
         $allowIps = env('ALLOW_IP', ''); // 設定檔
@@ -23,7 +32,7 @@ class BaseService
         $redisKey = 'allowIPMD5';
         $md5TXT = env('ALLOW_IP_MD5');
 
-        if (!redis()->exists($redisKey)) {
+        if (! redis()->exists($redisKey)) {
             $client = make(\Hyperf\Guzzle\ClientFactory::class)->create();
             $res = $client->get($md5TXT);
             $statusCode = $res->getStatusCode();
@@ -36,10 +45,10 @@ class BaseService
         }
         // 判斷md5 && 判斷IP 是否在 env內
         if (ipInArray(md5($ip), explode(',', $allowIpTxts)) || ipInArray($ip, $allowIps)) {
-            setLog()->info(" Line:" . __LINE__ . ' md5 or ipInArray true ');
+            setLog()->info(' Line:' . __LINE__ . ' md5 or ipInArray true ');
             return true;
         }
-        setLog()->info("Line   " . __LINE__ . ' ? - deny ip = ' . $ip);
+        setLog()->info('Line   ' . __LINE__ . ' ? - deny ip = ' . $ip);
         return false;
     }
 
@@ -80,6 +89,4 @@ class BaseService
         }
         return '';
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * This file is part of Hyperf.
@@ -10,13 +11,16 @@ declare(strict_types=1);
  */
 namespace App\Controller\Api;
 
-use App\Service\VideoService;
-use App\Service\TagService;
+use App\Controller\AbstractController;
+use App\Model\Image;
+use App\Request\VideoApiSuggestRequest;
 use App\Service\ActorService;
+use App\Service\SuggestService;
+use App\Service\TagService;
+use App\Service\VideoService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use App\Controller\AbstractController;
 
 /**
  * @Controller
@@ -28,10 +32,10 @@ class VideoController extends AbstractController
      */
     public function list(RequestInterface $request, VideoService $service)
     {
-      $offset = $request->input('offset',0);
-      $limit = $request->input('limit',0);
-      $result = $service->getVideos($offset ,$limit);
-      return $this->success($result);
+        $offset = $request->input('offset', 0);
+        $limit = $request->input('limit', 0);
+        $result = $service->getVideos($offset, $limit);
+        return $this->success($result);
     }
 
     /**
@@ -39,21 +43,21 @@ class VideoController extends AbstractController
      */
     public function count(VideoService $service)
     {
-      $result = $service->getVideoCount();
-      return $this->success([$result]);
+        $result = $service->getVideoCount();
+        return $this->success([$result]);
     }
 
     /**
-     * 回調匯入資料 
+     * 回調匯入資料.
      * @RequestMapping(path="data", methods="post")
      */
     public function data(RequestInterface $request, VideoService $VideoService, TagService $tagService, ActorService $actorService)
     {
-      $data = $request->all();
-      $video = $VideoService->storeVideo($data);
-      $tagService->videoCorrespondTag($data,$video->id);
-      $actorService->videoCorrespondActor($data,$video->id);
-      return $this->success([$video]);
+        $data = $request->all();
+        $video = $VideoService->storeVideo($data);
+        $tagService->videoCorrespondTag($data, $video->id);
+        $actorService->videoCorrespondActor($data, $video->id);
+        return $this->success([$video]);
     }
 
     /**
@@ -61,17 +65,37 @@ class VideoController extends AbstractController
      */
     public function search(RequestInterface $request, VideoService $service)
     {
-      $offset = $request->input('offset',0);
-      $limit = $request->input('limit',10);
-      $name = $request->input('name',"");
-      $length = $request->input('length',0);
-      $compare = $request->input('compare',0);
-      if(empty($name) || strlen($name) ==0){
-        $result = ['message'=>'name 不得為空']; 
-        return $this->success($result);
-      }else{
-        $result = $service->searchVideo($name ,$compare ,$length ,$offset ,$limit);
+        $offset = $request->input('offset', 0);
+        $limit = $request->input('limit', 10);
+        $name = $request->input('name', '');
+        $length = $request->input('length', 0);
+        $compare = $request->input('compare', 0);
+        if (empty($name) || strlen($name) == 0) {
+            $result = ['message' => 'name 不得為空'];
+            return $this->success($result);
+        }
+        $result = $service->searchVideo($name, $compare, $length, $offset, $limit);
         return $this->success([$result]);
-      }
+    }
+
+    /**
+     * @RequestMapping(path="suggest", methods="get")
+     */
+    public function suggest(VideoApiSuggestRequest $request, VideoService $service, SuggestService $suggestService)
+    {
+        $page = (int) $request->input('page', 0);
+        $userId = (int) auth()->user()->getId();
+        $suggest = $suggestService->getTagProportionByUser($userId);
+        $models = $service->getVideosBySuggest($suggest, $page);
+
+        $data = [];
+        $data['models'] = $models;
+        $data['page'] = $page;
+        $data['step'] = Image::PAGE_PER;
+        $path = '/api/video/suggest';
+        $data['next'] = $path . '?page=' . ($page + 1);
+        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+
+        return $this->success($data);
     }
 }

@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Service;
 
 use App\Model\Image;
@@ -11,12 +20,12 @@ use Intervention\Image\ImageManager;
 
 class ImageService
 {
-    public function storeImage(array $data) : Image
+    public function storeImage(array $data): Image
     {
         $model = Image::findOrNew($data['id']);
         $model->user_id = $data['user_id'];
         $model->title = $data['title'];
-        if (!empty($data['url'])) {
+        if (! empty($data['url'])) {
             $model->thumbnail = $data['thumbnail'];
             $model->url = $data['url'];
         }
@@ -28,12 +37,12 @@ class ImageService
         return $model;
     }
 
-    public function moveImageFile($file) : array
+    public function moveImageFile($file): array
     {
         $extension = $file->getExtension();
         $filename = sha1(Carbon::now()->toDateTimeString());
-        if(!file_exists(BASE_PATH.'/public/image')){
-            mkdir(BASE_PATH.'/public/image', 0755);
+        if (! file_exists(BASE_PATH . '/public/image')) {
+            mkdir(BASE_PATH . '/public/image', 0755);
         }
         $imageUrl = '/image/' . $filename . '.' . $extension;
         $path = BASE_PATH . '/public' . $imageUrl;
@@ -41,11 +50,11 @@ class ImageService
 
         return [
             'url' => $imageUrl,
-            'path' => $path
+            'path' => $path,
         ];
     }
 
-    public function createThumbnail(string $filePath) : string
+    public function createThumbnail(string $filePath): string
     {
         $pathInfo = pathinfo($filePath);
         $manager = new ImageManager();
@@ -56,10 +65,10 @@ class ImageService
         return $imageUrl;
     }
 
-    public function getImages(?array $tagIds, int $page) : Collection
+    public function getImages(?array $tagIds, int $page): Collection
     {
         $imageIds = [];
-        if (!empty($tagIds)) {
+        if (! empty($tagIds)) {
             $imageIds = TagCorrespond::where('correspond_type', Image::class)
                 ->whereIn('tag_id', $tagIds)
                 ->get()
@@ -67,23 +76,23 @@ class ImageService
         }
 
         $query = Image::with([
-            'tags'
+            'tags',
         ])
-        ->offset(Image::PAGE_PER * $page)
-        ->limit(Image::PAGE_PER);
+            ->offset(Image::PAGE_PER * $page)
+            ->limit(Image::PAGE_PER);
 
-        if (!empty($imageIds)) {
+        if (! empty($imageIds)) {
             $query = $query->whereIn('id', $imageIds);
         }
 
         return $query->get();
     }
 
-    public function getImagesByKeyword(string $keyword, int $page) : Collection
+    public function getImagesByKeyword(string $keyword, int $page): Collection
     {
-        $tagIds = Tag::where('name', 'like', '%'.$keyword.'%')->get()->pluck('id')->toArray();
+        $tagIds = Tag::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
         $imageIds = [];
-        if (!empty($tagIds)) {
+        if (! empty($tagIds)) {
             $imageIds = TagCorrespond::where('correspond_type', Image::class)
                 ->whereIn('tag_id', $tagIds)
                 ->get()
@@ -91,20 +100,20 @@ class ImageService
         }
 
         $query = Image::with([
-            'tags'
+            'tags',
         ])
-        ->orWhere('title', 'like', '%'.$keyword.'%')
-        ->offset(Image::PAGE_PER * $page)
-        ->limit(Image::PAGE_PER);
+            ->orWhere('title', 'like', '%' . $keyword . '%')
+            ->offset(Image::PAGE_PER * $page)
+            ->limit(Image::PAGE_PER);
 
-        if (!empty($imageIds)) {
+        if (! empty($imageIds)) {
             $query = $query->orWhereIn('id', $imageIds);
         }
 
         return $query->get();
     }
 
-    public function getImagesBySuggest(array $suggest, int $page) : array
+    public function getImagesBySuggest(array $suggest, int $page): array
     {
         $result = [];
         $useImageIds = [];
@@ -124,13 +133,13 @@ class ImageService
             $useImageIds = array_unique(array_merge($imageIds, $useImageIds));
 
             $models = Image::with([
-                'tags'
+                'tags',
             ])
-            ->whereIn('id', $imageIds)
-            ->offset(Image::PAGE_PER * $page)
-            ->limit($limit)
-            ->get()
-            ->toArray();
+                ->whereIn('id', $imageIds)
+                ->offset(Image::PAGE_PER * $page)
+                ->limit($limit)
+                ->get()
+                ->toArray();
 
             $result = array_merge($models, $result);
         }

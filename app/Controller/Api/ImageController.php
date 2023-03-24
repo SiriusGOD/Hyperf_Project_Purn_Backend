@@ -1,7 +1,14 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
@@ -9,17 +16,13 @@ use App\Model\Image;
 use App\Request\ImageApiListRequest;
 use App\Request\ImageApiSearchRequest;
 use App\Request\ImageApiSuggestRequest;
-use App\Request\TagRequest;
 use App\Service\ImageService;
 use App\Service\SuggestService;
-use App\Service\TagService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
-use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\Paginator\Paginator;
 
 /**
- * @Controller()
+ * @Controller
  */
 class ImageController extends AbstractController
 {

@@ -10,6 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Request;
+
 use App\Model\Role;
 use App\Model\User;
 use Hyperf\Validation\Request\FormRequest;
@@ -32,14 +33,12 @@ class UserDetailRequest extends FormRequest
     {
         $roleIds = Role::where('type', Role::TYPE['API'])->get()->pluck('id')->toArray();
         $roleIds[] = Role::API_DEFAULT_USER_ROLE_ID;
-        $rules = [
+        return [
             'id' => [
                 'required',
                 'numeric',
-                Rule::exists('users')->whereIn('role_id', $roleIds)->where('status', User::STATUS['NORMAL'])
-            ]
+                Rule::exists('users')->whereIn('role_id', $roleIds)->where('status', User::STATUS['NORMAL']),
+            ],
         ];
-
-        return $rules;
     }
 }

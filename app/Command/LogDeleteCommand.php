@@ -11,11 +11,9 @@ declare(strict_types=1);
  */
 namespace App\Command;
 
-use App\Service\ObfuscationService;
 use Carbon\Carbon;
 use Hyperf\Command\Annotation\Command;
 use Hyperf\Command\Command as HyperfCommand;
-use Hyperf\Di\Annotation\Inject;
 use Psr\Container\ContainerInterface;
 
 /**

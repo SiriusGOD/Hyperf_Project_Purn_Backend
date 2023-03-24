@@ -9,13 +9,11 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-
 namespace App\Service;
 
 use App\Model\Role;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
-
 
 class RoleService
 {
@@ -38,13 +36,14 @@ class RoleService
     {
         return Role::count();
     }
-    //取得角色
+
+    // 取得角色
     public function findRole($id)
     {
         return Role::findOrFail($id);
     }
 
-    //新增角色 回傳角色
+    // 新增角色 回傳角色
     public function storeRole($data)
     {
         if ($data['id']) {
@@ -58,13 +57,12 @@ class RoleService
         return $record;
     }
 
-    //刪除角色
+    // 刪除角色
     public function delRole($id)
     {
-        $role=Role::findOrFail($id);
-        if($role){
+        $role = Role::findOrFail($id);
+        if ($role) {
             $role->delete();
         }
     }
-
 }

@@ -1,12 +1,20 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Model;
 
 use Carbon\Carbon;
 
 /**
- * @property int $id 
+ * @property int $id
  * @property string $name
  * @property int $type
  * @property Carbon $created_at
@@ -20,20 +28,23 @@ class Role extends Model
 
     public const TYPE = [
         'ADMIN' => 0,
-        'API' => 1
+        'API' => 1,
     ];
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $table = 'roles';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = ['name'];
+
     /**
      * The attributes that should be cast to native types.
      *
@@ -41,7 +52,7 @@ class Role extends Model
      */
     protected $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
-    static public function getTypeNameByType(int $type)
+    public static function getTypeNameByType(int $type)
     {
         $typeFlip = array_flip(self::TYPE);
         return strtolower($typeFlip[$type]);

@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 /**
  * This file is part of Hyperf.
  *
@@ -10,7 +9,6 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-
 use App\Constants\ErrorCode;
 use Hyperf\AsyncQueue\Driver\DriverFactory;
 use Hyperf\AsyncQueue\JobInterface;
@@ -31,7 +29,7 @@ use Swoole\WebSocket\Frame;
 /*
  * 获取容器或实例
  */
-if (!function_exists('di')) {
+if (! function_exists('di')) {
     /**
      * Finds an entry of the di by its identifier and returns it.
      * @param null|mixed $id
@@ -52,7 +50,7 @@ if (!function_exists('di')) {
 /*
  * server 实例 基于 swoole server
  */
-if (!function_exists('server')) {
+if (! function_exists('server')) {
     function server()
     {
         return di()->get(ServerFactory::class)->getServer()->getServer();
@@ -62,7 +60,7 @@ if (!function_exists('server')) {
 /*
  * 获取服务
  */
-if (!function_exists('service')) {
+if (! function_exists('service')) {
     /**
      * service
      * 获取服务类实例.
@@ -88,7 +86,7 @@ if (!function_exists('service')) {
 /*
  * 控制台日志
  */
-if (!function_exists('stdLog')) {
+if (! function_exists('stdLog')) {
     function stdLog()
     {
         return di()->get(StdoutLoggerInterface::class);
@@ -98,7 +96,7 @@ if (!function_exists('stdLog')) {
 /*
  * 文件日志
  */
-if (!function_exists('logger')) {
+if (! function_exists('logger')) {
     /**
      * @param mixed $name
      * @param mixed $group
@@ -114,7 +112,7 @@ if (!function_exists('logger')) {
 /*
  * redis 客户端实例
  */
-if (!function_exists('redis')) {
+if (! function_exists('redis')) {
     function redis()
     {
         return di()->get(Hyperf\Redis\Redis::class);
@@ -124,7 +122,7 @@ if (!function_exists('redis')) {
 /*
  * 缓存实例 简单的缓存
  */
-if (!function_exists('cache')) {
+if (! function_exists('cache')) {
     function cache()
     {
         return di()->get(CacheInterface::class);
@@ -134,7 +132,7 @@ if (!function_exists('cache')) {
 /*
  * 将可抛出对象格式化为字符串
  */
-if (!function_exists('format_throwable')) {
+if (! function_exists('format_throwable')) {
     /**
      * Format a throwable to string.
      * @throws ContainerExceptionInterface
@@ -149,7 +147,7 @@ if (!function_exists('format_throwable')) {
 /*
  * 将job推送到异步队列
  */
-if (!function_exists('queue_push')) {
+if (! function_exists('queue_push')) {
     /**
      * Push a job to async queue.
      */
@@ -162,7 +160,7 @@ if (!function_exists('queue_push')) {
 /*
  * 不可逆加密
  */
-if (!function_exists('encrypt_with_salt')) {
+if (! function_exists('encrypt_with_salt')) {
     /**
      * 加密.
      * @param mixed $str
@@ -177,7 +175,7 @@ if (!function_exists('encrypt_with_salt')) {
 /*
  * 可逆加密
  */
-if (!function_exists('encrypt')) {
+if (! function_exists('encrypt')) {
     /**
      * 加密函数.
      * @param string $str 加密前的字符串
@@ -200,7 +198,7 @@ if (!function_exists('encrypt')) {
 /*
  * 可逆解密
  */
-if (!function_exists('decrypt')) {
+if (! function_exists('decrypt')) {
     /**
      * 解密函数.
      * @param string $str 加密后的字符串
@@ -224,7 +222,7 @@ if (!function_exists('decrypt')) {
 /*
  * 校验密码复杂度
  */
-if (!function_exists('valid_pass')) {
+if (! function_exists('valid_pass')) {
     function valid_pass($password): array
     {
         // $r1 = '/[A-Z]/';  //uppercase
@@ -260,7 +258,7 @@ if (!function_exists('valid_pass')) {
  * 检查手机号码格式
  * @param string $mobile 手机号码
  */
-if (!function_exists('check_mobile')) {
+if (! function_exists('check_mobile')) {
     function check_mobile($mobile): bool
     {
         return preg_match('/1[3-9]\d{9}$/', $mobile) || preg_match('/000\d{8}$/', $mobile);
@@ -270,7 +268,7 @@ if (!function_exists('check_mobile')) {
 /*
  * 计算总页数
  */
-if (!function_exists('page')) {
+if (! function_exists('page')) {
     /**
      * 计算总页数等.
      * @param mixed $totalCount
@@ -295,7 +293,7 @@ if (!function_exists('page')) {
 /*
  * redis 客户端实例
  */
-if (!function_exists('redis')) {
+if (! function_exists('redis')) {
     function redis()
     {
         return di()->get(Redis::class);
@@ -305,7 +303,7 @@ if (!function_exists('redis')) {
 /*
  * websocket frame 实例
  */
-if (!function_exists('frame')) {
+if (! function_exists('frame')) {
     function frame()
     {
         return di()->get(Frame::class);
@@ -315,7 +313,7 @@ if (!function_exists('frame')) {
 /*
  * 缓存实例 简单的缓存
  */
-if (!function_exists('cache')) {
+if (! function_exists('cache')) {
     function cache()
     {
         return di()->get(Psr\SimpleCache\CacheInterface::class);
@@ -325,7 +323,7 @@ if (!function_exists('cache')) {
 /*
  * 获取request实例
  */
-if (!function_exists('request')) {
+if (! function_exists('request')) {
     function request()
     {
         return di()->get(ServerRequestInterface::class);
@@ -335,14 +333,14 @@ if (!function_exists('request')) {
 /*
  * 获取response实例
  */
-if (!function_exists('response')) {
+if (! function_exists('response')) {
     function response()
     {
         return di()->get(ResponseInterface::class);
     }
 }
 
-if (!function_exists('auth')) {
+if (! function_exists('auth')) {
     /**
      * Auth认证辅助方法.
      * @return mixed
@@ -356,10 +354,10 @@ if (!function_exists('auth')) {
     }
 }
 
-if (!function_exists('convert_bytes')) {
+if (! function_exists('convert_bytes')) {
     function convert_bytes($number): string
     {
-        $number = (string)$number;
+        $number = (string) $number;
         $len = strlen($number);
         if ($len < 4) {
             return sprintf('%d b', $number);
@@ -374,11 +372,8 @@ if (!function_exists('convert_bytes')) {
     }
 }
 
-
-
-
-//使用者的權限
-if (!function_exists('authPermission')) {
+// 使用者的權限
+if (! function_exists('authPermission')) {
     function authPermission(string $key)
     {
         $service = di(\App\Service\PermissionService::class);
@@ -386,10 +381,10 @@ if (!function_exists('authPermission')) {
     }
 }
 
-if (!function_exists('calc_bytes')) {
+if (! function_exists('calc_bytes')) {
     function calc_bytes($size, $digits = 2): string
     {
-        if (!$size) {
+        if (! $size) {
             return '';
         }
         $unit = ['', 'K', 'M', 'G', 'T', 'P'];
@@ -417,18 +412,18 @@ if (! function_exists('cutStrLang')) {
     }
 }
 // 判斷是否在array中
-if (!function_exists('checkInAryRtnStr')) {
+if (! function_exists('checkInAryRtnStr')) {
     function checkInAryRtnStr(int $id, array $array, string $string): string
     {
         return in_array($id, $array) ? $string : '';
     }
 }
 // 寫入LOG
-if (!function_exists('checkUserSession')) {
+if (! function_exists('checkUserSession')) {
     function checkUserSession()
     {
         $all = di(\Hyperf\Contract\SessionInterface::class)->all();
-        if (!isset($all['auth_session'])) {
+        if (! isset($all['auth_session'])) {
             return false;
         }
         return true;
@@ -436,7 +431,7 @@ if (!function_exists('checkUserSession')) {
 }
 
 // Debgu show log
-if (!function_exists('debugLog')) {
+if (! function_exists('debugLog')) {
     function debugLog($data)
     {
         if (is_array($data)) {
@@ -447,17 +442,16 @@ if (!function_exists('debugLog')) {
     }
 }
 
-
 // redis鎖
-if (!function_exists('redisLock')) {
+if (! function_exists('redisLock')) {
     function redisLock($key)
     {
-        return redis()->setnx($key, 1) && redis()->expire($key, 10);
+        return redis()->setnx($key, "1") && redis()->expire($key, 10);
     }
 }
 
 // 隨幾產生數字
-if (!function_exists('randInt')) {
+if (! function_exists('randInt')) {
     function randInt(int $count)
     {
         $c = '';
@@ -468,26 +462,8 @@ if (!function_exists('randInt')) {
     }
 }
 
-// 從REDIS 取得 sites
-if (!function_exists('getSitesUrl')) {
-    function getSitesUrl($siteId)
-    {
-        $sites = di(\App\Service\SiteService::class)->getSites();
-        $url = '';
-        foreach ($sites as $key => $site) {
-            if ($site['id'] == $siteId) {
-                $url = $site['url'];
-            }
-        }
-        if ($url == '') {
-            return false;
-        }
-        return $url;
-    }
-}
-
 // redis 是否存在
-if (!function_exists('redisExists')) {
+if (! function_exists('redisExists')) {
     function redisExists($key)
     {
         if (redis()->exists($key)) {
@@ -497,7 +473,7 @@ if (!function_exists('redisExists')) {
     }
 }
 // 日誌
-if (!function_exists('setLog')) {
+if (! function_exists('setLog')) {
     function setLog()
     {
         return di(Hyperf\Logger\LoggerFactory::class)->get();
@@ -505,7 +481,7 @@ if (!function_exists('setLog')) {
 }
 
 // 判斷IP 是否在Array
-if (!function_exists('ipInArray')) {
+if (! function_exists('ipInArray')) {
     function ipInArray($ip, $allowIps)
     {
         if (in_array($ip, $allowIps)) {

@@ -18,8 +18,11 @@ use Hyperf\Redis\Redis;
 class ActorService
 {
     public const CACHE_KEY = 'actor';
+
     public const COUNT_KEY = 'actor_count';
+
     public const EXPIRE = 600;
+
     public const COUNT_EXPIRE = 180;
 
     protected Redis $redis;
@@ -28,62 +31,67 @@ class ActorService
     {
         $this->redis = $redis;
     }
-    //影片演員關聯
-    public function videoCorrespondActor(array $data ,int $videoId){
-      if($data['tags']!=""){
-        $tags = explode(",",$data['tags']);
-        foreach($tags as $v){
-          $d['name'] = $v; 
-          $d['user_id'] = 1; 
-          $d['sex'] = 0; 
-          $actor = self::storeActorByName($d);
-          self::createActorRelationship("video", $videoId, $actor->id);
+
+    // 影片演員關聯
+    public function videoCorrespondActor(array $data, int $videoId)
+    {
+        if ($data['tags'] != '') {
+            $tags = explode(',', $data['tags']);
+            foreach ($tags as $v) {
+                $d['name'] = $v;
+                $d['user_id'] = 1;
+                $d['sex'] = 0;
+                $actor = self::storeActorByName($d);
+                self::createActorRelationship('video', $videoId, $actor->id);
+            }
         }
-      }
     }
 
     // 取得演員
-    public function getActors($offset=0 ,$limit=0): array
+    public function getActors($offset = 0, $limit = 0): array
     {
-        if ($this->redis->exists(self::CACHE_KEY."$offset,$limit")) {
-            $jsonResult = $this->redis->get(self::CACHE_KEY."$offset,$limit");
+        if ($this->redis->exists(self::CACHE_KEY . "{$offset},{$limit}")) {
+            $jsonResult = $this->redis->get(self::CACHE_KEY . "{$offset},{$limit}");
             return json_decode($jsonResult, true);
         }
-        $result = self::selfGet($offset , $limit); 
-        $this->redis->set(self::CACHE_KEY."$offset,$limit", json_encode($result),self::EXPIRE);
+        $result = self::selfGet($offset, $limit);
+        $this->redis->set(self::CACHE_KEY . "{$offset},{$limit}", json_encode($result), self::EXPIRE);
         return $result;
     }
 
     // 計算總數
-    public function getCount(){
+    public function getCount()
+    {
         return Actor::count();
     }
 
     // 計算總數 存Redis
-    public function getActorCount(){
+    public function getActorCount()
+    {
         if ($this->redis->exists(self::COUNT_KEY)) {
             $jsonResult = $this->redis->get(self::COUNT_KEY);
             return json_decode($jsonResult, true);
         }
-        $result = self::getCount(); 
+        $result = (string) self::getCount();
         $this->redis->set(self::COUNT_KEY, $result, self::COUNT_EXPIRE);
         return $result;
     }
 
     // 共用自取
-    public function selfGet($offset=0 ,$limit=0){
-        return Actor::select("id","sex","name",'created_at')
+    public function selfGet($offset = 0, $limit = 0)
+    {
+        return Actor::select('id', 'sex', 'name', 'created_at')
             ->offset($offset)
             ->limit($limit)
             ->get()
             ->toArray();
     }
-  
+
     // 更新快取
     public function updateCache(): void
     {
-        $result = self::selfGet(); 
-        $this->redis->set(self::CACHE_KEY."0,0", json_encode($result),self::EXPIRE);
+        $result = self::selfGet();
+        $this->redis->set(self::CACHE_KEY . '0,0', json_encode($result), self::EXPIRE);
     }
 
     // 新增或更新演員
@@ -100,20 +108,20 @@ class ActorService
     // 新增或更新演員
     public function storeActorByName(array $data)
     {
-      if(Actor::where('name', $data['name'])->exists()) {
-          $model = Actor::where("name",$data['name'])->first();
-      }else{
-          $model = new Actor();
-      }
-      $model->user_id = $data['user_id'];
-      $model->name = $data['name'];
-      $model->sex = $data['sex'];
-      $model->save();
-      return $model;
+        if (Actor::where('name', $data['name'])->exists()) {
+            $model = Actor::where('name', $data['name'])->first();
+        } else {
+            $model = new Actor();
+        }
+        $model->user_id = $data['user_id'];
+        $model->name = $data['name'];
+        $model->sex = $data['sex'];
+        $model->save();
+        return $model;
     }
 
-    //新熷 演員關係
-    public function createActorRelationship(string $className, int $classId, int $actorId) : void
+    // 新熷 演員關係
+    public function createActorRelationship(string $className, int $classId, int $actorId): void
     {
         $model = new ActorCorrespond();
         $model->correspond_type = $className;
@@ -121,6 +129,4 @@ class ActorService
         $model->actor_id = $actorId;
         $model->save();
     }
-
 }
-

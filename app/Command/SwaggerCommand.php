@@ -1,13 +1,20 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Command;
 
-use Hyperf\Command\Command as HyperfCommand;
 use Hyperf\Command\Annotation\Command;
-use Psr\Container\ContainerInterface;
+use Hyperf\Command\Command as HyperfCommand;
 use Hyperf\DbConnection\Db;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -60,7 +67,7 @@ class SwaggerCommand extends HyperfCommand
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        parent::__construct($this -> name);
+        parent::__construct($this->name);
     }
 
     public function configure()
@@ -363,7 +370,6 @@ eof;
 
     /**
      * 獲取資料類型.
-     * @param $value
      */
     private function gettype($value): string
     {

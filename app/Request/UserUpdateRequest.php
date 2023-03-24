@@ -10,9 +10,9 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Request;
+
 use App\Service\UserService;
 use Hyperf\Redis\Redis;
-use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
 
 class UserUpdateRequest extends AuthBaseRequest
@@ -42,23 +42,23 @@ class UserUpdateRequest extends AuthBaseRequest
     public function rules(): array
     {
         $id = 0;
-        if(auth()->check()) {
+        if (auth()->check()) {
             $id = auth()->user()->getId();
         }
-        if (!empty($this->input('id'))) {
+        if (! empty($this->input('id'))) {
             $id = $this->input('id');
         }
 
-        $rules = [
+        return [
             'id' => 'numeric|exists:users',
             'name' => [
                 'string',
-                Rule::unique('users')->ignore($id)
+                Rule::unique('users')->ignore($id),
             ],
             'password' => 'string',
             'email' => [
                 'string',
-                Rule::unique('users')->ignore($id)
+                Rule::unique('users')->ignore($id),
             ],
             'sex' => 'numeric',
             'age' => 'numeric|between:18,130',
@@ -66,10 +66,8 @@ class UserUpdateRequest extends AuthBaseRequest
             'address' => 'string',
             'uuid' => [
                 'string',
-                Rule::unique('users')->ignore($id)
-            ]
+                Rule::unique('users')->ignore($id),
+            ],
         ];
-
-        return $rules;
     }
 }

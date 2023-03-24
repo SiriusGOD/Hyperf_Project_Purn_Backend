@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * This file is part of Hyperf.
@@ -146,4 +147,3 @@ class ActorController extends AbstractController
         return $response->redirect('/admin/actor/index');
     }
 }
-

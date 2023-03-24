@@ -1,14 +1,19 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Middleware\PermissionMiddleware;
 use App\Model\Order;
-use App\Model\OrderDetail;
-use App\Request\OrderRequest;
 use App\Service\OrderService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -64,8 +69,8 @@ class OrderController extends AbstractController
         $step = Order::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
 
-        $query = Order::join('users','orders.user_id','users.id')
-            ->select('orders.*','users.name')
+        $query = Order::join('users', 'orders.user_id', 'users.id')
+            ->select('orders.*', 'users.name')
             ->offset(($page - 1) * $step)
             ->limit($step);
         $orders = $query->get();
@@ -101,12 +106,12 @@ class OrderController extends AbstractController
     public function edit(RequestInterface $request)
     {
         $id = $request->input('id');
-        $data['model'] = Order::join('users','orders.user_id','users.id')
-            ->select('orders.*','users.name')
+        $data['model'] = Order::join('users', 'orders.user_id', 'users.id')
+            ->select('orders.*', 'users.name')
             ->findOrFail($id);
-        $data['model_details'] = Order::join('order_details','orders.id','order_details.order_id')
+        $data['model_details'] = Order::join('order_details', 'orders.id', 'order_details.order_id')
             ->select('order_details.*')
-            ->where('orders.id',$id)
+            ->where('orders.id', $id)
             ->get();
         $data['navbar'] = trans('default.order_control.order_edit');
         $data['order_active'] = 'active';
@@ -157,10 +162,10 @@ class OrderController extends AbstractController
         $data['page'] = $page;
         $data['step'] = $step;
         $path = '/admin/order/search';
-        if(!empty($order_status)){
+        if (! empty($order_status)) {
             $data['next'] = $path . '?page=' . ($page + 1) . '&order_status=' . $order_status;
             $data['prev'] = $path . '?page=' . ($page - 1) . '&order_status=' . $order_status;
-        }else{
+        } else {
             $data['next'] = $path . '?page=' . ($page + 1);
             $data['prev'] = $path . '?page=' . ($page - 1);
         }

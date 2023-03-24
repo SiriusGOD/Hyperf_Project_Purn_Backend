@@ -25,6 +25,7 @@ use Hyperf\Database\Model\SoftDeletes;
 class Site extends Model
 {
     use SoftDeletes;
+
     // 每頁筆數
     public const PAGE_PER = 10;
 

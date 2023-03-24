@@ -9,15 +9,12 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-
 namespace App\Service;
 
-use App\Constants\Constants;
 use App\Model\Permission;
+use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
-use HyperfExt\Hashing\Hash;
-use Hyperf\DbConnection\Db;
 
 class PermissionService
 {
@@ -35,11 +32,10 @@ class PermissionService
         $permissionsPluck = Db::table('role_has_permissions')->where('role_id', $role_id)->pluck('permission_id', 'id');
         $permiss_id = $permissionsPluck->toArray();
         $permissionsPluck = Permission::whereIn('id', $permiss_id)->pluck('name', 'id');
-        $perArys = $permissionsPluck->toArray();
-        return $perArys;
+        return $permissionsPluck->toArray();
     }
 
-    //儲存 角色權限
+    // 儲存 角色權限
     public function storePermission($datas, $role_id)
     {
         Db::table('role_has_permissions')->where('role_id', $role_id)->delete();
@@ -50,13 +46,13 @@ class PermissionService
         Db::table('role_has_permissions')->insert($insertData);
     }
 
-    //取得全部權限
+    // 取得全部權限
     public function getAll()
     {
         return Permission::all();
     }
 
-    //取得全部權限-存成Array
+    // 取得全部權限-存成Array
     public function parseData()
     {
         $datas = self::getAll();
@@ -67,7 +63,7 @@ class PermissionService
         return $d;
     }
 
-    //取得角色權限
+    // 取得角色權限
     public function getRolePermission($role_id)
     {
         $datas = Db::table('role_has_permissions')->where('role_id', $role_id)->get();
@@ -78,21 +74,20 @@ class PermissionService
         return $d;
     }
 
-    //controller 是否有權限 middle
+    // controller 是否有權限 middle
     public function hasPermission(array $callbacks)
     {
         $callBackStr = explode('\Admin\\', $callbacks[0]);
         $callBackStr = explode('Controller', $callBackStr[1]);
-        $key = strtolower($callBackStr[0]) . "-" . $callbacks[1];
+        $key = strtolower($callBackStr[0]) . '-' . $callbacks[1];
         $flag = self::checkPermission($key);
         if ($flag) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
-    //使用者的權限
+    // 使用者的權限
     public function checkPermission(string $key)
     {
         $user_id = auth('session')->user()->id;
@@ -100,8 +95,8 @@ class PermissionService
         if (empty($user_id) || empty($role_id)) {
             return false;
         }
-        //如果是超極管理員
-        if($role_id==1){
+        // 如果是超極管理員
+        if ($role_id == 1) {
             return true;
         }
         $redisKey = \App\Constants\Constants::USER_PERMISSION_KEY . $user_id;
@@ -115,7 +110,7 @@ class PermissionService
         return in_array($key, $perArys) ? true : false;
     }
 
-    //權限重設
+    // 權限重設
     public function resetPermission()
     {
         $user_id = auth('session')->user()->id;

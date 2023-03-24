@@ -10,7 +10,9 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Request;
+
 use Hyperf\Validation\Request\FormRequest;
+
 class ActorRequest extends FormRequest
 {
     /**
@@ -26,14 +28,11 @@ class ActorRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'id' => 'numeric',
             'user_id' => 'numeric',
             'name' => 'required|max:255',
             'sex' => 'required|max:255',
         ];
-
-        return $rules;
     }
 }
-

@@ -9,7 +9,6 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-
 namespace App\Controller\Admin;
 
 use App\Constants\ErrorCode;
@@ -17,8 +16,8 @@ use App\Controller\AbstractController;
 use App\Exception\BusinessException;
 use App\Middleware\AllowIPMiddleware;
 use App\Model\User;
-use App\Service\UserService;
 use App\Service\PermissionService;
+use App\Service\UserService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -31,8 +30,8 @@ use HyperfExt\Hashing\Hash;
 use HyperfExt\Jwt\Contracts\JwtFactoryInterface;
 use HyperfExt\Jwt\Contracts\ManagerInterface;
 use HyperfExt\Jwt\Jwt;
-use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use PragmaRX\Google2FA\Google2FA;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
 /**
  * @Controller
@@ -106,13 +105,13 @@ class UserController extends AbstractController
         $credentials = $request->inputs(['name', 'password']);
         $user = $service->checkUser($credentials);
         if ($user) {
-            if (env('GOOGLE_AUTH_VALID')==1) {
+            if (env('GOOGLE_AUTH_VALID') == 1) {
                 $secret = $request->input('secret');
                 $valid = $google2FA->verifyKey($user->avatar, $secret);
                 if ($valid == 1) {
                     return $this->handleLogin($user, $response);
                 }
-            }else{
+            } else {
                 return $this->handleLogin($user, $response);
             }
         }
@@ -123,7 +122,7 @@ class UserController extends AbstractController
         return $render->render('loginPage', $data);
     }
 
-    //登入成功處理
+    // 登入成功處理
     public function handleLogin($user, $response)
     {
         auth('session')->login($user);
@@ -166,7 +165,7 @@ class UserController extends AbstractController
         } else {
             $record = new User();
         }
-        if (!empty($password = $request->input('password'))) {
+        if (! empty($password = $request->input('password'))) {
             $record->password = Hash::make($password);
         }
         $record->name = $request->input('name');

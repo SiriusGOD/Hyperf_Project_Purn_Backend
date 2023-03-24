@@ -12,12 +12,13 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
-use App\Model\Site;
+use App\Middleware\PermissionMiddleware;
 use App\Model\Tag;
 use App\Request\TagRequest;
 use App\Service\TagService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
@@ -28,10 +29,6 @@ use HyperfExt\Jwt\Contracts\JwtFactoryInterface;
 use HyperfExt\Jwt\Contracts\ManagerInterface;
 use HyperfExt\Jwt\Jwt;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
-
-use Hyperf\HttpServer\Annotation\Middleware;
-use Hyperf\HttpServer\Annotation\Middlewares;
-use App\Middleware\PermissionMiddleware;
 
 /**
  * @Controller

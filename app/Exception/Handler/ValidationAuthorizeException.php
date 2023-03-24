@@ -12,13 +12,11 @@ declare(strict_types=1);
 namespace App\Exception\Handler;
 
 use App\Constants\ApiCode;
-use App\Constants\ErrorCode;
 use App\Exception\UnauthorizedException;
+use Hyperf\Di\Annotation\Inject;
 use Hyperf\Validation\ValidationExceptionHandler;
 use Hyperf\View\RenderInterface;
 use Psr\Http\Message\ResponseInterface;
-use Hyperf\Di\Annotation\Inject;
-use Throwable;
 
 class ValidationAuthorizeException extends ValidationExceptionHandler
 {
@@ -32,26 +30,26 @@ class ValidationAuthorizeException extends ValidationExceptionHandler
      */
     protected \Hyperf\HttpServer\Contract\ResponseInterface $response;
 
-    public function handle(Throwable $throwable, ResponseInterface $response)
+    public function handle(\Throwable $throwable, ResponseInterface $response)
     {
-        if (!$throwable instanceof UnauthorizedException) {
+        if (! $throwable instanceof UnauthorizedException) {
             return $response;
         }
 
         $this->stopPropagation();
         $url = request()->getUri()->getPath();
-        if (str_contains($url, "api")) {
+        if (str_contains($url, 'api')) {
             return $this->response->json([
                 'code' => ApiCode::BAD_LOGIN,
-                'msg'  => $throwable->getMessage(),
+                'msg' => $throwable->getMessage(),
             ]);
         }
         return $this->render->render('error', [
-            'errors' => $throwable->getMessage()
+            'errors' => $throwable->getMessage(),
         ]);
     }
 
-    public function isValid(Throwable $throwable): bool
+    public function isValid(\Throwable $throwable): bool
     {
         return true;
     }

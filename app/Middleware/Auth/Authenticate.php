@@ -1,16 +1,23 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Middleware\Auth;
 
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface as HttpResponse;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 class Authenticate implements MiddlewareInterface
 {
@@ -40,20 +47,20 @@ class Authenticate implements MiddlewareInterface
     {
         // 根据具体业务判断逻辑走向，这里假设用户携带的token有效
         $isValidToken = true;
-        if($isValidToken){
+        if ($isValidToken) {
             return $handler->handle($request);
         }
         return $this->response->json(
             [
                 'code' => -1,
                 'data' => [
-                    'error'           => '中间件验证token无效，阻止继续向下执行',
-                    'ServerParams'    => $this->request->getServerParams(),
+                    'error' => '中间件验证token无效，阻止继续向下执行',
+                    'ServerParams' => $this->request->getServerParams(),
                     'getCookieParams' => $this->request->getCookieParams(),
-                    'QueryParams'     => $this->request->getQueryParams(),
-                    'headers'         => $this->request->getHeaders(),
-                    'uri'             => $this->request->getUri(),
-                    'method'          => $this->request->getMethod(),
+                    'QueryParams' => $this->request->getQueryParams(),
+                    'headers' => $this->request->getHeaders(),
+                    'uri' => $this->request->getUri(),
+                    'method' => $this->request->getMethod(),
                 ],
             ]
         );

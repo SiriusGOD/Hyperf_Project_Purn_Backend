@@ -1,7 +1,14 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Middleware;
 
 use Hyperf\Context\Context;
@@ -35,7 +42,7 @@ class RequestIdMiddleware implements MiddlewareInterface
     {
         $this->logger->debug('include_files_count : ' . count(get_included_files()));
         $response = Context::get(ResponseInterface::class);
-        $response = $response->withHeader('Request-Id', md5((string)microtime(true)))
+        $response = $response->withHeader('Request-Id', md5((string) microtime(true)))
             ->withHeader('include_files_count', count(get_included_files()));
         Context::set(ResponseInterface::class, $response);
         return $handler->handle($request);

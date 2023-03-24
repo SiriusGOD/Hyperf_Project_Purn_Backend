@@ -9,7 +9,6 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-
 namespace App\Middleware;
 
 use Hyperf\Context\Context;
@@ -49,7 +48,7 @@ class AllowIPMiddleware implements MiddlewareInterface
         Context::set(ResponseInterface::class, $response);
         $service = di(\App\Service\BaseService::class);
         $ip = $service->getIp($request->getHeaders(), $request->getServerParams());
-        if (!$service->allowIp($ip)) {
+        if (! $service->allowIp($ip)) {
             return $this->response->json(
                 [
                     'code' => -1,

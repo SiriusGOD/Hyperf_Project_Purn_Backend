@@ -10,7 +10,9 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Request;
+
 use Hyperf\Validation\Request\FormRequest;
+
 class VideoRequest extends FormRequest
 {
     /**
@@ -26,13 +28,10 @@ class VideoRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'user_id' => 'numeric',
             'title' => 'required|max:255',
             'm3u8' => 'required|max:255',
         ];
-
-        return $rules;
     }
 }
-

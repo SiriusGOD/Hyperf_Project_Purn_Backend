@@ -45,14 +45,14 @@ class UserService
     {
         $model = new User();
 
-        if(!empty($data['id']) and User::where('id', $data['id'])->exists()) {
+        if (! empty($data['id']) and User::where('id', $data['id'])->exists()) {
             $model = User::find($data['id']);
         }
 
-        if (!empty($data['name']) and empty($model->name)) {
+        if (! empty($data['name']) and empty($model->name)) {
             $model->name = $data['name'];
         }
-        if (!empty($data['password'])) {
+        if (! empty($data['password'])) {
             $model->password = Hash::make($data['password']);
         }
         $model->sex = $data['sex'];
@@ -76,7 +76,7 @@ class UserService
     // 使用者列表
     public function getList($page, $pagePer)
     {
-        return User::select()->where('status',1)->offset(($page - 1) * $pagePer)->limit($pagePer)->get();
+        return User::select()->where('status', 1)->offset(($page - 1) * $pagePer)->limit($pagePer)->get();
     }
 
     // 使用者列表
@@ -84,47 +84,44 @@ class UserService
     {
         return User::count();
     }
+
     // 使用者列表
     public function userRoleUpdate($roldId)
     {
-        User::where('role_id',$roldId)->update(['role_id'=>'']);
+        User::where('role_id', $roldId)->update(['role_id' => '']);
     }
 
-
-    //登入驗證
+    // 登入驗證
     public function checkUser(array $userInfo)
     {
-        $user = User::where('name',$userInfo['name'])->first();
-        if(!$user){
+        $user = User::where('name', $userInfo['name'])->first();
+        if (! $user) {
             return false;
-        }else{
-            if(Hash::check($userInfo["password"], $user->password)){
-                return $user;
-            }else{
-                return false;
-            }
         }
+        if (Hash::check($userInfo['password'], $user->password)) {
+            return $user;
+        }
+        return false;
     }
 
     public function apiCheckUser(array $userInfo)
     {
-        $user = User::where('email',$userInfo['email'])->first();
-        if (!$user) {
-            $user = User::where('uuid',$userInfo['uuid'])->first();
+        $user = User::where('email', $userInfo['email'])->first();
+        if (! $user) {
+            $user = User::where('uuid', $userInfo['uuid'])->first();
         }
 
-        if(!$user) {
+        if (! $user) {
             return false;
         }
 
-        if(Hash::check($userInfo["password"], $user->password)){
+        if (Hash::check($userInfo['password'], $user->password)) {
             return $user;
-        }else{
-            return false;
         }
+        return false;
     }
 
-    public function apiRegisterUser(array $data) : User
+    public function apiRegisterUser(array $data): User
     {
         $model = new User();
         $model->name = $data['name'];
@@ -132,7 +129,7 @@ class UserService
         $model->sex = $data['sex'];
         $model->age = $data['age'];
         $model->avatar = $model->avatar ?? '';
-        if (!empty($data['avatar'])) {
+        if (! empty($data['avatar'])) {
             $model->avatar = $data['avatar'];
         }
         $model->email = $data['email'];
@@ -145,12 +142,12 @@ class UserService
         return $model;
     }
 
-    public function moveUserAvatar($file) : string
+    public function moveUserAvatar($file): string
     {
         $extension = $file->getExtension();
         $filename = sha1(Carbon::now()->toDateTimeString());
-        if(!file_exists(BASE_PATH.'/public/avatar')){
-            mkdir(BASE_PATH.'/public/avatar', 0755);
+        if (! file_exists(BASE_PATH . '/public/avatar')) {
+            mkdir(BASE_PATH . '/public/avatar', 0755);
         }
         $imageUrl = '/image/' . $filename . '.' . $extension;
         $path = BASE_PATH . '/public' . $imageUrl;
@@ -159,38 +156,38 @@ class UserService
         return $imageUrl;
     }
 
-    public function updateUser(int $id, array $data) : void
+    public function updateUser(int $id, array $data): void
     {
         $model = User::find($id);
-        if (!empty($data['name']) and empty($model->name)) {
+        if (! empty($data['name']) and empty($model->name)) {
             $model->name = $data['name'];
         }
 
-        if (!empty($data['password'])) {
+        if (! empty($data['password'])) {
             $model->password = Hash::make($data['password']);
         }
 
-        if (!empty($data['sex'])) {
+        if (! empty($data['sex'])) {
             $model->sex = $data['sex'];
         }
 
-        if (!empty($data['age'])) {
+        if (! empty($data['age'])) {
             $model->age = $data['age'];
         }
 
-        if (!empty($data['avatar'])) {
+        if (! empty($data['avatar'])) {
             $model->avatar = $data['avatar'];
         }
 
-        if (!empty($data['email'])) {
+        if (! empty($data['email'])) {
             $model->email = $data['email'];
         }
 
-        if (!empty($data['phone'])) {
+        if (! empty($data['phone'])) {
             $model->phone = $data['phone'];
         }
 
-        if (!empty($data['uuid'])) {
+        if (! empty($data['uuid'])) {
             $model->uuid = $data['uuid'];
         }
 
@@ -199,15 +196,15 @@ class UserService
         $model->save();
     }
 
-    public function saveToken(int $userId, string $token) : void
+    public function saveToken(int $userId, string $token): void
     {
         $this->redis->set(self::CACHE_KEY . $userId, $token);
     }
 
-    public function checkAndSaveDevice(int $userId, string $uuid) : bool
+    public function checkAndSaveDevice(int $userId, string $uuid): bool
     {
         $key = self::DEVICE_CACHE_KEY . $userId;
-        if (!$this->redis->exists($key)) {
+        if (! $this->redis->exists($key)) {
             $today = Carbon::now()->toDateString();
             $nextDay = Carbon::parse($today . ' 00:00:00')->addDay()->timestamp;
             $expire = $nextDay - time();

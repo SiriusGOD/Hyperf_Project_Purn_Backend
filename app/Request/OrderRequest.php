@@ -12,9 +12,6 @@ declare(strict_types=1);
 namespace App\Request;
 
 use App\Model\Order;
-use App\Service\UserService;
-use Hyperf\Redis\Redis;
-use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
 
 class OrderRequest extends AuthBaseRequest
@@ -24,7 +21,7 @@ class OrderRequest extends AuthBaseRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'user_id' => 'required|numeric',
             'order_status' => Rule::in([
                 Order::ORDER_STATUS['create'],
@@ -35,7 +32,5 @@ class OrderRequest extends AuthBaseRequest
             'limit' => 'numeric',
             'product_id' => 'numeric',
         ];
-
-        return $rules;
     }
 }

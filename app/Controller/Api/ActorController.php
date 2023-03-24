@@ -25,13 +25,13 @@ class ActorController extends AbstractController
     /**
      * @RequestMapping(path="list", methods="get")
      */
-    public function list(RequestInterface $request, ActorService $service )
+    public function list(RequestInterface $request, ActorService $service)
     {
-        $offset = $request->input('offset',0);   
-        $limit = $request->input('limit',0);   
-        $result = $service->getActors($offset ,$limit);
+        $offset = $request->input('offset', 0);
+        $limit = $request->input('limit', 0);
+        $result = $service->getActors($offset, $limit);
         return $this->success([
-            'result' => $result
+            'result' => $result,
         ]);
     }
 
@@ -42,7 +42,7 @@ class ActorController extends AbstractController
     {
         $result = $service->getActorCount();
         return $this->success([
-            'count' => $result
+            'count' => $result,
         ]);
     }
 }

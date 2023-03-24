@@ -15,9 +15,7 @@ use App\Constants\ApiCode;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\Logger\LoggerFactory;
-use Hyperf\View\RenderInterface;
 use Psr\Http\Message\ResponseInterface;
-use Throwable;
 
 class AppExceptionHandler extends ExceptionHandler
 {
@@ -31,7 +29,7 @@ class AppExceptionHandler extends ExceptionHandler
         $this->loggerFactory = $loggerFactory->get('error', 'error');
     }
 
-    public function handle(Throwable $throwable, ResponseInterface $response)
+    public function handle(\Throwable $throwable, ResponseInterface $response)
     {
         $this->logger->error(sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
         $this->logger->error($throwable->getTraceAsString());
@@ -41,14 +39,14 @@ class AppExceptionHandler extends ExceptionHandler
             $message = $throwable->getTraceAsString();
             return $this->response->json([
                 'code' => ApiCode::FATAL_ERROR,
-                'msg'  => $message,
+                'msg' => $message,
             ]);
         }
 
         return $this->response->redirect('/');
     }
 
-    public function isValid(Throwable $throwable): bool
+    public function isValid(\Throwable $throwable): bool
     {
         return true;
     }

@@ -108,8 +108,8 @@ class AdvertisementController extends AbstractController
             $file = $request->file('image');
             $extension = $request->file('image')->getExtension();
             $filename = sha1(Carbon::now()->toDateTimeString());
-            if(!file_exists(BASE_PATH.'/public/advertisement')){
-                mkdir(BASE_PATH.'/public/advertisement', 0755);
+            if (! file_exists(BASE_PATH . '/public/advertisement')) {
+                mkdir(BASE_PATH . '/public/advertisement', 0755);
             }
             $imageUrl = '/advertisement/' . $filename . '.' . $extension;
             $file->moveTo(BASE_PATH . '/public' . $imageUrl);
@@ -124,7 +124,7 @@ class AdvertisementController extends AbstractController
         $data['position'] = $request->input('position');
         $data['start_time'] = $request->input('start_time');
         $data['end_time'] = $request->input('end_time');
-        $data['buyer'] = $request->input('buyer');  
+        $data['buyer'] = $request->input('buyer');
         $data['expire'] = $request->input('expire');
         $service->storeAdvertisement($data);
         return $response->redirect('/admin/advertisement/index');

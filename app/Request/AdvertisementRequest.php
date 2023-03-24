@@ -17,7 +17,6 @@ use Hyperf\Validation\Rule;
 
 class AdvertisementRequest extends FormRequest
 {
-
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -52,7 +51,7 @@ class AdvertisementRequest extends FormRequest
                     Advertisement::EXPIRE['no'],
                     Advertisement::EXPIRE['yes'],
                 ]),
-            ]
+            ],
         ];
         $siteIds = $this->getSiteIds();
         if (! empty($siteIds)) {

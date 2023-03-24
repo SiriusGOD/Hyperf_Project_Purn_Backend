@@ -10,8 +10,8 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Request;
+
 use Hyperf\Validation\Request\FormRequest;
-use Hyperf\Validation\Rule;
 
 class ImageApiListRequest extends FormRequest
 {
@@ -20,7 +20,7 @@ class ImageApiListRequest extends FormRequest
      */
     public function authorize(): bool
     {
-       return true;
+        return true;
     }
 
     /**
@@ -28,10 +28,8 @@ class ImageApiListRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
-            'tags.*' => 'required|numeric'
+        return [
+            'tags.*' => 'required|numeric',
         ];
-
-        return $rules;
     }
 }

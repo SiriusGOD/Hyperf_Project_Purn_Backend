@@ -50,7 +50,7 @@ class AdvertisementTask
         foreach ($models as $model) {
             $model->expire = Advertisement::EXPIRE['yes'];
             $model->save();
-            $this->logger->info('廣告 id : '.$model->id.' 過期');
+            $this->logger->info('廣告 id : ' . $model->id . ' 過期');
         }
 
         $this->service->updateCache();

@@ -10,8 +10,6 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Request;
-use Hyperf\Validation\Request\FormRequest;
-use Hyperf\Validation\Rule;
 
 class TagRequest extends AuthBaseRequest
 {
@@ -20,10 +18,8 @@ class TagRequest extends AuthBaseRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'name' => 'required|string|between:1,50',
         ];
-
-        return $rules;
     }
 }

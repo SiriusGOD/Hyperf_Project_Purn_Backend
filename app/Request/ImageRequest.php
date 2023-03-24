@@ -10,11 +10,8 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Request;
-use App\Service\UserService;
-use Hyperf\Redis\Redis;
-use Hyperf\Validation\Request\FormRequest;
+
 use Hyperf\Validation\Rule;
-use Hyperf\Validation\UnauthorizedException;
 
 class ImageRequest extends AuthBaseRequest
 {
@@ -28,11 +25,11 @@ class ImageRequest extends AuthBaseRequest
             'group_id' => 'numeric',
             'id' => 'numeric',
             'image' => [
-                Rule::requiredIf(function() {
+                Rule::requiredIf(function () {
                     return empty($this->input('id'));
                 }),
-                'image'
-            ]
+                'image',
+            ],
         ];
 
         return $rules;
