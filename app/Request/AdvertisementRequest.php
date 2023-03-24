@@ -14,6 +14,7 @@ namespace App\Request;
 use App\Model\Advertisement;
 use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
+use App\Traits\SitePermissionTrait;
 
 class AdvertisementRequest extends FormRequest
 {
@@ -54,10 +55,6 @@ class AdvertisementRequest extends FormRequest
                 ]),
             ]
         ];
-        $siteIds = $this->getSiteIds();
-        if (! empty($siteIds)) {
-            $rules['site_id'][] = Rule::in($siteIds);
-        }
 
         return $rules;
     }
