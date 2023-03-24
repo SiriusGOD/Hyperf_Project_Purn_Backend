@@ -151,7 +151,7 @@ class VideoService
         $this->redis->set(self::CACHE_KEY . '0,0', json_encode($result), self::EXPIRE);
     }
 
-    public function getVideosBySuggest(array $suggest, int $page) : array
+    public function getVideosBySuggest(array $suggest, int $page): array
     {
         $result = [];
         $useImageIds = [];

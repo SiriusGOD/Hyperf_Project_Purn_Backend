@@ -99,6 +99,7 @@ class PayService
     /**
      * 生成支付签名.
      * @param string $signKey
+     * @param mixed $array
      * @return string
      */
     public function make_sign_pay($array, $signKey = '')

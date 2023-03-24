@@ -11,8 +11,6 @@ declare(strict_types=1);
  */
 namespace App\Model;
 
-use Carbon\Carbon;
-
 /**
  * @property int $id
  * @property int $user_id
@@ -24,9 +22,8 @@ use Carbon\Carbon;
  * @property string $end_time
  * @property string $buyer
  * @property int $expire
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property Site $site
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  */
 class Advertisement extends Model
 {
@@ -56,9 +53,4 @@ class Advertisement extends Model
      * @var array
      */
     protected $casts = ['id' => 'integer', 'user_id' => 'integer', 'position' => 'integer', 'expire' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
-
-    public function site()
-    {
-        return $this->belongsTo(Site::class, 'site_id', 'id')->withTrashed();
-    }
 }

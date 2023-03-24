@@ -28,21 +28,12 @@ use Qbhy\HyperfAuth\Authenticatable;
  * @property \Carbon\Carbon $updated_at
  * @property int $role_id
  * @property string $uuid
- * @property \Hyperf\Database\Model\Collection|Site[] $sites
  */
 class User extends Model implements Authenticatable
 {
-    public const STATUS = [
-        'NORMAL' => 1,
-        'DISABLE' => 2,
-        'DELETE' => 3,
-    ];
+    public const STATUS = ['NORMAL' => 1, 'DISABLE' => 2, 'DELETE' => 3];
 
-    public const SEX = [
-        'DEFAULT' => 0,
-        'MALE' => 1,
-        'FEMALE' => 2,
-    ];
+    public const SEX = ['DEFAULT' => 0, 'MALE' => 1, 'FEMALE' => 2];
 
     public const PAGE_PER = 10;
 

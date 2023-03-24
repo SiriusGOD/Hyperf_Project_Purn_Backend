@@ -370,6 +370,7 @@ eof;
 
     /**
      * 獲取資料類型.
+     * @param mixed $value
      */
     private function gettype($value): string
     {

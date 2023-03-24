@@ -446,7 +446,7 @@ if (! function_exists('debugLog')) {
 if (! function_exists('redisLock')) {
     function redisLock($key)
     {
-        return redis()->setnx($key, "1") && redis()->expire($key, 10);
+        return redis()->setnx($key, '1') && redis()->expire($key, 10);
     }
 }
 

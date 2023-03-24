@@ -30,7 +30,7 @@ class AdvertisementRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'id' => 'numeric',
             'user_id' => 'numeric',
             'name' => 'required|max:255',
@@ -53,7 +53,5 @@ class AdvertisementRequest extends FormRequest
                 ]),
             ],
         ];
-
-        return $rules;
     }
 }

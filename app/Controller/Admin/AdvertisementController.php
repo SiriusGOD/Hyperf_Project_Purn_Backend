@@ -70,8 +70,7 @@ class AdvertisementController extends AbstractController
         // 顯示幾筆
         $step = Advertisement::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = Advertisement::with('site')
-            ->offset(($page - 1) * $step)
+        $query = Advertisement::offset(($page - 1) * $step)
             ->limit($step);
         $advertisements = $query->get();
 
