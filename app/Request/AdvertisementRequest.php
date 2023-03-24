@@ -53,10 +53,6 @@ class AdvertisementRequest extends FormRequest
                 ]),
             ],
         ];
-        $siteIds = $this->getSiteIds();
-        if (! empty($siteIds)) {
-            $rules['site_id'][] = Rule::in($siteIds);
-        }
 
         return $rules;
     }
