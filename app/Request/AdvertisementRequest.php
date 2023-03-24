@@ -14,7 +14,6 @@ namespace App\Request;
 use App\Model\Advertisement;
 use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
-use App\Traits\SitePermissionTrait;
 
 class AdvertisementRequest extends FormRequest
 {
