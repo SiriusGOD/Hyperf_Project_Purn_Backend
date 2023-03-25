@@ -102,6 +102,8 @@ class ProductController extends AbstractController
      */
     public function expire(RequestInterface $request, ResponseInterface $response, ProductService $service): PsrResponseInterface
     {
+        $product_type = $request->input('product_type') ? $request->input('product_type') : '';
+
         $query = Product::where('id', $request->input('id'));
         $record = $query->first();
 
@@ -112,11 +114,16 @@ class ProductController extends AbstractController
         $record->expire = $request->input('expire', 1);
         $record->save();
         $service->updateCache();
-        return $response->redirect('/admin/product/index');
+        if(!empty($product_type)){
+            return $response->redirect('/admin/product/search?product_type='.urlencode($product_type));
+        }else{
+            return $response->redirect('/admin/product/index');
+        }
+        
     }
 
     /**
-     * @RequestMapping(path="create", methods={"get"})
+     * @RequestMapping(path="create", methods={"GET"})
      */
     public function create(RequestInterface $request)
     {

@@ -113,7 +113,7 @@
                                                 @endif
                                                 @if(authPermission('product-delete'))
                                                     <div class="row mb-1">
-                                                    <a href="/admin/product/delete?id={{$model->id}}" class="btn btn-danger">{{trans('default.delete') ?? '編輯'}}</a>
+                                                    <a href="/admin/product/delete?id={{$model->id}}" class="btn btn-danger">{{trans('default.delete') ?? '刪除'}}</a>
                                                     </div>
                                                 @endif
                                                 @if(authPermission('product-expire'))
@@ -121,6 +121,9 @@
                                                     <form action="/admin/product/expire" method="post">
                                                         <input type="hidden" name="id" value="{{$model->id}}" >
                                                         <input type="hidden" name="expire" value="{{\App\Model\product::EXPIRE['yes']}}" >
+                                                        @if(!empty($product_type))
+                                                        <input type="hidden" name="product_type" value="{{$product_type}}" >
+                                                        @endif
                                                         <input type="submit"  class="btn btn-danger" value="{{trans('default.take_down') ?? '下架'}}">
                                                     </form>
                                                 </div>
@@ -130,6 +133,9 @@
                                                     <form action="/admin/product/expire" method="post">
                                                         <input type="hidden" name="id" value="{{$model->id}}" >
                                                         <input type="hidden" name="expire" value="{{\App\Model\product::EXPIRE['no']}}" >
+                                                        @if(!empty($product_type))
+                                                        <input type="hidden" name="product_type" value="{{$product_type}}" >
+                                                        @endif
                                                         <input type="submit"  class="btn btn-danger" value="{{trans('default.take_up') ?? '上架'}}">
                                                     </form>
                                                 </div>
