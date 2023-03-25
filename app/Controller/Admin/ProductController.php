@@ -14,6 +14,7 @@ use App\Service\ImageService;
 use App\Service\VideoService;
 use App\Service\ProductService;
 use App\Request\ProductRequest;
+use App\Request\ProductMultipleStoreRequest;
 use App\Model\Product;
 use App\Model\Video;
 use Hyperf\Di\Annotation\Inject;
@@ -316,7 +317,7 @@ class ProductController extends AbstractController
     /**
      * @RequestMapping(path="multipleStore", methods={"POST"})
      */
-    public function multipleStore(RequestInterface $request, ResponseInterface $response, ProductService $service)
+    public function multipleStore(ProductMultipleStoreRequest $request, ResponseInterface $response, ProductService $service)
     {
         $correspond_id = json_decode($request->input('correspond_id'), true);
         $correspond_name = json_decode($request->input('correspond_name'), true);
