@@ -273,7 +273,7 @@ class ProductController extends AbstractController
         }
         
         $data['product_type'] = $product_type;
-        $data['navbar'] = trans('default.product_control.product_create');
+        $data['navbar'] = trans('default.product_control.product_multiple_create');
         $data['product_active'] = 'active';
         $data['total'] = $total;
         $data['datas'] = $products;

@@ -25,7 +25,7 @@
                                 </form>
                             </div>
                             <button type="submit" class="btn btn-primary col-md-1 mb-1" onclick="multipleInsert()">{{trans('default.product_control.multiple_create') ?? '大批新增'}}</button>
-                            <button type="submit" class="btn btn-danger col-md-1 mb-1" onclick="clearCache()">{{trans('default.product_control.multiple_create') ?? '大批新增'}}</button>
+                            <button type="submit" class="btn btn-danger col-md-1 mb-1" onclick="clearCache()">{{trans('default.product_control.product_clear_choose') ?? '清除選擇'}}</button>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
