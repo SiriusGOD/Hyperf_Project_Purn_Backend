@@ -73,59 +73,5 @@ class VideoTest extends HttpTestCase
         $this->assertSame(2, (int)$res->type);
     }
 
-    public function testVideoStore()
-    {
-        $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
-        $db  = \Hyperf\Utils\ApplicationContext::getContainer()->get(DB::class);
-        $res = $db->select("select * from ks_mv order by id asc limit 1150  "); 
-        foreach($res as  $row){
-          $arr = (array) $row;
-          $arr['user_id'] = 1;
-          $arr['description'] = 'description';
-          $arr['refreshed_at']= date("Y-m-d H:i:s");
-          unset($arr['id']);
-          unset($arr['uid']);
-          $model = $service->storeVideo($arr);
-          self::storeVideoTag($arr ,$model->id);
-          self::storeVideoActor($arr ,$model->id);
-        }
-        $this->assertSame(2, 2);
-    }
-
-    public function storeVideoTag($arr ,$videoId){
-        $sTag = \Hyperf\Utils\ApplicationContext::getContainer()->get(TagService::class);
-        $tags = explode(",",$arr['tags']);
-        foreach($tags as $v){
-          if(strlen($v)>1){
-            $tag = $sTag->createTagByName($v ,1);
-            $sTag->createTagRelationship("video" ,$videoId ,$tag->id);
-          }
-        }
-    }
-
-    public function storeVideoActor($arr, $videoId){
-        $sActor = \Hyperf\Utils\ApplicationContext::getContainer()->get(ActorService::class);
-        $data['name'] = $arr['actors']; 
-        $data['user_id'] = 1; 
-        $data['sex'] = 0; 
-        $actor = $sActor->storeActorByName($data);
-        $sActor->createActorRelationship("video", $videoId, $actor->id);
-    }
-
-    public function testUpdateVideo()
-    {
-      $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
-      $db  = \Hyperf\Utils\ApplicationContext::getContainer()->get(DB::class);
-      $res1 = $db->select("select * from ks_mv order by id asc limit 1"); 
-      foreach($res1 as  $res){
-        $arr = (array) $res;
-        unset($arr['uid']);
-        $arr['user_id'] = 1;
-        $arr['description'] = 'description';
-        $arr['refreshed_at']= date("Y-m-d H:i:s");
-        $service->storeVideo($arr);
-      }
-      $this->assertSame(2, 2);
-    }
 }
 
