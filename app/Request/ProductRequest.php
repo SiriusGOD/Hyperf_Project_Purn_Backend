@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
+namespace App\Request;
+
+use Hyperf\Validation\Request\FormRequest;
+use Hyperf\Validation\Rule;
+use App\Model\Product;
+
+class ProductRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
+    {
+        $rules = [
+            'id' => 'numeric',
+            'product_type' => 'required|max:255',
+            'product_id' => 'numeric',
+            'correspond_id' => 'numeric',
+            'product_name' => 'required|max:255',
+            'expire' => [
+                'required',
+                Rule::in([
+                    Product::EXPIRE['no'],
+                    Product::EXPIRE['yes'],
+                ]),
+            ],
+            'start_time' => 'required|date',
+            'end_time' => 'required|date|after:start_date',
+            'product_currency' => 'required|max:255',
+            'product_price' => 'required|numeric',
+        ];
+
+        return $rules;
+    }
+}

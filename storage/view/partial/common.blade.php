@@ -164,6 +164,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('product-index'))
+                    <li class="nav-item">
+                        <a href="/admin/product/index" class="nav-link {{$product_active ?? ''}}">
+                            <i class="nav-icon fas fa-boxes"></i>
+                            <p>
+                                {{trans('default.leftbox.product') ?? '商品管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

@@ -31,6 +31,18 @@ use Hyperf\Database\Model\SoftDeletes;
  */
 class Product extends Model
 {
+    public const EXPIRE = ['no' => 0, 'yes' => 1];
+    public const PAGE_PER = 10;
+    public const TYPE_LIST = [
+        'image' => 'App\Model\Image',
+        'video' => 'App\Model\Video'
+    ];
+    public const CURRENCY = [
+        'CNY' => '人民幣',
+        'USD' => '美金',
+        'TWD' => '台幣'
+    ];
+    
     use SoftDeletes;
 
     /**

@@ -92,8 +92,10 @@ return [
     'description_msg_def' => '請輸入描述',
     'name_msg_def' => '請輸入名稱',
     'sex' => '性別',
-    'created_at'=>"建立時間",
-    'user_id'=>"建立者",
+    'created_at' => "建立時間",
+    'user_id' => "建立者",
+    'type' => "類型",
+    'preview' => "預覽",
     // -------------------------------------------------------------------
     // video
     'video' => [
@@ -138,6 +140,7 @@ return [
         'order' => '訂單管理',
         'video' => '影片管理',
         'actor' => '演員管理',
+        'product' => '商品管理',
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -228,6 +231,26 @@ return [
         'order_details' => '訂單明細',
         'order_search_msg' => '訂單編號或訂單狀態請擇一，如兩者都選，則以訂單編號為主',
         'order_choose_status' => '選擇訂單狀態'
+    ],
+    // -------------------------------------------------------------------
+    // ProductController
+    'product_control' => [
+        'product_control' => '商品管理',
+        'product_create' => '新增商品',
+        'product_multiple_create' => '新增大批商品',
+        'multiple_create' => '大批新增',
+        'product_currency' => '商品幣別',
+        'product_price' => '商品價格',
+        'product_type' => '商品類型',
+        'product_choose' => '選擇商品',
+        'product_choose_type' => '選擇商品類型',
+        'product_name' => '商品名稱',
+        'product_search' => '商品查詢',
+        'product_name_search' => '查詢名稱',
+        'product_edit' => '編輯商品',
+        'product_multiple_edit' => '編輯大批商品',
+        'product_clear_choose' => '清除選擇',
+        'product_num' => '商品數',
     ],
     // -------------------------------------------------------------------
 ];
