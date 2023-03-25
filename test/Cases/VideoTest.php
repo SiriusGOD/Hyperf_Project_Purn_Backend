@@ -69,7 +69,7 @@ class VideoTest extends HttpTestCase
             'count_pay'        => 0,
             'club_id'          => 0,
         ];
-        $res = $service->createVideo($insertData);
+        $res = $service->storeVideo($insertData);
         $this->assertSame(2, (int)$res->type);
     }
 
