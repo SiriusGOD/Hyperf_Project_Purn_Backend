@@ -29,7 +29,7 @@ class ImageService
             $model->thumbnail = $data['thumbnail'];
             $model->url = $data['url'];
         }
-        $model->likes = $model->likes ?? 0;
+        $model->like = $model->like ?? 0;
         $model->group_id = $data['group_id'];
         $model->description = $data['description'];
         $model->save();

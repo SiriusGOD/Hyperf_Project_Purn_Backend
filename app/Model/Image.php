@@ -21,7 +21,7 @@ use Hyperf\Database\Model\SoftDeletes;
  * @property string $title_thumbnail
  * @property string $thumbnail
  * @property string $url
- * @property int $likes
+ * @property int $like
  * @property int $group_id
  * @property Carbon $created_at
  * @property Carbon $updated_at

@@ -13,6 +13,7 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Model\Image;
+use App\Request\ImageApiLikeRequest;
 use App\Request\ImageApiListRequest;
 use App\Request\ImageApiSearchRequest;
 use App\Request\ImageApiSuggestRequest;
@@ -83,5 +84,23 @@ class ImageController extends AbstractController
         $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
 
         return $this->success($data);
+    }
+
+    /**
+     * @RequestMapping(path="like", methods="post")
+     */
+    public function like(ImageApiLikeRequest $request)
+    {
+        $id = $request->input('id');
+
+        $model = Image::find($id);
+        $model->like++;
+
+        $model->save();
+
+        return $this->success([
+            'id' => $id,
+            'like' => $model->like,
+        ]);
     }
 }

@@ -36,7 +36,6 @@ class VideoTest extends HttpTestCase
             'title'            => "三上2",
             'coins'            => 20,
             'm3u8'             => "/qwe",
-            'description'      => "/qwe",
             'refreshed_at'     => date("Y-m-d H:i:s"),
             'full_m3u8'        => '',
             'v_ext'            => 'm3u8',
