@@ -34,6 +34,7 @@ class VideoTest extends HttpTestCase
             'user_id'          => 1,
             'music_id'         => 1,
             'title'            => "三上2",
+            'description'      => "test",
             'coins'            => 20,
             'm3u8'             => "/qwe",
             'refreshed_at'     => date("Y-m-d H:i:s"),
