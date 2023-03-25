@@ -165,7 +165,7 @@
         $(document).ready(function() {
             let products = JSON.parse(localStorage.getItem('multipleProducts'));
             products.forEach(id => {
-                $("#checkbox" + id).attr('checked', true);
+                $("#checkbox" + id).prop('checked', true);
             });
         });
         function insertCache(id){
@@ -192,7 +192,7 @@
             let products = JSON.parse(localStorage.getItem('multipleProducts'));;
             
             products.forEach(id => {
-                $("#checkbox" + id).attr('checked', false);
+                $("#checkbox" + id).prop('checked', false);
                 // document.getElementById("checkbox" + id).checked = false;
             });
 
