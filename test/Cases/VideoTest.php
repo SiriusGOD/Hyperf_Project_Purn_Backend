@@ -51,7 +51,6 @@ class VideoTest extends HttpTestCase
             'p_id'             => 1,
             'user_id'          => 1,
             'music_id'         => 1,
-            'title'            => "大戰教師",
             'description'      => "test",
             'coins'            => 20,
             'm3u8'             => "/watch8/a77b2b0863aeaab3be89a6f1b85baa82/a77b2b0863aeaab3be89a6f1b85baa82.m3u8",
@@ -66,9 +65,7 @@ class VideoTest extends HttpTestCase
             'gif_width'        => 0,
             'gif_height'       => 0,
             'directors'        => 'category',
-            'actors'           => '一小央泽,桜桃喵,深田由美',
             'category'         => 1,
-            'tags'             => '口交,女神,换脸,美乳,丝袜',
             'via'              => 'live',
             'onshelf_tm'       => time(),
             'rating'           => '12',
@@ -125,6 +122,15 @@ class VideoTest extends HttpTestCase
         $this->assertNotSame($res2['data']["models"][0]["id"], $res1['data']["models"][0]["id"]);
     }
 
+    //vidoe search api 測試
+    public function testApiSearch()
+    {
+        $rand = new URand();
+        $title = $rand->getRandTitle();
+        $res2 = $this->client->get('/api/video/search',['title'=>$title]);
+        $this->assertSame(200, (int) $res2['code']);
+    }
+
     //vidoe list api 有tag測試
     public function testApiListHasTags()
     {
@@ -142,7 +148,6 @@ class VideoTest extends HttpTestCase
             if (strpos($tagstr, $search_string) !== false && $flag==false) {
                 $assertCount ++;
                 $flag = true;
-                echo "\nThe string '$search_string' was found in the string '$tagstr'.";
             } 
           }
         }

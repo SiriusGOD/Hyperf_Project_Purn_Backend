@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
-use App\Model\Image;
 use App\Request\VideoApiSuggestRequest;
 use App\Service\ActorService;
 use App\Service\SuggestService;
@@ -79,14 +78,14 @@ class VideoController extends AbstractController
     {
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 10);
-        $name = $request->input('name', '');
+        $title = $request->input('title');
         $length = $request->input('length', 0);
         $compare = $request->input('compare', 0);
-        if (empty($name) || strlen($name) == 0) {
-            $result = ['message' => 'name 不得為空'];
+        if (empty($title) || strlen($title) == 0) {
+            $result = ['message' => 'title 不得為空'];
             return $this->success($result);
         }
-        $result = $service->searchVideo($name, $compare, $length, $offset, $limit);
+        $result = $service->searchVideo($title, $compare, $length, $offset, $limit);
         return $this->success([$result]);
     }
 
@@ -99,11 +98,10 @@ class VideoController extends AbstractController
         $userId = (int) auth()->user()->getId();
         $suggest = $suggestService->getTagProportionByUser($userId);
         $models = $service->getVideosBySuggest($suggest, $page);
-
         $data = [];
         $data['models'] = $models;
         $data['page'] = $page;
-        $data['step'] = Image::PAGE_PER;
+        $data['step'] = Constants::DEFAULT_PAGE_PER;
         $path = '/api/video/suggest';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);

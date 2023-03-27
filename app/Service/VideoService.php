@@ -121,14 +121,14 @@ class VideoService
      * @param mixed $offset
      * @param mixed $limit
      */
-    public function searchVideo($name, $compare, $length, $offset, $limit)
+    public function searchVideo(string $title, $compare, int $length, $offset, $limit)
     {
         # if ($this->redis->exists(self::CACHE_KEY.$name)) {
       #    $jsonResult = $this->redis->get(self::CACHE_KEY.$name);
       #    return json_decode($jsonResult, true);
         # }
 
-        $model = Video::where('name', 'like', "%{$name}%");
+        $model = Video::where('title', 'like', "%{$title}%");
         if ($compare > 0 && $length > 0) {
             if ($compare == 1) {
                 $model = $model->where('videos.lenght', '>=', $length);
