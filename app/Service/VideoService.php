@@ -14,38 +14,48 @@ namespace App\Service;
 use App\Model\ActorCorrespond;
 use App\Model\TagCorrespond;
 use App\Model\Video;
+use Hyperf\Database\Model\Collection;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
 class VideoService
 {
     public const CACHE_KEY = 'video';
-
     public const COUNT_KEY = 'video_count';
-
     public const EXPIRE = 600;
-
     public const COUNT_EXPIRE = 180;
 
     protected Redis $redis;
 
-    public function __construct(Redis $redis, LoggerFactory $loggerFactory)
+    public function __construct(Video $video, Redis $redis, LoggerFactory $loggerFactory)
     {
         $this->redis = $redis;
         $this->logger = $loggerFactory->get('reply');
+        $this->model =  $video;
+    }
+  
+    //影片列表
+    public function getVideos(?array $tagIds, int $page): Collection
+    {
+        $videoIds = [];
+        $query = $this->model;
+        if (! empty($tagIds)) {
+          $videoIds = TagCorrespond::where('correspond_type', 'video')
+              ->whereIn('tag_id', $tagIds)
+              ->pluck('correspond_id');
+        }
+        //if(!empty($tagIds)){
+        //  $query = $query->with([
+        //      'tags',
+        //  ]);
+        //}
+        $query = $query->offset(Video::PAGE_PER * $page)->limit(Video::PAGE_PER);
+        if (! empty($videoIds)) {
+            $query = $query->whereIn('id', $videoIds);
+        }
+        return $query->get();
     }
 
-    // 取得影片
-    public function getVideos($offset = 0, $limit = 0): array
-    {
-        if ($this->redis->exists(self::CACHE_KEY . "{$offset},{$limit}")) {
-            $jsonResult = $this->redis->get(self::CACHE_KEY . "{$offset},{$limit}");
-            return json_decode($jsonResult, true);
-        }
-        $result = self::selfGet($offset, $limit);
-        $this->redis->set(self::CACHE_KEY . "{$offset},{$limit}", json_encode($result), self::EXPIRE);
-        return $result;
-    }
 
     // 新增影片
     public function storeVideo($data)

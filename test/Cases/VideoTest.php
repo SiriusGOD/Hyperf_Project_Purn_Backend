@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 /**
  * This file is part of Hyperf.
@@ -10,20 +9,39 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace HyperfTest\Cases;
-use Hyperf\DbConnection\Db;
+
+use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
+
 use App\Service\VideoService;
 use App\Service\TagService;
 use App\Service\ActorService;
+use App\Util\URand;
+
 /**
  * @internal
  * @coversNothing
  */
 class VideoTest extends HttpTestCase
 {
+     /**
+     * @var Client
+     */
+    protected $client;
+  
+    public function __construct($name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+        $this->client = make(Client::class);
+    }
+
+    //測試Count
     public function testCount()
     {
+        $rand = new URand();
         $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
+        $tagService = \Hyperf\Utils\ApplicationContext::getContainer()->get(TagService::class);
+        $actorService = \Hyperf\Utils\ApplicationContext::getContainer()->get(ActorService::class);
         $rating = rand(20000,200000);
         $like = floor($rating/15);
         // 插入数据
@@ -33,24 +51,24 @@ class VideoTest extends HttpTestCase
             'p_id'             => 1,
             'user_id'          => 1,
             'music_id'         => 1,
-            'title'            => "三上2",
+            'title'            => "大戰教師",
             'description'      => "test",
             'coins'            => 20,
-            'm3u8'             => "/qwe",
+            'm3u8'             => "/watch8/a77b2b0863aeaab3be89a6f1b85baa82/a77b2b0863aeaab3be89a6f1b85baa82.m3u8",
             'refreshed_at'     => date("Y-m-d H:i:s"),
             'full_m3u8'        => '',
             'v_ext'            => 'm3u8',
             'duration'         => 111,
-            'cover_thumb'      => 'cover_thumb',//封面
+            'cover_thumb'      => '/new/av/20211220/2021122023012418421.png',//封面
             'thumb_width'      => 0,
             'thumb_height'     => 0,
             'gif_thumb'        => 'cover_full',//封面 竖
             'gif_width'        => 0,
             'gif_height'       => 0,
             'directors'        => 'category',
-            'actors'           => 'actors',
-            'category'         => "qwe",
-            'tags'             => 'tags',
+            'actors'           => '一小央泽,桜桃喵,深田由美',
+            'category'         => 1,
+            'tags'             => '口交,女神,换脸,美乳,丝袜',
             'via'              => 'live',
             'onshelf_tm'       => time(),
             'rating'           => '12',
@@ -69,9 +87,66 @@ class VideoTest extends HttpTestCase
             'count_pay'        => 0,
             'club_id'          => 0,
         ];
-        $res = $service->storeVideo($insertData);
-        $this->assertSame(2, (int)$res->type);
+
+        for($i=1 ; $i<=20 ; $i++){
+            $insertData['tags'] = $rand->getRandTagActor(5,"TAG");
+            $insertData['actors'] = $rand->getRandTagActor(5,"ACTOR");
+            $insertData['title'] = $rand->getRandTitle();
+            $video = $service->storeVideo($insertData);
+            if($insertData['tags']){
+                $exps = explode(",",$insertData['tags']);
+                foreach($exps as $str){
+                    $tag = $tagService->createTagByName($str, 1);
+                    $tagService->createTagRelationship("video",$video->id ,$tag->id );
+                } 
+            }
+
+            if($insertData['actors']){
+                $exps = explode(",",$insertData['tags']);
+                foreach($exps as $str){
+                  $data["name"] = $str; 
+                  $data["user_id"] = 1; 
+                  $data["sex"] = 1; 
+                  $actor = $actorService->storeActorByName($data); 
+                  $actorService->createActorRelationship("video",$video->id ,$actor->id );
+                }
+            }
+        }
+        $this->assertSame(2, (int)$video->type);
     }
 
+    //vidoe list api 測試
+    public function testApiList()
+    {
+        $res1 = $this->client->get('/api/video/list');
+        $this->assertSame(200, (int) $res1['code']);
+        $res2 = $this->client->get('/api/video/list',['page'=>2]);
+        $this->assertSame(200, (int) $res2['code']);
+        $this->assertNotSame($res2['data']["models"][0]["id"], $res1['data']["models"][0]["id"]);
+    }
+
+    //vidoe list api 有tag測試
+    public function testApiListHasTags()
+    {
+        $tagService = \Hyperf\Utils\ApplicationContext::getContainer()->get(TagService::class);
+        $tags = $tagService->getTags();
+        $data = array_slice( $tags->toArray(),0,3);
+        $ids  = array_column($data , 'id') ;
+        $names  = array_column($data , 'name') ;
+        $res1 = $this->client->get('/api/video/list',[ 'tags' => $ids ]);
+        $assertCount = 0;
+        for($i=1; $i<=4; $i++){
+          $tagstr = $res1['data']["models"][$i]['tags'];
+          $flag = false;
+          foreach($names as $search_string){
+            if (strpos($tagstr, $search_string) !== false && $flag==false) {
+                $assertCount ++;
+                $flag = true;
+                echo "\nThe string '$search_string' was found in the string '$tagstr'.";
+            } 
+          }
+        }
+        $this->assertSame(4, $assertCount );
+    }
 }
 

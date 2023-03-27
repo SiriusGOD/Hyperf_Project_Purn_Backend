@@ -15,13 +15,14 @@ use PHPUnit\Framework\TestCase;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
 use App\Service\ActorService;
+
 /**
  * @internal
  * @coversNothing
  */
 class ActorTest extends HttpTestCase
 {
-  /**
+     /**
      * @var Client
      */
     protected $client;
@@ -47,8 +48,13 @@ class ActorTest extends HttpTestCase
 
     public function testApiList()
     {
-        $data = $this->client->get('/api/actor/list');
-        $this->assertSame(200, (int) $data['code']);
+        $res1 = $this->client->get('/api/actor/list');
+        $this->assertSame(200, (int) $res1['code']);
+
+        $res2 = $this->client->get('/api/actor/list',['page'=>2]);
+        $this->assertSame(200, (int) $res2['code']);
+
+        $this->assertNotSame($res2['data']["models"][0]["id"], $res1['data']["models"][0]["id"]);
     }
 
 }

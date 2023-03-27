@@ -53,4 +53,14 @@ class Video extends Model
      * @var array
      */
     protected $casts = ['id' => 'integer', 'user_id' => 'integer', 'length' => 'integer', 'likes' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'correspond', 'tag_corresponds', 'correspond_id');
+    }
 }

@@ -21,6 +21,7 @@ use App\Service\VideoService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use App\Constants\Constants;
 
 /**
  * @Controller
@@ -32,10 +33,21 @@ class VideoController extends AbstractController
      */
     public function list(RequestInterface $request, VideoService $service)
     {
-        $offset = $request->input('offset', 0);
-        $limit = $request->input('limit', 0);
-        $result = $service->getVideos($offset, $limit);
-        return $this->success($result);
+        $tagIds = $request->input('tags',[]);
+        $page = (int) $request->input('page', 1);
+        $data = [];
+        $data['models'] =$service->getVideos($tagIds, $page);
+        $data['page'] = $page;
+        $data['step'] = Constants::DEFAULT_PAGE_PER;
+        $path = '/api/image/list';
+        $data['next'] = $path . '?page=' . ($page + 1);
+        if( $page == 1 ){
+          $data['prev'] = "";
+        }else{
+          $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        }
+        return $this->success($data);
+
     }
 
     /**
