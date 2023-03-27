@@ -131,11 +131,11 @@ class ProductController extends AbstractController
         $product_type = $request->input('product_type');
         if(!empty($product_type)){
             switch($product_type){
-                case Image::class :
+                case 'image':
                     $model = Image::findOrFail($id);
                     break;
 
-                case Video::class :
+                case 'video' :
                     $model = Video::findOrFail($id);
                     break;    
             }
@@ -162,8 +162,21 @@ class ProductController extends AbstractController
         $product_name = $request->input('product_name');
 
         if(!empty($product_type)){
-            $query = $product_type::select('*');
-            $query_tatal = $product_type::select('*');
+            switch ($product_type) {
+                case 'image':
+                    $type_class = Product::TYPE_CORRESPOND_LIST['image'];
+                    break;
+                case 'video':
+                    $type_class = Product::TYPE_CORRESPOND_LIST['video'];
+                    break;
+                
+                default:
+                    $type_class = '';
+                    break;
+            }
+
+            $query = $type_class::select('*');
+            $query_tatal = $type_class::select('*');
 
             if(!empty($product_name)){
                 $query = $query->where('title', 'like', '%'.$product_name.'%');
@@ -207,7 +220,7 @@ class ProductController extends AbstractController
     {
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = (int)auth('session')->user()->id;
-        $data['type'] = $request->input('product_type');
+        $data['type'] = Product::TYPE_CORRESPOND_LIST[$request->input('product_type')];
         $data['correspond_id'] = $request->input('product_id') ? $request->input('product_id') : $request->input('correspond_id');
         $data['name'] = $request->input('product_name');
         $data['expire'] = (int) $request->input('expire');
@@ -259,8 +272,21 @@ class ProductController extends AbstractController
         $product_name = $request->input('product_name');
 
         if(!empty($product_type)){
-            $query = $product_type::select('*');
-            $query_tatal = $product_type::select('*');
+            switch ($product_type) {
+                case 'image':
+                    $type_class = Product::TYPE_CORRESPOND_LIST['image'];
+                    break;
+                case 'video':
+                    $type_class = Product::TYPE_CORRESPOND_LIST['video'];
+                    break;
+                
+                default:
+                    $type_class = '';
+                    break;
+            }
+
+            $query = $type_class::select('*');
+            $query_tatal = $type_class::select('*');
             
             if(!empty($product_name)){
                 $query = $query->where('title', 'like', '%'.$product_name.'%');
@@ -278,7 +304,7 @@ class ProductController extends AbstractController
         if ($total == 0) {
             $data['last_page'] = 1;
         }
-        
+
         $data['product_type'] = $product_type;
         $data['navbar'] = trans('default.product_control.product_multiple_create');
         $data['product_active'] = 'active';
@@ -299,15 +325,28 @@ class ProductController extends AbstractController
     /**
      * @RequestMapping(path="multipleInsert", methods={"GET"})
      */
-    public function multipleInsert(RequestInterface $request)
+    public function multipleInsert(RequestInterface $request, ProductService $service)
     {
         $data = json_decode($request->input('data'),true);
         $type = urldecode($request->input('type'));
         
+        switch ($type) {
+            case 'image':
+                $type_class = Product::TYPE_CORRESPOND_LIST['image'];
+                break;
+            case 'video':
+                $type_class = Product::TYPE_CORRESPOND_LIST['video'];
+                break;
+            
+            default:
+                $type_class = '';
+                break;
+        }
+
         $product_id_arr = [];
         $product_name_arr = [];
         foreach ($data as $key => $value) {
-            $model = $type::findOrFail($value);
+            $model = $type_class::findOrFail($value);
             array_push($product_id_arr, $value);
             array_push($product_name_arr, $model -> title);
         }
@@ -331,7 +370,7 @@ class ProductController extends AbstractController
 
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = (int)auth('session')->user()->id;
-        $data['type'] = $request->input('product_type');
+        $data['type'] = Product::TYPE_CORRESPOND_LIST[$request->input('product_type')];
         // $data['correspond_id'] = $request->input('product_id') ? $request->input('product_id') : $request->input('correspond_id');
         // $data['name'] = $request->input('product_name');
         $data['expire'] = (int) $request->input('expire');
@@ -361,6 +400,19 @@ class ProductController extends AbstractController
         $product_name = $request->input('product_name');
 
         if(!empty($product_type)){
+            switch ($product_type) {
+                case 'image':
+                    $product_type = Product::TYPE_CORRESPOND_LIST['image'];
+                    break;
+                case 'video':
+                    $product_type = Product::TYPE_CORRESPOND_LIST['video'];
+                    break;
+                
+                default:
+                    $product_type = '';
+                    break;
+            }
+
             $query = Product::select('*')->where('type',$product_type);
             $query_tatal = Product::select('*')->where('type',$product_type);
 

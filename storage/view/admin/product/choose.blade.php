@@ -11,12 +11,11 @@
                                 <form action="/admin/product/choose" method="get">
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_choose_type') ?? '選擇商品類型'}}</label>
                                     <select  class="form-control-sm" name="product_type" >
-                                        <option value="{{\App\Model\Product::TYPE_LIST['image']}}" {{$product_type == \App\Model\Product::TYPE_LIST['image'] ? 'selected' : ''}}>
-                                            {{trans('default.image') ?? '圖片'}}
+                                        <@foreach(\App\Model\Product::TYPE_LIST as $type)
+                                        <option value="{{$type}}" {{$product_type == $type ? 'selected' : ''}}>
+                                            {{\App\Model\Product::TYPE_LIST_NAME[$type]}}
                                         </option>
-                                        <option value="{{\App\Model\Product::TYPE_LIST['video']}}" {{$product_type == \App\Model\Product::TYPE_LIST['video'] ? 'selected' : ''}}>
-                                            {{trans('default.video.title') ?? '影片'}}
-                                        </option>
+                                        @endforeach
                                     </select>
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_name_search') ?? '查詢名稱'}}: </label>
                                     <input type="text" name="product_name" id="product_name" value="" placeholder="請輸入影片或圖片名稱">
@@ -68,11 +67,11 @@
                                             <td class="sorting_1 dtr-control">{{ $model->id}}</td>
                                             <td>
                                                 @switch($product_type)
-                                                    @case(\App\Model\Product::TYPE_LIST['image'])
+                                                    @case(\App\Model\Product::TYPE_LIST[0])
                                                         {{trans('default.image') ?? '圖片'}}
                                                         @break
 
-                                                    @case(\App\Model\Product::TYPE_LIST['video'])
+                                                    @case(\App\Model\Product::TYPE_LIST[1])
                                                         {{trans('default.video.title') ?? '影片'}}
                                                         @break
                                                 @endswitch
@@ -80,11 +79,11 @@
                                             <td>{{ $model->title}}</td>
                                             <td>
                                                 @switch($product_type)
-                                                    @case(\App\Model\Product::TYPE_LIST['image'])
+                                                    @case(\App\Model\Product::TYPE_LIST[0])
                                                         <img src="{{$model->thumbnail}}" alt="image" style="width:100px">
                                                         @break
 
-                                                    @case(\App\Model\Product::TYPE_LIST['video'])
+                                                    @case(\App\Model\Product::TYPE_LIST[1])
                                                         <img src="{{$model->cover_thumb}}" alt="image" style="width:100px">
                                                         @break
                                                 @endswitch

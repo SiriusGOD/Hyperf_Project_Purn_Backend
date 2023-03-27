@@ -49,7 +49,7 @@ class OrderController extends AbstractController
         if (empty($prod_id)) {
             return $this->error('product id 字段是必须的', ErrorCode::BAD_REQUEST);
         }
-        $payment_type = $request->input('product_id', 1);
+        $payment_type = $request->input('payment_type', 1);
         $oauth_type = $request->input('oauth_type', 'web');
         $pay_proxy = $request->input('pay_proxy', 'online'); // agent or online
 
