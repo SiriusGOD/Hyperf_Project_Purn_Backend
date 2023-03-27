@@ -13,6 +13,7 @@ namespace App\Service;
 
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
+use Hyperf\Database\Model\Collection;
 use Hyperf\Redis\Redis;
 
 class ActorService
@@ -27,9 +28,10 @@ class ActorService
 
     protected Redis $redis;
 
-    public function __construct(Redis $redis)
+    public function __construct(Redis $redis , Actor $actor)
     {
         $this->redis = $redis;
+        $this->model = $actor;
     }
 
     // 影片演員關聯
@@ -48,15 +50,10 @@ class ActorService
     }
 
     // 取得演員
-    public function getActors($offset = 0, $limit = 0): array
+    public function getActors(int $page): Collection
     {
-        if ($this->redis->exists(self::CACHE_KEY . "{$offset},{$limit}")) {
-            $jsonResult = $this->redis->get(self::CACHE_KEY . "{$offset},{$limit}");
-            return json_decode($jsonResult, true);
-        }
-        $result = self::selfGet($offset, $limit);
-        $this->redis->set(self::CACHE_KEY . "{$offset},{$limit}", json_encode($result), self::EXPIRE);
-        return $result;
+      $query = $this->model->offset(Actor::PAGE_PER * $page)->limit(Actor::PAGE_PER);
+      return $query->get();
     }
 
     // 計算總數

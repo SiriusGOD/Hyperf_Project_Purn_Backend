@@ -13,6 +13,7 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Service\ActorService;
+use App\Constants\Constants;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -27,12 +28,14 @@ class ActorController extends AbstractController
      */
     public function list(RequestInterface $request, ActorService $service)
     {
-        $offset = $request->input('offset', 0);
-        $limit = $request->input('limit', 0);
-        $result = $service->getActors($offset, $limit);
-        return $this->success([
-            'result' => $result,
-        ]);
+      $page = (int) $request->input('page', 1);
+      $data['models'] = $service->getActors($page);
+      $data['page'] = $page;
+      $data['step'] = Constants::DEFAULT_PAGE_PER;
+      $path = '/api/actor/list';
+      $data['next'] = $path . '?page=' . ($page + 1);
+      $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+      return $this->success($data);
     }
 
     /**
@@ -40,9 +43,9 @@ class ActorController extends AbstractController
      */
     public function count(ActorService $service)
     {
-        $result = $service->getActorCount();
-        return $this->success([
-            'count' => $result,
-        ]);
+      $result = $service->getActorCount();
+      return $this->success([
+          'count' => $result,
+      ]);
     }
 }
