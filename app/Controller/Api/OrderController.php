@@ -25,12 +25,12 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 class OrderController extends AbstractController
 {
     /**
-     * @RequestMapping(path="getUserOrder", methods="post")
+     * @RequestMapping(path="list", methods="get")
      * 獲取使用者訂單
      */
-    public function getUserOrder(OrderRequest $request, OrderService $service)
+    public function list(OrderRequest $request, OrderService $service)
     {
-        $user_id = $request->input('user_id', 0);
+        $user_id = auth()->user()->getId();
         $order_status = $request->input('order_status');
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 0);
@@ -44,7 +44,7 @@ class OrderController extends AbstractController
      */
     public function create(OrderRequest $request, OrderService $service, PayService $pay_service)
     {
-        $user_id = $request->input('user_id', 0);
+        $user_id = auth()->user()->getId();
         $prod_id = $request->input('product_id', 0);
         if (empty($prod_id)) {
             return $this->error('product id 字段是必须的', ErrorCode::BAD_REQUEST);
