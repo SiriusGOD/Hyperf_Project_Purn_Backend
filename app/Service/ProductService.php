@@ -58,14 +58,6 @@ class ProductService
         $model->save();
     }
 
-    // 軟刪除
-    public function delete($id)
-    {
-        $model = Product::findOrNew($id);
-        $model -> deleted_at = Carbon::now()->toDateTimeString();
-        $model->save();
-    }
-
     // 新增radis大批匯入的商品ID
     public function insertCache($id)
     {

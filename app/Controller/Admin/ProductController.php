@@ -250,17 +250,6 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @RequestMapping(path="delete", methods={"get"})
-     */
-    public function delete(RequestInterface $request, ResponseInterface $response, ProductService $service)
-    {
-        $id = $request->input('id');
-        $service -> delete($id);
-
-        return $response->redirect('/admin/product/index');
-    }
-
-    /**
      * @RequestMapping(path="multipleChoice", methods={"GET"})
      */
     public function multipleChoice(RequestInterface $request)

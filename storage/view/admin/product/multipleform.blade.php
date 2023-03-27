@@ -11,13 +11,6 @@
                                 <input type="hidden" name="correspond_id" value="{{$product_id_arr ?? null}}">
                                 <input type="hidden" name="correspond_name" value="{{$product_name_arr ?? null}}">
                                 <input type="hidden" name="product_type" value="{{$product_type ?? null}}">
-                                <!-- <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.name') ?? '名稱'}}</label>
-                                    <textarea id="story" name="story" rows="5" cols="33">
-                                    @foreach(json_decode($product_name_arr, true) as $key => $value)
-                                        <p>{{$value ?? ''}}</p>
-                                    @endforeach
-                                </div> -->
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_num') ?? '商品數'}}</label>
                                     <p>{{count(json_decode($product_name_arr, true))}} 筆</p>

@@ -110,11 +110,6 @@
                                                     <a href="/admin/product/edit?id={{$model->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
                                                     </div>
                                                 @endif
-                                                @if(authPermission('product-delete'))
-                                                    <div class="row mb-1">
-                                                    <a href="/admin/product/delete?id={{$model->id}}" class="btn btn-danger">{{trans('default.delete') ?? '刪除'}}</a>
-                                                    </div>
-                                                @endif
                                                 @if(authPermission('product-expire'))
                                                 <div class="row mb-1">
                                                     <form action="/admin/product/expire" method="post">
