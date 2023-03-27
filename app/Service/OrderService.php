@@ -164,8 +164,8 @@ class OrderService
         }
     }
 
-    // 更新訂單狀態
-    public function updateOrderStatus($user_id, $order_num, $order_status)
+    // 刪除訂單
+    public function delete($user_id, $order_num, $order_status)
     {
         $query = Order::where([
             ['user_id', '=', $user_id],

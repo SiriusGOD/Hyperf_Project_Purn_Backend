@@ -22,7 +22,6 @@ class OrderRequest extends AuthBaseRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|numeric',
             'order_status' => Rule::in([
                 Order::ORDER_STATUS['create'],
                 Order::ORDER_STATUS['delete'],
