@@ -25,6 +25,9 @@ class OrderSeed implements BaseInterface
         $model->telephone = '09123456789';
         $model->payment_type = 1;
         $model->currency = '台幣';
+        $model->pay_way = 'wechat';
+        $model->pay_url = 'http://test/order/payc.php?id=20200629000216561009';
+        $model->pay_proxy = 'online';
         $model->total_price = 20;
         $model->status = 11;
         $model->save();
@@ -38,6 +41,9 @@ class OrderSeed implements BaseInterface
         $model->telephone = '0911111111';
         $model->payment_type = 1;
         $model->currency = '台幣';
+        $model->pay_way = 'wechat';
+        $model->pay_url = 'http://test/order/payc.php?id=20200629000216561010';
+        $model->pay_proxy = 'online';
         $model->total_price = 100;
         $model->status = 1;
         $model->save();
