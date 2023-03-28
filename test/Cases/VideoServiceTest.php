@@ -63,6 +63,7 @@ class VideoServiceTest extends HttpTestCase
             'gif_width'        => 0,
             'gif_height'       => 0,
             'directors'        => 'category',
+            'description'      => "test",
             'category'         => 1,
             'via'              => 'live',
             'onshelf_tm'       => time(),
@@ -98,10 +99,11 @@ class VideoServiceTest extends HttpTestCase
             if($insertData['actors']){
                 $exps = explode(",",$insertData['tags']);
                 foreach($exps as $str){
+                  $data["id"] = null; 
                   $data["name"] = $str; 
                   $data["user_id"] = 1; 
                   $data["sex"] = 1; 
-                  $actor = $actorService->storeActorByName($data); 
+                  $actor = $actorService->storeActor($data); 
                   $actorService->createActorRelationship("video",$video->id ,$actor->id );
                 }
             }
