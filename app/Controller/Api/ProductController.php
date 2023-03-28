@@ -32,12 +32,13 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @RequestMapping(path="count", methods="get")
+     * @RequestMapping(path="count", methods="POST")
      * 獲取上架中的商品數
      */
-    public function count(ProductService $service)
+    public function count(ProductApiRequest $request, ProductService $service)
     {
-        $result = $service->getCount();
+        $keyword = $request->input('keyword','');
+        $result = $service->getCount($keyword);
         $data = array(
             'count' => $result
         );
