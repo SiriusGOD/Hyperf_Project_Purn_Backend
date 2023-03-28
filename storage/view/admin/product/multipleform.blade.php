@@ -11,13 +11,6 @@
                                 <input type="hidden" name="correspond_id" value="{{$product_id_arr ?? null}}">
                                 <input type="hidden" name="correspond_name" value="{{$product_name_arr ?? null}}">
                                 <input type="hidden" name="product_type" value="{{$product_type ?? null}}">
-                                <!-- <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.name') ?? '名稱'}}</label>
-                                    <textarea id="story" name="story" rows="5" cols="33">
-                                    @foreach(json_decode($product_name_arr, true) as $key => $value)
-                                        <p>{{$value ?? ''}}</p>
-                                    @endforeach
-                                </div> -->
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_num') ?? '商品數'}}</label>
                                     <p>{{count(json_decode($product_name_arr, true))}} 筆</p>
@@ -26,11 +19,11 @@
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_type') ?? '商品類型'}}</label>
                                     <p>
                                         @switch($product_type)
-                                            @case(\App\Model\Product::TYPE_LIST['image'])
+                                            @case(\App\Model\Product::TYPE_LIST[0])
                                                 {{trans('default.image') ?? '圖片'}}
                                                 @break
 
-                                            @case(\App\Model\Product::TYPE_LIST['video'])
+                                            @case(\App\Model\Product::TYPE_LIST[1])
                                                 {{trans('default.video.title') ?? '影片'}}
                                                 @break
                                                 

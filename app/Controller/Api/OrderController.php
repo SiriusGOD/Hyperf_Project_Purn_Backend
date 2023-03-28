@@ -13,6 +13,7 @@ namespace App\Controller\Api;
 
 use App\Constants\ErrorCode;
 use App\Controller\AbstractController;
+use App\Model\Order;
 use App\Request\OrderRequest;
 use App\Service\OrderService;
 use App\Service\PayService;
@@ -30,7 +31,11 @@ class OrderController extends AbstractController
      */
     public function list(OrderRequest $request, OrderService $service)
     {
+<<<<<<< HEAD
         $user_id = auth()->user()->getId();
+=======
+        $user_id = auth('jwt')->user()->getId();
+>>>>>>> tw0691_0327_product_api
         $order_status = $request->input('order_status');
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 0);
@@ -44,12 +49,16 @@ class OrderController extends AbstractController
      */
     public function create(OrderRequest $request, OrderService $service, PayService $pay_service)
     {
+<<<<<<< HEAD
         $user_id = auth()->user()->getId();
+=======
+        $user_id = auth('jwt')->user()->getId();
+>>>>>>> tw0691_0327_product_api
         $prod_id = $request->input('product_id', 0);
         if (empty($prod_id)) {
             return $this->error('product id 字段是必须的', ErrorCode::BAD_REQUEST);
         }
-        $payment_type = $request->input('product_id', 1);
+        $payment_type = $request->input('payment_type', 1);
         $oauth_type = $request->input('oauth_type', 'web');
         $pay_proxy = $request->input('pay_proxy', 'online'); // agent or online
 
@@ -71,15 +80,15 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @RequestMapping(path="update", methods="post")
+     * @RequestMapping(path="delete", methods="post")
      * 修改訂單狀態
      */
-    public function update(OrderRequest $request, OrderService $service)
+    public function delete(OrderRequest $request, OrderService $service)
     {
-        $user_id = $request->input('user_id', 0);
+        $user_id = auth('jwt')->user()->getId();
         $order_num = $request->input('order_num');
-        $order_status = $request->input('order_status');
-        $result = $service->updateOrderStatus($user_id, $order_num, $order_status);
+        $order_status = Order::ORDER_STATUS['delete'];
+        $result = $service->delete($user_id, $order_num, $order_status);
         if ($result) {
             return $this->success([], '訂單狀態更新成功');
         }

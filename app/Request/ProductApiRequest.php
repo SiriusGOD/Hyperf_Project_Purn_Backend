@@ -11,25 +11,31 @@ declare(strict_types=1);
  */
 namespace App\Request;
 
-use App\Model\Order;
+use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
+use App\Model\Product;
 
-class OrderRequest extends AuthBaseRequest
+class ProductApiRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
     /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
     {
-        return [
-            'order_status' => Rule::in([
-                Order::ORDER_STATUS['create'],
-                Order::ORDER_STATUS['delete'],
-                Order::ORDER_STATUS['finish'],
-            ]),
+        $rules = [
+            'keyword' => 'max:255',
             'offset' => 'numeric',
-            'limit' => 'numeric',
-            'product_id' => 'numeric',
+            'limit' => 'numeric'
         ];
+
+        return $rules;
     }
 }

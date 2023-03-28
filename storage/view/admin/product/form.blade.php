@@ -20,11 +20,11 @@
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_type') ?? '商品類型'}}</label>
                                     <p>
                                         @switch($product_type)
-                                            @case(\App\Model\Product::TYPE_LIST['image'])
+                                            @case(\App\Model\Product::TYPE_LIST[0])
                                                 {{trans('default.image') ?? '圖片'}}
                                                 @break
 
-                                            @case(\App\Model\Product::TYPE_LIST['video'])
+                                            @case(\App\Model\Product::TYPE_LIST[1])
                                                 {{trans('default.video.title') ?? '影片'}}
                                                 @break
                                                 

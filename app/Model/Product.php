@@ -33,10 +33,16 @@ class Product extends Model
 {
     public const EXPIRE = ['no' => 0, 'yes' => 1];
     public const PAGE_PER = 10;
-    public const TYPE_LIST = [
+    public const TYPE_LIST = ['image','video'];
+    public const TYPE_LIST_NAME = [
+        'image' => '圖片',
+        'video' => '影片'
+    ];
+    public const TYPE_CORRESPOND_LIST = [
         'image' => 'App\Model\Image',
         'video' => 'App\Model\Video'
     ];
+
     public const CURRENCY = [
         'CNY' => '人民幣',
         'USD' => '美金',
