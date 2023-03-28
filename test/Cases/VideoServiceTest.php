@@ -50,7 +50,6 @@ class VideoServiceTest extends HttpTestCase
             'p_id'             => 1,
             'user_id'          => 1,
             'music_id'         => 1,
-            'description'      => "test",
             'coins'            => 20,
             'm3u8'             => "/watch8/a77b2b0863aeaab3be89a6f1b85baa82/a77b2b0863aeaab3be89a6f1b85baa82.m3u8",
             'refreshed_at'     => date("Y-m-d H:i:s"),
