@@ -31,11 +31,7 @@ class OrderController extends AbstractController
      */
     public function list(OrderRequest $request, OrderService $service)
     {
-<<<<<<< HEAD
-        $user_id = auth()->user()->getId();
-=======
         $user_id = auth('jwt')->user()->getId();
->>>>>>> tw0691_0327_product_api
         $order_status = $request->input('order_status');
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 0);
@@ -49,11 +45,7 @@ class OrderController extends AbstractController
      */
     public function create(OrderRequest $request, OrderService $service, PayService $pay_service)
     {
-<<<<<<< HEAD
-        $user_id = auth()->user()->getId();
-=======
         $user_id = auth('jwt')->user()->getId();
->>>>>>> tw0691_0327_product_api
         $prod_id = $request->input('product_id', 0);
         if (empty($prod_id)) {
             return $this->error('product id 字段是必须的', ErrorCode::BAD_REQUEST);
