@@ -239,8 +239,20 @@ class ProductController extends AbstractController
         $id = $request->input('id');
         $model = Product::findOrFail($id);
         $model -> title = $model -> name;
+        switch ($model -> type) {
+            case Product::TYPE_CORRESPOND_LIST['image']:
+                $product_type = 'image';
+                break;
+            case Product::TYPE_CORRESPOND_LIST['video']:
+                $product_type = 'video';
+                break;
+            
+            default:
+                $product_type = '';
+                break;
+        }
         $data['model'] = $model;
-        $data['product_type'] = $model -> type;
+        $data['product_type'] = $product_type;
         $data['navbar'] = trans('default.product_control.product_edit');
         $data['product_active'] = 'active';
         return $this->render->render('admin.product.form', $data);
