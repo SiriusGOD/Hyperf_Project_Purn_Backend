@@ -85,7 +85,7 @@ class ImageController extends AbstractController
         if ($total == 0) {
             $data['last_page'] = 1;
         }
-        $data['navbar'] = trans('default.ad_control.ad_control');
+        $data['navbar'] = trans('default.image_control.image_control');
         $data['image_active'] = 'active';
         $data['total'] = $total;
         $data['datas'] = $models;
