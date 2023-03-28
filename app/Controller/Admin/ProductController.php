@@ -69,12 +69,11 @@ class ProductController extends AbstractController
         $step = Product::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
         $query = Product::select('*')
-            ->whereNull('deleted_at')
             ->offset(($page - 1) * $step)
             ->limit($step);
         $products = $query->get();
 
-        $query = Product::select('*')->whereNull('deleted_at');
+        $query = Product::select('*');
         $total = $query->count();
 
         $data['last_page'] = ceil($total / $step);
