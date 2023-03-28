@@ -33,7 +33,7 @@ class VideoController extends AbstractController
     public function list(RequestInterface $request, VideoService $service)
     {
         $tagIds = $request->input('tags',[]);
-        $page = (int) $request->input('page', 1);
+        $page = (int) $request->input('page', 0);
         $data = [];
         $data['models'] =$service->getVideos($tagIds, $page);
         $data['page'] = $page;
@@ -76,17 +76,21 @@ class VideoController extends AbstractController
      */
     public function search(RequestInterface $request, VideoService $service)
     {
-        $offset = $request->input('offset', 0);
-        $limit = $request->input('limit', 10);
         $title = $request->input('title');
         $length = $request->input('length', 0);
         $compare = $request->input('compare', 0);
+        $page = (int) $request->input('page', 0);
         if (empty($title) || strlen($title) == 0) {
             $result = ['message' => 'title 不得為空'];
             return $this->success($result);
         }
-        $result = $service->searchVideo($title, $compare, $length, $offset, $limit);
-        return $this->success([$result]);
+        $data['models'] =$service->searchVideo($title, $compare, $length, $page);
+        $data['page'] = $page;
+        $data['step'] = Constants::DEFAULT_PAGE_PER;
+        $path = '/api/video/search';
+        $data['next'] = $path . '?page=' . ($page + 1);
+        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        return $this->success($data);
     }
 
     /**

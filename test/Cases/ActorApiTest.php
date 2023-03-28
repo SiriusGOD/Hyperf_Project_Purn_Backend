@@ -36,10 +36,8 @@ class ActorApiTest extends HttpTestCase
     {
         $res1 = $this->client->get('/api/actor/list');
         $this->assertSame(200, (int) $res1['code']);
-
-        $res2 = $this->client->get('/api/actor/list',['page'=>2]);
+        $res2 = $this->client->get('/api/actor/list',['page'=>1]);
         $this->assertSame(200, (int) $res2['code']);
-
         $this->assertNotSame($res2['data']["models"][0]["id"], $res1['data']["models"][0]["id"]);
     }
 

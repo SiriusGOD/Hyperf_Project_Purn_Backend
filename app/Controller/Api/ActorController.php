@@ -28,7 +28,7 @@ class ActorController extends AbstractController
      */
     public function list(RequestInterface $request, ActorService $service)
     {
-      $page = (int) $request->input('page', 1);
+      $page = (int) $request->input('page', 0);
       $data['models'] = $service->getActors($page);
       $data['page'] = $page;
       $data['step'] = Constants::DEFAULT_PAGE_PER;

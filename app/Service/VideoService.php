@@ -138,14 +138,13 @@ class VideoService
      * @param mixed $offset
      * @param mixed $limit
      */
-    public function searchVideo(string $title, $compare, int $length, $offset, $limit)
+    public function searchVideo(string $title, $compare, int $length, $page)
     {
         # if ($this->redis->exists(self::CACHE_KEY.$name)) {
-      #    $jsonResult = $this->redis->get(self::CACHE_KEY.$name);
-      #    return json_decode($jsonResult, true);
+        #  $jsonResult = $this->redis->get(self::CACHE_KEY.$name);
+        #  return json_decode($jsonResult, true);
         # }
-
-        $model = Video::where('title', 'like', "%{$title}%");
+        $model = Video::where('title', 'like', "%$title%");
         if ($compare > 0 && $length > 0) {
             if ($compare == 1) {
                 $model = $model->where('videos.lenght', '>=', $length);
@@ -153,13 +152,8 @@ class VideoService
                 $model = $model->where('videos.lenght', '<=', $length);
             }
         }
-
-        return $model->offset($offset)
-            ->limit($limit)
-            ->get()
-            ->toArray();
-
         // $this->redis->set(self::COUNT_KEY, $model, self::COUNT_EXPIRE);
+        return $model->offset(Video::PAGE_PER * $page)->limit(Video::PAGE_PER)->get();
     }
 
     // 共用自取
