@@ -83,7 +83,6 @@ class ProductService
         if(!empty($keyword)){
             $tagIds = Tag::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
         }
-        
         // image
         $img_query = Product::join('images', 'products.correspond_id', 'images.id')
             ->select('products.id', 'products.name', 'products.start_time', 'products.end_time', 'products.currency', 'products.selling_price', 'images.thumbnail', 'images.like', 'images.description')
@@ -91,10 +90,14 @@ class ProductService
             ->where('products.start_time', '<=', $now)
             ->where('products.end_time', '>=', $now)
             ->where('products.expire', Product::EXPIRE['no']);
+           
         if(!empty($tagIds)){
-            $img_query = $img_query->join('tag_corresponds', 'images.id', 'tag_corresponds.correspond_id')
+            $img_query = $img_query->leftjoin('tag_corresponds', 'images.id', 'tag_corresponds.correspond_id')
                 ->where('tag_corresponds.correspond_type', '=', Image::class)
-                ->whereIn('tag_corresponds.tag_id',$tagIds);
+                ->whereIn('tag_corresponds.tag_id',$tagIds)
+                ->orwhere('products.name', 'like', '%' . $keyword . '%');
+        }else if(!empty($keyword)){
+            $img_query = $img_query->where('products.name', 'like', '%' . $keyword . '%');
         }
         if($offset != 0){
             $img_query = $img_query->offset($offset);
@@ -111,10 +114,14 @@ class ProductService
             ->where('products.start_time', '<=', $now)
             ->where('products.end_time', '>=', $now)
             ->where('products.expire', Product::EXPIRE['no']);
+            
         if(!empty($tagIds)){
-            $video_query = $video_query->join('tag_corresponds', 'videos.id', 'tag_corresponds.correspond_id')
+            $video_query = $video_query->leftjoin('tag_corresponds', 'videos.id', 'tag_corresponds.correspond_id')
                 ->where('tag_corresponds.correspond_type', '=', Video::class)
-                ->whereIn('tag_corresponds.tag_id',$tagIds);
+                ->whereIn('tag_corresponds.tag_id',$tagIds)
+                ->orWhere('products.name', 'like', '%' . $keyword . '%');
+        }else if(!empty($keyword)){
+            $video_query = $video_query->where('products.name', 'like', '%' . $keyword . '%');
         }
         if($offset != 0){
             $video_query = $video_query->offset($offset);
@@ -136,8 +143,26 @@ class ProductService
     }
 
     // 獲取商品總數 (上架中的)
-    public function getCount()
+    public function getCount($keyword)
     {
-        return Product::where('expire',0)->count();
+        if(!empty($keyword)){
+            $tagIds = Tag::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
+        }
+
+        $query = Product::where('expire',0);
+
+        if(!empty($tagIds)){
+            $query = Product::join('tag_corresponds', function($join){
+                $join->on('products.correspond_id', '=', 'tag_corresponds.correspond_id')
+                ->on('products.type', '=', 'tag_corresponds.correspond_type');
+            })
+            ->whereIn('tag_corresponds.tag_id',$tagIds)
+            ->orWhere('products.name', 'like', '%' . $keyword . '%');
+        }else if(!empty($keyword)){
+            $query = $query->where('products.name', 'like', '%' . $keyword . '%');
+        }
+        $data = $query->count();
+
+        return $data;
     }
 }
