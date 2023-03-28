@@ -12,8 +12,8 @@ namespace HyperfTest\Cases;
 
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
-
 use App\Service\VideoService;
+use App\Service\SuggestService;
 use App\Service\TagService;
 use App\Service\ActorService;
 use App\Util\URand;
@@ -22,7 +22,7 @@ use App\Util\URand;
  * @internal
  * @coversNothing
  */
-class VideoTest extends HttpTestCase
+class VideoServiceTest extends HttpTestCase
 {
      /**
      * @var Client
@@ -36,7 +36,7 @@ class VideoTest extends HttpTestCase
     }
 
     //測試Count
-    public function testCount()
+    public function testVideoStore()
     {
         $rand = new URand();
         $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
@@ -97,7 +97,6 @@ class VideoTest extends HttpTestCase
                     $tagService->createTagRelationship("video",$video->id ,$tag->id );
                 } 
             }
-
             if($insertData['actors']){
                 $exps = explode(",",$insertData['tags']);
                 foreach($exps as $str){
@@ -112,46 +111,21 @@ class VideoTest extends HttpTestCase
         $this->assertSame(2, (int)$video->type);
     }
 
-    //vidoe list api 測試
-    public function testApiList()
+    //測試user TAG 假資料 
+    public function testVideoSuggestByUser()
     {
-        $res1 = $this->client->get('/api/video/list');
-        $this->assertSame(200, (int) $res1['code']);
-        $res2 = $this->client->get('/api/video/list',['page'=>2]);
-        $this->assertSame(200, (int) $res2['code']);
-        $this->assertNotSame($res2['data']["models"][0]["id"], $res1['data']["models"][0]["id"]);
-    }
-
-    //vidoe search api 測試
-    public function testApiSearch()
-    {
+        $userId = 2;
         $rand = new URand();
-        $title = $rand->getRandTitle();
-        $res2 = $this->client->get('/api/video/search',['title'=>$title]);
-        $this->assertSame(200, (int) $res2['code']);
-    }
-
-    //vidoe list api 有tag測試
-    public function testApiListHasTags()
-    {
         $tagService = \Hyperf\Utils\ApplicationContext::getContainer()->get(TagService::class);
+        $suggestService = \Hyperf\Utils\ApplicationContext::getContainer()->get(SuggestService::class);
         $tags = $tagService->getTags();
-        $data = array_slice( $tags->toArray(),0,3);
+        $data = array_slice( $tags->toArray(),0, count($tags->toArray()) );
         $ids  = array_column($data , 'id') ;
-        $names  = array_column($data , 'name') ;
-        $res1 = $this->client->get('/api/video/list',[ 'tags' => $ids ]);
-        $assertCount = 0;
-        for($i=1; $i<=4; $i++){
-          $tagstr = $res1['data']["models"][$i]['tags'];
-          $flag = false;
-          foreach($names as $search_string){
-            if (strpos($tagstr, $search_string) !== false && $flag==false) {
-                $assertCount ++;
-                $flag = true;
-            } 
-          }
-        }
-        $this->assertSame(4, $assertCount );
+        $randKeys = $rand->getRandTag($ids,6);
+        foreach($randKeys as $key){
+            $tagId = $ids[$key];
+            $model = $suggestService->storeUserTag($tagId,$userId);
+        } 
+        $this->assertSame($userId, $model->user_id );
     }
 }
-

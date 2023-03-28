@@ -55,4 +55,15 @@ class URand
       }
     }
 
+    //亂數 tag
+    public static function getRandTag(array $tags, int $count){
+      $datas = [];  
+      while (count($datas) < $count) {
+        $rand = rand(0, count($tags));
+        if (!in_array($rand, $datas)) {
+          $datas[$rand] = $rand;
+        }
+      }
+      return $datas;
+    }
 }
