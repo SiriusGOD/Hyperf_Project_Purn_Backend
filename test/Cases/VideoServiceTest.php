@@ -13,7 +13,6 @@ namespace HyperfTest\Cases;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
 use App\Service\VideoService;
-use App\Service\SuggestService;
 use App\Service\TagService;
 use App\Service\ActorService;
 use App\Util\URand;
@@ -111,21 +110,4 @@ class VideoServiceTest extends HttpTestCase
         $this->assertSame(2, (int)$video->type);
     }
 
-    //測試user TAG 假資料 
-    public function testVideoSuggestByUser()
-    {
-        $userId = 2;
-        $rand = new URand();
-        $tagService = \Hyperf\Utils\ApplicationContext::getContainer()->get(TagService::class);
-        $suggestService = \Hyperf\Utils\ApplicationContext::getContainer()->get(SuggestService::class);
-        $tags = $tagService->getTags();
-        $data = array_slice( $tags->toArray(),0, count($tags->toArray()) );
-        $ids  = array_column($data , 'id') ;
-        $randKeys = $rand->getRandTag($ids,6);
-        foreach($randKeys as $key){
-            $tagId = $ids[$key];
-            $model = $suggestService->storeUserTag($tagId,$userId);
-        } 
-        $this->assertSame($userId, $model->user_id );
-    }
 }

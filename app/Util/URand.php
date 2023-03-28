@@ -37,6 +37,11 @@ class URand
       return self::$RAND_TITLES[rand(0 , count(self::$RAND_TITLES) -1)];
     }
 
+    //隨機演員 
+    public static function getRandActor(){
+      return self::$RAND_ACTORS[rand(0 , count(self::$RAND_ACTORS) -1)];
+    }
+
     //取得 測試 演員
     public static function getRandTagActor(int $nums, string $type){
       $datas = [];  
@@ -59,9 +64,9 @@ class URand
     public static function getRandTag(array $tags, int $count){
       $datas = [];  
       while (count($datas) < $count) {
-        $rand = rand(0, count($tags));
-        if (!in_array($rand, $datas)) {
-          $datas[$rand] = $rand;
+        $rand = rand(0, count($tags)-1);
+        if (!in_array($tags[$rand], $datas)) {
+          $datas[] = $tags[$rand];
         }
       }
       return $datas;

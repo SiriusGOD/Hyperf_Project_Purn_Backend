@@ -33,7 +33,6 @@ class VideoApiTest extends HttpTestCase
         $this->client = make(Client::class);
     }
 
-
     //vidoe list api 測試
     public function testApiList()
     {
@@ -76,7 +75,8 @@ class VideoApiTest extends HttpTestCase
         $this->assertSame(4, $assertCount );
     }
 
-    public function testSuggest()
+    //推廌影片 --ERROR 沒結果...  
+    public function testVideoSuggest()
     {
         $user = User::find(2);
         $token = auth()->login($user);
@@ -84,8 +84,6 @@ class VideoApiTest extends HttpTestCase
         $data = $this->client->get('/api/video/suggest', [], [
             'Authorization' => 'Bearer ' . $token,
         ]);
-
-        print_r($data);
         $this->assertSame(200, (int) $data['code']);
     }
 
