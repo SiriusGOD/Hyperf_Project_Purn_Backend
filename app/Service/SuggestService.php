@@ -26,7 +26,21 @@ class SuggestService
     {
         $this->redis = $redis;
     }
-
+    //寫入user tag  or update count
+    public function storeUserTag(int $tagId, int $userId)
+    {
+        if (UserTag::where('tag_id', $tagId)->where('user_id', $userId)->exists()) {
+            $model = UserTag::where('tag_id', $tagId)->where('user_id', $userId)->first();
+            $model->count = $model->count + 1;
+        } else {
+            $model = new UserTag();
+            $model->user_id = $userId;
+            $model->tag_id = $tagId;
+            $model->count = 1;
+        }
+        $model->save();
+        return $model;
+    } 
     public function getTagProportionByUser(int $userId): array
     {
         $result = [];
