@@ -20,7 +20,7 @@ class ProductController extends AbstractController
 {
     /**
      * @RequestMapping(path="list", methods="POST")
-     * 獲取商品列表 
+     * 獲取上架中的商品列表 
      */
     public function list(ProductApiRequest $request, ProductService $service)
     {

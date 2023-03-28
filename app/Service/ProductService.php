@@ -86,15 +86,15 @@ class ProductService
         
         // image
         $img_query = Product::join('images', 'products.correspond_id', 'images.id')
-            ->join('tag_corresponds', 'images.id', 'tag_corresponds.correspond_id')
             ->select('products.id', 'products.name', 'products.start_time', 'products.end_time', 'products.currency', 'products.selling_price', 'images.thumbnail', 'images.like', 'images.description')
             ->where('products.type', '=', Image::class)
-            ->where('tag_corresponds.correspond_type', '=', Image::class)
             ->where('products.start_time', '<=', $now)
             ->where('products.end_time', '>=', $now)
             ->where('products.expire', Product::EXPIRE['no']);
         if(!empty($tagIds)){
-            $img_query = $img_query->whereIn('tag_corresponds.tag_id',$tagIds);
+            $img_query = $img_query->join('tag_corresponds', 'images.id', 'tag_corresponds.correspond_id')
+                ->where('tag_corresponds.correspond_type', '=', Image::class)
+                ->whereIn('tag_corresponds.tag_id',$tagIds);
         }
         if($offset != 0){
             $img_query = $img_query->offset($offset);
@@ -106,15 +106,15 @@ class ProductService
 
         // video
         $video_query = Product::join('videos', 'products.correspond_id', 'videos.id')
-            ->join('tag_corresponds', 'videos.id', 'tag_corresponds.correspond_id')
             ->select('products.id', 'products.name', 'products.start_time', 'products.end_time', 'products.currency', 'products.selling_price', 'videos.m3u8', 'videos.full_m3u8', 'videos.duration', 'videos.cover_thumb', 'videos.like', 'videos.category')
             ->where('products.type', '=', Video::class)
-            ->where('tag_corresponds.correspond_type', '=', Video::class)
             ->where('products.start_time', '<=', $now)
             ->where('products.end_time', '>=', $now)
             ->where('products.expire', Product::EXPIRE['no']);
         if(!empty($tagIds)){
-            $video_query = $video_query->whereIn('tag_corresponds.tag_id',$tagIds);
+            $video_query = $video_query->join('tag_corresponds', 'videos.id', 'tag_corresponds.correspond_id')
+                ->where('tag_corresponds.correspond_type', '=', Video::class)
+                ->whereIn('tag_corresponds.tag_id',$tagIds);
         }
         if($offset != 0){
             $video_query = $video_query->offset($offset);
