@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Carbon\Carbon;
-use Hyperf\Database\Model\SoftDeletes;
 
 /**
  * @property int $id
@@ -20,14 +19,13 @@ use Hyperf\Database\Model\SoftDeletes;
  * @property string $type
  * @property int $correspond_id
  * @property string $name
- * @property int $position
+ * @property int $expire
  * @property string $start_time
  * @property string $end_time
  * @property string $currency
  * @property string $selling_price
  * @property Carbon $created_at
  * @property Carbon $updated_at
- * @property Carbon $deleted_at
  */
 class Product extends Model
 {
@@ -48,8 +46,6 @@ class Product extends Model
         'USD' => '美金',
         'TWD' => '台幣'
     ];
-    
-    use SoftDeletes;
 
     /**
      * The table associated with the model.

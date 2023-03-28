@@ -87,7 +87,7 @@ class ProductService
         // image
         $img_query = Product::join('images', 'products.correspond_id', 'images.id')
             ->join('tag_corresponds', 'images.id', 'tag_corresponds.correspond_id')
-            ->select('products.id', 'products.name', 'products.start_time', 'products.end_time', 'products.currency', 'products.selling_price', 'images.thumbnail', 'images.likes', 'images.description')
+            ->select('products.id', 'products.name', 'products.start_time', 'products.end_time', 'products.currency', 'products.selling_price', 'images.thumbnail', 'images.like', 'images.description')
             ->where('products.type', '=', Image::class)
             ->where('tag_corresponds.correspond_type', '=', Image::class)
             ->where('products.start_time', '<=', $now)

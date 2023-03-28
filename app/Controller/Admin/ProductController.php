@@ -68,9 +68,7 @@ class ProductController extends AbstractController
         // 顯示幾筆
         $step = Product::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = Product::select('*')
-            ->offset(($page - 1) * $step)
-            ->limit($step);
+        $query = Product::offset(($page - 1) * $step)->limit($step);
         $products = $query->get();
 
         $query = Product::select('*');
