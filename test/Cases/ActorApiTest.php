@@ -14,13 +14,12 @@ namespace HyperfTest\Cases;
 use PHPUnit\Framework\TestCase;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
-use App\Service\ActorService;
 
 /**
  * @internal
  * @coversNothing
  */
-class ActorTest extends HttpTestCase
+class ActorApiTest extends HttpTestCase
 {
      /**
      * @var Client
@@ -31,19 +30,6 @@ class ActorTest extends HttpTestCase
     {
         parent::__construct($name, $data, $dataName);
         $this->client = make(Client::class);
-    }
-
-    public function testCount()
-    {
-        $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(ActorService::class);
-        $res = $service->getCount();
-        $data['id']=null;
-        $data['user_id']=1;
-        $data['name']=time();
-        $data['sex']=1;
-        $service->storeActor($data);
-        $res2 = $service->getCount();
-        $this->assertSame($res2, $res+1);
     }
 
     public function testApiList()

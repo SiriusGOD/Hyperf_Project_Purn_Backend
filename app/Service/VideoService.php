@@ -56,6 +56,23 @@ class VideoService
         return $query->get();
     }
 
+    //影片列表
+    public function getVideosByCorresponds(?array $corresponds, int $page): Collection
+    {
+        $videoIds = [];
+        $query = $this->model;
+        if (! empty($corresponds)) {
+          $videoIds = ActorCorrespond::where('correspond_type', 'video')
+              ->whereIn('actor_id', $corresponds['actors'])
+              ->pluck('correspond_id');
+        }
+        $query = $query->offset(Video::PAGE_PER * $page)->limit(Video::PAGE_PER);
+        if (! empty($actorCorr)) {
+            $query = $query->whereIn('id', $videoIds);
+        }
+        return $query->get();
+    }
+
 
     // 新增影片
     public function storeVideo($data)
