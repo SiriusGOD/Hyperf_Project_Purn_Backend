@@ -173,11 +173,81 @@ return [
             'provider' => 'users',
             'options' => [],
         ],
+        'jwt_member' => [
+            'driver' => Qbhy\HyperfAuth\Guard\JwtGuard::class,
+            'provider' => 'members',
+
+            /*
+             * 以下是 simple-jwt 配置
+            * 必填
+            * jwt 服务端身份标识
+            */
+            'secret' => env('JWT_SECRET'),
+
+            /*
+             * 可选配置
+             * jwt 默认头部token使用的字段
+             */
+            'header_name' => env('JWT_HEADER_NAME', 'Authorization'),
+
+            /*
+             * 可选配置
+             * jwt 生命周期，单位秒，默认一天
+             */
+            'ttl' => (int) env('JWT_TTL', 60 * 60 * 24),
+
+            /*
+             * 可选配置
+             * 允许过期多久以内的 token 进行刷新，单位秒，默认一周
+             */
+            'refresh_ttl' => (int) env('JWT_REFRESH_TTL', 60 * 60 * 24 * 7),
+
+            /*
+             * 可选配置
+             * 默认使用的加密类
+             */
+            'default' => Encrypter\SHA1Encrypter::class,
+
+            /*
+             * 可选配置
+             * 加密类必须实现 Qbhy\SimpleJwt\Interfaces\Encrypter 接口
+             */
+            'drivers' => [
+                Encrypter\PasswordHashEncrypter::alg() => Encrypter\PasswordHashEncrypter::class,
+                Encrypter\CryptEncrypter::alg() => Encrypter\CryptEncrypter::class,
+                Encrypter\SHA1Encrypter::alg() => Encrypter\SHA1Encrypter::class,
+                Encrypter\Md5Encrypter::alg() => Encrypter\Md5Encrypter::class,
+            ],
+
+            /*
+             * 可选配置
+             * 编码类
+             */
+            'encoder' => new Encoders\Base64UrlSafeEncoder(),
+            //            'encoder' => new Encoders\Base64Encoder(),
+
+            /*
+             * 可选配置
+             * 缓存类
+             */
+            'cache' => function () {
+                return make(\Qbhy\HyperfAuth\HyperfRedisCache::class);
+            },
+            /*
+             * 可选配置
+             * 缓存前缀
+             */
+            'prefix' => env('SIMPLE_JWT_PREFIX', 'jwt_token'),
+        ],
     ],
     'providers' => [
         'users' => [
             'driver' => \Qbhy\HyperfAuth\Provider\EloquentProvider::class,
             'model' => App\Model\User::class, //  需要实现 Qbhy\HyperfAuth\Authenticatable 接口
+        ],
+        'members' => [
+            'driver' => \Qbhy\HyperfAuth\Provider\EloquentProvider::class,
+            'model' => App\Model\Member::class, //  需要实现 Qbhy\HyperfAuth\Authenticatable 接口
         ],
     ],
 ];

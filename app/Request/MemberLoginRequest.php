@@ -11,15 +11,27 @@ declare(strict_types=1);
  */
 namespace App\Request;
 
-class AddUserTagRequest extends AuthApiBaseRequest
+use Hyperf\Validation\Request\FormRequest;
+
+class MemberLoginRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
     /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
     {
         return [
-            'tags.*' => 'required|numeric',
+            'email' => 'string',
+            'uuid' => 'required|string',
+            'password' => 'required|string',
         ];
     }
 }
