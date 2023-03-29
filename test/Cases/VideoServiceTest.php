@@ -33,6 +33,24 @@ class VideoServiceTest extends HttpTestCase
         parent::__construct($name, $data, $dataName);
         $this->client = make(Client::class);
     }
+    //測試find
+    public function testVideoFind()
+    {
+        $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
+        $row = $service->getVideos([],0); 
+        $res = $service->find((int)$row[0]->id);
+        $this->assertSame((int)$row[0]->id, $res->id);
+        $this->assertSame($row[0]->title, $res->title);
+    }
+
+    //測試Search
+    public function testVideoSearch()
+    {
+        $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
+        $data = $service->getVideos([],0); 
+        $res = $service->searchVideo($data[0]->title ,null ,0 ,0);
+        $this->assertSame($res[0]->title, $data[0]->title);
+    }
 
     //測試Count
     public function testVideoStore()

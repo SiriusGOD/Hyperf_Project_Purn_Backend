@@ -35,6 +35,13 @@ class VideoService
     }
   
     //影片列表
+    public function find(int $id)
+    {
+        $query = $this->model->select("id","title","m3u8","cover_thumb","tags","actors")->where('id',$id)->first();
+        return $query;
+    }
+
+    //影片列表
     public function getVideos(?array $tagIds, int $page): Collection
     {
         $videoIds = [];

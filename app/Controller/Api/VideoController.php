@@ -72,6 +72,16 @@ class VideoController extends AbstractController
     }
 
     /**
+     * @RequestMapping(path="find", methods="get")
+     */
+    public function find(RequestInterface $request, VideoService $service)
+    {
+        $id = $request->input('id',0);
+        $data['models'] = $service->find($id);
+        return $this->success($data);
+    }
+
+    /**
      * @RequestMapping(path="search", methods="get")
      */
     public function search(RequestInterface $request, VideoService $service)

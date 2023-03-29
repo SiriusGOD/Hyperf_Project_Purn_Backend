@@ -107,6 +107,15 @@ class VideoApiTest extends HttpTestCase
         $this->assertSame($res[0]->title, $res2['data']["models"][0]["title"]);
     }
 
+    //vidoe find api
+    public function testApiFind()
+    {
+        $tagService = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
+        $row = $tagService->getVideos([],0); 
+        $res1 = $this->client->get('/api/video/find',[ 'id' => (int)$row[0]->id ]);
+        print_r($res1);
+        $this->assertSame((int)$row[0]->id , $res1['data']["models"]['id'] );
+    }
     //vidoe list api 有tag測試
     public function testApiListHasTags()
     {
