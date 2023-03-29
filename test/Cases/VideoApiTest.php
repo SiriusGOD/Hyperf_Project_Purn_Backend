@@ -67,7 +67,7 @@ class VideoApiTest extends HttpTestCase
             'cover_thumb'      => '/new/av/20211220/2021122023012418421.png',//封面
             'thumb_width'      => 0,
             'thumb_height'     => 0,
-            'gif_thumb'        => 'cover_full',//封面 竖
+            'gif_thumb'        => '/new/av/20211220/2021122023012418421.png',
             'gif_width'        => 0,
             'gif_height'       => 0,
             'directors'        => 'category',

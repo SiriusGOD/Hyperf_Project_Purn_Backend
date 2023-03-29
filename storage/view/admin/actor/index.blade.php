@@ -38,11 +38,6 @@
                       
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Engine version: activate to sort column ascending">
-                                            {{trans('default.user_id') ?? '建立者'}}
-                                        </th>
-                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1"
                                             aria-label="CSS grade: activate to sort column ascending">{{trans('default.created_at') ?? '建立時間'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
@@ -57,7 +52,6 @@
                                             <td class="sorting_1 dtr-control">{{ $model->id}}</td>
                                             <td>{{ $model->name}}</td>
                                             <td>{{ $model->sex ==1 ? "女" :"男"}}</td>
-                                            <td>{{ $model->user->name }}</td>
                                             <td>{{ $model->created_at}}</td>
                                             <td>
                                                 @if(authPermission('actor-edit'))
@@ -74,7 +68,6 @@
                                         <th rowspan="1" colspan="1">{{trans('default.id')?? '序號'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.actor.name')?? '名稱'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.sex') ?? '性別'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.user_id') ?? '建立者'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.created_at') ?? '建立時間'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>
