@@ -10,6 +10,7 @@ declare(strict_types=1);
  */
 namespace HyperfTest\Cases;
 
+use App\Model\UserTag;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
 use App\Service\SuggestService;
@@ -22,34 +23,20 @@ use App\Util\URand;
  */
 class SuggestServiceTest extends HttpTestCase
 {
-     /**
-     * @var Client
-     */
-    protected $client;
-  
-    public function __construct($name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-        $this->client = make(Client::class);
-    }
-
     //測試user suggest TAG 假資料 
-    public function testVideoSuggestByUser()
+    public function testSuggestByUser()
     {
-        $userId = 2;
-        $rand = new URand();
-        $tagService = \Hyperf\Utils\ApplicationContext::getContainer()->get(TagService::class);
-        $suggestService = \Hyperf\Utils\ApplicationContext::getContainer()->get(SuggestService::class);
-        $tags = $tagService->getTags();
-        $data = array_slice( $tags->toArray(),0, count($tags->toArray()) );
-        $ids  = array_column($data , 'id') ;
-        $randKeys = $rand->getRandTag($ids, 20);
-        foreach($randKeys as $key){
-            $tagId = $key;
-            
-            $model = $suggestService->storeUserTag($tagId,$userId);
-        } 
-        $this->assertSame($userId, $model->user_id );
-        $this->assertSame($tagId, $model->tag_id );
+        $expect = 1;
+        $userTag = new UserTag();
+        $userTag->tag_id = $expect;
+        $userTag->user_id = 0;
+        $userTag->count = 1;
+        $userTag->save();
+
+        $service = make(SuggestService::class);
+        $result = $service->getTagProportionByUser(0);
+
+        $userTag->delete();
+        $this->assertSame($expect, $result[0]['tag_id']);
     }
 }
