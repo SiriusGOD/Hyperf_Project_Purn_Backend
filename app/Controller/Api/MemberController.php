@@ -43,7 +43,8 @@ class MemberController extends AbstractController
         $token = auth()->login($user);
         $service->saveToken($user->id, $token);
         return $this->success([
-            'token' => $token,
+            'id' => $user->id,
+            'token' => $token
         ]);
     }
 
@@ -70,7 +71,8 @@ class MemberController extends AbstractController
 
         $token = auth()->login($user);
         return $this->success([
-            'token' => $token,
+            'id' => $user->id,
+            'token' => $token
         ]);
     }
 

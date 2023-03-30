@@ -50,7 +50,8 @@ class UserController extends AbstractController
         $token = auth()->login($user);
         $service->saveToken($user->id, $token);
         return $this->success([
-            'token' => $token,
+            'id' => $user->id,
+            'token' => $token
         ]);
     }
 
@@ -77,7 +78,8 @@ class UserController extends AbstractController
 
         $token = auth()->login($user);
         return $this->success([
-            'token' => $token,
+            'id' => $user->id,
+            'token' => $token
         ]);
     }
 
@@ -153,6 +155,6 @@ class UserController extends AbstractController
     {
         $id = $request->input('id');
 
-        return $this->success(User::find($id)->toArray());
+        return $this->success(M::find($id)->toArray());
     }
 }
