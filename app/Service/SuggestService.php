@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use App\Model\UserTag;
+use App\Model\MemberTag;
 use Hyperf\Redis\Redis;
 
 class SuggestService
@@ -29,11 +29,11 @@ class SuggestService
     //寫入user tag  or update count
     public function storeUserTag(int $tagId, int $userId)
     {
-        if (UserTag::where('tag_id', $tagId)->where('user_id', $userId)->exists()) {
-            $model = UserTag::where('tag_id', $tagId)->where('user_id', $userId)->first();
+        if (MemberTag::where('tag_id', $tagId)->where('user_id', $userId)->exists()) {
+            $model = MemberTag::where('tag_id', $tagId)->where('user_id', $userId)->first();
             $model->count = $model->count + 1;
         } else {
-            $model = new UserTag();
+            $model = new MemberTag();
             $model->user_id = $userId;
             $model->tag_id = $tagId;
             $model->count = 1;
@@ -49,8 +49,8 @@ class SuggestService
             return json_decode($this->redis->get($key), true);
         }
 
-        $userTags = UserTag::where('user_id', $userId)->orderByDesc('count')->get();
-        $sum = UserTag::where('user_id', $userId)->sum('count');
+        $userTags = MemberTag::where('user_id', $userId)->orderByDesc('count')->get();
+        $sum = MemberTag::where('user_id', $userId)->sum('count');
 
         foreach ($userTags as $row) {
             $proportion = round($row->count / $sum, 2, PHP_ROUND_HALF_DOWN);

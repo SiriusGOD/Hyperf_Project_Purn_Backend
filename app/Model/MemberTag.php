@@ -19,14 +19,14 @@ namespace App\Model;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  */
-class UserTag extends Model
+class MemberTag extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'user_tags';
+    protected $table = 'member_tags';
 
     /**
      * The attributes that are mass assignable.

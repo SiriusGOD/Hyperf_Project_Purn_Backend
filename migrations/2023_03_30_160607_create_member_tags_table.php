@@ -4,14 +4,14 @@ use Hyperf\Database\Schema\Schema;
 use Hyperf\Database\Schema\Blueprint;
 use Hyperf\Database\Migrations\Migration;
 
-class CreateUserTagsTable extends Migration
+class CreateMemberTagsTable extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('user_tags', function (Blueprint $table) {
+        Schema::create('member_tags', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('user_id')->comment('用戶id')->index();
             $table->bigInteger('tag_id')->comment('標籤id');
@@ -25,6 +25,6 @@ class CreateUserTagsTable extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_tags');
+        Schema::dropIfExists('member_tags');
     }
 }
