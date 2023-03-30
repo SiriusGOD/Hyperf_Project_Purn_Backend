@@ -55,7 +55,9 @@ class VideoController extends AbstractController
     public function count(VideoService $service)
     {
         $result = $service->getVideoCount();
-        return $this->success(['count' =>$result]);
+        return $this->success([
+            'count' => (int)$result,
+        ]);
     }
 
     /**
