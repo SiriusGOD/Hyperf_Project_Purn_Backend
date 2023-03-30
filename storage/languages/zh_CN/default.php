@@ -191,7 +191,14 @@ return [
         'ad_id' => '廣告序號',
         'ad_name' => '廣告名稱',
         'ad_image' => '圖片廣告',
-        'ad_link' => '友情鏈接'
+        'ad_link' => '友情鏈接',
+        'ad_position' => [
+            \App\Model\Advertisement::POSITION['top_banner'] => '上 banner',
+            \App\Model\Advertisement::POSITION['bottom_banner'] => '下 banner',
+            \App\Model\Advertisement::POSITION['popup_window'] => '彈窗',
+            \App\Model\Advertisement::POSITION['ad_image'] => '圖片廣告',
+            \App\Model\Advertisement::POSITION['ad_link'] => '友情鏈接',
+        ]
     ],
     // -------------------------------------------------------------------
     // TagController
@@ -251,6 +258,10 @@ return [
         'product_multiple_edit' => '編輯大批商品',
         'product_clear_choose' => '清除選擇',
         'product_num' => '商品數',
+        'product_type_array' => [
+            \App\Model\Product::TYPE_CORRESPOND_LIST['image'] => '圖片',
+            \App\Model\Product::TYPE_CORRESPOND_LIST['video'] => '影片',
+        ]
     ],
     // -------------------------------------------------------------------
 ];

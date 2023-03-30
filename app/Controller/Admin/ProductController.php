@@ -69,6 +69,7 @@ class ProductController extends AbstractController
         $data['prev'] = $path . '?page=' . ($page - 1);
         $paginator = new Paginator($products, $step, $page);
         $data['paginator'] = $paginator->toArray();
+        $data['product_type'] = '';
         return $this->render->render('admin.product.index', $data);
     }
 

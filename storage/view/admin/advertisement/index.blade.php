@@ -81,30 +81,8 @@
                                             </td>
                                             <td>{{ $model->url}}</td>
                                             <td>
-                                                @switch($model->position)
-                                                    @case(\App\Model\Advertisement::POSITION['top_banner'])
-                                                        上 banner
-                                                        @break
-
-                                                    @case(\App\Model\Advertisement::POSITION['bottom_banner'])
-                                                        下 banner
-                                                        @break
-
-                                                    @case(\App\Model\Advertisement::POSITION['popup_window'])
-                                                        彈窗
-                                                        @break
-
-                                                    @case(\App\Model\Advertisement::POSITION['ad_image'])
-                                                        圖片廣告
-                                                        @break
-
-                                                    @case(\App\Model\Advertisement::POSITION['ad_link'])
-                                                        友情鏈接
-                                                        @break
-                                                
-                                                    @default
-                                                        彈窗
-                                                @endswitch</td>
+                                                {{trans('default.ad_control.ad_position')[$model->position]}}
+                                            </td>
                                             <td>{{ $model->start_time}}</td>
                                             <td>{{ $model->end_time}}</td>
                                             <td>{{ $model->buyer}}</td>

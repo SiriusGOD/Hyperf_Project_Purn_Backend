@@ -12,6 +12,7 @@
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_choose_type') ?? '選擇商品類型'}}</label>
                                     <select  class="form-control-sm" name="product_type" >
                                     @foreach(\App\Model\Product::TYPE_LIST as $type)
+                                        <option value=""></option>
                                         <option value="{{$type}}" {{$product_type == $type ? 'selected' : ''}}>
                                             {{\App\Model\Product::TYPE_LIST_NAME[$type]}}
                                         </option>
@@ -88,15 +89,7 @@
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $model->id}}</td>
                                             <td>
-                                                @switch($model->type)
-                                                    @case(\App\Model\Product::TYPE_CORRESPOND_LIST['image'])
-                                                        {{trans('default.image') ?? '圖片'}}
-                                                        @break
-
-                                                    @case(\App\Model\Product::TYPE_CORRESPOND_LIST['video'])
-                                                        {{trans('default.video.title') ?? '影片'}}
-                                                        @break
-                                                @endswitch
+                                                {{trans('default.product_control.product_type_array')[$model->type]}}
                                             </td>
                                             <td>{{ $model->name}}</td>
                                             <td>{{ $model->currency}}</td>
