@@ -26,10 +26,10 @@ class AuthBaseRequest extends FormRequest
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
-    {
+    {   
         $redis = make(Redis::class);
 
-        if (! auth('jwt')->check()) {
+        if (! auth()->check()) {
             return false;
         }
 

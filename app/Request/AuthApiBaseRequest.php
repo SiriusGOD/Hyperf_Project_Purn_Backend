@@ -29,11 +29,11 @@ class AuthApiBaseRequest extends FormRequest
     {
         $redis = make(Redis::class);
 
-        if (! auth('jwt_member')->check()) {
+        if (! auth('jwt')->check()) {
             return false;
         }
 
-        $token = $redis->get(MemberService::CACHE_KEY . auth('jwt_member')->user()->getId());
+        $token = $redis->get(MemberService::CACHE_KEY . auth('jwt')->user()->getId());
 
         if ($this->header('Authorization') == 'Bearer ' . $token) {
             return true;

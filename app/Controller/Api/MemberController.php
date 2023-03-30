@@ -90,7 +90,7 @@ class MemberController extends AbstractController
     public function addUserTag(AddUserTagRequest $request)
     {
         $tags = $request->input('tags');
-        $userId = auth('jwt_member')->user()->getId();
+        $userId = auth('jwt')->user()->getId();
         foreach ($tags as $tag) {
             if (! is_int($tag)) {
                 continue;
@@ -117,7 +117,7 @@ class MemberController extends AbstractController
      */
     public function update(MemberUpdateRequest $request, MemberService $service)
     {
-        $userId = auth('jwt_member')->user()->getId();
+        $userId = auth('jwt')->user()->getId();
         $path = '';
         if ($request->hasFile('avatar')) {
             $path = $service->moveUserAvatar($request->file('avatar'));

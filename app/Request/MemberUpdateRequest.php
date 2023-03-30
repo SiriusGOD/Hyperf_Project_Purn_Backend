@@ -23,9 +23,9 @@ class MemberUpdateRequest extends AuthBaseRequest
     public function authorize(): bool
     {
         $redis = make(Redis::class);
-        $token = $redis->get(MemberService::CACHE_KEY . auth('jwt_member')->user()->getId());
+        $token = $redis->get(MemberService::CACHE_KEY . auth('jwt')->user()->getId());
 
-        if (auth('jwt_member')->check() and $this->header('Authorization') == 'Bearer ' . $token) {
+        if (auth('jwt')->check() and $this->header('Authorization') == 'Bearer ' . $token) {
             return true;
         }
 
@@ -42,8 +42,8 @@ class MemberUpdateRequest extends AuthBaseRequest
     public function rules(): array
     {
         $id = 0;
-        if (auth('jwt_member')->check()) {
-            $id = auth('jwt_member')->user()->getId();
+        if (auth('jwt')->check()) {
+            $id = auth('jwt')->user()->getId();
         }
         if (! empty($this->input('id'))) {
             $id = $this->input('id');
