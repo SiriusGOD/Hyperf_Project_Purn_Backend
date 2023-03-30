@@ -31,13 +31,10 @@ class UserDetailRequest extends FormRequest
      */
     public function rules(): array
     {
-        $roleIds = Role::where('type', Role::TYPE['API'])->get()->pluck('id')->toArray();
-        $roleIds[] = Role::API_DEFAULT_USER_ROLE_ID;
         return [
             'id' => [
                 'required',
                 'numeric',
-                Rule::exists('users')->whereIn('role_id', $roleIds)->where('status', User::STATUS['NORMAL']),
             ],
         ];
     }

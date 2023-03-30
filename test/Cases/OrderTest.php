@@ -2,18 +2,17 @@
 
 namespace HyperfTest\Cases;
 
+use App\Model\Member;
 use App\Model\Order;
 use App\Model\User;
 use App\Service\UserService;
-use App\Task\ProductTask;
 use HyperfTest\HttpTestCase;
-use PHPUnit\Util\Json;
 
 class OrderTest extends HttpTestCase
 {
     public function testList()
     {
-        $user = User::first();
+        $user = Member::first();
         $token = auth()->login($user);
         make(UserService::class)->saveToken($user->id, $token);
         $data = $this->client->get('/api/order/list', [], [
@@ -25,7 +24,7 @@ class OrderTest extends HttpTestCase
 
     public function testCreate()
     {
-        $user = User::first();
+        $user = Member::first();
         $token = auth()->login($user);
         make(UserService::class)->saveToken($user->id, $token);
         $data = $this->client->post('/api/order/create', [

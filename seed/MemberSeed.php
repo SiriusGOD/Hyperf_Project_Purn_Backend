@@ -10,11 +10,11 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-class UserSeed implements BaseInterface
+class MemberSeed implements BaseInterface
 {
     public function up(): void
     {
-        $model = new \App\Model\User();
+        $model = new \App\Model\Member();
         $model->name = 'admin';
         $model->password = password_hash('quH25df15Ed', PASSWORD_DEFAULT);
         $model->sex = 1;
@@ -26,7 +26,7 @@ class UserSeed implements BaseInterface
         $model->role_id = 1;
         $model->save();
 
-        $model = new \App\Model\User();
+        $model = new \App\Model\Member();
         $model->name = 'test';
         $model->password = password_hash('quH25df15Ed', PASSWORD_DEFAULT);
         $model->sex = 1;
@@ -41,11 +41,11 @@ class UserSeed implements BaseInterface
 
     public function down(): void
     {
-        \App\Model\User::truncate();
+        \App\Model\Member::truncate();
     }
 
     public function base(): bool
     {
-        return true;
+        return false;
     }
 }

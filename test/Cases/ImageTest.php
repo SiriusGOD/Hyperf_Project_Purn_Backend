@@ -3,6 +3,7 @@
 namespace HyperfTest\Cases;
 
 use App\Model\Image;
+use App\Model\Member;
 use App\Model\User;
 use App\Service\UserService;
 use HyperfTest\HttpTestCase;
@@ -27,7 +28,7 @@ class ImageTest extends HttpTestCase
 
     public function testSuggest()
     {
-        $user = User::first();
+        $user = Member::first();
         $token = auth()->login($user);
         make(UserService::class)->saveToken($user->id, $token);
         $data = $this->client->get('/api/image/suggest', [], [
@@ -39,7 +40,7 @@ class ImageTest extends HttpTestCase
 
     public function testLike()
     {
-        $user = User::first();
+        $user = Member::first();
 
         $model = new Image();
         $model->user_id = $user->id;
