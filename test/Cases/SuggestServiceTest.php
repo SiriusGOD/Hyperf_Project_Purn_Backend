@@ -10,7 +10,7 @@ declare(strict_types=1);
  */
 namespace HyperfTest\Cases;
 
-use App\Model\MemberTag;
+use App\Model\UserTag;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
 use App\Service\SuggestService;
@@ -27,7 +27,7 @@ class SuggestServiceTest extends HttpTestCase
     public function testSuggestByUser()
     {
         $expect = 1;
-        $userTag = new MemberTag();
+        $userTag = new UserTag();
         $userTag->tag_id = $expect;
         $userTag->user_id = 0;
         $userTag->count = 1;

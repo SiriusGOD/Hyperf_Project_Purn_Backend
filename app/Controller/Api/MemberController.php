@@ -6,7 +6,7 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Model\Member;
-use App\Model\MemberTag;
+use App\Model\UserTag;
 use App\Request\AddUserTagRequest;
 use App\Request\MemberDetailRequest;
 use App\Request\MemberLoginRequest;
@@ -89,7 +89,7 @@ class MemberController extends AbstractController
     /**
      * @RequestMapping(path="tag", methods="post")
      */
-    public function addMemberTag(AddUserTagRequest $request)
+    public function addUserTag(AddUserTagRequest $request)
     {
         $tags = $request->input('tags');
         $userId = auth('jwt')->user()->getId();
@@ -98,12 +98,12 @@ class MemberController extends AbstractController
                 continue;
             }
 
-            $model = MemberTag::where('user_id', $userId)
+            $model = UserTag::where('user_id', $userId)
                 ->where('tag_id', $tag)
                 ->first();
 
             if (empty($model)) {
-                $model = new MemberTag();
+                $model = new UserTag();
             }
 
             $model->user_id = $userId;
