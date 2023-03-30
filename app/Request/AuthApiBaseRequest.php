@@ -11,11 +11,11 @@ declare(strict_types=1);
  */
 namespace App\Request;
 
-use App\Service\UserService;
+use App\Service\MemberService;
 use Hyperf\Redis\Redis;
 use Hyperf\Validation\Request\FormRequest;
 
-class AuthBaseRequest extends FormRequest
+class AuthApiBaseRequest extends FormRequest
 {
     public function failedAuthorization()
     {
@@ -26,14 +26,14 @@ class AuthBaseRequest extends FormRequest
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
-    {   
+    {
         $redis = make(Redis::class);
 
-        if (! auth()->check()) {
+        if (! auth('jwt')->check()) {
             return false;
         }
 
-        $token = $redis->get(UserService::CACHE_KEY . auth()->user()->getId());
+        $token = $redis->get(MemberService::CACHE_KEY . auth('jwt')->user()->getId());
 
         if ($this->header('Authorization') == 'Bearer ' . $token) {
             return true;

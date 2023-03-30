@@ -100,7 +100,7 @@ return [
         ],
         'jwt' => [
             'driver' => Qbhy\HyperfAuth\Guard\JwtGuard::class,
-            'provider' => 'users',
+            'provider' => 'members',
 
             /*
              * 以下是 simple-jwt 配置
@@ -178,6 +178,10 @@ return [
         'users' => [
             'driver' => \Qbhy\HyperfAuth\Provider\EloquentProvider::class,
             'model' => App\Model\User::class, //  需要实现 Qbhy\HyperfAuth\Authenticatable 接口
+        ],
+        'members' => [
+            'driver' => \Qbhy\HyperfAuth\Provider\EloquentProvider::class,
+            'model' => App\Model\Member::class, //  需要实现 Qbhy\HyperfAuth\Authenticatable 接口
         ],
     ],
 ];
