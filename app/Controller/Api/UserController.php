@@ -13,7 +13,7 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Model\User;
-use App\Model\UserTag;
+use App\Model\MemberTag;
 use App\Request\AddUserTagRequest;
 use App\Request\UserDetailRequest;
 use App\Request\UserLoginRequest;
@@ -96,12 +96,12 @@ class UserController extends AbstractController
                 continue;
             }
 
-            $model = UserTag::where('user_id', $userId)
+            $model = MemberTag::where('user_id', $userId)
                 ->where('tag_id', $tag)
                 ->first();
 
             if (empty($model)) {
-                $model = new UserTag();
+                $model = new MemberTag();
             }
 
             $model->user_id = $userId;
