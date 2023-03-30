@@ -11,41 +11,33 @@ declare(strict_types=1);
  */
 namespace App\Controller\Api;
 
+use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Service\ActorService;
-use App\Constants\Constants;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
-/**
- * @Controller
- */
+#[Controller]
 class ActorController extends AbstractController
 {
-    /**
-     * @RequestMapping(path="list", methods="get")
-     */
+    #[RequestMapping(methods: ['GET'], path: 'list')]
     public function list(RequestInterface $request, ActorService $service)
     {
-      $page = (int) $request->input('page', 0);
-      $data['models'] = $service->getActors($page);
-      $data['page'] = $page;
-      $data['step'] = Constants::DEFAULT_PAGE_PER;
-      $path = '/api/actor/list';
-      $data['next'] = $path . '?page=' . ($page + 1);
-      $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
-      return $this->success($data);
+        $page = (int) $request->input('page', 0);
+        $data['models'] = $service->getActors($page);
+        $data['page'] = $page;
+        $data['step'] = Constants::DEFAULT_PAGE_PER;
+        $path = '/api/actor/list';
+        $data['next'] = $path . '?page=' . ($page + 1);
+        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        return $this->success($data);
     }
 
-    /**
-     * @RequestMapping(path="count", methods="get")
-     */
+    #[RequestMapping(methods: ['GET'], path: 'count')]
     public function count(ActorService $service)
     {
-      $result = $service->getActorCount();
-      return $this->success([
-          'count' => $result,
-      ]);
+        $result = $service->getActorCount();
+        return $this->success(['count' => $result]);
     }
 }

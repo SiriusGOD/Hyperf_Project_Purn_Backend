@@ -11,8 +11,8 @@ declare(strict_types=1);
  */
 namespace App\Request;
 
-use App\Model\Role;
 use App\Model\Member;
+use App\Model\Role;
 use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
 

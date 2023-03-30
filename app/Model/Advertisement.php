@@ -38,19 +38,19 @@ class Advertisement extends Model
      *
      * @var string
      */
-    protected $table = 'advertisements';
+    protected ?string $table = 'advertisements';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [];
+    protected array $fillable = [];
 
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'user_id' => 'integer', 'position' => 'integer', 'expire' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'position' => 'integer', 'expire' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

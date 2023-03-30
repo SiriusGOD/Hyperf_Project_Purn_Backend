@@ -19,9 +19,6 @@ use Symfony\Component\Console\Input\InputOption;
 
 require_once BASE_PATH . '/seed/BaseInterface.php';
 
-/**
- * @Command
- */
 #[Command]
 class SeedRunCommand extends HyperfCommand
 {
@@ -35,7 +32,6 @@ class SeedRunCommand extends HyperfCommand
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-
         parent::__construct('seed:run');
     }
 
@@ -57,19 +53,16 @@ class SeedRunCommand extends HyperfCommand
             $this->classRun($className);
             return;
         }
-
         $option = $this->input->getOption('refresh');
         if ($option == 'refresh') {
             $this->info('run seed refresh');
             $this->refresh();
         }
-
         $option = $this->input->getOption('rollback');
         if ($option == 'rollback') {
             $this->info('run seed rollback');
             $this->rollback();
         }
-
         $isBase = false;
         $option = $this->input->getOption('base');
         if ($option == 'base' or env('APP_ENV', 'production') == 'production' or env('APP_ENV', 'prod') == 'prod') {
@@ -88,7 +81,6 @@ class SeedRunCommand extends HyperfCommand
         $class->up();
         $lastSeed = Seed::orderByDesc('id')->first();
         $lastSeedBatch = 0;
-
         if (! empty($lastSeed)) {
             $lastSeedBatch = $lastSeed->batch;
         }
@@ -101,13 +93,11 @@ class SeedRunCommand extends HyperfCommand
     public function refresh()
     {
         $seeds = Seed::orderByDesc('id')->get();
-
         foreach ($seeds as $seed) {
             require_once BASE_PATH . '/seed/' . $seed->seed . '.php';
             $class = new $seed->seed();
             $class->down();
         }
-
         Seed::truncate();
     }
 
@@ -116,11 +106,9 @@ class SeedRunCommand extends HyperfCommand
         $files = scandir(BASE_PATH . '/seed');
         $lastSeed = Seed::orderByDesc('id')->first();
         $lastSeedBatch = 0;
-
         if (! empty($lastSeed)) {
             $lastSeedBatch = $lastSeed->batch;
         }
-
         foreach ($files as $file) {
             if (str_contains($file, self::BASE_FILENAME)) {
                 require_once BASE_PATH . '/seed/' . $file;
@@ -146,13 +134,10 @@ class SeedRunCommand extends HyperfCommand
     {
         $lastSeed = Seed::orderByDesc('id')->first();
         $lastSeedBatch = 0;
-
         if (! empty($lastSeed)) {
             $lastSeedBatch = $lastSeed->batch;
         }
-
         $seeds = Seed::where('batch', $lastSeedBatch)->get();
-
         foreach ($seeds as $seed) {
             require_once BASE_PATH . '/seed/' . $seed->seed . '.php';
             $this->info('run rollback ' . $seed->seed);
@@ -172,7 +157,6 @@ class SeedRunCommand extends HyperfCommand
 
     protected function getArguments()
     {
-        return [
-        ];
+        return [];
     }
 }

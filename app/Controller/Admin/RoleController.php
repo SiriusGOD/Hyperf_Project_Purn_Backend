@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
-use App\Middleware\PermissionMiddleware;
 use App\Model\Role;
 use App\Model\User;
 use App\Service\PermissionService;
@@ -26,10 +25,8 @@ use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\View\RenderInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-/**
- * @Controller
- * @Middleware(PermissionMiddleware::class)
- */
+#[Controller]
+#[Middleware(middleware: 'App\\Middleware\\PermissionMiddleware')]
 class RoleController extends AbstractController
 {
     protected RenderInterface $render;
@@ -40,9 +37,7 @@ class RoleController extends AbstractController
         $this->render = $render;
     }
 
-    /**
-     * @RequestMapping(path="index", methods={"GET"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'index')]
     public function index(RequestInterface $request, RoleService $service)
     {
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
@@ -61,13 +56,10 @@ class RoleController extends AbstractController
         $data['prev'] = $path . '?page=' . ($page - 1);
         $data['navbar'] = trans('default.role_control.role');
         $data['role_active'] = 'active';
-
         return $this->render->render('admin.role.index', $data);
     }
 
-    /**
-     * @RequestMapping(path="store", methods={"POST"})
-     */
+    #[RequestMapping(methods: ['POST'], path: 'store')]
     public function store(RequestInterface $request, ResponseInterface $response, RoleService $service, PermissionService $permissionService): PsrResponseInterface
     {
         $data['id'] = $request->input('id') ? $request->input('id') : null;
@@ -79,9 +71,7 @@ class RoleController extends AbstractController
         return $response->redirect('/admin/role/index');
     }
 
-    /**
-     * @RequestMapping(path="create", methods={"get"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'create')]
     public function create(PermissionService $permissionService)
     {
         $data['navbar'] = trans('default.role_control.role_insert');
@@ -89,13 +79,10 @@ class RoleController extends AbstractController
         $data['role_active'] = 'active';
         $data['rolePermission'] = [];
         $data['permissions'] = $permissionService->parseData();
-
         return $this->render->render('admin.role.form', $data);
     }
 
-    /**
-     * @RequestMapping(path="edit", methods={"get"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'edit')]
     public function edit(RequestInterface $request, RoleService $service, PermissionService $permissionService)
     {
         $id = $request->input('id');
@@ -104,13 +91,10 @@ class RoleController extends AbstractController
         $data['role_active'] = 'active';
         $data['rolePermission'] = $permissionService->getRolePermission($id);
         $data['permissions'] = $permissionService->parseData();
-
         return $this->render->render('admin.role.form', $data);
     }
 
-    /**
-     * @RequestMapping(path="delete", methods={"POST"})
-     */
+    #[RequestMapping(methods: ['POST'], path: 'delete')]
     public function delete(RequestInterface $request, ResponseInterface $response, RoleService $service, UserService $userService): PsrResponseInterface
     {
         $roleId = $request->input('id');

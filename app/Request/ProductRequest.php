@@ -11,9 +11,9 @@ declare(strict_types=1);
  */
 namespace App\Request;
 
+use App\Model\Product;
 use Hyperf\Validation\Request\FormRequest;
 use Hyperf\Validation\Rule;
-use App\Model\Product;
 
 class ProductRequest extends FormRequest
 {
@@ -30,7 +30,7 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'id' => 'numeric',
             'product_type' => 'required|max:255',
             'product_id' => 'numeric',
@@ -48,7 +48,5 @@ class ProductRequest extends FormRequest
             'product_currency' => 'required|max:255',
             'product_price' => 'required|numeric',
         ];
-
-        return $rules;
     }
 }

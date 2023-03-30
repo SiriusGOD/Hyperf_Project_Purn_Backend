@@ -16,9 +16,6 @@ use Hyperf\Command\Annotation\Command;
 use Hyperf\Command\Command as HyperfCommand;
 use Psr\Container\ContainerInterface;
 
-/**
- * @Command
- */
 #[Command]
 class LogDeleteCommand extends HyperfCommand
 {
@@ -29,7 +26,6 @@ class LogDeleteCommand extends HyperfCommand
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-
         parent::__construct('log:delete');
     }
 
@@ -43,7 +39,6 @@ class LogDeleteCommand extends HyperfCommand
     {
         $path = BASE_PATH . '/runtime/logs/';
         $files = scandir($path);
-
         $oldBaseDay = Carbon::now();
         foreach ($files as $file) {
             $baseName = basename($file, '.log');

@@ -13,7 +13,6 @@ namespace App\Controller\Admin;
 
 use App\Constants\VideoCode;
 use App\Controller\AbstractController;
-use App\Middleware\PermissionMiddleware;
 use App\Model\Video;
 use App\Request\VideoRequest;
 use App\Service\ActorService;
@@ -28,44 +27,23 @@ use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Paginator\Paginator;
 use Hyperf\Validation\Contract\ValidatorFactoryInterface;
 use Hyperf\View\RenderInterface;
-use HyperfExt\Jwt\Contracts\JwtFactoryInterface;
-use HyperfExt\Jwt\Contracts\ManagerInterface;
-use HyperfExt\Jwt\Jwt;
 
-/**
- * @Controller
- * @Middleware(PermissionMiddleware::class)
- */
+#[Controller]
+#[Middleware(middleware: 'App\\Middleware\\PermissionMiddleware')]
 class VideoController extends AbstractController
 {
-    /**
-     * 提供了对 JWT 编解码、刷新和失活的能力。
-     */
-    protected ManagerInterface $manager;
-
-    /**
-     * 提供了从请求解析 JWT 及对 JWT 进行一系列相关操作的能力。
-     */
-    protected Jwt $jwt;
-
     protected RenderInterface $render;
 
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected ValidatorFactoryInterface $validationFactory;
 
-    public function __construct(ManagerInterface $manager, JwtFactoryInterface $jwtFactory, RenderInterface $render)
+    public function __construct(RenderInterface $render)
     {
         parent::__construct();
-        $this->manager = $manager;
-        $this->jwt = $jwtFactory->make();
         $this->render = $render;
     }
 
-    /**
-     * @RequestMapping(path="index", methods={"GET"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'index')]
     public function index(RequestInterface $request)
     {
         // 顯示幾筆
@@ -94,9 +72,7 @@ class VideoController extends AbstractController
         return $this->render->render('admin.video.index', $data);
     }
 
-    /**
-     * @RequestMapping(path="store", methods={"POST"})
-     */
+    #[RequestMapping(methods: ['POST'], path: 'store')]
     public function store(VideoRequest $request, ResponseInterface $response, VideoService $videoService, TagService $tagService, ActorService $actorService)
     {
         $data = $request->all();
@@ -108,9 +84,7 @@ class VideoController extends AbstractController
         return $response->redirect('/admin/video/index');
     }
 
-    /**
-     * @RequestMapping(path="create", methods={"get"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'create')]
     public function create()
     {
         $data['navbar'] = trans('default.video.insert');
@@ -121,9 +95,7 @@ class VideoController extends AbstractController
         return $this->render->render('admin.video.form', $data);
     }
 
-    /**
-     * @RequestMapping(path="edit", methods={"get"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'edit')]
     public function edit(RequestInterface $request)
     {
         $id = $request->input('id');

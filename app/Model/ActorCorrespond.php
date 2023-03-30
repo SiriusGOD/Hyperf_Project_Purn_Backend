@@ -28,19 +28,19 @@ class ActorCorrespond extends Model
      *
      * @var string
      */
-    protected $table = 'actor_corresponds';
+    protected ?string $table = 'actor_corresponds';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [];
+    protected array $fillable = [];
 
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'correspond_id' => 'integer', 'actor_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'correspond_id' => 'integer', 'actor_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

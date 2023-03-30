@@ -19,8 +19,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * @Command
- * 產生Swagger注釋範例
+ * 產生Swagger注釋範例.
  */
 #[Command]
 class SwaggerCommand extends HyperfCommand
@@ -31,29 +30,38 @@ class SwaggerCommand extends HyperfCommand
     protected $container;
 
     // 表注釋對應
+    // 表注釋對應
     protected $swaggerTable;
 
+    // 請求方式
     // 請求方式
     protected $swaggerMethod;
 
     // url路徑
+    // url路徑
     protected $swaggerPath;
 
+    // 標籤
     // 標籤
     protected $swaggerTag;
 
     // 概要
+    // 概要
     protected $swaggerSummary;
 
+    // 描述
     // 描述
     protected $swaggerDescription;
 
     // query格式資料
+    // query格式資料
     protected $swaggerQuery;
 
     // 請求 json 資料類型
+    // 請求 json 資料類型
     protected $swaggerRequestBody;
 
+    // 響應 json 資料類型
     // 響應 json 資料類型
     protected $swaggerResponse;
 
@@ -62,7 +70,7 @@ class SwaggerCommand extends HyperfCommand
      *
      * @var string
      */
-    protected $name = 'swagger:format';
+    protected ?string $name = 'swagger:format';
 
     public function __construct(ContainerInterface $container)
     {
@@ -108,7 +116,6 @@ class SwaggerCommand extends HyperfCommand
         $doc = PHP_EOL . PHP_EOL;
         $header = $this->swaggerPath . $this->swaggerTag . $this->swaggerSummary . $this->swaggerDescription;
         $header = trim($header, PHP_EOL);
-
         $body = $this->swaggerQuery . $this->swaggerRequestBody . $this->swaggerResponse;
         $body = trim($body, PHP_EOL);
         $doc .= <<<eof
@@ -198,7 +205,6 @@ eof;
         $doc = '';
         foreach ($output as $k => $v) {
             $type = $this->gettype($v);
-
             $doc .= <<<eof
      *     @OA\\Parameter(name="{$k}", in="query", description="",
      *         @OA\\Schema(type="{$type}", default="{$v}")
@@ -409,7 +415,6 @@ eof;
         if (empty($tables)) {
             return [];
         }
-
         $tablesList = explode(',', $tables);
         if (! $tablesList) {
             return [];

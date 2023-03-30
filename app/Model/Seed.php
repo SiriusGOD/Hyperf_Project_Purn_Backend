@@ -27,19 +27,19 @@ class Seed extends Model
      *
      * @var string
      */
-    protected $table = 'seeds';
+    protected ?string $table = 'seeds';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [];
+    protected array $fillable = [];
 
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'batch' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'batch' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

@@ -18,9 +18,7 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\View\RenderInterface;
 
-/**
- * @Controller
- */
+#[Controller]
 class indexController extends AbstractController
 {
     protected RenderInterface $render;
@@ -31,9 +29,7 @@ class indexController extends AbstractController
         $this->render = $render;
     }
 
-    /**
-     * @RequestMapping(path="dashboard", methods={"GET"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'dashboard')]
     public function dashboard(RequestInterface $request, RoleService $service)
     {
         $data['navbar'] = '首頁';

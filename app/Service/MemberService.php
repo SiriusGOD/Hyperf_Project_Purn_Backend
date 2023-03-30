@@ -11,13 +11,11 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use App\Model\Role;
-use App\Model\User;
 use App\Model\Member;
+use App\Model\Role;
 use Carbon\Carbon;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
-use HyperfExt\Hashing\Hash;
 
 class MemberService
 {
@@ -35,7 +33,6 @@ class MemberService
         $this->logger = $loggerFactory->get('reply');
     }
 
-
     public function apiCheckUser(array $userInfo)
     {
         $user = Member::where('email', $userInfo['email'])->first();
@@ -47,7 +44,7 @@ class MemberService
             return false;
         }
 
-        if (Hash::check($userInfo['password'], $user->password)) {
+        if (password_verify($userInfo['password'], $user->password)) {
             return $user;
         }
         return false;
@@ -57,7 +54,7 @@ class MemberService
     {
         $model = new Member();
         $model->name = $data['name'];
-        $model->password = Hash::make($data['password']);
+        $model->password = password_hash($data['password'],PASSWORD_DEFAULT);
         $model->sex = $data['sex'];
         $model->age = $data['age'];
         $model->avatar = $model->avatar ?? '';
@@ -121,7 +118,7 @@ class MemberService
         }
 
         if (! empty($data['password'])) {
-            $model->password = Hash::make($data['password']);
+            $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
         }
 
         if (! empty($data['sex'])) {

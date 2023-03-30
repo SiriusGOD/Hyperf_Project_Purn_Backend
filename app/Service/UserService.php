@@ -16,7 +16,6 @@ use App\Model\User;
 use Carbon\Carbon;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
-use HyperfExt\Hashing\Hash;
 
 class UserService
 {
@@ -53,7 +52,7 @@ class UserService
             $model->name = $data['name'];
         }
         if (! empty($data['password'])) {
-            $model->password = Hash::make($data['password']);
+            $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
         }
         $model->sex = $data['sex'];
         $model->age = $data['age'];
@@ -98,7 +97,7 @@ class UserService
         if (! $user) {
             return false;
         }
-        if (Hash::check($userInfo['password'], $user->password)) {
+        if (password_verify($userInfo['password'], $user->password)) {
             return $user;
         }
         return false;
@@ -115,7 +114,7 @@ class UserService
             return false;
         }
 
-        if (Hash::check($userInfo['password'], $user->password)) {
+        if (password_verify($userInfo['password'], $user->password)) {
             return $user;
         }
         return false;
@@ -125,7 +124,7 @@ class UserService
     {
         $model = new User();
         $model->name = $data['name'];
-        $model->password = Hash::make($data['password']);
+        $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
         $model->sex = $data['sex'];
         $model->age = $data['age'];
         $model->avatar = $model->avatar ?? '';
@@ -164,7 +163,7 @@ class UserService
         }
 
         if (! empty($data['password'])) {
-            $model->password = Hash::make($data['password']);
+            $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
         }
 
         if (! empty($data['sex'])) {

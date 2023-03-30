@@ -18,28 +18,21 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
-/**
- * @Controller
- */
+#[Controller]
 class TagController extends AbstractController
 {
-    /**
-     * @RequestMapping(path="list", methods="get")
-     */
+    #[RequestMapping(methods: ['GET'], path: 'list')]
     public function list(RequestInterface $request, TagService $service)
     {
         $data = $service->getTags();
         return $this->success($data->toArray());
     }
 
-    /**
-     * @RequestMapping(path="create", methods="post")
-     */
+    #[RequestMapping(methods: ['POST'], path: 'create')]
     public function create(TagRequest $request, TagService $service)
     {
         $userId = auth('jwt')->user()->getId();
         $service->createTag($request->input('name'), $userId);
-
         return $this->success();
     }
 }

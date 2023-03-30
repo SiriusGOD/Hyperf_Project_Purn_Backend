@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
-use App\Middleware\PermissionMiddleware;
 use App\Model\Actor;
 use App\Request\ActorRequest;
 use App\Service\ActorService;
@@ -25,52 +24,30 @@ use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Paginator\Paginator;
 use Hyperf\Validation\Contract\ValidatorFactoryInterface;
 use Hyperf\View\RenderInterface;
-use HyperfExt\Jwt\Contracts\JwtFactoryInterface;
-use HyperfExt\Jwt\Contracts\ManagerInterface;
-use HyperfExt\Jwt\Jwt;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-/**
- * @Controller
- * @Middleware(PermissionMiddleware::class)
- */
+#[Controller]
+#[Middleware(middleware: 'App\\Middleware\\PermissionMiddleware')]
 class ActorController extends AbstractController
 {
-    /**
-     * 提供了对 JWT 编解码、刷新和失活的能力。
-     */
-    protected ManagerInterface $manager;
-
-    /**
-     * 提供了从请求解析 JWT 及对 JWT 进行一系列相关操作的能力。
-     */
-    protected Jwt $jwt;
-
     protected RenderInterface $render;
 
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected ValidatorFactoryInterface $validationFactory;
 
-    public function __construct(ManagerInterface $manager, JwtFactoryInterface $jwtFactory, RenderInterface $render)
+    public function __construct(RenderInterface $render)
     {
         parent::__construct();
-        $this->manager = $manager;
-        $this->jwt = $jwtFactory->make();
         $this->render = $render;
     }
 
-    /**
-     * @RequestMapping(path="index", methods={"GET"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'index')]
     public function index(RequestInterface $request)
     {
         // 顯示幾筆
         $step = Actor::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = Actor::offset(($page - 1) * $step)
-            ->limit($step);
+        $query = Actor::offset(($page - 1) * $step)->limit($step);
         $actors = $query->get();
         $query = Actor::select('*');
         $total = $query->count();
@@ -92,9 +69,7 @@ class ActorController extends AbstractController
         return $this->render->render('admin.actor.index', $data);
     }
 
-    /**
-     * @RequestMapping(path="store", methods={"POST"})
-     */
+    #[RequestMapping(methods: ['POST'], path: 'store')]
     public function store(ActorRequest $request, ResponseInterface $response, ActorService $service): PsrResponseInterface
     {
         $data['id'] = $request->input('id') ? $request->input('id') : null;
@@ -105,9 +80,7 @@ class ActorController extends AbstractController
         return $response->redirect('/admin/actor/index');
     }
 
-    /**
-     * @RequestMapping(path="create", methods={"get"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'create')]
     public function create()
     {
         $data['navbar'] = trans('default.actor.insert');
@@ -117,9 +90,7 @@ class ActorController extends AbstractController
         return $this->render->render('admin.actor.form', $data);
     }
 
-    /**
-     * @RequestMapping(path="edit", methods={"get"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'edit')]
     public function edit(RequestInterface $request)
     {
         $id = $request->input('id');
@@ -129,18 +100,14 @@ class ActorController extends AbstractController
         return $this->render->render('admin.actor.form', $data);
     }
 
-    /**
-     * @RequestMapping(path="expire", methods={"POST"})
-     */
+    #[RequestMapping(methods: ['POST'], path: 'expire')]
     public function expire(RequestInterface $request, ResponseInterface $response, ActorService $service): PsrResponseInterface
     {
         $query = Actor::where('id', $request->input('id'));
         $record = $query->first();
-
         if (empty($record)) {
             return $response->redirect('/admin/actor/index');
         }
-
         $record->expire = $request->input('expire', 1);
         $record->save();
         $service->updateCache();

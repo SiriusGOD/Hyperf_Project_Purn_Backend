@@ -9,7 +9,6 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-
 namespace App\Constants;
 
 class Constants
@@ -23,6 +22,6 @@ class Constants
     // 系统超级管理员id
     public const SYS_ADMIN_ID = 1;
 
-    //Default Page
+    // Default Page
     public const DEFAULT_PAGE_PER = 10;
 }

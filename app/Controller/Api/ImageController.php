@@ -22,20 +22,15 @@ use App\Service\SuggestService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 
-/**
- * @Controller
- */
+#[Controller]
 class ImageController extends AbstractController
 {
-    /**
-     * @RequestMapping(path="list", methods="get")
-     */
+    #[RequestMapping(methods: ['GET'], path: 'list')]
     public function list(ImageApiListRequest $request, ImageService $service)
     {
         $tagIds = $request->input('tags');
         $page = (int) $request->input('page', 0);
         $models = $service->getImages($tagIds, $page);
-
         $data = [];
         $data['models'] = $models;
         $data['page'] = $page;
@@ -46,15 +41,12 @@ class ImageController extends AbstractController
         return $this->success($data);
     }
 
-    /**
-     * @RequestMapping(path="search", methods="get")
-     */
+    #[RequestMapping(methods: ['GET'], path: 'search')]
     public function search(ImageApiSearchRequest $request, ImageService $service)
     {
         $keyword = $request->input('keyword');
         $page = (int) $request->input('page', 0);
         $models = $service->getImagesByKeyword($keyword, $page);
-
         $data = [];
         $data['models'] = $models;
         $data['page'] = $page;
@@ -65,16 +57,13 @@ class ImageController extends AbstractController
         return $this->success($data);
     }
 
-    /**
-     * @RequestMapping(path="suggest", methods="get")
-     */
+    #[RequestMapping(methods: ['GET'], path: 'suggest')]
     public function suggest(ImageApiSuggestRequest $request, SuggestService $suggestService, ImageService $service)
     {
         $page = (int) $request->input('page', 0);
         $userId = (int) auth()->user()->getId();
         $suggest = $suggestService->getTagProportionByUser($userId);
         $models = $service->getImagesBySuggest($suggest, $page);
-
         $data = [];
         $data['models'] = $models;
         $data['page'] = $page;
@@ -82,25 +71,16 @@ class ImageController extends AbstractController
         $path = '/api/image/suggest';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
-
         return $this->success($data);
     }
 
-    /**
-     * @RequestMapping(path="like", methods="post")
-     */
+    #[RequestMapping(methods: ['POST'], path: 'like')]
     public function like(ImageApiLikeRequest $request)
     {
         $id = $request->input('id');
-
         $model = Image::find($id);
-        $model->like++;
-
+        ++$model->like;
         $model->save();
-
-        return $this->success([
-            'id' => $id,
-            'like' => $model->like,
-        ]);
+        return $this->success(['id' => $id, 'like' => $model->like]);
     }
 }

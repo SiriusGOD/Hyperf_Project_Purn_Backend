@@ -41,21 +41,21 @@ class User extends Model implements Authenticatable
      * The table associated with the model.
      * @var string
      */
-    protected $table = 'users';
+    protected ?string $table = 'users';
 
     /**
      * The attributes that are mass assignable.
      * @var array
      */
-    protected $fillable = ['name', 'sex', 'age', 'password', 'role_id'];
+    protected array $fillable = ['name', 'sex', 'age', 'password', 'role_id'];
 
     /**
      * The attributes that should be cast to native types.
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'sex' => 'integer', 'age' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'role_id' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'sex' => 'integer', 'age' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'role_id' => 'integer'];
 
-    protected $hidden = ['password'];
+    protected array $hidden = ['password'];
 
     public function getJwtIdentifier()
     {

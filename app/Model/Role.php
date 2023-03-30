@@ -36,21 +36,21 @@ class Role extends Model
      *
      * @var string
      */
-    protected $table = 'roles';
+    protected ?string $table = 'roles';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['name'];
+    protected array $fillable = ['name'];
 
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public static function getTypeNameByType(int $type)
     {

@@ -19,14 +19,10 @@ use Psr\Http\Message\ResponseInterface;
 
 class ValidationException extends ValidationExceptionHandler
 {
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected RenderInterface $render;
 
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected \Hyperf\HttpServer\Contract\ResponseInterface $response;
 
     public function handle(\Throwable $throwable, ResponseInterface $response)
@@ -36,13 +32,8 @@ class ValidationException extends ValidationExceptionHandler
         $errors = $throwable->validator->errors()->all();
         $url = request()->getUri()->getPath();
         if (str_contains($url, 'api')) {
-            return $this->response->json([
-                'code' => ApiCode::BAD_REQUEST,
-                'msg' => $errors,
-            ]);
+            return $this->response->json(['code' => ApiCode::BAD_REQUEST, 'msg' => $errors]);
         }
-        return $this->render->render('error', [
-            'errors' => $errors,
-        ]);
+        return $this->render->render('error', ['errors' => $errors]);
     }
 }

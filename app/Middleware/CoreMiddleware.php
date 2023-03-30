@@ -21,7 +21,7 @@ class CoreMiddleware extends \Hyperf\HttpServer\CoreMiddleware
      *
      * @return ResponseInterface
      */
-    protected function handleNotFound(ServerRequestInterface $request)
+    protected function handleNotFound(ServerRequestInterface $request): ResponseInterface
     {
         // 重写路由找不到的处理逻辑
         return $this->response()->withStatus(404);
@@ -32,7 +32,7 @@ class CoreMiddleware extends \Hyperf\HttpServer\CoreMiddleware
      *
      * @return ResponseInterface
      */
-    protected function handleMethodNotAllowed(array $methods, ServerRequestInterface $request)
+    protected function handleMethodNotAllowed(array $methods, ServerRequestInterface $request): ResponseInterface
     {
         // 重写 HTTP 方法不允许的处理逻辑
         return $this->response()->withStatus(405);

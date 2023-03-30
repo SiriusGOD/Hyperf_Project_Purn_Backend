@@ -12,8 +12,6 @@ declare(strict_types=1);
 namespace App\Request;
 
 use Hyperf\Validation\Request\FormRequest;
-use Hyperf\Validation\Rule;
-use App\Model\Product;
 
 class ProductApiRequest extends FormRequest
 {
@@ -30,12 +28,10 @@ class ProductApiRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'keyword' => 'max:255',
             'offset' => 'numeric',
-            'limit' => 'numeric'
+            'limit' => 'numeric',
         ];
-
-        return $rules;
     }
 }

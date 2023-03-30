@@ -21,8 +21,11 @@ use Hyperf\Redis\Redis;
 class VideoService
 {
     public const CACHE_KEY = 'video';
+
     public const COUNT_KEY = 'video_count';
+
     public const EXPIRE = 600;
+
     public const COUNT_EXPIRE = 180;
 
     protected Redis $redis;
@@ -31,31 +34,30 @@ class VideoService
     {
         $this->redis = $redis;
         $this->logger = $loggerFactory->get('reply');
-        $this->model =  $video;
-    }
-  
-    //影片列表
-    public function find(int $id)
-    {
-        $query = $this->model->select("id","title","m3u8","cover_thumb","tags","actors")->where('id',$id)->first();
-        return $query;
+        $this->model = $video;
     }
 
-    //影片列表
+    // 影片列表
+    public function find(int $id)
+    {
+        return $this->model->select('id', 'title', 'm3u8', 'cover_thumb', 'tags', 'actors')->where('id', $id)->first();
+    }
+
+    // 影片列表
     public function getVideos(?array $tagIds, int $page): Collection
     {
         $videoIds = [];
         $query = $this->model;
         if (! empty($tagIds)) {
-          $videoIds = TagCorrespond::where('correspond_type', 'video')
-              ->whereIn('tag_id', $tagIds)
-              ->pluck('correspond_id');
+            $videoIds = TagCorrespond::where('correspond_type', 'video')
+                ->whereIn('tag_id', $tagIds)
+                ->pluck('correspond_id');
         }
-        //if(!empty($tagIds)){
+        // if(!empty($tagIds)){
         //  $query = $query->with([
         //      'tags',
         //  ]);
-        //}
+        // }
         $query = $query->offset(Video::PAGE_PER * $page)->limit(Video::PAGE_PER);
         if (! empty($videoIds)) {
             $query = $query->whereIn('id', $videoIds);
@@ -63,15 +65,15 @@ class VideoService
         return $query->get();
     }
 
-    //影片列表
+    // 影片列表
     public function getVideosByCorresponds(?array $corresponds, int $page): Collection
     {
         $videoIds = [];
         $query = $this->model;
         if (! empty($corresponds)) {
-          $videoIds = ActorCorrespond::where('correspond_type', 'video')
-              ->whereIn('actor_id', $corresponds['actors'])
-              ->pluck('correspond_id');
+            $videoIds = ActorCorrespond::where('correspond_type', 'video')
+                ->whereIn('actor_id', $corresponds['actors'])
+                ->pluck('correspond_id');
         }
         $query = $query->offset(Video::PAGE_PER * $page)->limit(Video::PAGE_PER);
         if (! empty($actorCorr)) {
@@ -79,7 +81,6 @@ class VideoService
         }
         return $query->get();
     }
-
 
     // 新增影片
     public function storeVideo($data)
@@ -144,6 +145,7 @@ class VideoService
      * @param mixed $length
      * @param mixed $offset
      * @param mixed $limit
+     * @param mixed $page
      */
     public function searchVideo(string $title, $compare, int $length, $page)
     {
@@ -151,7 +153,7 @@ class VideoService
         #  $jsonResult = $this->redis->get(self::CACHE_KEY.$name);
         #  return json_decode($jsonResult, true);
         # }
-        $model = Video::where('title', 'like', "%$title%");
+        $model = Video::where('title', 'like', "%{$title}%");
         if ($compare > 0 && $length > 0) {
             if ($compare == 1) {
                 $model = $model->where('duration', '>=', $length);

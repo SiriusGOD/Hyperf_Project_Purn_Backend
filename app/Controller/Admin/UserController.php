@@ -14,7 +14,6 @@ namespace App\Controller\Admin;
 use App\Constants\ErrorCode;
 use App\Controller\AbstractController;
 use App\Exception\BusinessException;
-use App\Middleware\AllowIPMiddleware;
 use App\Model\User;
 use App\Service\PermissionService;
 use App\Service\UserService;
@@ -26,46 +25,26 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Validation\Contract\ValidatorFactoryInterface;
 use Hyperf\View\RenderInterface;
-use HyperfExt\Hashing\Hash;
-use HyperfExt\Jwt\Contracts\JwtFactoryInterface;
-use HyperfExt\Jwt\Contracts\ManagerInterface;
-use HyperfExt\Jwt\Jwt;
 use PragmaRX\Google2FA\Google2FA;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-/**
- * @Controller
- * @Middleware(AllowIPMiddleware::class)
- */
+#[Controller]
+#[Middleware(middleware: 'App\\Middleware\\AllowIPMiddleware')]
 class UserController extends AbstractController
 {
-    /**
-     * 提供了对 JWT 编解码、刷新和失活的能力。
-     */
-    protected ManagerInterface $manager;
-
-    /**
-     * 提供了从请求解析 JWT 及对 JWT 进行一系列相关操作的能力。
-     */
-    protected Jwt $jwt;
-
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected ValidatorFactoryInterface $validationFactory;
 
-    public function __construct(ManagerInterface $manager, JwtFactoryInterface $jwtFactory, PermissionService $permissionService)
+    public function __construct(PermissionService $permissionService)
     {
         parent::__construct();
-        $this->manager = $manager;
-        $this->jwt = $jwtFactory->make();
         $this->permissionService = $permissionService;
     }
 
     /**
      * register.
-     * @RequestMapping(path="register", methods={"POST"})
      */
+    #[RequestMapping(methods: ['POST'], path: 'register')]
     public function register(): PsrResponseInterface
     {
         return $this->success();
@@ -73,31 +52,21 @@ class UserController extends AbstractController
 
     /**
      * register.
-     * @RequestMapping(path="loginPage", methods={"get"})
      */
+    #[RequestMapping(methods: ['GET'], path: 'loginPage')]
     public function loginPage(RenderInterface $render)
     {
         return $render->render('loginPage');
     }
 
     /**
-     * @RequestMapping(path="login", methods={"POST"})
      * @return PsrResponseInterface|ResponseInterface
      */
+    #[RequestMapping(methods: ['POST'], path: 'login')]
     public function login(RequestInterface $request, ResponseInterface $response, UserService $service, RenderInterface $render, Google2FA $google2FA)
     {
         $input = $this->request->all();
-        $validator = $this->validationFactory->make(
-            $input,
-            [
-                'name' => 'required',
-                'password' => 'required',
-            ],
-            [
-                'name.required' => 'name is required',
-                'password.required' => 'password is required',
-            ]
-        );
+        $validator = $this->validationFactory->make($input, ['name' => 'required', 'password' => 'required'], ['name.required' => 'name is required', 'password.required' => 'password is required']);
         if ($validator->fails()) {
             $errorMessage = $validator->errors()->first();
             throw new BusinessException(ErrorCode::FORBIDDEN, $errorMessage);
@@ -115,13 +84,11 @@ class UserController extends AbstractController
                 return $this->handleLogin($user, $response);
             }
         }
-        $data = [
-            'error_login' => true,
-            'error_login_msg' => trans('default.error_login_msg'),
-        ];
+        $data = ['error_login' => true, 'error_login_msg' => trans('default.error_login_msg')];
         return $render->render('loginPage', $data);
     }
 
+    // 登入成功處理
     // 登入成功處理
     public function handleLogin($user, $response)
     {
@@ -130,9 +97,7 @@ class UserController extends AbstractController
         return $response->redirect('/admin/index/dashboard');
     }
 
-    /**
-     * @RequestMapping(path="logout", methods={"get"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'logout')]
     public function logout(ResponseInterface $response): PsrResponseInterface
     {
         auth('session')->logout();
@@ -140,24 +105,18 @@ class UserController extends AbstractController
     }
 
     /**
-     * @RequestMapping(path="page", methods={"GET"})
      * @param mixed $page
      * @param mixed $step
      */
+    #[RequestMapping(methods: ['GET'], path: 'page')]
     public function page($page = 1, $step = 10): PsrResponseInterface
     {
-        $data = User::select()->orderBy('created_at', 'desc')
-            ->offset(($page - 1) * $step)
-            ->limit($step)
-            ->get();
+        $data = User::select()->orderBy('created_at', 'desc')->offset(($page - 1) * $step)->limit($step)->get();
         $total = User::count();
-
         return $this->paginator($total, $data);
     }
 
-    /**
-     * @RequestMapping(path="create", methods={"POST"})
-     */
+    #[RequestMapping(methods: ['POST'], path: 'create')]
     public function create(RequestInterface $request): PsrResponseInterface
     {
         if ($request->input('id')) {
@@ -166,7 +125,7 @@ class UserController extends AbstractController
             $record = new User();
         }
         if (! empty($password = $request->input('password'))) {
-            $record->password = Hash::make($password);
+            $record->password = password_hash($password,PASSWORD_DEFAULT);
         }
         $record->name = $request->input('name');
         $record->phone = $request->input('phone');
@@ -179,29 +138,12 @@ class UserController extends AbstractController
         return $this->success();
     }
 
-    /**
-     * @RequestMapping(path="delete", methods={"DELETE"})
-     */
+    #[RequestMapping(methods: ['DELETE'], path: 'delete')]
     public function delete(RequestInterface $request): PsrResponseInterface
     {
         $record = User::findOrFail($request->input('id'));
         $record->status = User::STATUS['DELETE'];
         $record->save();
         return $this->success();
-    }
-
-    /**
-     * @param mixed $token
-     * @return ResponseInterface
-     */
-    protected function respondWithToken($token): PsrResponseInterface
-    {
-        return $this->success(
-            [
-                'access_token' => $token,
-                'token_type' => 'bearer',
-                'expire_in' => make(JwtFactoryInterface::class)->make()->getPayloadFactory()->getTtl(),
-            ]
-        );
     }
 }

@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
-use App\Middleware\PermissionMiddleware;
 use App\Model\User;
 use App\Request\UserUpdateRequest;
 use App\Service\RoleService;
@@ -29,47 +28,26 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Validation\Contract\ValidatorFactoryInterface;
 use Hyperf\View\RenderInterface;
-use HyperfExt\Jwt\Contracts\JwtFactoryInterface;
-use HyperfExt\Jwt\Contracts\ManagerInterface;
-use HyperfExt\Jwt\Jwt;
 use PragmaRX\Google2FA\Google2FA;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-/**
- * @Controller
- * @Middleware(PermissionMiddleware::class)
- */
+#[Controller]
+#[Middleware(middleware: 'App\\Middleware\\PermissionMiddleware')]
 class ManagerController extends AbstractController
 {
-    /**
-     * 提供了对 JWT 编解码、刷新和失活的能力。
-     */
-    protected ManagerInterface $manager;
-
-    /**
-     * 提供了从请求解析 JWT 及对 JWT 进行一系列相关操作的能力。
-     */
-    protected Jwt $jwt;
-
     protected RenderInterface $render;
 
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected ValidatorFactoryInterface $validationFactory;
 
-    public function __construct(ManagerInterface $manager, JwtFactoryInterface $jwtFactory, RenderInterface $render, Google2FA $google2FA)
+    public function __construct(RenderInterface $render, Google2FA $google2FA)
     {
         parent::__construct();
-        $this->manager = $manager;
-        $this->jwt = $jwtFactory->make();
         $this->render = $render;
         $this->google2FA = $google2FA;
     }
 
-    /**
-     * @RequestMapping(path="index", methods={"GET"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'index')]
     public function index(RequestInterface $request, UserService $service, RoleService $roleService)
     {
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
@@ -89,13 +67,10 @@ class ManagerController extends AbstractController
         $data['prev'] = $path . '?page=' . ($page - 1);
         $data['navbar'] = trans('default.manager_control.manager_control');
         $data['user_active'] = 'active';
-
         return $this->render->render('admin.manager.index', $data);
     }
 
-    /**
-     * @RequestMapping(path="store", methods={"POST"})
-     */
+    #[RequestMapping(methods: ['POST'], path: 'store')]
     public function store(UserUpdateRequest $request, ResponseInterface $response, UserService $service): PsrResponseInterface
     {
         $data['id'] = $request->input('id') ? $request->input('id') : null;
@@ -116,9 +91,7 @@ class ManagerController extends AbstractController
         return $response->redirect('/admin/manager/index');
     }
 
-    /**
-     * @RequestMapping(path="create", methods={"get"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'create')]
     public function create(RoleService $roleService)
     {
         $data['google2fa_url'] = '';
@@ -130,9 +103,7 @@ class ManagerController extends AbstractController
         return $this->render->render('admin.manager.form', $data);
     }
 
-    /**
-     * @RequestMapping(path="googleAuth", methods={"get"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'googleAuth')]
     public function googleAuth(RequestInterface $request, UserService $service, ResponseInterface $response)
     {
         $avatar = $this->google2FA->generateSecretKey();
@@ -142,9 +113,7 @@ class ManagerController extends AbstractController
         return $response->redirect('/admin/manager/index');
     }
 
-    /**
-     * @RequestMapping(path="edit", methods={"get"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'edit')]
     public function edit(RequestInterface $request, UserService $service, RoleService $roleService)
     {
         $id = $request->input('id');
@@ -154,17 +123,8 @@ class ManagerController extends AbstractController
         $data['qrcode_image'] = '';
         // 如果 還沒設定GOOGLE 驗證碼
         if (strlen($user->avatar) > 1) {
-            $g2faUrl = $this->google2FA->getQRCodeUrl(
-                env('APP_NAME', 'CompanyName'),
-                $user->name,
-                $user->avatar
-            );
-            $writer = new Writer(
-                new ImageRenderer(
-                    new RendererStyle(320),
-                    new ImagickImageBackEnd()
-                )
-            );
+            $g2faUrl = $this->google2FA->getQRCodeUrl(env('APP_NAME', 'CompanyName'), $user->name, $user->avatar);
+            $writer = new Writer(new ImageRenderer(new RendererStyle(320), new ImagickImageBackEnd()));
             $qrcode_image = base64_encode($writer->writeString($g2faUrl));
             $data['qrcode_image'] = $qrcode_image;
         }
@@ -174,9 +134,7 @@ class ManagerController extends AbstractController
         return $this->render->render('admin.manager.form', $data);
     }
 
-    /**
-     * @RequestMapping(path="delete", methods={"POST"})
-     */
+    #[RequestMapping(methods: ['POST'], path: 'delete')]
     public function delete(RequestInterface $request, ResponseInterface $response, UserService $service): PsrResponseInterface
     {
         $service->deleteUser($request->input('id'));

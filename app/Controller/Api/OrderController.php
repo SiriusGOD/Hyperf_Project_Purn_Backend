@@ -20,15 +20,13 @@ use App\Service\PayService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 
-/**
- * @Controller
- */
+#[Controller]
 class OrderController extends AbstractController
 {
     /**
-     * @RequestMapping(path="list", methods="get")
-     * 獲取使用者訂單
+     * 獲取使用者訂單.
      */
+    #[RequestMapping(methods: ['GET'], path: 'list')]
     public function list(OrderRequest $request, OrderService $service)
     {
         $user_id = auth('jwt')->user()->getId();
@@ -40,9 +38,9 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @RequestMapping(path="create", methods="post")
-     * 新增使用者訂單
+     * 新增使用者訂單.
      */
+    #[RequestMapping(methods: ['POST'], path: 'create')]
     public function create(OrderRequest $request, OrderService $service, PayService $pay_service)
     {
         $user_id = auth('jwt')->user()->getId();
@@ -52,11 +50,10 @@ class OrderController extends AbstractController
         }
         $payment_type = $request->input('payment_type', 1);
         $oauth_type = $request->input('oauth_type', 'web');
-        $pay_proxy = $request->input('pay_proxy', 'online'); // agent or online
-
+        $pay_proxy = $request->input('pay_proxy', 'online');
+        // agent or online
         $base_service = di(\App\Service\BaseService::class);
         $ip = $base_service->getIp($request->getHeaders(), $request->getServerParams());
-
         // 生成支付鏈接(測試)
         $pay_res = $pay_service->getPayUrl($user_id, $prod_id, $payment_type, $oauth_type, $pay_proxy, $ip);
         if (isset($pay_res['success']) && $pay_res['success'] == true) {
@@ -72,9 +69,9 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @RequestMapping(path="delete", methods="post")
-     * 修改訂單狀態
+     * 修改訂單狀態.
      */
+    #[RequestMapping(methods: ['POST'], path: 'delete')]
     public function delete(OrderRequest $request, OrderService $service)
     {
         $user_id = auth('jwt')->user()->getId();

@@ -17,14 +17,10 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
-/**
- * @Controller
- */
+#[Controller]
 class AdvertisementController extends AbstractController
 {
-    /**
-     * @RequestMapping(path="list", methods="get")
-     */
+    #[RequestMapping(methods: ['GET'], path: 'list')]
     public function list(RequestInterface $request, AdvertisementService $service)
     {
         $data = $service->getAdvertisements();
@@ -38,7 +34,6 @@ class AdvertisementController extends AbstractController
             $item['image_url'] = $host . $item['image_url'];
             $result[] = $item;
         }
-
         return $this->success($result);
     }
 }

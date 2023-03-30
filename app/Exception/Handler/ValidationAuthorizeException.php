@@ -20,14 +20,10 @@ use Psr\Http\Message\ResponseInterface;
 
 class ValidationAuthorizeException extends ValidationExceptionHandler
 {
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected RenderInterface $render;
 
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected \Hyperf\HttpServer\Contract\ResponseInterface $response;
 
     public function handle(\Throwable $throwable, ResponseInterface $response)
@@ -35,18 +31,12 @@ class ValidationAuthorizeException extends ValidationExceptionHandler
         if (! $throwable instanceof UnauthorizedException) {
             return $response;
         }
-
         $this->stopPropagation();
         $url = request()->getUri()->getPath();
         if (str_contains($url, 'api')) {
-            return $this->response->json([
-                'code' => ApiCode::BAD_LOGIN,
-                'msg' => $throwable->getMessage(),
-            ]);
+            return $this->response->json(['code' => ApiCode::BAD_LOGIN, 'msg' => $throwable->getMessage()]);
         }
-        return $this->render->render('error', [
-            'errors' => $throwable->getMessage(),
-        ]);
+        return $this->render->render('error', ['errors' => $throwable->getMessage()]);
     }
 
     public function isValid(\Throwable $throwable): bool

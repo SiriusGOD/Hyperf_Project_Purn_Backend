@@ -18,9 +18,7 @@ use Hyperf\Crontab\Annotation\Crontab;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
-/**
- * @Crontab(name="ProductTask", rule="* * * * *", callback="execute", memo="廣告上下架定時任務")
- */
+#[Crontab(name: 'ProductTask', rule: '* * * * *', callback: 'execute', memo: '廣告上下架定時任務')]
 class ProductTask
 {
     protected Redis $redis;
@@ -38,23 +36,17 @@ class ProductTask
     public function execute()
     {
         $now = Carbon::now()->toDateTimeString();
-        $models = Product::where('end_time', '<=', $now)
-            ->where('expire', Product::EXPIRE['no'])
-            ->get();
-
+        $models = Product::where('end_time', '<=', $now)->where('expire', Product::EXPIRE['no'])->get();
         if (count($models) == 0) {
             return;
         }
-
         $this->logger->info('有商品過期');
         foreach ($models as $model) {
             $model->expire = Product::EXPIRE['yes'];
             $model->save();
             $this->logger->info('商品 id : ' . $model->id . ' 過期');
         }
-
         $this->service->updateCache();
-
         $this->logger->info('更新商品完成');
     }
 }

@@ -30,21 +30,25 @@ use Carbon\Carbon;
 class Product extends Model
 {
     public const EXPIRE = ['no' => 0, 'yes' => 1];
+
     public const PAGE_PER = 10;
-    public const TYPE_LIST = ['image','video'];
+
+    public const TYPE_LIST = ['image', 'video'];
+
     public const TYPE_LIST_NAME = [
         'image' => '圖片',
-        'video' => '影片'
+        'video' => '影片',
     ];
+
     public const TYPE_CORRESPOND_LIST = [
         'image' => 'App\Model\Image',
-        'video' => 'App\Model\Video'
+        'video' => 'App\Model\Video',
     ];
 
     public const CURRENCY = [
         'CNY' => '人民幣',
         'USD' => '美金',
-        'TWD' => '台幣'
+        'TWD' => '台幣',
     ];
 
     /**
@@ -52,21 +56,21 @@ class Product extends Model
      *
      * @var string
      */
-    protected $table = 'products';
+    protected ?string $table = 'products';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [];
+    protected array $fillable = [];
 
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'user_id' => 'integer', 'correspond_id' => 'integer', 'position' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'correspond_id' => 'integer', 'position' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     // 影片關連
     public function video()

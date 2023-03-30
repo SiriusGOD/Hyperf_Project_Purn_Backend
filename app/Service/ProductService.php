@@ -11,10 +11,9 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\Image;
 use App\Model\Product;
 use App\Model\Tag;
-use App\Model\TagCorrespond;
-use App\Model\Image;
 use App\Model\Video;
 use Carbon\Carbon;
 use Hyperf\Redis\Redis;
@@ -22,7 +21,9 @@ use Hyperf\Redis\Redis;
 class ProductService
 {
     public const CACHE_KEY = 'product';
+
     public const MULTIPLE_CACHE_KEY = 'multiple_cache';
+
     public const TTL_30_Min = 1800;
 
     protected Redis $redis;
@@ -49,38 +50,40 @@ class ProductService
     public function store(array $data)
     {
         $model = Product::findOrNew($data['id']);
-        $model -> user_id = $data['user_id'];
-        $model -> type = $data['type'];
-        $model -> correspond_id = $data['correspond_id'];
-        $model -> name = $data['name'];
-        $model -> expire = $data['expire'];
-        $model -> start_time = $data['start_time'];
-        $model -> end_time = $data['end_time'];
-        $model -> currency = $data['currency'];
-        $model -> selling_price = $data['selling_price'];
+        $model->user_id = $data['user_id'];
+        $model->type = $data['type'];
+        $model->correspond_id = $data['correspond_id'];
+        $model->name = $data['name'];
+        $model->expire = $data['expire'];
+        $model->start_time = $data['start_time'];
+        $model->end_time = $data['end_time'];
+        $model->currency = $data['currency'];
+        $model->selling_price = $data['selling_price'];
         $model->save();
     }
 
     // 新增radis大批匯入的商品ID
     public function insertCache($id)
     {
-        $redisKey = self::MULTIPLE_CACHE_KEY . ":" . (int)auth('session')->user()->id;
-        $re = $this->redis->lrem($redisKey, 1, (int)$id);
-        if($re == 0)$this->redis->lpush($redisKey, $id);
+        $redisKey = self::MULTIPLE_CACHE_KEY . ':' . (int) auth('session')->user()->id;
+        $re = $this->redis->lrem($redisKey, 1, (int) $id);
+        if ($re == 0) {
+            $this->redis->lpush($redisKey, $id);
+        }
     }
 
     // 獲取商品列表
     public function getListByKeyword($keyword, $offset, $limit)
     {
-        $checkRedisKey = self::CACHE_KEY . ":" . $offset . ":" . $limit . ":" . $keyword;
+        $checkRedisKey = self::CACHE_KEY . ':' . $offset . ':' . $limit . ':' . $keyword;
 
-        if($this->redis->exists($checkRedisKey)){
+        if ($this->redis->exists($checkRedisKey)) {
             $jsonResult = $this->redis->get($checkRedisKey);
             return json_decode($jsonResult, true);
         }
 
         $now = Carbon::now()->toDateTimeString();
-        if(!empty($keyword)){
+        if (! empty($keyword)) {
             $tagIds = Tag::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
         }
         // image
@@ -90,19 +93,19 @@ class ProductService
             ->where('products.start_time', '<=', $now)
             ->where('products.end_time', '>=', $now)
             ->where('products.expire', Product::EXPIRE['no']);
-           
-        if(!empty($tagIds)){
+
+        if (! empty($tagIds)) {
             $img_query = $img_query->leftjoin('tag_corresponds', 'images.id', 'tag_corresponds.correspond_id')
                 ->where('tag_corresponds.correspond_type', '=', Image::class)
-                ->whereIn('tag_corresponds.tag_id',$tagIds)
+                ->whereIn('tag_corresponds.tag_id', $tagIds)
                 ->orwhere('products.name', 'like', '%' . $keyword . '%');
-        }else if(!empty($keyword)){
+        } elseif (! empty($keyword)) {
             $img_query = $img_query->where('products.name', 'like', '%' . $keyword . '%');
         }
-        if($offset != 0){
+        if ($offset != 0) {
             $img_query = $img_query->offset($offset);
         }
-        if($limit != 0){
+        if ($limit != 0) {
             $img_query = $img_query->limit($limit);
         }
         $img_data = $img_query->get()->toArray();
@@ -117,19 +120,19 @@ class ProductService
             ->where('products.start_time', '<=', $now)
             ->where('products.end_time', '>=', $now)
             ->where('products.expire', Product::EXPIRE['no']);
-            
-        if(!empty($tagIds)){
+
+        if (! empty($tagIds)) {
             $video_query = $video_query->leftjoin('tag_corresponds', 'videos.id', 'tag_corresponds.correspond_id')
                 ->where('tag_corresponds.correspond_type', '=', Video::class)
-                ->whereIn('tag_corresponds.tag_id',$tagIds)
+                ->whereIn('tag_corresponds.tag_id', $tagIds)
                 ->orWhere('products.name', 'like', '%' . $keyword . '%');
-        }else if(!empty($keyword)){
+        } elseif (! empty($keyword)) {
             $video_query = $video_query->where('products.name', 'like', '%' . $keyword . '%');
         }
-        if($offset != 0){
+        if ($offset != 0) {
             $video_query = $video_query->offset($offset);
         }
-        if($limit != 0){
+        if ($limit != 0) {
             $video_query = $video_query->limit($limit);
         }
         $video_data = $video_query->get()->toArray();
@@ -140,36 +143,34 @@ class ProductService
 
         $data = [
             'image' => $img_data,
-            'video' => $video_data
+            'video' => $video_data,
         ];
 
         $this->redis->set($checkRedisKey, json_encode($data));
         $this->redis->expire($checkRedisKey, self::TTL_30_Min);
-        
+
         return $data;
     }
 
     // 獲取商品總數 (上架中的)
     public function getCount($keyword)
     {
-        if(!empty($keyword)){
+        if (! empty($keyword)) {
             $tagIds = Tag::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
         }
 
-        $query = Product::where('expire',0);
+        $query = Product::where('expire', 0);
 
-        if(!empty($tagIds)){
-            $query = Product::join('tag_corresponds', function($join){
+        if (! empty($tagIds)) {
+            $query = Product::join('tag_corresponds', function ($join) {
                 $join->on('products.correspond_id', '=', 'tag_corresponds.correspond_id')
-                ->on('products.type', '=', 'tag_corresponds.correspond_type');
+                    ->on('products.type', '=', 'tag_corresponds.correspond_type');
             })
-            ->whereIn('tag_corresponds.tag_id',$tagIds)
-            ->orWhere('products.name', 'like', '%' . $keyword . '%');
-        }else if(!empty($keyword)){
+                ->whereIn('tag_corresponds.tag_id', $tagIds)
+                ->orWhere('products.name', 'like', '%' . $keyword . '%');
+        } elseif (! empty($keyword)) {
             $query = $query->where('products.name', 'like', '%' . $keyword . '%');
         }
-        $data = $query->count();
-
-        return $data;
+        return $query->count();
     }
 }

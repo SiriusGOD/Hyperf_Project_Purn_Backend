@@ -26,19 +26,19 @@ class UserInvitations extends Model
      *
      * @var string
      */
-    protected $table = 'user_invitations';
+    protected ?string $table = 'user_invitations';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [];
+    protected array $fillable = [];
 
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'user_id' => 'integer', 'use_date' => 'datetime', 'count' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'use_date' => 'datetime', 'count' => 'integer'];
 }

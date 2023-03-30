@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
 /**
  * This file is part of Hyperf.
  *
@@ -11,38 +11,44 @@ declare (strict_types=1);
  */
 namespace App\Model;
 
-use Carbon\Carbon;
 use Hyperf\Database\Model\SoftDeletes;
+
 /**
- * @property-read User $user 
- * @property-read \Hyperf\Database\Model\Collection|Tag[] $tags 
+ * @property User $user
+ * @property \Hyperf\Database\Model\Collection|Tag[] $tags
  */
 class Video extends Model
 {
     use SoftDeletes;
+
     public const PAGE_PER = 10;
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'videos';
+    protected ?string $table = 'videos';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [];
+    protected array $fillable = [];
+
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = [];
+    protected array $casts = [];
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
     public function tags()
     {
         return $this->morphToMany(Tag::class, 'correspond', 'tag_corresponds', 'correspond_id');

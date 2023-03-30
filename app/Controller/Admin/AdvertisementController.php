@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
-use App\Middleware\PermissionMiddleware;
 use App\Model\Advertisement;
 use App\Request\AdvertisementRequest;
 use App\Service\AdvertisementService;
@@ -26,57 +25,33 @@ use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Paginator\Paginator;
 use Hyperf\Validation\Contract\ValidatorFactoryInterface;
 use Hyperf\View\RenderInterface;
-use HyperfExt\Jwt\Contracts\JwtFactoryInterface;
-use HyperfExt\Jwt\Contracts\ManagerInterface;
-use HyperfExt\Jwt\Jwt;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-/**
- * @Controller
- * @Middleware(PermissionMiddleware::class)
- */
+#[Controller]
+#[Middleware(middleware: 'App\\Middleware\\PermissionMiddleware')]
 class AdvertisementController extends AbstractController
 {
-    /**
-     * 提供了对 JWT 编解码、刷新和失活的能力。
-     */
-    protected ManagerInterface $manager;
-
-    /**
-     * 提供了从请求解析 JWT 及对 JWT 进行一系列相关操作的能力。
-     */
-    protected Jwt $jwt;
-
     protected RenderInterface $render;
 
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected ValidatorFactoryInterface $validationFactory;
 
-    public function __construct(ManagerInterface $manager, JwtFactoryInterface $jwtFactory, RenderInterface $render)
+    public function __construct(RenderInterface $render)
     {
         parent::__construct();
-        $this->manager = $manager;
-        $this->jwt = $jwtFactory->make();
         $this->render = $render;
     }
 
-    /**
-     * @RequestMapping(path="index", methods={"GET"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'index')]
     public function index(RequestInterface $request)
     {
         // 顯示幾筆
         $step = Advertisement::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = Advertisement::offset(($page - 1) * $step)
-            ->limit($step);
+        $query = Advertisement::offset(($page - 1) * $step)->limit($step);
         $advertisements = $query->get();
-
         $query = Advertisement::select('*');
         $total = $query->count();
-
         $data['last_page'] = ceil($total / $step);
         if ($total == 0) {
             $data['last_page'] = 1;
@@ -91,15 +66,11 @@ class AdvertisementController extends AbstractController
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . ($page - 1);
         $paginator = new Paginator($advertisements, $step, $page);
-
         $data['paginator'] = $paginator->toArray();
-
         return $this->render->render('admin.advertisement.index', $data);
     }
 
-    /**
-     * @RequestMapping(path="store", methods={"POST"})
-     */
+    #[RequestMapping(methods: ['POST'], path: 'store')]
     public function store(AdvertisementRequest $request, ResponseInterface $response, AdvertisementService $service): PsrResponseInterface
     {
         $imageUrl = null;
@@ -129,9 +100,7 @@ class AdvertisementController extends AbstractController
         return $response->redirect('/admin/advertisement/index');
     }
 
-    /**
-     * @RequestMapping(path="create", methods={"get"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'create')]
     public function create()
     {
         $data['navbar'] = trans('default.ad_control.ad_insert');
@@ -143,9 +112,7 @@ class AdvertisementController extends AbstractController
         return $this->render->render('admin.advertisement.form', $data);
     }
 
-    /**
-     * @RequestMapping(path="edit", methods={"get"})
-     */
+    #[RequestMapping(methods: ['GET'], path: 'edit')]
     public function edit(RequestInterface $request)
     {
         $id = $request->input('id');
@@ -155,18 +122,14 @@ class AdvertisementController extends AbstractController
         return $this->render->render('admin.advertisement.form', $data);
     }
 
-    /**
-     * @RequestMapping(path="expire", methods={"POST"})
-     */
+    #[RequestMapping(methods: ['POST'], path: 'expire')]
     public function expire(RequestInterface $request, ResponseInterface $response, AdvertisementService $service): PsrResponseInterface
     {
         $query = Advertisement::where('id', $request->input('id'));
         $record = $query->first();
-
         if (empty($record)) {
             return $response->redirect('/admin/advertisement/index');
         }
-
         $record->expire = $request->input('expire', 1);
         $record->save();
         $service->updateCache();

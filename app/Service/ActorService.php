@@ -19,13 +19,16 @@ use Hyperf\Redis\Redis;
 class ActorService
 {
     public const CACHE_KEY = 'actor';
+
     public const COUNT_KEY = 'actor_count';
 
     public const EXPIRE = 600;
+
     public const COUNT_EXPIRE = 180;
+
     protected Redis $redis;
 
-    public function __construct(Redis $redis , Actor $actor)
+    public function __construct(Redis $redis, Actor $actor)
     {
         $this->redis = $redis;
         $this->model = $actor;
@@ -35,7 +38,7 @@ class ActorService
     public function videoCorrespondActor(array $data, int $videoId)
     {
         if ($data['tags'] != '') {
-            $ids=[];
+            $ids = [];
             $tags = explode(',', $data['tags']);
             foreach ($tags as $v) {
                 $d['name'] = $v;
@@ -43,8 +46,8 @@ class ActorService
                 $d['sex'] = 0;
                 $actor = self::storeActor($d);
                 $res = self::createActorRelationship('video', $videoId, $actor->id);
-                $ids["actorCorresponds"][] = $res->id;
-                $ids["actors"][] = $actor->id;
+                $ids['actorCorresponds'][] = $res->id;
+                $ids['actors'][] = $actor->id;
             }
             return $ids;
         }
@@ -53,8 +56,8 @@ class ActorService
     // 取得演員
     public function getActors(int $page): Collection
     {
-      $query = $this->model->offset(Actor::PAGE_PER * $page)->limit(Actor::PAGE_PER);
-      return $query->get();
+        $query = $this->model->offset(Actor::PAGE_PER * $page)->limit(Actor::PAGE_PER);
+        return $query->get();
     }
 
     // 計算總數
@@ -106,31 +109,30 @@ class ActorService
         $model->save();
         return $model;
     }
+
     // 新增或更新演員
     public function findActor(string $name)
     {
-        if (Actor::where('name',$name )->exists()) {
+        if (Actor::where('name', $name)->exists()) {
             return Actor::where('name', $name)->first();
-        } else {
-          return false;
         }
+        return false;
     }
 
     // 新熷 演員關係
     public function createActorRelationship(string $className, int $classId, int $actorId)
     {
         $model = ActorCorrespond::where('correspond_type', $className)
-                          ->where('correspond_id', $classId)
-                          ->where('actor_id', $actorId);
-        if (!$model->exists()) {
+            ->where('correspond_id', $classId)
+            ->where('actor_id', $actorId);
+        if (! $model->exists()) {
             $model = new ActorCorrespond();
             $model->correspond_type = $className;
             $model->correspond_id = $classId;
             $model->actor_id = $actorId;
             $model->save();
             return $model;
-        }else{
-            return $model->first();
         }
+        return $model->first();
     }
 }
