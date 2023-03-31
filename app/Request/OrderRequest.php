@@ -14,7 +14,7 @@ namespace App\Request;
 use App\Model\Order;
 use Hyperf\Validation\Rule;
 
-class OrderRequest extends AuthBaseRequest
+class OrderRequest extends AuthApiBaseRequest
 {
     /**
      * Get the validation rules that apply to the request.
