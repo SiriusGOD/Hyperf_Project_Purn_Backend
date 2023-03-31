@@ -78,7 +78,7 @@ class VideoApiTest extends HttpTestCase
             'refresh_at'       => time(),
             'created_at'       => date("Y-m-d H:i:s"),
             'is_free'          => 1,
-            'like'             => $like,
+            'likes'             => $like,
             'comment'          => 0,
             'status'           => 1,
             'thumb_start_time' => 0,
