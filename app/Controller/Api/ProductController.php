@@ -19,7 +19,7 @@ use App\Request\ProductApiRequest;
 class ProductController extends AbstractController
 {
     /**
-     * @RequestMapping(path="list", methods="POST")
+     * @RequestMapping(path="list", methods="GET")
      * 獲取上架中的商品列表 
      */
     public function list(ProductApiRequest $request, ProductService $service)
@@ -32,7 +32,7 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @RequestMapping(path="count", methods="POST")
+     * @RequestMapping(path="count", methods="GET")
      * 獲取上架中的商品數
      */
     public function count(ProductApiRequest $request, ProductService $service)
