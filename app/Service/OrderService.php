@@ -84,6 +84,9 @@ class OrderService
             $query = $query->limit($limit);
         }
         $orders = $query->get()->toArray();
+        foreach ($orders as $key => $value) {
+            $orders[$key]['total_price'] = (double)$value['total_price'];
+        }
 
         $this->redis->set($checkRedisKey, json_encode($orders));
         $this->redis->expire($checkRedisKey, self::TTL_30_Min);

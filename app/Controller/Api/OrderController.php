@@ -36,7 +36,7 @@ class OrderController extends AbstractController
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 0);
         $result = $service->searchUserOrder($user_id, $order_status, $offset, $limit);
-        return $this->success($result);
+        return $this->success(['models' => $result]);
     }
 
     /**
