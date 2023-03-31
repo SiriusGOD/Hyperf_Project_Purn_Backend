@@ -12,7 +12,10 @@ class ChageVideoColumn extends Migration
     public function up(): void
     {
         Schema::table('videos', function (Blueprint $table) {
-          $table->bigInteger('duration')->nullable()->change();
+          $table->dropColumn('duration');
+        });
+        Schema::table('videos', function (Blueprint $table) {
+          $table->integer('duration')->nullable()->comment("時長");
         });
     }
 
@@ -22,7 +25,7 @@ class ChageVideoColumn extends Migration
     public function down(): void
     {
         Schema::table('', function (Blueprint $table) {
-          $table->string('duration')->nullable()->change();
+          $table->string('duration')->nullable()->comment('時長')->change();
         });
     }
 }
