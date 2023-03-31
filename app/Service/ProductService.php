@@ -106,6 +106,9 @@ class ProductService
             $img_query = $img_query->limit($limit);
         }
         $img_data = $img_query->get()->toArray();
+        foreach ($img_data as $key => $value) {
+            $img_data[$key]['selling_price'] = (double)$value['selling_price'] ;
+        }
 
         // video
         $video_query = Product::join('videos', 'products.correspond_id', 'videos.id')
@@ -130,6 +133,10 @@ class ProductService
             $video_query = $video_query->limit($limit);
         }
         $video_data = $video_query->get()->toArray();
+
+        foreach ($video_data as $key => $value) {
+            $video_data[$key]['selling_price'] = (double)$value['selling_price'] ;
+        }
 
         $data = [
             'image' => $img_data,
