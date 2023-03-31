@@ -154,9 +154,9 @@ class VideoService
         $model = Video::where('title', 'like', "%$title%");
         if ($compare > 0 && $length > 0) {
             if ($compare == 1) {
-                $model = $model->where('videos.lenght', '>=', $length);
+                $model = $model->where('duration', '>=', $length);
             } else {
-                $model = $model->where('videos.lenght', '<=', $length);
+                $model = $model->where('duration', '<=', $length);
             }
         }
         // $this->redis->set(self::COUNT_KEY, $model, self::COUNT_EXPIRE);
