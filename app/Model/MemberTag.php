@@ -40,5 +40,5 @@ class MemberTag extends Model
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'user_id' => 'integer', 'tag_id' => 'integer', 'count' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected $casts = ['id' => 'integer', 'member_id' => 'integer', 'tag_id' => 'integer', 'count' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

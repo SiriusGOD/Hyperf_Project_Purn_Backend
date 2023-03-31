@@ -96,7 +96,7 @@ class UserController extends AbstractController
                 continue;
             }
 
-            $model = MemberTag::where('user_id', $userId)
+            $model = MemberTag::where('member_id', $userId)
                 ->where('tag_id', $tag)
                 ->first();
 

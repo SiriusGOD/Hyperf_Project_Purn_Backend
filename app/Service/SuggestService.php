@@ -29,8 +29,8 @@ class SuggestService
     //寫入user tag  or update count
     public function storeUserTag(int $tagId, int $userId)
     {
-        if (MemberTag::where('tag_id', $tagId)->where('user_id', $userId)->exists()) {
-            $model = MemberTag::where('tag_id', $tagId)->where('user_id', $userId)->first();
+        if (MemberTag::where('tag_id', $tagId)->where('member_id', $userId)->exists()) {
+            $model = MemberTag::where('tag_id', $tagId)->where('member_id', $userId)->first();
             $model->count = $model->count + 1;
         } else {
             $model = new MemberTag();
@@ -49,8 +49,8 @@ class SuggestService
             return json_decode($this->redis->get($key), true);
         }
 
-        $userTags = MemberTag::where('user_id', $userId)->orderByDesc('count')->get();
-        $sum = MemberTag::where('user_id', $userId)->sum('count');
+        $userTags = MemberTag::where('member_id', $userId)->orderByDesc('count')->get();
+        $sum = MemberTag::where('member_id', $userId)->sum('count');
 
         foreach ($userTags as $row) {
             $proportion = round($row->count / $sum, 2, PHP_ROUND_HALF_DOWN);
