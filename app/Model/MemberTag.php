@@ -26,19 +26,19 @@ class MemberTag extends Model
      *
      * @var string
      */
-    protected $table = 'member_tags';
+    protected ?string $table = 'member_tags';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [];
+    protected array $fillable = [];
 
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'member_id' => 'integer', 'tag_id' => 'integer', 'count' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'tag_id' => 'integer', 'count' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }
