@@ -1,13 +1,20 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Model\Member;
 use App\Model\MemberTag;
-use App\Request\AddUserTagRequest;
+use App\Request\AddMemberTagRequest;
 use App\Request\MemberDetailRequest;
 use App\Request\MemberLoginRequest;
 use App\Request\MemberRegisterRequest;
@@ -16,14 +23,10 @@ use App\Service\MemberService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 
-/**
- * @Controller
- */
+#[Controller]
 class MemberController extends AbstractController
 {
-    /**
-     * @RequestMapping(path="login", methods="post")
-     */
+    #[RequestMapping(methods: ['POST'], path: 'login')]
     public function login(MemberLoginRequest $request, MemberService $service)
     {
         $user = $service->apiCheckUser([
@@ -44,13 +47,11 @@ class MemberController extends AbstractController
         $service->saveToken($user->id, $token);
         return $this->success([
             'id' => $user->id,
-            'token' => $token
+            'token' => $token,
         ]);
     }
 
-    /**
-     * @RequestMapping(path="register", methods="post")
-     */
+    #[RequestMapping(methods: ['POST'], path: 'register')]
     public function register(MemberRegisterRequest $request, MemberService $service)
     {
         $path = '';
@@ -72,13 +73,11 @@ class MemberController extends AbstractController
         $token = auth()->login($user);
         return $this->success([
             'id' => $user->id,
-            'token' => $token
+            'token' => $token,
         ]);
     }
 
-    /**
-     * @RequestMapping(path="logout", methods="get")
-     */
+    #[RequestMapping(methods: ['GET'], path: 'logout')]
     public function logout()
     {
         auth()->logout();
@@ -86,10 +85,8 @@ class MemberController extends AbstractController
         return $this->success();
     }
 
-    /**
-     * @RequestMapping(path="tag", methods="post")
-     */
-    public function addUserTag(AddUserTagRequest $request)
+    #[RequestMapping(methods: ['POST'], path: 'tag')]
+    public function addMemberTag(AddMemberTagRequest $request)
     {
         $tags = $request->input('tags');
         $userId = auth('jwt')->user()->getId();
@@ -106,17 +103,15 @@ class MemberController extends AbstractController
                 $model = new MemberTag();
             }
 
-            $model->user_id = $userId;
+            $model->member_id = $userId;
             $model->tag_id = $tag;
-            $model->count = empty($model->count) ? 0 : $model->count++;
+            $model->count = empty($model->count) ? 1 : $model->count++;
             $model->save();
         }
         return $this->success();
     }
 
-    /**
-     * @RequestMapping(path="update", methods="put")
-     */
+    #[RequestMapping(methods: ['PUT'], path: 'update')]
     public function update(MemberUpdateRequest $request, MemberService $service)
     {
         $userId = auth('jwt')->user()->getId();
@@ -139,9 +134,7 @@ class MemberController extends AbstractController
         return $this->success();
     }
 
-    /**
-     * @RequestMapping(path="detail", methods="get")
-     */
+    #[RequestMapping(methods: ['GET'], path: 'detail')]
     public function detail(MemberDetailRequest $request)
     {
         $id = $request->input('id');

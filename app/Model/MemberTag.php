@@ -13,7 +13,7 @@ namespace App\Model;
 
 /**
  * @property int $id
- * @property int $user_id
+ * @property int $member_id
  * @property int $tag_id
  * @property int $count
  * @property \Carbon\Carbon $created_at
@@ -30,15 +30,11 @@ class MemberTag extends Model
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
     protected array $fillable = [];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
     protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'tag_id' => 'integer', 'count' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

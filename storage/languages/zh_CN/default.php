@@ -27,7 +27,8 @@ return [
         'manager' => '管理者',
         'advertisement' => '廣告',
         'tag' => '標籤',
-        'image' => '圖片'
+        'image' => '圖片',
+        'member' => '會員',
     ],
     'user_name' => '使用者名稱',
     'list' => '列表',
@@ -141,6 +142,7 @@ return [
         'video' => '影片管理',
         'actor' => '演員管理',
         'product' => '商品管理',
+        'member' => '會員管理',
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -160,6 +162,19 @@ return [
         'manager_phone' => '手機',
         'manager_status' => '狀態',
         'GoogleAtuh'=> 'GOOGLE 驗證碼',
+    ],
+    'member_control' => [
+        'member_control' => '會員',
+        'member_insert' => '新增會員',
+        'member_update' => '更新會員',
+        'member_acc' => '會員帳號',
+        'member_pass' => '密碼',
+        'member_sex' => '性別',
+        'member_age' => '年齡',
+        'member_avatar' => '大頭照',
+        'member_email' => '電子郵件',
+        'member_phone' => '手機',
+        'member_status' => '狀態',
     ],
     // -------------------------------------------------------------------
     // RoleController

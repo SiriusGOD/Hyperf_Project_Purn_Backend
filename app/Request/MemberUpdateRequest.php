@@ -15,27 +15,8 @@ use App\Service\MemberService;
 use Hyperf\Redis\Redis;
 use Hyperf\Validation\Rule;
 
-class MemberUpdateRequest extends AuthBaseRequest
+class MemberUpdateRequest extends AuthApiBaseRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        $redis = make(Redis::class);
-        $token = $redis->get(MemberService::CACHE_KEY . auth('jwt')->user()->getId());
-
-        if (auth('jwt')->check() and $this->header('Authorization') == 'Bearer ' . $token) {
-            return true;
-        }
-
-        if (auth('session')->check()) {
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      */

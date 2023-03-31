@@ -4,6 +4,7 @@ namespace HyperfTest\Cases;
 
 use App\Model\Member;
 use App\Model\User;
+use App\Service\MemberService;
 use App\Service\UserService;
 use HyperfTest\HttpTestCase;
 use PHPUnit\Util\Json;
@@ -21,7 +22,7 @@ class TagTest extends HttpTestCase
     {
         $user = Member::first();
         $token = auth()->login($user);
-        make(UserService::class)->saveToken($user->id, $token);
+        make(MemberService::class)->saveToken($user->id, $token);
         $data = $this->client->post('/api/tag/create', [
             'name' => str_random(),
         ], [

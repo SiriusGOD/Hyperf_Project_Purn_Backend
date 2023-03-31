@@ -13,6 +13,7 @@ namespace App\Service;
 
 use App\Model\Member;
 use App\Model\Role;
+use App\Model\User;
 use Carbon\Carbon;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
@@ -21,7 +22,7 @@ class MemberService
 {
     public const CACHE_KEY = 'member:token:';
 
-    public const DEVICE_CACHE_KEY = 'user:device:';
+    public const DEVICE_CACHE_KEY = 'member:device:';
 
     protected Redis $redis;
 
@@ -54,7 +55,7 @@ class MemberService
     {
         $model = new Member();
         $model->name = $data['name'];
-        $model->password = password_hash($data['password'],PASSWORD_DEFAULT);
+        $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
         $model->sex = $data['sex'];
         $model->age = $data['age'];
         $model->avatar = $model->avatar ?? '';
@@ -145,8 +146,49 @@ class MemberService
             $model->uuid = $data['uuid'];
         }
 
-        $model->status = Member::STATUS['NORMAL'];
-        $model->role_id = Role::API_DEFAULT_USER_ROLE_ID;
         $model->save();
+    }
+
+    // 使用者列表
+    public function getList($page, $pagePer)
+    {
+        return Member::select()->where('status', 1)->offset(($page - 1) * $pagePer)->limit($pagePer)->get();
+    }
+
+    // 使用者列表
+    public function allCount(): int
+    {
+        return Member::count();
+    }
+
+    public function storeUser(array $data)
+    {
+        $model = new Member();
+
+        if (! empty($data['id']) and User::where('id', $data['id'])->exists()) {
+            $model = Member::find($data['id']);
+        }
+
+        if (! empty($data['name']) and empty($model->name)) {
+            $model->name = $data['name'];
+        }
+        if (! empty($data['password'])) {
+            $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
+        $model->sex = $data['sex'];
+        $model->age = $data['age'];
+        $model->avatar = $data['avatar'];
+        $model->email = $data['email'];
+        $model->phone = $data['phone'];
+        $model->status = $data['status'];
+        $model->role_id = empty($model->role_id) ? Role::API_DEFAULT_USER_ROLE_ID : $model->role_id;
+        $model->save();
+    }
+
+    public function deleteUser($id)
+    {
+        $record = Member::findOrFail($id);
+        $record->status = User::STATUS['DELETE'];
+        $record->save();
     }
 }

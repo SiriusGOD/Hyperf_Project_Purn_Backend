@@ -40,15 +40,11 @@ class Role extends Model
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
     protected array $fillable = ['name'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
     protected array $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 

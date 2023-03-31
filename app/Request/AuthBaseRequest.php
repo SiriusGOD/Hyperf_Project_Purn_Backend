@@ -27,18 +27,6 @@ class AuthBaseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $redis = make(Redis::class);
-
-        if (! auth()->check()) {
-            return false;
-        }
-
-        $token = $redis->get(UserService::CACHE_KEY . auth()->user()->getId());
-
-        if ($this->header('Authorization') == 'Bearer ' . $token) {
-            return true;
-        }
-
         if (auth('session')->check()) {
             return true;
         }

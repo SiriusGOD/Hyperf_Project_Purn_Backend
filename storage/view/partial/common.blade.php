@@ -174,6 +174,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('member-index'))
+                    <li class="nav-item">
+                        <a href="/admin/member/index" class="nav-link {{$member_active ?? ''}}">
+                            <i class="nav-icon fas fa-user-tag"></i>
+                            <p>
+                                {{trans('default.leftbox.member') ?? '會員管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

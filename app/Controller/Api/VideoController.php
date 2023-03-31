@@ -49,7 +49,7 @@ class VideoController extends AbstractController
     {
         $result = $service->getVideoCount();
         return $this->success([
-            'count' => (int)$result,
+            'count' => (int) $result,
         ]);
     }
 

@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Request;
 
-class ImageApiLikeRequest extends AuthBaseRequest
+class ImageApiLikeRequest extends AuthApiBaseRequest
 {
     /**
      * Get the validation rules that apply to the request.

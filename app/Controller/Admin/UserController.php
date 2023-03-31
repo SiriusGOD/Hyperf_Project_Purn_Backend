@@ -125,7 +125,7 @@ class UserController extends AbstractController
             $record = new User();
         }
         if (! empty($password = $request->input('password'))) {
-            $record->password = password_hash($password,PASSWORD_DEFAULT);
+            $record->password = password_hash($password, PASSWORD_DEFAULT);
         }
         $record->name = $request->input('name');
         $record->phone = $request->input('phone');

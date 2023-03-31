@@ -110,7 +110,7 @@ class ProductService
         }
         $img_data = $img_query->get()->toArray();
         foreach ($img_data as $key => $value) {
-            $img_data[$key]['selling_price'] = (double)$value['selling_price'] ;
+            $img_data[$key]['selling_price'] = (float) $value['selling_price'];
         }
 
         // video
@@ -138,7 +138,7 @@ class ProductService
         $video_data = $video_query->get()->toArray();
 
         foreach ($video_data as $key => $value) {
-            $video_data[$key]['selling_price'] = (double)$value['selling_price'] ;
+            $video_data[$key]['selling_price'] = (float) $value['selling_price'];
         }
 
         $data = [

@@ -45,13 +45,11 @@ class Member extends Model implements Authenticatable
 
     /**
      * The attributes that are mass assignable.
-     * @var array
      */
     protected array $fillable = ['name', 'sex', 'age', 'password', 'role_id'];
 
     /**
      * The attributes that should be cast to native types.
-     * @var array
      */
     protected array $casts = ['id' => 'integer', 'sex' => 'integer', 'age' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'role_id' => 'integer'];
 

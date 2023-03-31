@@ -5,6 +5,7 @@ namespace HyperfTest\Cases;
 use App\Model\Member;
 use App\Model\Order;
 use App\Model\User;
+use App\Service\MemberService;
 use App\Service\UserService;
 use HyperfTest\HttpTestCase;
 
@@ -14,7 +15,7 @@ class OrderTest extends HttpTestCase
     {
         $user = Member::first();
         $token = auth()->login($user);
-        make(UserService::class)->saveToken($user->id, $token);
+        make(MemberService::class)->saveToken($user->id, $token);
         $data = $this->client->get('/api/order/list', [], [
             'Authorization' => 'Bearer ' . $token,
         ]);
@@ -26,7 +27,7 @@ class OrderTest extends HttpTestCase
     {
         $user = Member::first();
         $token = auth()->login($user);
-        make(UserService::class)->saveToken($user->id, $token);
+        make(MemberService::class)->saveToken($user->id, $token);
         $data = $this->client->post('/api/order/create', [
             'product_id' => 1,
             'payment_type' => 1,
@@ -59,7 +60,7 @@ class OrderTest extends HttpTestCase
         $model->save();
         $user = User::first();
         $token = auth()->login($user);
-        make(UserService::class)->saveToken($user->id, $token);
+        make(MemberService::class)->saveToken($user->id, $token);
         $data = $this->client->post('/api/order/delete', [
             'order_num' => $orderNum,
         ], [

@@ -18,8 +18,6 @@ class CoreMiddleware extends \Hyperf\HttpServer\CoreMiddleware
 {
     /**
      * Handle the response when cannot found any routes.
-     *
-     * @return ResponseInterface
      */
     protected function handleNotFound(ServerRequestInterface $request): ResponseInterface
     {
@@ -29,8 +27,6 @@ class CoreMiddleware extends \Hyperf\HttpServer\CoreMiddleware
 
     /**
      * Handle the response when the routes found but doesn't match any available methods.
-     *
-     * @return ResponseInterface
      */
     protected function handleMethodNotAllowed(array $methods, ServerRequestInterface $request): ResponseInterface
     {
