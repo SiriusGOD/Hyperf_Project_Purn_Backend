@@ -86,4 +86,15 @@ class OrderController extends AbstractController
         }
         return $this->error('該會員下查無此訂單或該訂單已取消', ErrorCode::BAD_REQUEST);
     }
+
+    /**
+     * @RequestMapping(path="search", methods="GET")
+     * 查詢訂單資訊
+     */
+    public function search(OrderRequest $request, OrderService $service)
+    {
+        $order_num = $request->input('order_num');
+        $result = $service->searchOrders($order_num, '');
+        return $this->success(['models' => $result->toArray()]);
+    }
 }
