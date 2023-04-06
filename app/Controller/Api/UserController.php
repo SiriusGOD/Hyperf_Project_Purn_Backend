@@ -155,6 +155,6 @@ class UserController extends AbstractController
     {
         $id = $request->input('id');
 
-        return $this->success(MemberTag::find($id)->toArray());
+        return $this->success(User::find($id)->toArray());
     }
 }
