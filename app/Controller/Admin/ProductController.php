@@ -146,6 +146,20 @@ class ProductController extends AbstractController
             $products = $query->get();
             $total = $query_tatal->count();
             $data['last_page'] = ceil($total / $step);
+
+            foreach ($products as $key => $value) {
+                switch ($product_type) {
+                    case 'image':
+                        $products[$key]->img_thumb = $value->thumbnail;
+                        break;
+                    case 'video':
+                        $products[$key]->img_thumb = $value->cover_thumb;
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+            }
         } else {
             $products = '';
             $total = 0;
@@ -239,6 +253,20 @@ class ProductController extends AbstractController
             $products = $query->get();
             $total = $query_tatal->count();
             $data['last_page'] = ceil($total / $step);
+            
+            foreach ($products as $key => $value) {
+                switch ($product_type) {
+                    case 'image':
+                        $products[$key]->img_thumb = $value->thumbnail;
+                        break;
+                    case 'video':
+                        $products[$key]->img_thumb = $value->cover_thumb;
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+            }
         } else {
             $products = '';
             $total = 0;

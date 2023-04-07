@@ -11,8 +11,8 @@
                                 <form action="/admin/product/search" method="get">
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_choose_type') ?? '選擇商品類型'}}</label>
                                     <select  class="form-control-sm" name="product_type" >
+                                    <option value="">全部</option>
                                     @foreach(\App\Model\Product::TYPE_LIST as $type)
-                                        <option value=""></option>
                                         <option value="{{$type}}" {{$product_type == $type ? 'selected' : ''}}>
                                             {{\App\Model\Product::TYPE_LIST_NAME[$type]}}
                                         </option>

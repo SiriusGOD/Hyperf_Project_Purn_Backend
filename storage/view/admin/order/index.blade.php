@@ -72,24 +72,7 @@
                                             <td class="sorting_1 dtr-control">{{ $model->id}}</td>
                                             <td>{{ $model->order_number}}</td>
                                             <td>{{ $model->name}}</td>
-                                            <td>
-                                                @switch($model->status)
-                                                    @case(\App\Model\Order::ORDER_STATUS['create'])
-                                                        訂單成立
-                                                        @break
-
-                                                    @case(\App\Model\Order::ORDER_STATUS['delete'])
-                                                        訂單取消
-                                                        @break
-
-                                                    @case(\App\Model\Order::ORDER_STATUS['finish'])
-                                                        訂單完成
-                                                        @break
-                                                
-                                                    @default
-                                                        訂單成立
-                                                @endswitch</td>
-                                            
+                                            <td>{{trans('default.order_control.order_status_msg')[$model->status]}}</td>
                                             <td>{{ $model->created_at}}</td>
                                             <td>
                                                 @if(authPermission('advertisement-edit'))

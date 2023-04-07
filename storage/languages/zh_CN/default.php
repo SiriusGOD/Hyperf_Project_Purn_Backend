@@ -252,7 +252,12 @@ return [
         'order_price' => '訂單金額',
         'order_details' => '訂單明細',
         'order_search_msg' => '訂單編號或訂單狀態請擇一，如兩者都選，則以訂單編號為主',
-        'order_choose_status' => '選擇訂單狀態'
+        'order_choose_status' => '選擇訂單狀態',
+        'order_status_msg' => [
+            \App\Model\Order::ORDER_STATUS['create'] => '訂單成立',
+            \App\Model\Order::ORDER_STATUS['delete'] => '訂單取消',
+            \App\Model\Order::ORDER_STATUS['finish'] => '訂單完成'
+        ]
     ],
     // -------------------------------------------------------------------
     // ProductController
@@ -276,6 +281,10 @@ return [
         'product_type_array' => [
             \App\Model\Product::TYPE_CORRESPOND_LIST['image'] => '圖片',
             \App\Model\Product::TYPE_CORRESPOND_LIST['video'] => '影片',
+        ],
+        'product_type_msg' => [
+            'image' => '圖片',
+            'video' => '影片',
         ]
     ],
     // -------------------------------------------------------------------

@@ -11,6 +11,7 @@
                                 <form action="/admin/product/choose" method="get">
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_choose_type') ?? '選擇商品類型'}}</label>
                                     <select  class="form-control-sm" name="product_type" >
+                                        <option value="">選擇商品類型</option>
                                         <@foreach(\App\Model\Product::TYPE_LIST as $type)
                                         <option value="{{$type}}" {{$product_type == $type ? 'selected' : ''}}>
                                             {{\App\Model\Product::TYPE_LIST_NAME[$type]}}
@@ -66,28 +67,10 @@
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $model->id}}</td>
                                             <td>
-                                                @switch($product_type)
-                                                    @case(\App\Model\Product::TYPE_LIST[0])
-                                                        {{trans('default.image') ?? '圖片'}}
-                                                        @break
-
-                                                    @case(\App\Model\Product::TYPE_LIST[1])
-                                                        {{trans('default.video.title') ?? '影片'}}
-                                                        @break
-                                                @endswitch
+                                            {{trans('default.product_control.product_type_msg')[$product_type]}}
                                             </td>
                                             <td>{{ $model->title}}</td>
-                                            <td>
-                                                @switch($product_type)
-                                                    @case(\App\Model\Product::TYPE_LIST[0])
-                                                        <img src="{{$model->thumbnail}}" alt="image" style="width:100px">
-                                                        @break
-
-                                                    @case(\App\Model\Product::TYPE_LIST[1])
-                                                        <img src="{{$model->cover_thumb}}" alt="image" style="width:100px">
-                                                        @break
-                                                @endswitch
-                                            </td>
+                                            <td>{{ $model->img_thumb}}</td>
                                             <td>{{ $model->m3u8}}</td>
                                             <td>
                                                 @if(authPermission('product-create'))
