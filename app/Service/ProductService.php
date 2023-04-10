@@ -115,7 +115,7 @@ class ProductService
 
         // video
         $video_query = Product::join('videos', 'products.correspond_id', 'videos.id')
-            ->select('products.id', 'products.name', 'products.start_time', 'products.end_time', 'products.currency', 'products.selling_price', 'videos.m3u8', 'videos.full_m3u8', 'videos.duration', 'videos.cover_thumb', 'videos.like', 'videos.category')
+            ->select('products.id', 'products.name', 'products.start_time', 'products.end_time', 'products.currency', 'products.selling_price', 'videos.m3u8', 'videos.full_m3u8', 'videos.duration', 'videos.cover_thumb', 'videos.likes', 'videos.category')
             ->where('products.type', '=', Video::class)
             ->where('products.start_time', '<=', $now)
             ->where('products.end_time', '>=', $now)

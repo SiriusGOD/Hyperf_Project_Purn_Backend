@@ -108,7 +108,7 @@ class OrderService
             'telephone' => $user['phone'],
             'payment_type' => $payment_type,
             'currency' => $product['currency'],
-            'total_price' => $product['selling_price'],
+            'total_price' => $product['selling_price'] ?? 0,
             'pay_way' => Order::PAY_WAY_MAP_NEW[$payment_type],
             'pay_url' => $pay_url,
             'pay_proxy' => $pay_proxy,
