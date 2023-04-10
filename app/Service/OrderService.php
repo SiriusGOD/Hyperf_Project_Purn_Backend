@@ -85,7 +85,7 @@ class OrderService
         }
         $orders = $query->get()->toArray();
         foreach ($orders as $key => $value) {
-            $orders[$key]['total_price'] = (double)$value['total_price'];
+            $orders[$key]['total_price'] = (float) $value['total_price'];
         }
 
         $this->redis->set($checkRedisKey, json_encode($orders));

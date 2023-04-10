@@ -13,8 +13,11 @@ namespace App\Controller\Api;
 
 use App\Constants\Constants;
 use App\Controller\AbstractController;
+use App\Model\Video;
+use App\Request\ClickRequest;
 use App\Request\VideoApiSuggestRequest;
 use App\Service\ActorService;
+use App\Service\ClickService;
 use App\Service\SuggestService;
 use App\Service\TagService;
 use App\Service\VideoService;
@@ -109,5 +112,13 @@ class VideoController extends AbstractController
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
         return $this->success($data);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'click')]
+    public function click(ClickRequest $request, ClickService $service)
+    {
+        $id = (int) $request->input('id');
+        $service->addClick(Video::class, $id);
+        return $this->success([]);
     }
 }

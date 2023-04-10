@@ -11,12 +11,24 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\MemberTag;
 use App\Model\Tag;
 use App\Model\TagCorrespond;
 use Hyperf\Database\Model\Collection;
+use Hyperf\DbConnection\Db;
+use Hyperf\Redis\Redis;
 
 class TagService
 {
+    public const POPULAR_TAG_CACHE_KEY = 'popular_tag';
+
+    public Redis $redis;
+
+    public function __construct(Redis $redis)
+    {
+        $this->redis = $redis;
+    }
+
     public function getTags(): Collection
     {
         return Tag::all();
@@ -75,5 +87,30 @@ class TagService
         foreach ($tagIds as $tagId) {
             $this->createTagRelationship($className, $classId, $tagId);
         }
+    }
+
+    public function getPopularTag()
+    {
+        if ($this->redis->exists(self::POPULAR_TAG_CACHE_KEY)) {
+            return json_decode($this->redis->get(self::POPULAR_TAG_CACHE_KEY), true);
+        }
+
+        $collect =  $this->calculatePopularTag();
+
+        return $collect->toArray();
+    }
+
+    public function calculatePopularTag()
+    {
+        $models = MemberTag::groupBy('tag_id')
+            ->select('tag_id', Db::raw('sum(count) as total'), 'tags.name')
+            ->join('tags', 'tags.id', '=', 'member_tags.tag_id')
+            ->orderByDesc('total')
+            ->limit(10)
+            ->get();
+
+        $this->redis->set(self::POPULAR_TAG_CACHE_KEY, $models->toJson());
+
+        return $models;
     }
 }

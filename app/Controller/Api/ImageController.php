@@ -13,10 +13,13 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Model\Image;
+use App\Model\Video;
+use App\Request\ClickRequest;
 use App\Request\ImageApiLikeRequest;
 use App\Request\ImageApiListRequest;
 use App\Request\ImageApiSearchRequest;
 use App\Request\ImageApiSuggestRequest;
+use App\Service\ClickService;
 use App\Service\ImageService;
 use App\Service\SuggestService;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -82,5 +85,13 @@ class ImageController extends AbstractController
         ++$model->like;
         $model->save();
         return $this->success(['id' => $id, 'like' => $model->like]);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'click')]
+    public function click(ClickRequest $request, ClickService $service)
+    {
+        $id = (int) $request->input('id');
+        $service->addClick(Image::class, $id);
+        return $this->success([]);
     }
 }

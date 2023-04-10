@@ -28,11 +28,10 @@ class TagController extends AbstractController
         return $this->success($data->toArray());
     }
 
-    #[RequestMapping(methods: ['POST'], path: 'create')]
-    public function create(TagRequest $request, TagService $service)
+    #[RequestMapping(methods: ['GET'], path: 'popular')]
+    public function popular(RequestInterface $request, TagService $service)
     {
-        $userId = auth('jwt')->user()->getId();
-        $service->createTag($request->input('name'), $userId);
-        return $this->success();
+        $data = $service->getPopularTag();
+        return $this->success($data);
     }
 }
