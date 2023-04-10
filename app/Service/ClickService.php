@@ -1,13 +1,37 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Service;
 
 use App\Model\Click;
 use Carbon\Carbon;
+use Hyperf\DbConnection\Db;
+use Hyperf\Redis\Redis;
 
 class ClickService
 {
-    public function addClick(string $type, int $typeId)
+    public const POPULAR_DAY = 30;
+
+    public const POPULAR_LIMIT = 100;
+
+    public const POPULAR_CLICK_CACHE_KEY = 'click:';
+
+    public Redis $redis;
+
+    public function __construct(Redis $redis)
+    {
+        $this->redis = $redis;
+    }
+
+    public function addClick(string $type, int $typeId): void
     {
         $today = Carbon::now()->toDateString();
         $model = Click::where('type', $type)
@@ -19,16 +43,43 @@ class ClickService
             $model = $this->createClick([
                 'type' => $type,
                 'type_id' => $typeId,
-                'statistical_date' => $today
+                'statistical_date' => $today,
             ]);
         }
 
-        $model->count++;
+        ++$model->count;
         $model->save();
-
     }
 
-    private function createClick(array $data)
+    public function calculatePopularClick(string $type)
+    {
+        $endDate = Carbon::now();
+        $startDate = $endDate->copy()->subDays(self::POPULAR_DAY);
+        $models = Click::where('type', $type)
+            ->whereBetween('statistical_date', [$startDate->toDateString(), $endDate->toDateString()])
+            ->groupBy(['type_id'])
+            ->select(DB::raw('type_id as id'), Db::raw('sum(count) as total'))
+            ->orderByDesc('total')
+            ->limit(self::POPULAR_LIMIT)
+            ->get();
+
+        if (! empty($models)) {
+            $this->redis->set(self::POPULAR_CLICK_CACHE_KEY . $type, $models->toJson());
+        }
+
+        return $models->toArray();
+    }
+
+    public function getPopularClick(string $type)
+    {
+        if ($this->redis->exists(self::POPULAR_CLICK_CACHE_KEY . $type)) {
+            return json_decode($this->redis->get(self::POPULAR_CLICK_CACHE_KEY . $type), true);
+        }
+
+        return $this->calculatePopularClick($type);
+    }
+
+    private function createClick(array $data): Click
     {
         $model = new Click();
         $model->type = $data['type'];

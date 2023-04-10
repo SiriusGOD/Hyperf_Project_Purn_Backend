@@ -253,7 +253,7 @@ class ProductController extends AbstractController
             $products = $query->get();
             $total = $query_tatal->count();
             $data['last_page'] = ceil($total / $step);
-            
+
             foreach ($products as $key => $value) {
                 switch ($product_type) {
                     case 'image':

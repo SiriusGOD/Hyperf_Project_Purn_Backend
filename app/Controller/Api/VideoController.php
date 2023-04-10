@@ -114,11 +114,19 @@ class VideoController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'click')]
-    public function click(ClickRequest $request, ClickService $service)
+    #[RequestMapping(methods: ['POST'], path: 'click')]
+    public function saveClick(ClickRequest $request, ClickService $service)
     {
         $id = (int) $request->input('id');
         $service->addClick(Video::class, $id);
         return $this->success([]);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'click/popular')]
+    public function getClickPopular(ClickService $service)
+    {
+        $result = $service->getPopularClick(Video::class);
+
+        return $this->success($result);
     }
 }

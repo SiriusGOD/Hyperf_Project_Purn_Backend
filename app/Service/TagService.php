@@ -95,7 +95,7 @@ class TagService
             return json_decode($this->redis->get(self::POPULAR_TAG_CACHE_KEY), true);
         }
 
-        $collect =  $this->calculatePopularTag();
+        $collect = $this->calculatePopularTag();
 
         return $collect->toArray();
     }
@@ -109,7 +109,9 @@ class TagService
             ->limit(10)
             ->get();
 
-        $this->redis->set(self::POPULAR_TAG_CACHE_KEY, $models->toJson());
+        if (! empty($models)) {
+            $this->redis->set(self::POPULAR_TAG_CACHE_KEY, $models->toJson());
+        }
 
         return $models;
     }

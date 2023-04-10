@@ -11,8 +11,6 @@ declare(strict_types=1);
  */
 namespace App\Request;
 
-use App\Service\UserService;
-use Hyperf\Redis\Redis;
 use Hyperf\Validation\Request\FormRequest;
 
 class AuthBaseRequest extends FormRequest

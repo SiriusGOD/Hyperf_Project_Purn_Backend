@@ -13,7 +13,6 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Model\Image;
-use App\Model\Video;
 use App\Request\ClickRequest;
 use App\Request\ImageApiLikeRequest;
 use App\Request\ImageApiListRequest;
@@ -87,11 +86,19 @@ class ImageController extends AbstractController
         return $this->success(['id' => $id, 'like' => $model->like]);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'click')]
-    public function click(ClickRequest $request, ClickService $service)
+    #[RequestMapping(methods: ['POST'], path: 'click')]
+    public function saveClick(ClickRequest $request, ClickService $service)
     {
         $id = (int) $request->input('id');
         $service->addClick(Image::class, $id);
         return $this->success([]);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'click/popular')]
+    public function getClickPopular(ClickService $service)
+    {
+        $result = $service->getPopularClick(Image::class);
+
+        return $this->success($result);
     }
 }

@@ -11,18 +11,20 @@ declare(strict_types=1);
  */
 namespace App\Task;
 
-use App\Service\TagService;
+use App\Model\Image;
+use App\Model\Video;
+use App\Service\ClickService;
 use Hyperf\Crontab\Annotation\Crontab;
 use Hyperf\Logger\LoggerFactory;
 
-#[Crontab(name: 'PopularTagTask', rule: '0 0 * * *', callback: 'execute', memo: '熱門標籤定時任務')]
-class PopularTagTask
+#[Crontab(name: 'PopularClickTask', rule: '0 0 * * *', callback: 'execute', memo: '熱門點擊定時任務')]
+class PopularClickTask
 {
     protected $service;
 
     private \Psr\Log\LoggerInterface $logger;
 
-    public function __construct(TagService $service, LoggerFactory $loggerFactory)
+    public function __construct(ClickService $service, LoggerFactory $loggerFactory)
     {
         $this->logger = $loggerFactory->get('crontab', 'crontab');
         $this->service = $service;
@@ -30,8 +32,9 @@ class PopularTagTask
 
     public function execute()
     {
-        $this->logger->info('開始執行熱門標籤定時任務');
-        $this->service->calculatePopularTag();
-        $this->logger->info('結束執行熱門標籤定時任務');
+        $this->logger->info('開始執行熱門點擊定時任務');
+        $this->service->calculatePopularClick(Image::class);
+        $this->service->calculatePopularClick(Video::class);
+        $this->logger->info('結束執行熱門點擊定時任務');
     }
 }

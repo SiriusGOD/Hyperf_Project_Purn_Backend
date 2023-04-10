@@ -11,8 +11,6 @@ declare(strict_types=1);
  */
 namespace App\Request;
 
-use App\Service\MemberService;
-use Hyperf\Redis\Redis;
 use Hyperf\Validation\Rule;
 
 class MemberUpdateRequest extends AuthApiBaseRequest
