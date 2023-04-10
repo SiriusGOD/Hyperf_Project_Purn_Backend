@@ -14,6 +14,7 @@ namespace App\Service;
 use App\Model\Member;
 use App\Model\Role;
 use App\Model\User;
+use App\Model\MemberFollow;
 use Carbon\Carbon;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
@@ -190,5 +191,54 @@ class MemberService
         $record = Member::findOrFail($id);
         $record->status = User::STATUS['DELETE'];
         $record->save();
+    }
+
+    public function getMemberFollowList($user_id, $follow_type = ''){
+        
+        if(empty($follow_type)){
+            $type_arr = MemberFollow::TYPE_LIST;
+        }else{
+            $type_arr = [$follow_type];
+        }
+
+        foreach ($type_arr as $key => $value) {
+            // image video略過 有需要再開啟
+            if($value == 'image' || $value == 'video')continue;
+            $class_name = MemberFollow::TYPE_CORRESPOND_LIST[$value];
+            switch ($value) {
+                    case 'image':
+                        $query = $class_name::join('member_follows', function ($join) use ($class_name) {
+                            $join->on('member_follows.correspond_id', '=', 'images.id')
+                                ->where('member_follows.correspond_type', '=', $class_name);
+                        })->select('images.id', 'images.title', 'images.thumbnail', 'images.description');
+                        break;
+                    case 'video':
+                        $query = $class_name::join('member_follows', function ($join) use ($class_name) {
+                            $join->on('member_follows.correspond_id', '=', 'videos.id')
+                                ->where('member_follows.correspond_type', '=', $class_name);
+                        })->select('videos.*');
+                        break;
+                case 'actor':
+                    $query = $class_name::join('member_follows', function ($join) use ($class_name) {
+                        $join->on('member_follows.correspond_id', '=', 'actors.id')
+                            ->where('member_follows.correspond_type', '=', $class_name);
+                    })->select('actors.id', 'actors.sex', 'actors.name');
+                    break;
+                case 'tag':
+                    $query = $class_name::join('member_follows', function ($join) use ($class_name) {
+                        $join->on('member_follows.correspond_id', '=', 'tags.id')
+                            ->where('member_follows.correspond_type', '=', $class_name)
+                                ;
+                    })->select('tags.id', 'tags.name');
+                    break;
+                
+                default:
+                    # code...
+                    break;
+            }
+            $result[$value] = $query->where('member_follows.member_id', '=', $user_id)->whereNull('member_follows.deleted_at')->get()->toArray();
+        }
+
+        return $result;
     }
 }

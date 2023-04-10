@@ -14,14 +14,19 @@ namespace App\Controller\Api;
 use App\Controller\AbstractController;
 use App\Model\Member;
 use App\Model\MemberTag;
+use App\Model\MemberFollow;
 use App\Request\AddMemberTagRequest;
 use App\Request\MemberDetailRequest;
 use App\Request\MemberLoginRequest;
 use App\Request\MemberRegisterRequest;
 use App\Request\MemberUpdateRequest;
 use App\Service\MemberService;
+use App\Request\AddMemberFollowRequest;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
+use Hyperf\HttpServer\Contract\RequestInterface;
+use App\Constants\ErrorCode;
+use Carbon\Carbon;
 
 #[Controller]
 class MemberController extends AbstractController
@@ -140,5 +145,58 @@ class MemberController extends AbstractController
         $id = $request->input('id');
 
         return $this->success(Member::find($id)->toArray());
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'addFollow')]
+    public function addMemberFollow(AddMemberFollowRequest $request)
+    {
+        $follow_id = $request->input('id');
+        $follow_type = $request->input('type');
+        $userId = auth('jwt')->user()->getId();
+        $model = MemberFollow::where('member_id', $userId)
+                ->where('correspond_type', MemberFollow::TYPE_CORRESPOND_LIST[$follow_type])
+                ->where('correspond_id', $follow_id)
+                ->whereNull('deleted_at')
+                ->first();
+        if (empty($model)) {
+            $model = new MemberFollow();
+            $model->member_id = $userId;
+            $model->correspond_type = MemberFollow::TYPE_CORRESPOND_LIST[$follow_type];
+            $model->correspond_id = $follow_id;
+            $model->save();
+            return $this->success();
+        }
+
+        return $this->error('該會員已追蹤', ErrorCode::BAD_REQUEST);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'deleteFollow')]
+    public function deleteMemberFollow(AddMemberFollowRequest $request)
+    {
+        $userId = auth('jwt')->user()->getId();
+        $follow_type = $request->input('type');
+        $follow_id = $request->input('id');
+
+        $model = MemberFollow::where('member_id', $userId)
+                ->where('correspond_type', MemberFollow::TYPE_CORRESPOND_LIST[$follow_type])
+                ->where('correspond_id', $follow_id)
+                ->whereNull('deleted_at')
+                ->first(); 
+        if (!empty($model)) {
+            $model->deleted_at = Carbon::now();
+            $model->save();
+            return $this->success();
+        }    
+        
+        return $this->error('查無該會員追蹤資料', ErrorCode::BAD_REQUEST);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'getFollowList')]
+    public function getMemberFollowList(RequestInterface $request, MemberService $service)
+    {
+        $userId = auth('jwt')->user()->getId();
+        $follow_type = $request->input('type');
+        $result = $service->getMemberFollowList($userId, $follow_type);
+        return $this->success(['models' => $result]);
     }
 }
