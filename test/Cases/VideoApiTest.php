@@ -10,6 +10,9 @@ declare(strict_types=1);
  */
 namespace HyperfTest\Cases;
 
+use App\Model\Member;
+use App\Service\MemberService;
+use App\Model\Order;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
 use App\Service\UserService;
@@ -105,6 +108,42 @@ class VideoApiTest extends HttpTestCase
         $res = $this->videoService->getVideos([],0);
         $res2 = $this->client->get('/api/video/search',['title'=>$res[0]->title]);
         $this->assertSame($res[0]->title, $res2['data']["models"][0]["title"]);
+    }
+
+    //vidoe stage api
+    public function testApiStageList()
+    {
+        $user = Member::first();
+        $token = auth()->login($user);
+        make(MemberService::class)->saveToken($user->id, $token);
+        $data1 = $this->client->get('/api/video/stagelist', [
+          "page" => 0
+        ], [
+            'Authorization' => 'Bearer ' . $token,
+        ]);
+        $data2 = $this->client->get('/api/video/stagelist', [
+          "page" => 1
+        ], [
+            'Authorization' => 'Bearer ' . $token,
+        ]);
+        $this->assertNotSame($data1['data']["models"][0]["id"], $data2['data']["models"][0]["id"]  );
+    }
+
+    //vidoe stage api
+    public function testApiStageVideo()
+    {
+        $videoId = rand(1,6);
+        $user = Member::first();
+        $token = auth()->login($user);
+        make(MemberService::class)->saveToken($user->id, $token);
+        $data = $this->client->post('/api/video/stageVideo', [
+          "video_id" => $videoId
+        ], [
+            'Authorization' => 'Bearer ' . $token,
+        ]);
+        $this->assertSame(200, (int)$data['code']);
+        $res = make(VideoService::class)->myStageVideo($user->id);
+        $this->assertSame($res[0]->member_id, $user->id);
     }
 
     //vidoe find api
