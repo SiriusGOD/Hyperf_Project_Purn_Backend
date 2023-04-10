@@ -12,21 +12,28 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
+use App\Job\EmailVerificationJob;
+use App\Middleware\Auth\ApiAuthMiddleware;
+use App\Middleware\TryLimitMiddleware;
 use App\Model\Member;
 use App\Model\MemberTag;
 use App\Model\MemberFollow;
+use App\Model\MemberVerification;
 use App\Request\AddMemberTagRequest;
 use App\Request\MemberDetailRequest;
 use App\Request\MemberLoginRequest;
 use App\Request\MemberRegisterRequest;
 use App\Request\MemberUpdateRequest;
+use App\Request\VerificationRequest;
 use App\Service\MemberService;
 use App\Request\AddMemberFollowRequest;
+use Carbon\Carbon;
+use Hyperf\AsyncQueue\Driver\DriverFactory;
 use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use App\Constants\ErrorCode;
-use Carbon\Carbon;
 
 #[Controller]
 class MemberController extends AbstractController
@@ -147,6 +154,42 @@ class MemberController extends AbstractController
         return $this->success(Member::find($id)->toArray());
     }
 
+    #[Middleware(ApiAuthMiddleware::class)]
+    #[Middleware(TryLimitMiddleware::class)]
+    #[RequestMapping(methods: ['GET'], path: 'verification')]
+    public function sendVerification(MemberService $service, DriverFactory $factory)
+    {
+        $member = auth()->user();
+
+        $code = $service->getVerificationCode($member->id);
+        $driver = $factory->get('default');
+        $content = trans('email.verification.content', ['code' => $code]);
+        $driver->push(new EmailVerificationJob($member->email, $content));
+
+        return $this->success();
+    }
+
+    #[Middleware(ApiAuthMiddleware::class)]
+    #[RequestMapping(methods: ['POST'], path: 'verification/check')]
+    public function checkVerificationCode(VerificationRequest $request)
+    {
+        $member = auth()->user();
+        $now = Carbon::now()->toDateTimeString();
+        $model = MemberVerification::where('member_id', $member->id)
+            ->where('expired_at', '>=', $now)
+            ->where('code', $request->input('code'))
+            ->first();
+
+        if (! empty($model)) {
+            $member->status = Member::STATUS['NORMAL'];
+            $member->save();
+            $model->delete();
+            return $this->success();
+        }
+
+        return $this->error(trans('validation.expire_code'), 400);
+    }
+
     #[RequestMapping(methods: ['POST'], path: 'addFollow')]
     public function addMemberFollow(AddMemberFollowRequest $request)
     {
@@ -181,13 +224,13 @@ class MemberController extends AbstractController
                 ->where('correspond_type', MemberFollow::TYPE_CORRESPOND_LIST[$follow_type])
                 ->where('correspond_id', $follow_id)
                 ->whereNull('deleted_at')
-                ->first(); 
+                ->first();
         if (!empty($model)) {
             $model->deleted_at = Carbon::now();
             $model->save();
             return $this->success();
-        }    
-        
+        }
+
         return $this->error('查無該會員追蹤資料', ErrorCode::BAD_REQUEST);
     }
 

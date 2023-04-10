@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Member;
+use App\Model\MemberVerification;
 use App\Model\Role;
 use App\Model\User;
 use App\Model\MemberFollow;
@@ -24,6 +25,8 @@ class MemberService
     public const CACHE_KEY = 'member:token:';
 
     public const DEVICE_CACHE_KEY = 'member:device:';
+
+    public const EXPIRE_VERIFICATION_MINUTE = 10;
 
     protected Redis $redis;
 
@@ -193,8 +196,33 @@ class MemberService
         $record->save();
     }
 
+    public function getVerificationCode(int $memberId): string
+    {
+        $now = Carbon::now()->toDateTimeString();
+        $model = MemberVerification::where('member_id', $memberId)
+            ->where('expired_at', '>=', $now)
+            ->first();
+
+        if (! empty($model)) {
+            return $model->code;
+        }
+
+        return $this->createVerificationCode($memberId);
+    }
+
+    protected function createVerificationCode(int $memberId): string
+    {
+        $model = new MemberVerification();
+        $model->member_id = $memberId;
+        $model->code = str_random();
+        $model->expired_at = Carbon::now()->addMinutes(self::EXPIRE_VERIFICATION_MINUTE)->toDateTimeString();
+        $model->save();
+
+        return $model->code;
+    }
+
     public function getMemberFollowList($user_id, $follow_type = ''){
-        
+
         if(empty($follow_type)){
             $type_arr = MemberFollow::TYPE_LIST;
         }else{
@@ -231,7 +259,7 @@ class MemberService
                                 ;
                     })->select('tags.id', 'tags.name');
                     break;
-                
+
                 default:
                     # code...
                     break;

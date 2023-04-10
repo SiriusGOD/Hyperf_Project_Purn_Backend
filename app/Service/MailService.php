@@ -9,7 +9,12 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-return [
-    Hyperf\Crontab\Process\CrontabDispatcherProcess::class,
-    Hyperf\AsyncQueue\Process\ConsumerProcess::class,
-];
+namespace App\Service;
+
+class MailService
+{
+    public function send(string $address, string $content): bool
+    {
+        return true;
+    }
+}
