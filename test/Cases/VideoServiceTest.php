@@ -33,6 +33,40 @@ class VideoServiceTest extends HttpTestCase
         parent::__construct($name, $data, $dataName);
         $this->client = make(Client::class);
     }
+    //測試 del video stage
+    public function testDelMyStageVideo()
+    {
+        $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
+        $member_id = 1;
+        $res = $service->myStageVideo($member_id, 0);
+        $ids = [(int)$res->toArray()[2]["id"]];
+        $bool = $service->delStageVideo($ids);
+        $this->assertSame(true, $bool);
+    }
+    //測試video stage
+    public function testGetMyStageVideo()
+    {
+        $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
+        $member_id = 1;
+        $res = $service->myStageVideo($member_id, 0);
+        $this->assertSame($res->toArray()[0]["member_id"], $member_id);
+    }
+    //測試video stage
+    public function testVideoStage()
+    {
+        $wg = new \Hyperf\Utils\WaitGroup();
+        for($i=1 ; $i<=10 ; $i++)
+        {
+            $wg->add(1);
+            co(function () use ($wg) {
+              $service = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
+              $res = $service->storeStageVideo(rand(1,100), 1);
+              $this->assertSame(true, $res);
+              $wg->done();
+            });
+        }
+        $wg->wait();
+    }
     //測試find
     public function testVideoFind()
     {
