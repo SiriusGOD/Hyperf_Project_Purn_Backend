@@ -85,9 +85,9 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @RequestMapping(path="search", methods="GET")
      * 查詢訂單資訊
      */
+    #[RequestMapping(methods: ['GET'], path: 'search')]
     public function search(OrderRequest $request, OrderService $service)
     {
         $order_num = $request->input('order_num');
