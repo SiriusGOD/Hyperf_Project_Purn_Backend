@@ -11,14 +11,16 @@ declare(strict_types=1);
  */
 namespace App\Controller\Api;
 
+use App\Constants\ErrorCode;
 use App\Controller\AbstractController;
 use App\Job\EmailVerificationJob;
 use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Middleware\TryLimitMiddleware;
 use App\Model\Member;
-use App\Model\MemberTag;
 use App\Model\MemberFollow;
+use App\Model\MemberTag;
 use App\Model\MemberVerification;
+use App\Request\AddMemberFollowRequest;
 use App\Request\AddMemberTagRequest;
 use App\Request\MemberDetailRequest;
 use App\Request\MemberLoginRequest;
@@ -28,14 +30,12 @@ use App\Request\RegisterVerificationRequest;
 use App\Request\ResetPasswordVerificationRequest;
 use App\Request\SendVerificationRequest;
 use App\Service\MemberService;
-use App\Request\AddMemberFollowRequest;
 use Carbon\Carbon;
 use Hyperf\AsyncQueue\Driver\DriverFactory;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use App\Constants\ErrorCode;
 
 #[Controller]
 class MemberController extends AbstractController
@@ -166,7 +166,6 @@ class MemberController extends AbstractController
             $member = $service->getUserFromEmailOrUuid($request->input('email'), $request->input('uuid'));
         }
 
-
         $code = $service->getVerificationCode($member->id);
         $driver = $factory->get('default');
         $content = trans('email.verification.content', ['code' => $code]);
@@ -228,10 +227,10 @@ class MemberController extends AbstractController
         $follow_type = $request->input('type');
         $userId = auth('jwt')->user()->getId();
         $model = MemberFollow::where('member_id', $userId)
-                ->where('correspond_type', MemberFollow::TYPE_CORRESPOND_LIST[$follow_type])
-                ->where('correspond_id', $follow_id)
-                ->whereNull('deleted_at')
-                ->first();
+            ->where('correspond_type', MemberFollow::TYPE_CORRESPOND_LIST[$follow_type])
+            ->where('correspond_id', $follow_id)
+            ->whereNull('deleted_at')
+            ->first();
         if (empty($model)) {
             $model = new MemberFollow();
             $model->member_id = $userId;
@@ -252,11 +251,11 @@ class MemberController extends AbstractController
         $follow_id = $request->input('id');
 
         $model = MemberFollow::where('member_id', $userId)
-                ->where('correspond_type', MemberFollow::TYPE_CORRESPOND_LIST[$follow_type])
-                ->where('correspond_id', $follow_id)
-                ->whereNull('deleted_at')
-                ->first();
-        if (!empty($model)) {
+            ->where('correspond_type', MemberFollow::TYPE_CORRESPOND_LIST[$follow_type])
+            ->where('correspond_id', $follow_id)
+            ->whereNull('deleted_at')
+            ->first();
+        if (! empty($model)) {
             $model->deleted_at = Carbon::now();
             $model->save();
             return $this->success();

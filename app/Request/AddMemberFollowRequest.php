@@ -10,8 +10,9 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Request;
-use Hyperf\Validation\Rule;
+
 use App\Model\MemberFollow;
+use Hyperf\Validation\Rule;
 
 class AddMemberFollowRequest extends AuthApiBaseRequest
 {
@@ -26,7 +27,7 @@ class AddMemberFollowRequest extends AuthApiBaseRequest
                 MemberFollow::TYPE_LIST[0],
                 MemberFollow::TYPE_LIST[1],
                 MemberFollow::TYPE_LIST[2],
-                MemberFollow::TYPE_LIST[3]
+                MemberFollow::TYPE_LIST[3],
             ])],
         ];
     }

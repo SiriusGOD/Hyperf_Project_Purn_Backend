@@ -12,10 +12,10 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Member;
+use App\Model\MemberFollow;
 use App\Model\MemberVerification;
 use App\Model\Role;
 use App\Model\User;
-use App\Model\MemberFollow;
 use Carbon\Carbon;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
@@ -221,42 +221,33 @@ class MemberService
         return $user;
     }
 
-    protected function createVerificationCode(int $memberId): string
+    public function getMemberFollowList($user_id, $follow_type = '')
     {
-        $model = new MemberVerification();
-        $model->member_id = $memberId;
-        $model->code = str_random();
-        $model->expired_at = Carbon::now()->addMinutes(self::EXPIRE_VERIFICATION_MINUTE)->toDateTimeString();
-        $model->save();
-
-        return $model->code;
-    }
-
-    public function getMemberFollowList($user_id, $follow_type = ''){
-
-        if(empty($follow_type)){
+        if (empty($follow_type)) {
             $type_arr = MemberFollow::TYPE_LIST;
-        }else{
+        } else {
             $type_arr = [$follow_type];
         }
 
         foreach ($type_arr as $key => $value) {
             // image video略過 有需要再開啟
-            if($value == 'image' || $value == 'video')continue;
+            if ($value == 'image' || $value == 'video') {
+                continue;
+            }
             $class_name = MemberFollow::TYPE_CORRESPOND_LIST[$value];
             switch ($value) {
-                    case 'image':
-                        $query = $class_name::join('member_follows', function ($join) use ($class_name) {
-                            $join->on('member_follows.correspond_id', '=', 'images.id')
-                                ->where('member_follows.correspond_type', '=', $class_name);
-                        })->select('images.id', 'images.title', 'images.thumbnail', 'images.description');
-                        break;
-                    case 'video':
-                        $query = $class_name::join('member_follows', function ($join) use ($class_name) {
-                            $join->on('member_follows.correspond_id', '=', 'videos.id')
-                                ->where('member_follows.correspond_type', '=', $class_name);
-                        })->select('videos.*');
-                        break;
+                case 'image':
+                    $query = $class_name::join('member_follows', function ($join) use ($class_name) {
+                        $join->on('member_follows.correspond_id', '=', 'images.id')
+                            ->where('member_follows.correspond_type', '=', $class_name);
+                    })->select('images.id', 'images.title', 'images.thumbnail', 'images.description');
+                    break;
+                case 'video':
+                    $query = $class_name::join('member_follows', function ($join) use ($class_name) {
+                        $join->on('member_follows.correspond_id', '=', 'videos.id')
+                            ->where('member_follows.correspond_type', '=', $class_name);
+                    })->select('videos.*');
+                    break;
                 case 'actor':
                     $query = $class_name::join('member_follows', function ($join) use ($class_name) {
                         $join->on('member_follows.correspond_id', '=', 'actors.id')
@@ -266,11 +257,9 @@ class MemberService
                 case 'tag':
                     $query = $class_name::join('member_follows', function ($join) use ($class_name) {
                         $join->on('member_follows.correspond_id', '=', 'tags.id')
-                            ->where('member_follows.correspond_type', '=', $class_name)
-                                ;
+                            ->where('member_follows.correspond_type', '=', $class_name);
                     })->select('tags.id', 'tags.name');
                     break;
-
                 default:
                     # code...
                     break;
@@ -279,5 +268,16 @@ class MemberService
         }
 
         return $result;
+    }
+
+    protected function createVerificationCode(int $memberId): string
+    {
+        $model = new MemberVerification();
+        $model->member_id = $memberId;
+        $model->code = str_random();
+        $model->expired_at = Carbon::now()->addMinutes(self::EXPIRE_VERIFICATION_MINUTE)->toDateTimeString();
+        $model->save();
+
+        return $model->code;
     }
 }

@@ -13,7 +13,6 @@ namespace App\Request;
 
 class RegisterVerificationRequest extends AuthApiBaseRequest
 {
-
     /**
      * Get the validation rules that apply to the request.
      */
