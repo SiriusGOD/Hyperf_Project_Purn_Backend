@@ -24,7 +24,9 @@ use App\Request\MemberDetailRequest;
 use App\Request\MemberLoginRequest;
 use App\Request\MemberRegisterRequest;
 use App\Request\MemberUpdateRequest;
-use App\Request\VerificationRequest;
+use App\Request\RegisterVerificationRequest;
+use App\Request\ResetPasswordVerificationRequest;
+use App\Request\SendVerificationRequest;
 use App\Service\MemberService;
 use App\Request\AddMemberFollowRequest;
 use Carbon\Carbon;
@@ -154,12 +156,16 @@ class MemberController extends AbstractController
         return $this->success(Member::find($id)->toArray());
     }
 
-    #[Middleware(ApiAuthMiddleware::class)]
     #[Middleware(TryLimitMiddleware::class)]
     #[RequestMapping(methods: ['GET'], path: 'verification')]
-    public function sendVerification(MemberService $service, DriverFactory $factory)
+    public function sendVerification(SendVerificationRequest $request, MemberService $service, DriverFactory $factory)
     {
-        $member = auth()->user();
+        if (auth()->check()) {
+            $member = auth()->user();
+        } else {
+            $member = $service->getUserFromEmailOrUuid($request->input('email'), $request->input('uuid'));
+        }
+
 
         $code = $service->getVerificationCode($member->id);
         $driver = $factory->get('default');
@@ -170,8 +176,8 @@ class MemberController extends AbstractController
     }
 
     #[Middleware(ApiAuthMiddleware::class)]
-    #[RequestMapping(methods: ['POST'], path: 'verification/check')]
-    public function checkVerificationCode(VerificationRequest $request)
+    #[RequestMapping(methods: ['POST'], path: 'verification/register_check')]
+    public function checkRegisterVerificationCode(RegisterVerificationRequest $request)
     {
         $member = auth()->user();
         $now = Carbon::now()->toDateTimeString();
@@ -182,6 +188,31 @@ class MemberController extends AbstractController
 
         if (! empty($model)) {
             $member->status = Member::STATUS['NORMAL'];
+            $member->save();
+            $model->delete();
+            return $this->success();
+        }
+
+        return $this->error(trans('validation.expire_code'), 400);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'verification/reset_password_check')]
+    public function checkResetPasswordVerificationCode(ResetPasswordVerificationRequest $request, MemberService $service)
+    {
+        $member = $service->getUserFromEmailOrUuid($request->input('email'), $request->input('uuid'));
+
+        if (empty($member)) {
+            return $this->error(trans('validation.exists', ['attribute' => 'email or uuid']), 400);
+        }
+
+        $now = Carbon::now()->toDateTimeString();
+        $model = MemberVerification::where('member_id', $member->id)
+            ->where('expired_at', '>=', $now)
+            ->where('code', $request->input('code'))
+            ->first();
+
+        if (! empty($model)) {
+            $member->password = password_hash($request->input('password'), PASSWORD_DEFAULT);
             $member->save();
             $model->delete();
             return $this->success();

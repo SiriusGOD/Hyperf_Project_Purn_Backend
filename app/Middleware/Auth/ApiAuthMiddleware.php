@@ -11,7 +11,10 @@ declare(strict_types=1);
  */
 namespace App\Middleware\Auth;
 
+use App\Service\MemberService;
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface as HttpResponse;
+use Hyperf\Redis\Redis;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -35,9 +38,16 @@ class ApiAuthMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $check = auth()->check();
+        $redis = make(Redis::class);
 
-        if ($check) {
+        if (! auth('jwt')->check()) {
+            throw new \App\Exception\UnauthorizedException(403, trans('validation.authorize'));
+        }
+
+        $token = $redis->get(MemberService::CACHE_KEY . auth('jwt')->user()->getId());
+
+        $headerAuth = make(RequestInterface::class)->header('Authorization');
+        if ($headerAuth == 'Bearer ' . $token) {
             return $handler->handle($request);
         }
 

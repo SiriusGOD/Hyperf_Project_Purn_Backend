@@ -40,10 +40,7 @@ class MemberService
 
     public function apiCheckUser(array $userInfo)
     {
-        $user = Member::where('email', $userInfo['email'])->first();
-        if (! $user) {
-            $user = Member::where('uuid', $userInfo['uuid'])->first();
-        }
+        $user = $this->getUserFromEmailOrUuid($userInfo['email'], $userInfo['uuid']);
 
         if (! $user) {
             return false;
@@ -208,6 +205,20 @@ class MemberService
         }
 
         return $this->createVerificationCode($memberId);
+    }
+
+    public function getUserFromEmailOrUuid(?string $email, ?string $uuid)
+    {
+        $user = Member::where('email', $email)->first();
+        if (empty($user)) {
+            $user = Member::where('uuid', $uuid)->first();
+        }
+
+        if (empty($user)) {
+            return false;
+        }
+
+        return $user;
     }
 
     protected function createVerificationCode(int $memberId): string
