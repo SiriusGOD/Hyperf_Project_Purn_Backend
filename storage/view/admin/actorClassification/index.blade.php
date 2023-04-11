@@ -25,6 +25,11 @@
                                             colspan="1" aria-sort="ascending"
                                             aria-label="Rendering engine: activate to sort column descending">{{trans('default.id') ?? '序號'}}
                                         </th>
+                                        <th class="sorting sorting_asc" tabindex="0" aria-controls="example2"
+                                            rowspan="1"
+                                            colspan="1" aria-sort="ascending"
+                                            aria-label="Rendering engine: activate to sort column descending">{{trans('default.sort') ?? '排序'}}
+                                        </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.user_name') ?? '使用者名稱'}}
@@ -33,22 +38,36 @@
                                             colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.actor_classification_control.classification_name') ?? '分類名稱'}}
                                         </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
+                                            aria-label="CSS grade: activate to sort column ascending">{{trans('default.action') ?? '動作'}}
+                                        </th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach($datas as $model)
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $model->id }}</td>
+                                            <td class="sorting_1 dtr-control">{{ $model->sort }}</td>
                                             <td class="sorting_1 dtr-control">{{ $model->user->name }}</td>
                                             <td>{{ $model->name }}</td>
+                                            <td>
+                                            @if(authPermission('actorClassification-edit'))
+                                                <div class="row mb-1">
+                                                <a href="/admin/actor_classification/edit?id={{$model->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
+                                                </div>
+                                            @endif
+                                            </td>
                                         </tr>
                                     @endforeach
                                     </tbody>
                                     <tfoot>
                                     <tr>
                                         <th rowspan="1" colspan="1">{{trans('default.id') ?? '序號'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.sort') ?? '排序'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.user_name') ?? '使用者名稱'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.actor_classification_control.classification_name') ?? '分類名稱'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>
                                     </tfoot>
                                 </table>

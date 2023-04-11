@@ -27,11 +27,12 @@ class ActorClassificationService
     }
 
     // 新增或更新分類
-    public function storeActorClassification(string $name, int $user_id): void
+    public function storeActorClassification(array $data): void
     {
-        $model = new ActorClassification();
-        $model->user_id = $user_id;
-        $model->name = $name;
+        $model = ActorClassification::findOrNew($data['id']);
+        $model->sort = $data['sort'];
+        $model->user_id = $data['user_id'];
+        $model->name = $data['name'];
         $model->save();
     }
 }

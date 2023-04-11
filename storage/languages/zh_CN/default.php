@@ -295,6 +295,8 @@ return [
         'classification_create' => '新增分類',
         'classification_name' => '分類名稱',
         'classification_name_def' => '請輸入分類名稱',
+        'classification_sort_def' => '請輸入排序號碼',
+        'classification_edit' => '編輯分類',
     ],
     // -------------------------------------------------------------------
 ];

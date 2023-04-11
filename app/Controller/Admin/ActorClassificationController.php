@@ -40,7 +40,7 @@ class ActorClassificationController extends AbstractController
         // 顯示幾筆
         $step = ActorClassification::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $models = ActorClassification::with('user')->offset(($page - 1) * $step)->limit($step)->get();
+        $models = ActorClassification::with('user')->offset(($page - 1) * $step)->limit($step)->orderBy('sort')->get();
         $total = ActorClassification::count();
         $data['last_page'] = ceil($total / $step);
         if ($total == 0) {
@@ -52,7 +52,7 @@ class ActorClassificationController extends AbstractController
         $data['datas'] = $models;
         $data['page'] = $page;
         $data['step'] = $step;
-        $path = '/admin/tag/index';
+        $path = '/admin/actor_classification/index';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . ($page - 1);
         $paginator = new Paginator($models, $step, $page);
@@ -71,9 +71,21 @@ class ActorClassificationController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'store')]
     public function store(ActorClassificationRequest $request, ResponseInterface $response, ActorClassificationService $service): PsrResponseInterface
     {
-        $userId = auth('session')->user()->getId();
-        $name = $request->input('name');
-        $service->storeActorClassification($name, $userId);
-        return $response->redirect('/admin/actorClassification/index');
+        $data['id'] = $request->input('id') ? $request->input('id') : null;
+        $data['user_id'] = auth('session')->user()->getId();
+        $data['name'] = $request->input('name');
+        $data['sort'] = (int)$request->input('sort');
+        $service->storeActorClassification($data);
+        return $response->redirect('/admin/actor_classification/index');
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'edit')]
+    public function edit(RequestInterface $request)
+    {
+        $id = $request->input('id');
+        $data['model'] = ActorClassification::findOrFail($id);
+        $data['navbar'] = trans('default.actor_classification_control.classification_edit');
+        $data['actor_classification_active'] = 'active';
+        return $this->render->render('admin.actorClassification.form', $data);
     }
 }

@@ -19,6 +19,7 @@ class ActorClassificationRequest extends AuthBaseRequest
     public function rules(): array
     {
         return [
+            'sort' => 'required|numeric',
             'name' => 'required|string|between:1,50',
         ];
     }
