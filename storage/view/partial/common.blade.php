@@ -134,6 +134,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('actorClassification-index'))
+                    <li class="nav-item">
+                        <a href="/admin/actor_classification/index" class="nav-link {{$actor_classification_active ?? ''}}">
+                            <i class="nav-icon fas fa-child"></i>
+                            <p>
+                                {{trans('default.leftbox.classification') ?? '演員分類管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
                 @if(authPermission('actor-index'))
                     <li class="nav-item">
                         <a href="/admin/actor/index" class="nav-link {{$actor_active ?? ''}}">
