@@ -12,14 +12,11 @@ namespace HyperfTest\Cases;
 
 use App\Model\Member;
 use App\Service\MemberService;
-use App\Model\Order;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
-use App\Service\UserService;
 use App\Service\VideoService;
 use App\Service\TagService;
 use App\Util\URand;
-use App\Model\User;
 /**
  * @internal
  * @coversNothing
@@ -35,7 +32,7 @@ class VideoApiTest extends HttpTestCase
     {
         parent::__construct($name, $data, $dataName);
         $this->client = make(Client::class);
-        $this->videoService = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
+        $this->videoService = make(VideoService::class);
     }
 
     //vidoe list api 測試

@@ -72,7 +72,7 @@ class VideoService
         return false;
     }
 
-    // 影片列表
+    // 取得影片
     public function find(int $id)
     {
         return $this->model->select('id', 'title', 'm3u8', 'cover_thumb', 'tags', 'actors')->where('id', $id)->first();
