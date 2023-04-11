@@ -13,6 +13,7 @@ namespace App\Service;
 
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
+use App\Model\ActorHasClassification;
 use Hyperf\Database\Model\Collection;
 use Hyperf\Redis\Redis;
 
@@ -107,6 +108,12 @@ class ActorService
         $model->name = $data['name'];
         $model->sex = $data['sex'];
         $model->save();
+
+        // 新增或更新演員分類關係
+        $model = Actor::where('name', $data['name'])->first();
+        $arr_classify = $data['classifications'] ?? [];
+        $this->createActorClassificationRelationship($arr_classify, $model->id);
+
         return $model;
     }
 
@@ -134,5 +141,21 @@ class ActorService
             return $model;
         }
         return $model->first();
+    }
+
+    // 新增或更新演員分類關係
+    public function createActorClassificationRelationship(array $classification, int $actorId)
+    {
+        ActorHasClassification::where('actor_id', $actorId)->delete();
+        foreach ($classification as $key => $value) {
+            $model = ActorHasClassification::where('actor_classifications_id', $value)
+                ->where('actor_id', $actorId);
+            if (! $model->exists()) {
+                $model = new ActorHasClassification();
+                $model->actor_id = $actorId;
+                $model->actor_classifications_id = $value;
+                $model->save();
+            }
+        }
     }
 }

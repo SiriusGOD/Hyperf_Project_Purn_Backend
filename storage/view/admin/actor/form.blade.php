@@ -23,6 +23,7 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                @include('partial.actorClassificationSelect')
                                 <button type="submit" class="btn btn-primary">{{trans('default.submit') ?? '送出'}}</button>
                             </form>
                         </div>

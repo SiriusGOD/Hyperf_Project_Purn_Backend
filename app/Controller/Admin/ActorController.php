@@ -12,7 +12,9 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
+use Hyperf\DbConnection\Db;
 use App\Model\Actor;
+use App\Model\ActorHasClassification;
 use App\Request\ActorRequest;
 use App\Service\ActorService;
 use Hyperf\Di\Annotation\Inject;
@@ -47,7 +49,11 @@ class ActorController extends AbstractController
         // 顯示幾筆
         $step = Actor::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = Actor::offset(($page - 1) * $step)->limit($step);
+        $query = Actor::leftjoin('actor_has_classifications', 'actor_has_classifications.actor_id','actors.id')
+                ->leftjoin('actor_classifications', 'actor_classifications.id', 'actor_has_classifications.actor_classifications_id')
+                ->select('actors.*', Db::raw("GROUP_CONCAT(actor_classifications.name SEPARATOR ' , ') as classification "))
+                ->groupBy('actors.id')
+                ->offset(($page - 1) * $step)->limit($step);
         $actors = $query->get();
         $query = Actor::select('*');
         $total = $query->count();
@@ -76,6 +82,7 @@ class ActorController extends AbstractController
         $data['user_id'] = auth('session')->user()->id;
         $data['name'] = $request->input('name');
         $data['sex'] = $request->input('sex');
+        $data['classifications'] = $request->input('classifications');
         $service->storeActor($data);
         return $response->redirect('/admin/actor/index');
     }
@@ -87,6 +94,7 @@ class ActorController extends AbstractController
         $data['actor_active'] = 'active';
         $model = new Actor();
         $data['model'] = $model;
+        $data['classification_ids'] = '';
         return $this->render->render('admin.actor.form', $data);
     }
 
@@ -97,6 +105,7 @@ class ActorController extends AbstractController
         $data['model'] = Actor::findOrFail($id);
         $data['navbar'] = trans('default.ad_control.ad_update');
         $data['actor_active'] = 'active';
+        $data['classification_ids'] = ActorHasClassification::where('actor_id', $id)->get()->pluck('actor_classifications_id');
         return $this->render->render('admin.actor.form', $data);
     }
 
