@@ -15,6 +15,37 @@
                             @endif
                         </div>
                         <div class="row">
+                            <form action="/admin/video/index" method="get" class="col-md-12">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-3">
+                                            <label>{{trans('default.video.title') ?? '影片名稱'}}</label>
+                                            <input type="text" class="form-control" name="title" aria-describedby="title" value="{{$title ?? ''}}">
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label>{{trans('default.video.status') ?? '狀態'}}</label>
+                                            <select name="status" class="form-control">
+                                                <option value=""></option>
+                                                @foreach(trans('default.video.status_type') as $key => $value)
+                                                    <option value="{{$key}}" @if($key == $status) selected @endif>{{$value}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label>{{trans('default.video.start_duration') ?? '最小時長'}}</label>
+                                            <input type="text" class="form-control" name="start_duration" aria-describedby="title" value="{{$start_duration ?? ''}}">
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label>{{trans('default.video.end_duration') ?? '最大時長'}}</label>
+                                            <input type="text" class="form-control" name="end_duration" aria-describedby="title" value="{{$end_duration ?? ''}}">
+                                        </div>
+                                    </div>
+                                    @include('partial.tagSelect')
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary">search</button>
+                                    </div>
+                            </form>
+                        </div>
+                        <div class="row">
                             <div class="col-sm-12">
                                 <table id="example2" class="table table-bordered table-hover dataTable dtr-inline"
                                        aria-describedby="example2_info">

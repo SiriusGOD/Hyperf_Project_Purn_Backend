@@ -16,6 +16,7 @@ use App\Model\MemberHasVideo;
 use App\Model\TagCorrespond;
 use App\Model\Video;
 use Hyperf\Database\Model\Collection;
+use Hyperf\Database\Model\Builder;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
@@ -248,5 +249,38 @@ class VideoService
         }
 
         return $result;
+    }
+
+    public function adminSearchVideoQuery(array $params) : Builder
+    {
+        $step = Video::PAGE_PER;
+        $query = Video::offset(($params['page'] - 1) * $step)->limit($step);
+        if (! empty($params['status'])) {
+            $query = $query->where('status', $params['status']);
+        }
+
+        if (! empty($params['title'])) {
+            $query = $query->where('title', 'like', '%' . $params['title'] . '%');
+        }
+
+        if (! empty($params['start_duration'])) {
+            $query = $query->where('duration', '>=', $params['start_duration']);
+        }
+
+        if (! empty($params['end_duration'])) {
+            $query = $query->where('duration', '<=', $params['end_duration']);
+        }
+
+        if (! empty($params['tag_ids'])) {
+            $ids = TagCorrespond::where('correspond_type', Video::class)
+                ->whereIn('tag_id', $params['tag_ids'])
+                ->get()
+                ->pluck('correspond_id')
+                ->toArray();
+
+            $query = $query->whereIn('id', $ids);
+        }
+
+        return $query;
     }
 }
