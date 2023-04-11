@@ -11,24 +11,23 @@ declare(strict_types=1);
  */
 namespace App\Request;
 
-use App\Model\MemberFollow;
-use Hyperf\Validation\Rule;
+use Hyperf\Validation\Request\FormRequest;
 
-class AddMemberFollowRequest extends AuthApiBaseRequest
+class SendVerificationRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return true;
+    }
+
     /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric',
-            'type' => ['required', Rule::in([
-                MemberFollow::TYPE_LIST[0],
-                MemberFollow::TYPE_LIST[1],
-                MemberFollow::TYPE_LIST[2],
-                MemberFollow::TYPE_LIST[3],
-            ])],
+            'email' => 'string',
+            'uuid' => 'string',
         ];
     }
 }

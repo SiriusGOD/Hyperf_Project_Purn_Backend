@@ -29,8 +29,10 @@ class ApiCode
     public const BAD_LOGIN = 403;
 
     public const FATAL_ERROR = 500;
-    //找不到使用者
+
+    // 找不到使用者
     public const USER_NOT_FOUND = 000001;
-    //找不到使用者
-    public const USER_NOT_FOUND_MSG = "user not found!";
+
+    // 找不到使用者
+    public const USER_NOT_FOUND_MSG = 'user not found!';
 }

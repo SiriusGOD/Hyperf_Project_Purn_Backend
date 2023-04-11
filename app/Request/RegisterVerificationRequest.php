@@ -11,10 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Request;
 
-use App\Model\MemberFollow;
-use Hyperf\Validation\Rule;
-
-class AddMemberFollowRequest extends AuthApiBaseRequest
+class RegisterVerificationRequest extends AuthApiBaseRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -22,13 +19,7 @@ class AddMemberFollowRequest extends AuthApiBaseRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|numeric',
-            'type' => ['required', Rule::in([
-                MemberFollow::TYPE_LIST[0],
-                MemberFollow::TYPE_LIST[1],
-                MemberFollow::TYPE_LIST[2],
-                MemberFollow::TYPE_LIST[3],
-            ])],
+            'code' => 'required|string',
         ];
     }
 }

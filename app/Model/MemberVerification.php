@@ -14,16 +14,17 @@ namespace App\Model;
 /**
  * @property int $id
  * @property int $member_id
- * @property int $video_id
+ * @property string $code
+ * @property string $expired_at
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  */
-class MemberHasVideo extends Model
+class MemberVerification extends Model
 {
-    public const PAGE_PER = 10;
-
     /**
      * The table associated with the model.
      */
-    protected ?string $table = 'member_has_videos';
+    protected ?string $table = 'member_verifications';
 
     /**
      * The attributes that are mass assignable.
@@ -33,5 +34,5 @@ class MemberHasVideo extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'video_id' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

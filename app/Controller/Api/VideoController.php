@@ -11,8 +11,8 @@ declare(strict_types=1);
  */
 namespace App\Controller\Api;
 
-use App\Constants\Constants;
 use App\Constants\Apicode;
+use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Model\Video;
 use App\Request\ClickRequest;
@@ -48,27 +48,27 @@ class VideoController extends AbstractController
         return $this->success($data);
     }
 
-    //儲存影片
+    // 儲存影片
     #[RequestMapping(methods: ['POST'], path: 'stageVideo')]
     public function stageVideo(RequestInterface $request, VideoService $videoService)
     {
-        $videoId = $request->input("video_id");
+        $videoId = $request->input('video_id');
         $userId = auth('jwt')->user()->getId();
-        if(!$userId){
-          return $this->error(Apicode::USER_NOT_FOUND_MSG, Apicode::USER_NOT_FOUND);
+        if (! $userId) {
+            return $this->error(Apicode::USER_NOT_FOUND_MSG, Apicode::USER_NOT_FOUND);
         }
-        $videoService->storeStageVideo($videoId,$userId);
+        $videoService->storeStageVideo($videoId, $userId);
         return $this->success([]);
     }
 
-    //儲存影片
+    // 儲存影片
     #[RequestMapping(methods: ['GET'], path: 'stagelist')]
     public function stageList(RequestInterface $request, VideoService $service)
     {
-        $videoId = $request->input("video_id");
+        $videoId = $request->input('video_id');
         $userId = auth('jwt')->user()->getId();
-        if(!$userId){
-          return $this->error(Apicode::USER_NOT_FOUND_MSG, Apicode::USER_NOT_FOUND);
+        if (! $userId) {
+            return $this->error(Apicode::USER_NOT_FOUND_MSG, Apicode::USER_NOT_FOUND);
         }
         $page = (int) $request->input('page', 0);
         $data = [];

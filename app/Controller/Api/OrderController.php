@@ -85,7 +85,7 @@ class OrderController extends AbstractController
     }
 
     /**
-     * 查詢訂單資訊
+     * 查詢訂單資訊.
      */
     #[RequestMapping(methods: ['GET'], path: 'search')]
     public function search(OrderRequest $request, OrderService $service)
