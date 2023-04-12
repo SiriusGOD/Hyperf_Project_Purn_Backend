@@ -37,6 +37,21 @@ class MemberSeed implements BaseInterface
         $model->status = 1;
         $model->role_id = 2;
         $model->save();
+
+        for($i=1 ; $i<=20 ;$i++)
+        {
+          $model = new \App\Model\Member();
+          $model->name = 'test'.$i;
+          $model->password = password_hash('quH25df15Ed', PASSWORD_DEFAULT);
+          $model->sex = 1;
+          $model->age = 20;
+          $model->avatar = '';
+          $model->email = $i.'test@test.com';
+          $model->phone = '098765432'.$i;
+          $model->status = 1;
+          $model->role_id = 2;
+          $model->save();
+        }
     }
 
     public function down(): void

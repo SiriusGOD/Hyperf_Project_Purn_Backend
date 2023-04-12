@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Util\URand;
+use App\Constants\RedeemCode;
 
 /**
  * This file is part of Hyperf.
@@ -21,7 +22,7 @@ class RedeemSeed implements BaseInterface
         $model->code = URand::randomString(10);
         $model->count = rand(1,20);
         $model->category_id = 1;
-        $model->category_name = 'VIP天數';
+        $model->category_name = RedeemCode::CATEGORY[1];
         $model->diamond_point = 0;
         $model->vip_days= rand(1,20);
         $model->free_watch = 0;
@@ -33,9 +34,9 @@ class RedeemSeed implements BaseInterface
         $model = new \App\Model\Redeem();
         $model->title = '優惠劵台北市好捧'.URand::getRandTitle(10);
         $model->code = URand::randomString(10);
-        $model->count = 0;
+        $model->count = 2;
         $model->category_id = 2;
-        $model->category_name = '鑽石點數';
+        $model->category_name = RedeemCode::CATEGORY[2];
         $model->diamond_point = rand(1,20);
         $model->vip_days= 0;
         $model->free_watch = 0;
@@ -47,9 +48,9 @@ class RedeemSeed implements BaseInterface
         $model = new \App\Model\Redeem();
         $model->title = '優惠劵台北市好捧'.URand::getRandTitle(10);
         $model->code = URand::randomString(10);
-        $model->count = rand(1,20);
+        $model->count = 2;
         $model->category_id = 3;
-        $model->category_name = '免費觀看次數';
+        $model->category_name = RedeemCode::CATEGORY[3];
         $model->diamond_point = 0;
         $model->vip_days= 0;
         $model->free_watch = rand(1,20);
@@ -64,7 +65,7 @@ class RedeemSeed implements BaseInterface
         $model->code = URand::randomString(10);
         $model->count = rand(1,20);
         $model->category_id = 3;
-        $model->category_name = '免費觀看次數';
+        $model->category_name = RedeemCode::CATEGORY[3];
         $model->diamond_point = 0;
         $model->vip_days= 0;
         $model->free_watch = rand(1,20);
