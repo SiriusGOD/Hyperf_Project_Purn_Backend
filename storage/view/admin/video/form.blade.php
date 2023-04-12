@@ -94,6 +94,10 @@
                                         </div>
                                       @endif  
                                 </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.video.release_time') ?? '上架時間'}}</label>
+                                    <input type="text" class="form-control" name="release_time" placeholder="name" value="{{$video->release_time ?? \Carbon\Carbon::now()}}">
+                                </div>
                                 <button type="submit"
                                         class="btn btn-primary">{{trans('default.submit') ?? '送出'}}</button>
                             </form>
@@ -108,5 +112,17 @@
         </div>
         <!-- /.col -->
     </div>
+
+    <script>
+        $('input[name="release_time"]').daterangepicker({
+            singleDatePicker: true,
+            timePicker:true,
+            timePicker24Hour: true,
+            showDropdowns: true,
+            locale: {
+                format: 'YYYY-M-DD HH:mm:00'
+            }
+        });
+    </script>
 
 @endsection

@@ -127,7 +127,7 @@ return [
         ],
         'start_duration' => '最小時長',
         'end_duration' => '最大時長',
-        ''
+        'release_time' => '上架時間',
     ],
 
     // actor

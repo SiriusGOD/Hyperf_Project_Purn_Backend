@@ -15,8 +15,9 @@ use App\Model\ActorCorrespond;
 use App\Model\MemberHasVideo;
 use App\Model\TagCorrespond;
 use App\Model\Video;
-use Hyperf\Database\Model\Collection;
+use Carbon\Carbon;
 use Hyperf\Database\Model\Builder;
+use Hyperf\Database\Model\Collection;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
@@ -76,7 +77,10 @@ class VideoService
     // 影片列表
     public function find(int $id)
     {
-        return $this->model->select('id', 'title', 'm3u8', 'cover_thumb', 'tags', 'actors')->where('id', $id)->first();
+        return $this->model->select('id', 'title', 'm3u8', 'cover_thumb', 'tags', 'actors')
+            ->where('release_time', '>=', Carbon::now()->toDateTimeString())
+            ->where('id', $id)
+            ->first();
     }
 
     // 影片列表
@@ -94,7 +98,9 @@ class VideoService
         //      'tags',
         //  ]);
         // }
-        $query = $query->offset(Video::PAGE_PER * $page)->limit(Video::PAGE_PER);
+        $query = $query->offset(Video::PAGE_PER * $page)
+            ->where('release_time', '>=', Carbon::now()->toDateTimeString())
+            ->limit(Video::PAGE_PER);
         if (! empty($videoIds)) {
             $query = $query->whereIn('id', $videoIds);
         }
@@ -189,7 +195,8 @@ class VideoService
         #  $jsonResult = $this->redis->get(self::CACHE_KEY.$name);
         #  return json_decode($jsonResult, true);
         # }
-        $model = Video::where('title', 'like', "%{$title}%");
+        $model = Video::where('title', 'like', "%{$title}%")
+            ->where('release_time', '>=', Carbon::now()->toDateTimeString());
         if ($compare > 0 && $length > 0) {
             if ($compare == 1) {
                 $model = $model->where('duration', '>=', $length);
@@ -240,6 +247,7 @@ class VideoService
                 'tags',
             ])
                 ->whereIn('id', $ids)
+                ->where('release_time', '>=', Carbon::now()->toDateTimeString())
                 ->offset($limit * $page)
                 ->limit($limit)
                 ->get()
@@ -251,7 +259,7 @@ class VideoService
         return $result;
     }
 
-    public function adminSearchVideoQuery(array $params) : Builder
+    public function adminSearchVideoQuery(array $params): Builder
     {
         $step = Video::PAGE_PER;
         $query = Video::offset(($params['page'] - 1) * $step)->limit($step);
