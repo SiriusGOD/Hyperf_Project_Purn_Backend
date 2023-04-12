@@ -70,6 +70,10 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.video.like') ?? '點讚數'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.video.is_hide') ?? '隐藏'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
@@ -85,6 +89,7 @@
                                             <td> {{ $video->title}}</td>
                                             <td> {{ $const::CATEGORY[$video->category]}}</td>
                                             <td> {{ $const::IS_FREE[$video->is_free]}}</td>
+                                            <td> {{ $video->likes }}</td>
                                             <td> {{ $const::IS_HIDE[$video->is_hide]}}</td>
                                             <td>
                                                 @if(authPermission('video-edit'))
@@ -109,8 +114,11 @@
                                     <tfoot>
                                     <tr>
                                         <th rowspan="1" colspan="1">{{trans('default.id') ?? '序號'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.account') ?? '帳號'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.enable_user')?? '啟用'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.video.title') ?? '影片名稱'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.video.category')?? '分類'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.video.is_free') ?? '是否限免'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.video.like') ?? '點讚數'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.video.is_hide') ?? '隐藏'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>
                                     </tfoot>

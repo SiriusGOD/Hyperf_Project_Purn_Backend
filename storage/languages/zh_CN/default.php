@@ -110,13 +110,13 @@ return [
         'is_hide' => '隐藏',
         'm3u8' => 'M3u8',
         'fan_id' => '番号',
-        'update_video'=>'更新影片',
-        'cover_thumb'=> '封面圖',
-        'coins'=> '定價',
-        'actors'=> '演員',
-        'input_tags'=> '標籤  請以,分開',
-        'input_actors'=> '演員  請以,分開',
-        'gif_thumb'=>'GIF',
+        'update_video' => '更新影片',
+        'cover_thumb' => '封面圖',
+        'coins' => '定價',
+        'actors' => '演員',
+        'input_tags' => '標籤  請以,分開',
+        'input_actors' => '演員  請以,分開',
+        'gif_thumb' => 'GIF',
         'status' => '狀態',
         'status_type' => [
             0 => '未審核',
@@ -128,6 +128,7 @@ return [
         'start_duration' => '最小時長',
         'end_duration' => '最大時長',
         'release_time' => '上架時間',
+        'like' => '點讚數',
     ],
 
     // actor
