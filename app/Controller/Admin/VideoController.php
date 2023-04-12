@@ -44,12 +44,20 @@ class VideoController extends AbstractController
     }
 
     #[RequestMapping(methods: ['GET'], path: 'index')]
-    public function index(RequestInterface $request)
+    public function index(RequestInterface $request, VideoService $service)
     {
         // 顯示幾筆
         $step = Video::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = Video::offset(($page - 1) * $step)->limit($step);
+        $query = $service->adminSearchVideoQuery([
+            'page' => $page,
+            'status' => $request->input('status'),
+            'title' => $request->input('title'),
+            'start_duration' => $request->input('start_duration'),
+            'end_duration' => $request->input('end_duration'),
+            'tag_ids' => $request->input('tags'),
+        ]);
+
         $videos = $query->get();
         $query = Video::select('*');
         $total = $query->count();
@@ -67,6 +75,11 @@ class VideoController extends AbstractController
         $path = '/admin/video/index';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . ($page - 1);
+        $data['title'] = $request->input('title');
+        $data['status'] = $request->input('status', '');
+        $data['start_duration'] = $request->input('start_duration');
+        $data['end_duration'] = $request->input('end_duration');
+        $data['tag_ids'] = json_encode(TagService::tagIdsToInt($request->input('tags')));
         $paginator = new Paginator($videos, $step, $page);
         $data['paginator'] = $paginator->toArray();
         return $this->render->render('admin.video.index', $data);

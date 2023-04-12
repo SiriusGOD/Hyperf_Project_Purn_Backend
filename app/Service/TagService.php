@@ -115,4 +115,19 @@ class TagService
 
         return $models;
     }
+
+    public static function tagIdsToInt(?array $tags): array
+    {
+        $result = [];
+
+        if (empty($tags)) {
+            return $result;
+        }
+
+        foreach ($tags as $tag) {
+            $result[] = (int) $tag;
+        }
+
+        return $result;
+    }
 }

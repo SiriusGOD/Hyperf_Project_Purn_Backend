@@ -117,6 +117,17 @@ return [
         'input_tags'=> '標籤  請以,分開',
         'input_actors'=> '演員  請以,分開',
         'gif_thumb'=>'GIF',
+        'status' => '狀態',
+        'status_type' => [
+            0 => '未審核',
+            1 => '審核通過',
+            2 => '未通過',
+            3 => '回調中',
+            4 => '已刪除',
+        ],
+        'start_duration' => '最小時長',
+        'end_duration' => '最大時長',
+        'release_time' => '上架時間',
     ],
 
     // actor
