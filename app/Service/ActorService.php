@@ -13,8 +13,10 @@ namespace App\Service;
 
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
+use App\Model\ActorHasClassification;
 use Hyperf\Database\Model\Collection;
 use Hyperf\Redis\Redis;
+use Hyperf\DbConnection\Db;
 
 class ActorService
 {
@@ -54,10 +56,32 @@ class ActorService
     }
 
     // 取得演員
-    public function getActors(int $page): Collection
+    public function getActors(int $page): array
     {
-        $query = $this->model->offset(Actor::PAGE_PER * $page)->limit(Actor::PAGE_PER);
-        return $query->get();
+        $query = $this->model->offset(Actor::PAGE_PER * $page)->limit(Actor::PAGE_PER)->get()->toArray();
+        foreach ($query as $key => $value) {
+            $actor_id = $value['id'];
+            // 獲取該演員參與的影片數與圖片數
+            $count_arr = ActorCorrespond::select('correspond_type', Db::raw("count(*) as count" ))
+                    ->where('actor_id', $actor_id)
+                    ->groupBy(['actor_id', 'correspond_type'])
+                    ->get()->toArray();
+            foreach ($count_arr as $key2 => $value2) {
+                switch ($value2['correspond_type']) {
+                    case 'video':
+                        $query[$key]['video_count'] = $value2['count'];
+                        break;
+
+                    case 'image':
+                        $query[$key]['image_count'] = $value2['count'];
+                        break;
+                }
+            }
+
+            if(empty($query[$key]['video_count']))$query[$key]['video_count'] = 0;
+            if(empty($query[$key]['image_count']))$query[$key]['image_count'] = 0;
+        }
+        return $query;
     }
 
     // 計算總數
@@ -106,7 +130,14 @@ class ActorService
         $model->user_id = $data['user_id'];
         $model->name = $data['name'];
         $model->sex = $data['sex'];
+        $model->avatar = $data['image_url'];
         $model->save();
+
+        // 新增或更新演員分類關係
+        $model = Actor::where('name', $data['name'])->first();
+        $arr_classify = $data['classifications'] ?? [];
+        $this->createActorClassificationRelationship($arr_classify, $model->id);
+
         return $model;
     }
 
@@ -134,5 +165,21 @@ class ActorService
             return $model;
         }
         return $model->first();
+    }
+
+    // 新增或更新演員分類關係
+    public function createActorClassificationRelationship(array $classification, int $actorId)
+    {
+        ActorHasClassification::where('actor_id', $actorId)->delete();
+        foreach ($classification as $key => $value) {
+            $model = ActorHasClassification::where('actor_classifications_id', $value)
+                ->where('actor_id', $actorId);
+            if (! $model->exists()) {
+                $model = new ActorHasClassification();
+                $model->actor_id = $actorId;
+                $model->actor_classifications_id = $value;
+                $model->save();
+            }
+        }
     }
 }

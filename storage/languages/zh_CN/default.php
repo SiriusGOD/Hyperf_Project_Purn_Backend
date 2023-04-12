@@ -154,6 +154,7 @@ return [
         'actor' => '演員管理',
         'product' => '商品管理',
         'member' => '會員管理',
+        'classification' => '演員分類管理'
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -297,6 +298,16 @@ return [
             'image' => '圖片',
             'video' => '影片',
         ]
+    ],
+    // -------------------------------------------------------------------
+    // ActorClassificationController
+    'actor_classification_control' => [
+        'classification_control' => '演員分類管理',
+        'classification_create' => '新增分類',
+        'classification_name' => '分類名稱',
+        'classification_name_def' => '請輸入分類名稱',
+        'classification_sort_def' => '請輸入排序號碼',
+        'classification_edit' => '編輯分類',
     ],
     // -------------------------------------------------------------------
 ];
