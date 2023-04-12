@@ -15,6 +15,7 @@ use App\Controller\AbstractController;
 use App\Model\Tag;
 use App\Request\TagRequest;
 use App\Service\TagService;
+use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -47,7 +48,11 @@ class TagController extends AbstractController
         // 顯示幾筆
         $step = Tag::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $models = Tag::with('user')->offset(($page - 1) * $step)->limit($step)->get();
+        $models = Tag::with('user')->leftjoin('tag_has_groups', 'tags.id', 'tag_has_groups.tag_id')
+                ->leftjoin('tag_groups', 'tag_has_groups.tag_group_id', 'tag_groups.id')
+                ->select('tags.*', Db::raw("GROUP_CONCAT(tag_groups.name SEPARATOR ' , ') as group_name "))
+                ->groupBy('tags.id')
+                ->offset(($page - 1) * $step)->limit($step)->get();
         $total = Tag::count();
         $data['last_page'] = ceil($total / $step);
         if ($total == 0) {
@@ -72,7 +77,8 @@ class TagController extends AbstractController
     {
         $userId = auth('session')->user()->getId();
         $name = $request->input('name');
-        $service->createTag($name, $userId);
+        $groups = $request->input('groups');
+        $service->createTag($name, $userId, $groups);
         return $response->redirect('/admin/tag/index');
     }
 
@@ -81,6 +87,7 @@ class TagController extends AbstractController
     {
         $data['navbar'] = trans('default.tag_control.tag_insert');
         $data['tag_active'] = 'active';
+        $data['tag_group_ids'] = '';
         return $this->render->render('admin.tag.form', $data);
     }
 }
