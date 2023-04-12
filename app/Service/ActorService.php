@@ -130,6 +130,7 @@ class ActorService
         $model->user_id = $data['user_id'];
         $model->name = $data['name'];
         $model->sex = $data['sex'];
+        $model->avatar = $data['image_url'];
         $model->save();
 
         // 新增或更新演員分類關係

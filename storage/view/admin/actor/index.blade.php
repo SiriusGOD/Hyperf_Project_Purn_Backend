@@ -29,7 +29,11 @@
                                             colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.actor.name') ?? '名稱'}}
                                         </th>
-
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
+                                            aria-label="Engine version: activate to sort column ascending">
+                                            {{trans('default.image') ?? '圖片'}}
+                                        </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
                                             aria-label="Engine version: activate to sort column ascending">
@@ -54,6 +58,9 @@
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $model->id}}</td>
                                             <td>{{ $model->name}}</td>
+                                            <td>
+                                                <img src="{{$model->avatar}}" alt="" style="width:100px">
+                                            </td>
                                             <td>{{ $model->sex ==1 ? "女" :"男"}}</td>
                                             <td>{{ $model->classification}}</td>
                                             <td>{{ $model->created_at}}</td>
@@ -71,6 +78,7 @@
                                     <tr>
                                         <th rowspan="1" colspan="1">{{trans('default.id')?? '序號'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.actor.name')?? '名稱'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.image') ?? '圖片'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.sex') ?? '性別'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.actor_classification_control.classification_name') ?? '分類名稱'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.created_at') ?? '建立時間'}}</th>

@@ -14,6 +14,19 @@
                                     <input type="text" class="form-control" name="name" id="name" placeholder="{{trans('default.ad_control.ad_input_name') ?? '請輸入廣告名稱'}}" value="{{$model->name ?? ''}}">
                                 </div>
                                 <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.image_profile_dec') ?? '圖片(不上傳就不更新，只接受圖片檔案(png jpeg gif))'}}</label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="image" id="customFile" accept="image/png, image/gif, image/jpeg">
+                                        <label class="custom-file-label" for="customFile">{{trans('default.choose_file') ?? '選擇檔案'}}</label>
+                                    </div>
+                                </div>
+                                <div class="form-group" id="selectedFiles"></div>
+                                <div class="form-group" id="modelImage">
+                                    @if(!empty($model->image_url))
+                                    <img src="{{$model->image_url}}" alt="image" style="width:100px">
+                                    @endif
+                                </div>
+                                <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.sex') ?? '性別'}}</label>
                                     <select class="form-control" name="sex">
                                         @foreach(['男','女'] as $key=>$role)

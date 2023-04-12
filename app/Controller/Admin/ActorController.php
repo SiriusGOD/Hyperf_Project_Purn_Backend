@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
+use Carbon\Carbon;
 use Hyperf\DbConnection\Db;
 use App\Model\Actor;
 use App\Model\ActorHasClassification;
@@ -83,6 +84,21 @@ class ActorController extends AbstractController
         $data['name'] = $request->input('name');
         $data['sex'] = $request->input('sex');
         $data['classifications'] = $request->input('classifications');
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $extension = $request->file('image')->getExtension();
+            $filename = sha1(Carbon::now()->toDateTimeString());
+            if (! file_exists(BASE_PATH . '/public/actor')) {
+                mkdir(BASE_PATH . '/public/actor', 0755);
+            }
+            $imageUrl = '/actor/' . $filename . '.' . $extension;
+            $file->moveTo(BASE_PATH . '/public' . $imageUrl);
+        }
+        if (! empty($imageUrl)) {
+            $data['image_url'] = $imageUrl;
+        }
+
         $service->storeActor($data);
         return $response->redirect('/admin/actor/index');
     }
