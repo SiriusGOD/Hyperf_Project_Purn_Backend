@@ -16,6 +16,7 @@ use App\Model\ActorCorrespond;
 use App\Model\ActorHasClassification;
 use Hyperf\Database\Model\Collection;
 use Hyperf\Redis\Redis;
+use Hyperf\DbConnection\Db;
 
 class ActorService
 {
@@ -55,10 +56,32 @@ class ActorService
     }
 
     // 取得演員
-    public function getActors(int $page): Collection
+    public function getActors(int $page): array
     {
-        $query = $this->model->offset(Actor::PAGE_PER * $page)->limit(Actor::PAGE_PER);
-        return $query->get();
+        $query = $this->model->offset(Actor::PAGE_PER * $page)->limit(Actor::PAGE_PER)->get()->toArray();
+        foreach ($query as $key => $value) {
+            $actor_id = $value['id'];
+            // 獲取該演員參與的影片數與圖片數
+            $count_arr = ActorCorrespond::select('correspond_type', Db::raw("count(*) as count" ))
+                    ->where('actor_id', $actor_id)
+                    ->groupBy(['actor_id', 'correspond_type'])
+                    ->get()->toArray();
+            foreach ($count_arr as $key2 => $value2) {
+                switch ($value2['correspond_type']) {
+                    case 'video':
+                        $query[$key]['video_count'] = $value2['count'];
+                        break;
+
+                    case 'image':
+                        $query[$key]['image_count'] = $value2['count'];
+                        break;
+                }
+            }
+
+            if(empty($query[$key]['video_count']))$query[$key]['video_count'] = 0;
+            if(empty($query[$key]['image_count']))$query[$key]['image_count'] = 0;
+        }
+        return $query;
     }
 
     // 計算總數
