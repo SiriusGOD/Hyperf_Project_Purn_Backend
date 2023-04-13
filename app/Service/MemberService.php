@@ -54,8 +54,12 @@ class MemberService
 
     public function apiRegisterUser(array $data): Member
     {
+        $name = $data['name'];
+        if(empty($name)){
+            $name = Member::VISITOR_NAME. substr(hash('sha256', $data['uuid'], false), 0, 10);
+        }
         $model = new Member();
-        $model->name = $data['name'];
+        $model->name = $name;
         $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
         $model->sex = $data['sex'];
         $model->age = $data['age'];

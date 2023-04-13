@@ -37,6 +37,8 @@ class Member extends Model implements Authenticatable
 
     public const PAGE_PER = 10;
 
+    public const VISITOR_NAME = '遊客';
+
     /**
      * The table associated with the model.
      * @var string
