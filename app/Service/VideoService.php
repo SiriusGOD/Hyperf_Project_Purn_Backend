@@ -102,7 +102,7 @@ class VideoService
         //      'tags',
         //  ]);
         // }
-        $query = $query->where('release_time', '>=', Carbon::now()->toDateTimeString());
+        $query = $query->where('release_time', '<=', Carbon::now()->toDateTimeString());
         if($status!=9){
             $query->where('status',$status);
         }
@@ -110,7 +110,6 @@ class VideoService
         if (! empty($videoIds)) {
             $query = $query->whereIn('id', $videoIds);
         }
-        
         return $query->get();
     }
 

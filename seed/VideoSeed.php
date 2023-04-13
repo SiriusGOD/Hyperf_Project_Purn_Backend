@@ -48,7 +48,7 @@ class VideoSeed implements BaseInterface
             'rating'           => '12',
             'refresh_at'       => time(),
             'created_at'       => date("Y-m-d H:i:s"),
-            'is_free'          => 1,
+            'is_free'          => rand(0,2),
             'likes'             => $like,
             'comment'          => 0,
             'status'           => 1,

@@ -58,7 +58,9 @@ class RedeemServiceTest extends HttpTestCase
     //取影片列表
     public function getCoseVideoList()
     {
-      return $this->video->getVideos([], 0 ,1);
+      $payStatus = 1;
+      $page = 0;
+      return $this->video->getVideos([], $page, $payStatus);
     }
 
     //測試redeem list
@@ -102,7 +104,7 @@ class RedeemServiceTest extends HttpTestCase
         $this->assertSame(1,$res);
         //兌換代碼 
        
-        for($i=rand(10,50) ; $i <= 70 ; $i++){
+        for($i=1 ; $i <= 30 ; $i++){
             $this->redeem->executeRedeemCode($code ,$i);
         }
 
@@ -127,10 +129,10 @@ class RedeemServiceTest extends HttpTestCase
     {
       $status = 0;
       $memberId = 1;
-      $memberRedeemList = $this->redeem->getMemberRedeemList(1 ,$status);
+      $memberRedeemList = $this->redeem->getMemberRedeemList($memberId ,$status);
       //付費影片
       $costVideos = self::getCoseVideoList();
-      //self::show( $costVideos->toArray());
+      self::show( $costVideos->toArray() );
       $videoId = $costVideos->toArray()[0]["id"];
       $this->assertSame((int)$memberRedeemList->toArray()[0]['status'], $status);
       self::show($memberRedeemList->toArray());
