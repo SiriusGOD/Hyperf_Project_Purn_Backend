@@ -65,7 +65,7 @@ class MemberService
         }
         $model->email = $data['email'];
         $model->phone = $data['phone'];
-        $model->status = Member::STATUS['NORMAL'];
+        $model->status = Member::STATUS['VISITORS'];
         $model->role_id = Role::API_DEFAULT_USER_ROLE_ID;
         $model->uuid = $data['uuid'];
         $model->save();
