@@ -31,7 +31,7 @@ use Qbhy\HyperfAuth\Authenticatable;
  */
 class Member extends Model implements Authenticatable
 {
-    public const STATUS = ['NORMAL' => 1, 'DISABLE' => 2, 'DELETE' => 3];
+    public const STATUS = ['VISITORS' => 0, 'NORMAL' => 1, 'DISABLE' => 2, 'DELETE' => 3];
 
     public const SEX = ['DEFAULT' => 0, 'MALE' => 1, 'FEMALE' => 2];
 

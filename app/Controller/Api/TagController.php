@@ -13,6 +13,8 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Service\TagService;
+use App\Service\TagGroupService;
+use App\Request\TagGroupSearchRequest;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -31,6 +33,21 @@ class TagController extends AbstractController
     public function popular(RequestInterface $request, TagService $service)
     {
         $data = $service->getPopularTag();
+        return $this->success($data);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'groupList')]
+    public function groupList(RequestInterface $request, TagGroupService $service)
+    {
+        $data = $service->getTags();
+        return $this->success($data);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'searchGroupTags')]
+    public function searchGroupTags(RequestInterface $request, TagGroupService $service)
+    {
+        $group_id = $request->input('group_id');
+        $data = $service->searchGroupTags($group_id);
         return $this->success($data);
     }
 }

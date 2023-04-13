@@ -10,7 +10,7 @@
 
                             @if(authPermission('tag-create'))
                                 <div class="col-sm-12 col-md-12 mb-1">
-                                    <a class="btn badge-info" href="/admin/tag/create">{{trans('default.tag_control.tag_insert') ?? '新增標籤'}}</a>
+                                    <a class="btn badge-info" href="/admin/tag_group/create">{{trans('default.tag_control.tag_insert') ?? '新增標籤'}}</a>
                                 </div>
                             @endif
                         </div>
@@ -35,7 +35,11 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.tag_group_control.tag_group_name') ?? '標籤群組名稱'}}
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.tag_group_control.tag_group_hide') ?? '是否隱藏'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
+                                            aria-label="CSS grade: activate to sort column ascending">{{trans('default.action') ?? '動作'}}
                                         </th>
                                     </tr>
                                     </thead>
@@ -45,7 +49,14 @@
                                             <td class="sorting_1 dtr-control">{{ $model->id }}</td>
                                             <td class="sorting_1 dtr-control">{{ $model->user->name }}</td>
                                             <td>{{ $model->name }}</td>
-                                            <td>{{ $model->group_name }}</td>
+                                            <td>{{ $model->is_hide == 0 ? trans('default.tag_group_control.not_hide') : trans('default.tag_group_control.hide')}}</td>
+                                            <td>
+                                            @if(authPermission('tagGroup-edit'))
+                                                <div class="row mb-1">
+                                                <a href="/admin/tag_group/edit?id={{$model->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
+                                                </div>
+                                            @endif
+                                            </td>
                                         </tr>
                                     @endforeach
                                     </tbody>
@@ -54,7 +65,8 @@
                                         <th rowspan="1" colspan="1">{{trans('default.id') ?? '序號'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.user_name') ?? '使用者名稱'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.tag_control.tag_name') ?? '標籤名稱'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.tag_group_control.tag_group_name') ?? '標籤群組名稱'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.tag_group_control.tag_group_hide') ?? '是否隱藏'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>
                                     </tfoot>
                                 </table>

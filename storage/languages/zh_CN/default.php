@@ -155,7 +155,8 @@ return [
         'actor' => '演員管理',
         'product' => '商品管理',
         'member' => '會員管理',
-        'classification' => '演員分類管理'
+        'classification' => '演員分類管理',
+        'tagGroup' => '標籤群組管理'
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -309,6 +310,17 @@ return [
         'classification_name_def' => '請輸入分類名稱',
         'classification_sort_def' => '請輸入排序號碼',
         'classification_edit' => '編輯分類',
+    ],
+    // -------------------------------------------------------------------
+    // TagGroupController
+    'tag_group_control' => [
+        'tag_group_control' => '標籤群組管理',
+        'tag_group_hide' => '是否隱藏',
+        'tag_group_insert' => '新增標籤群組',
+        'tag_group_edit' => '編輯標籤群組',
+        'hide' => '隱藏',
+        'not_hide' => '顯示',
+        'tag_group_name' => '標籤群組名稱',
     ],
     // -------------------------------------------------------------------
 ];

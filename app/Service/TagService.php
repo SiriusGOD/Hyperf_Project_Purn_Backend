@@ -14,6 +14,7 @@ namespace App\Service;
 use App\Model\MemberTag;
 use App\Model\Tag;
 use App\Model\TagCorrespond;
+use App\Model\TagHasGroup;
 use Hyperf\Database\Model\Collection;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
@@ -34,12 +35,17 @@ class TagService
         return Tag::all();
     }
 
-    public function createTag(string $name, int $userId): void
+    public function createTag(string $name, int $userId, array $groups): void
     {
         $model = new Tag();
         $model->name = $name;
         $model->user_id = $userId;
         $model->save();
+
+        if(count($groups) > 0){
+            $id = $model->id;
+            $this -> createTagGroupRelationship($groups, $id);
+        }
     }
 
     // 影片TAG關聯
@@ -129,5 +135,21 @@ class TagService
         }
 
         return $result;
+    }
+
+    // 新增或更新標籤群組關係
+    public function createTagGroupRelationship(array $groups, int $tag_id)
+    {
+        TagHasGroup::where('tag_id', $tag_id)->delete();
+        foreach ($groups as $key => $value) {
+            $model = TagHasGroup::where('tag_group_id', $value)
+                ->where('tag_id', $tag_id);
+            if (! $model->exists()) {
+                $model = new TagHasGroup();
+                $model->tag_id = $tag_id;
+                $model->tag_group_id = $value;
+                $model->save();
+            }
+        }
     }
 }
