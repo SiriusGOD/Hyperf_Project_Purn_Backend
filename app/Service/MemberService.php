@@ -40,7 +40,7 @@ class MemberService
 
     public function apiCheckUser(array $userInfo)
     {
-        $user = $this->getUserFromEmailOrUuid($userInfo['email'], $userInfo['uuid']);
+        $user = $this->getUserFromEmailOrUuid($userInfo['email'], $userInfo['account']);
 
         if (! $user) {
             return false;
@@ -56,7 +56,7 @@ class MemberService
     {
         $name = $data['name'];
         if(empty($name)){
-            $name = Member::VISITOR_NAME. substr(hash('sha256', $data['uuid'], false), 0, 10);
+            $name = Member::VISITOR_NAME. substr(hash('sha256', $data['account'], false), 0, 10);
         }
         $model = new Member();
         $model->name = $name;
@@ -77,7 +77,7 @@ class MemberService
         // $model->phone = $data['phone'];
         $model->status = Member::STATUS['VISITORS'];
         $model->role_id = Role::API_DEFAULT_USER_ROLE_ID;
-        $model->uuid = $data['uuid'];
+        $model->account = $data['account'];
         $model->save();
 
         return $model;
@@ -153,10 +153,9 @@ class MemberService
             $model->phone = $data['phone'];
         }
 
-        if (! empty($data['uuid'])) {
-            $model->uuid = $data['uuid'];
+        if (! empty($data['account'])) {
+            $model->account = $data['account'];
         }
-
         $model->save();
     }
 
@@ -223,7 +222,7 @@ class MemberService
             $user = Member::where('email', $email)->first();
         }
         if(empty($user)) {
-            $user = Member::where('uuid', $uuid)->first();
+            $user = Member::where('account', $uuid)->first();
         }
 
         if (empty($user)) {

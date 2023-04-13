@@ -36,7 +36,7 @@ class MemberRegisterRequest extends FormRequest
             'age' => 'numeric|between:18,130',
             'phone' => 'numeric',
             'address' => 'string',
-            'uuid' => 'required|string|unique:members',
+            'account' => 'required|string|unique:members',
         ];
     }
 }

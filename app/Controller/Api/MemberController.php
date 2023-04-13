@@ -46,14 +46,14 @@ class MemberController extends AbstractController
         $user = $service->apiCheckUser([
             'email' => $request->input('email'),
             'password' => $request->input('password'),
-            'uuid' => $request->input('uuid'),
+            'account' => $request->input('account'),
         ]);
 
         if (empty($user)) {
             return $this->error(trans('validation.authorize'), 401);
         }
 
-        if (! $service->checkAndSaveDevice($user->id, $request->input('uuid'))) {
+        if (! $service->checkAndSaveDevice($user->id, $request->input('device_id'))) {
             return $this->error(trans('validation.authorize'), 401);
         }
 
@@ -81,7 +81,7 @@ class MemberController extends AbstractController
             'avatar' => $path,
             'email' => $request->input('email', ''),
             'phone' => $request->input('phone', ''),
-            'uuid' => $request->input('uuid', null),
+            'account' => $request->input('account', null),
         ]);
 
         $token = auth()->login($user);
@@ -142,7 +142,7 @@ class MemberController extends AbstractController
             'avatar' => $path,
             'email' => $request->input('email'),
             'phone' => $request->input('phone'),
-            'uuid' => $request->input('uuid'),
+            'account' => $request->input('account'),
         ]);
 
         return $this->success();

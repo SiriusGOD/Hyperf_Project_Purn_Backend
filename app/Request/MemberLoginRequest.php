@@ -30,8 +30,9 @@ class MemberLoginRequest extends FormRequest
     {
         return [
             'email' => 'string',
-            'uuid' => 'required|string',
+            'device_id' => 'required|string',
             'password' => 'required|string',
+            'account' => 'string'
         ];
     }
 }
