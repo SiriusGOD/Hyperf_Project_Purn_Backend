@@ -194,6 +194,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('announcement-index'))
+                    <li class="nav-item">
+                        <a href="/admin/announcement/index" class="nav-link {{$announcement_active ?? ''}}">
+                            <i class="nav-icon fas fa-bullhorn"></i>
+                            <p>
+                                {{trans('default.leftbox.announcement') ?? '公告管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

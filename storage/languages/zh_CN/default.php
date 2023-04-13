@@ -155,7 +155,8 @@ return [
         'actor' => '演員管理',
         'product' => '商品管理',
         'member' => '會員管理',
-        'classification' => '演員分類管理'
+        'classification' => '演員分類管理',
+        'announcement' => '公告管理'
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -234,6 +235,23 @@ return [
         'tag_control' => '標籤管理',
         'tag_insert' => '新增標籤',
         'tag_name' => '標籤名稱',
+    ],
+    // -------------------------------------------------------------------
+    // -------------------------------------------------------------------
+    // TagController
+    'announcement_control' => [
+        'announcement_control' => '公告管理',
+        'announcement_insert' => '新增公告',
+        'announcement_update' => '更新公告',
+        'announcement_title' => '公告標題',
+        'announcement_content' => '公告內容',
+        'announcement_start_time' => '公告上架時間',
+        'announcement_end_time' => '公告下架時間',
+        'announcement_status' => '公告狀態',
+        'announcement_status_type' => [
+            0 => '未啟用',
+            1 => '啟用',
+        ],
     ],
     // -------------------------------------------------------------------
     // ImageController

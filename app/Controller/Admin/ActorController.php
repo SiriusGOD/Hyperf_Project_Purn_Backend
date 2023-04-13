@@ -12,12 +12,12 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
-use Carbon\Carbon;
-use Hyperf\DbConnection\Db;
 use App\Model\Actor;
 use App\Model\ActorHasClassification;
 use App\Request\ActorRequest;
 use App\Service\ActorService;
+use Carbon\Carbon;
+use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -50,11 +50,11 @@ class ActorController extends AbstractController
         // 顯示幾筆
         $step = Actor::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = Actor::leftjoin('actor_has_classifications', 'actor_has_classifications.actor_id','actors.id')
-                ->leftjoin('actor_classifications', 'actor_classifications.id', 'actor_has_classifications.actor_classifications_id')
-                ->select('actors.*', Db::raw("GROUP_CONCAT(actor_classifications.name SEPARATOR ' , ') as classification "))
-                ->groupBy('actors.id')
-                ->offset(($page - 1) * $step)->limit($step);
+        $query = Actor::leftjoin('actor_has_classifications', 'actor_has_classifications.actor_id', 'actors.id')
+            ->leftjoin('actor_classifications', 'actor_classifications.id', 'actor_has_classifications.actor_classifications_id')
+            ->select('actors.*', Db::raw("GROUP_CONCAT(actor_classifications.name SEPARATOR ' , ') as classification "))
+            ->groupBy('actors.id')
+            ->offset(($page - 1) * $step)->limit($step);
         $actors = $query->get();
         $query = Actor::select('*');
         $total = $query->count();

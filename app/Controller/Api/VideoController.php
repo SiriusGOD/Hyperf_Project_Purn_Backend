@@ -48,20 +48,21 @@ class VideoController extends AbstractController
         return $this->success($data);
     }
 
-    //影片兌換
+    // 影片兌換
     #[RequestMapping(methods: ['POST'], path: 'videoRedeem')]
     public function videoRedeem(RequestInterface $request, VideoService $videoService)
     {
-        $videoId = $request->input("video_id");
-        $code = $request->input("redeem_code");
+        $videoId = $request->input('video_id');
+        $code = $request->input('redeem_code');
         $userId = auth('jwt')->user()->getId();
-        if(!$userId){
-          return $this->error(Apicode::USER_NOT_FOUND_MSG, Apicode::USER_NOT_FOUND);
+        if (! $userId) {
+            return $this->error(Apicode::USER_NOT_FOUND_MSG, Apicode::USER_NOT_FOUND);
         }
-        $videoService->redeemVideo($videoId,$userId ,$code);
+        $videoService->redeemVideo($videoId, $userId, $code);
         return $this->success([]);
     }
-    //儲存影片
+
+    // 儲存影片
     #[RequestMapping(methods: ['POST'], path: 'stageVideo')]
     public function stageVideo(RequestInterface $request, VideoService $videoService)
     {

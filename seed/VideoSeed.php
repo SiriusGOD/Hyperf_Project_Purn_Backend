@@ -80,7 +80,8 @@ class VideoSeed implements BaseInterface
                   $data["id"] = null; 
                   $data["name"] = $str; 
                   $data["user_id"] = 1; 
-                  $data["sex"] = 1; 
+                  $data["sex"] = 1;
+                  $data['image_url'] = '';
                   $actor = make(ActorService::class)->storeActor($data); 
                   make(ActorService::class)->createActorRelationship("video",$video->id ,$actor->id );
                 }

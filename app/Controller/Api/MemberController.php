@@ -81,7 +81,7 @@ class MemberController extends AbstractController
             'avatar' => $path,
             'email' => $request->input('email', ''),
             'phone' => $request->input('phone', ''),
-            'uuid' => $request->input('uuid', null),
+            'uuid' => $request->input('uuid', ''),
         ]);
 
         $token = auth()->login($user);
