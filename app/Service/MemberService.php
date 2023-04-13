@@ -67,8 +67,14 @@ class MemberService
         if (! empty($data['avatar'])) {
             $model->avatar = $data['avatar'];
         }
-        $model->email = $data['email'];
-        $model->phone = $data['phone'];
+        if (! empty($data['email'])) {
+            $model->email = $data['email'];
+        }
+        if (! empty($data['phone'])) {
+            $model->phone = $data['phone'];
+        }
+        // $model->email = $data['email'];
+        // $model->phone = $data['phone'];
         $model->status = Member::STATUS['VISITORS'];
         $model->role_id = Role::API_DEFAULT_USER_ROLE_ID;
         $model->uuid = $data['uuid'];
@@ -213,8 +219,10 @@ class MemberService
 
     public function getUserFromEmailOrUuid(?string $email, ?string $uuid)
     {
-        $user = Member::where('email', $email)->first();
-        if (empty($user)) {
+        if(!empty($email)){
+            $user = Member::where('email', $email)->first();
+        }
+        if(empty($user)) {
             $user = Member::where('uuid', $uuid)->first();
         }
 
