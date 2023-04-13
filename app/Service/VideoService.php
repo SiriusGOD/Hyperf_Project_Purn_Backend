@@ -34,8 +34,10 @@ class VideoService
     protected Redis $redis;
 
     protected $logger;
-    protected $memberHasVideo; 
-    protected $model; 
+
+    protected $memberHasVideo;
+
+    protected $model;
 
     public function __construct(Video $video, Redis $redis, LoggerFactory $loggerFactory, MemberHasVideo $memberHasVideo)
     {
@@ -81,14 +83,14 @@ class VideoService
     // 取得影片
     public function find(int $id)
     {
-        return $this->model->select('id',"coins", 'title', 'm3u8', 'cover_thumb', 'tags', 'actors')
+        return $this->model->select('id', 'coins', 'title', 'm3u8', 'cover_thumb', 'tags', 'actors')
             ->where('release_time', '>=', Carbon::now()->toDateTimeString())
             ->where('id', $id)
             ->first();
     }
 
     // 影片列表
-    public function getVideos(?array $tagIds, int $page=0, int $status=9): Collection
+    public function getVideos(?array $tagIds, int $page = 0, int $status = 9): Collection
     {
         $videoIds = [];
         $query = $this->model;
@@ -102,14 +104,15 @@ class VideoService
         //      'tags',
         //  ]);
         // }
-        $query = $query->where('release_time', '<=', Carbon::now()->toDateTimeString());
-        if($status!=9){
-            $query->where('status',$status);
+        $query = $query->where('release_time', '>=', Carbon::now()->toDateTimeString());
+        if ($status != 9) {
+            $query->where('status', $status);
         }
         $query = $query->offset(Video::PAGE_PER * $page)->limit(Video::PAGE_PER);
         if (! empty($videoIds)) {
             $query = $query->whereIn('id', $videoIds);
         }
+
         return $query->get();
     }
 

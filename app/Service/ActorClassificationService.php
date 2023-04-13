@@ -12,10 +12,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\ActorClassification;
-use App\Model\Actor;
 use App\Model\ActorCorrespond;
-use App\Model\ActorHasClassification;
-use Carbon\Carbon;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
 
@@ -75,7 +72,7 @@ class ActorClassificationService
     public function getListByClassification(int $type_id)
     {
         $res_arr = [];
-        if(empty($type_id)){
+        if (empty($type_id)) {
             $type_arr = $this->getClassification();
             // 撈取每個分類總影片點擊率前四
             foreach ($type_arr as $key => $value) {
@@ -84,43 +81,43 @@ class ActorClassificationService
                     $join->on('actor_corresponds.correspond_id', '=', 'videos.id')
                         ->where('actor_corresponds.correspond_type', '=', 'video');
                 })
-                ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
-                ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
-                ->select('actors.id', 'actors.sex', 'actors.name', 'actors.avatar', DB::raw('sum(videos.rating) as video_click_num'))
-                ->where('actor_has_classifications.actor_classifications_id', $classify_id)
-                ->groupBy('actor_corresponds.actor_id')
-                ->orderBy('video_click_num', 'desc')
-                ->limit(self::GET_ACTOR_COUNT)
-                ->get()->toArray();
-                if(count($query) > 0){
-                    array_push($res_arr, array(
+                    ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
+                    ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
+                    ->select('actors.id', 'actors.sex', 'actors.name', 'actors.avatar', DB::raw('sum(videos.rating) as video_click_num'))
+                    ->where('actor_has_classifications.actor_classifications_id', $classify_id)
+                    ->groupBy('actor_corresponds.actor_id')
+                    ->orderBy('video_click_num', 'desc')
+                    ->limit(self::GET_ACTOR_COUNT)
+                    ->get()->toArray();
+                if (count($query) > 0) {
+                    array_push($res_arr, [
                         'type_id' => $classify_id,
                         'type_name' => $value['name'],
-                        'type_data' => $query
-                    ));
+                        'type_data' => $query,
+                    ]);
                 }
             }
-        }else{
+        } else {
             $type = ActorClassification::find($type_id)->toArray();
             $query = ActorCorrespond::join('videos', function ($join) {
                 $join->on('actor_corresponds.correspond_id', '=', 'videos.id')
                     ->where('actor_corresponds.correspond_type', '=', 'video');
             })
-            ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
-            ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
-            ->select('actors.id', 'actors.sex', 'actors.name', DB::raw('sum(videos.rating) as video_click_num'))
-            ->where('actor_has_classifications.actor_classifications_id', $type_id)
-            ->groupBy('actor_corresponds.actor_id')
-            ->orderBy('video_click_num', 'desc')
-            ->get()->toArray();
-            if(count($query) > 0){
-                array_push($res_arr, array(
+                ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
+                ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
+                ->select('actors.id', 'actors.sex', 'actors.name', DB::raw('sum(videos.rating) as video_click_num'))
+                ->where('actor_has_classifications.actor_classifications_id', $type_id)
+                ->groupBy('actor_corresponds.actor_id')
+                ->orderBy('video_click_num', 'desc')
+                ->get()->toArray();
+            if (count($query) > 0) {
+                array_push($res_arr, [
                     'type_id' => $type_id,
                     'type_name' => $type['name'],
-                    'type_data' => $query
-                ));
+                    'type_data' => $query,
+                ]);
             }
-        } 
+        }
         return $res_arr;
     }
 }

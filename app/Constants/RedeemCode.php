@@ -15,5 +15,4 @@ class RedeemCode
 {
     // type 1 长横幅 2 短 竖图
     public const CATEGORY = [1 => 'VIP天數', 2 => '鑽石點數', 3 => '免費觀看次數'];
-
 }

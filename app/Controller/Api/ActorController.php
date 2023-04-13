@@ -13,8 +13,8 @@ namespace App\Controller\Api;
 
 use App\Constants\Constants;
 use App\Controller\AbstractController;
-use App\Service\ActorService;
 use App\Service\ActorClassificationService;
+use App\Service\ActorService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -52,7 +52,7 @@ class ActorController extends AbstractController
     #[RequestMapping(methods: ['GET'], path: 'getListByClassification')]
     public function getListByClassification(RequestInterface $request, ActorClassificationService $service)
     {
-        $type_id = (int)$request->input('type_id', 0);
+        $type_id = (int) $request->input('type_id', 0);
         $result = $service->getListByClassification($type_id);
         return $this->success(['models' => $result]);
     }

@@ -14,9 +14,8 @@ namespace App\Service;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\ActorHasClassification;
-use Hyperf\Database\Model\Collection;
-use Hyperf\Redis\Redis;
 use Hyperf\DbConnection\Db;
+use Hyperf\Redis\Redis;
 
 class ActorService
 {
@@ -62,24 +61,27 @@ class ActorService
         foreach ($query as $key => $value) {
             $actor_id = $value['id'];
             // 獲取該演員參與的影片數與圖片數
-            $count_arr = ActorCorrespond::select('correspond_type', Db::raw("count(*) as count" ))
-                    ->where('actor_id', $actor_id)
-                    ->groupBy(['actor_id', 'correspond_type'])
-                    ->get()->toArray();
+            $count_arr = ActorCorrespond::select('correspond_type', Db::raw('count(*) as count'))
+                ->where('actor_id', $actor_id)
+                ->groupBy(['actor_id', 'correspond_type'])
+                ->get()->toArray();
             foreach ($count_arr as $key2 => $value2) {
                 switch ($value2['correspond_type']) {
                     case 'video':
                         $query[$key]['video_count'] = $value2['count'];
                         break;
-
                     case 'image':
                         $query[$key]['image_count'] = $value2['count'];
                         break;
                 }
             }
 
-            if(empty($query[$key]['video_count']))$query[$key]['video_count'] = 0;
-            if(empty($query[$key]['image_count']))$query[$key]['image_count'] = 0;
+            if (empty($query[$key]['video_count'])) {
+                $query[$key]['video_count'] = 0;
+            }
+            if (empty($query[$key]['image_count'])) {
+                $query[$key]['image_count'] = 0;
+            }
         }
         return $query;
     }
@@ -130,7 +132,7 @@ class ActorService
         $model->user_id = $data['user_id'];
         $model->name = $data['name'];
         $model->sex = $data['sex'];
-        $model->avatar = isset($data['image_url']) ? $data['image_url'] : "";
+        $model->avatar = $data['image_url'] ?? '';
         $model->save();
 
         // 新增或更新演員分類關係

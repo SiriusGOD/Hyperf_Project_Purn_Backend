@@ -1,22 +1,29 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
-use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\HttpServer\Contract\ResponseInterface;
+use App\Model\ActorClassification;
+use App\Request\ActorClassificationRequest;
+use App\Service\ActorClassificationService;
+use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
-use Hyperf\View\RenderInterface;
-use Hyperf\Validation\Contract\ValidatorFactoryInterface;
-use Hyperf\Di\Annotation\Inject;
-use App\Request\ActorClassificationRequest;
-use App\Model\ActorClassification;
-use App\Service\ActorClassificationService;
+use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Paginator\Paginator;
+use Hyperf\Validation\Contract\ValidatorFactoryInterface;
+use Hyperf\View\RenderInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
 #[Controller]
@@ -74,7 +81,7 @@ class ActorClassificationController extends AbstractController
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = auth('session')->user()->getId();
         $data['name'] = $request->input('name');
-        $data['sort'] = (int)$request->input('sort');
+        $data['sort'] = (int) $request->input('sort');
         $service->storeActorClassification($data);
         return $response->redirect('/admin/actor_classification/index');
     }
