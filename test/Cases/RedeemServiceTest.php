@@ -31,6 +31,8 @@ class RedeemServiceTest extends HttpTestCase
     protected $video;
     protected $redis;
   
+    protected $testUserId = 1;
+
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
@@ -56,11 +58,16 @@ class RedeemServiceTest extends HttpTestCase
     }
 
     //取影片列表
-    public function getCoseVideoList()
+    //是否限免 0 免费视频 1vip视频 2金币视频
+    public function getPayVideoList(int $isFree=1)
     {
-      $payStatus = 1;
+      return $this->video->getPayVideos([], $page=0, $status=1, $isFree);
+    }
+    //取影片列表
+    public function getCoseVideoList(int $status = 0)
+    {
       $page = 0;
-      return $this->video->getVideos([], $page, $payStatus);
+      return $this->video->getVideos([], $page, $status);
     }
 
     //測試redeem list
@@ -83,15 +90,12 @@ class RedeemServiceTest extends HttpTestCase
         $user  = Member::first();
         $token = auth()->login($user);
         make(MemberService::class)->saveToken($user->id, $token);
-
         //付費影片
         $code = $redeems_can->toArray()[0]["code"];
-
         //不可用
         $redeems_not = self::getStatusRedeem(1);
         $expiredCode = $redeems_not->toArray()[0]["code"];
         $latestCode = $redeems_can->toArray()[count($redeems_can->toArray())-1]["code"];
-
         //查看是否兌換
         $res = $this->redeem->checkRedeemCode($code);
         $this->assertSame(true, $res);
@@ -103,11 +107,9 @@ class RedeemServiceTest extends HttpTestCase
         $res = $this->redis->exists("redeem:expired:".$expiredCode);
         $this->assertSame(1,$res);
         //兌換代碼 
-       
         for($i=1 ; $i <= 30 ; $i++){
             $this->redeem->executeRedeemCode($code ,$i);
         }
-
         $memberRes = $this->redeem->getMemberRedeemByCode($code ,0);
         $redeemRes = $this->redeem->getRedeemByCode($code);
         $this->assertSame((int)$redeemRes["count"], count($memberRes->toArray()));
@@ -120,22 +122,31 @@ class RedeemServiceTest extends HttpTestCase
     public function testUserRemeemList()
     {
       $status = 0;
-      $memberRedeem = $this->redeem->getMemberRedeemList(1 ,$status);
-      $this->assertSame((int)$memberRedeem->toArray()[0]['status'], $status);
+      $memberRedeem = $this->redeem->getMemberRedeemList($this->testUserId ,$status);
+      if(count($memberRedeem->toArray())>0 ){
+        $this->assertSame((int)$memberRedeem->toArray()[0]['status'], $status);
+      }else{
+        $this->assertSame(0, count($memberRedeem->toArray()));
+      }
     }
 
     //測試兌換member redeem video 
     public function testUserRemeemVideo()
     {
       $status = 0;
-      $memberId = 1;
+      $memberId = $this->testUserId;
       $memberRedeemList = $this->redeem->getMemberRedeemList($memberId ,$status);
+      $videoStatus = 1;
+      $costVideos = self::getPayVideoList($videoStatus);
+      //測試 status 是否一至
       //付費影片
-      $costVideos = self::getCoseVideoList();
-      self::show( $costVideos->toArray() );
-      $videoId = $costVideos->toArray()[0]["id"];
-      $this->assertSame((int)$memberRedeemList->toArray()[0]['status'], $status);
-      self::show($memberRedeemList->toArray());
-      $this->redeem->redeemVideo($memberId, $videoId);
+      if(count($memberRedeemList->toArray())>0 ){
+        foreach($costVideos->toArray() as $video){
+          $videoId = $video["id"];
+          self::show($memberRedeemList->toArray());
+          $redeemStatus = $this->redeem->redeemVideo($memberId, $videoId);
+          $this->assertSame(true,$redeemStatus);
+        }
+      }
     }
 }

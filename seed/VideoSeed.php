@@ -48,7 +48,6 @@ class VideoSeed implements BaseInterface
             'rating'           => '12',
             'refresh_at'       => time(),
             'created_at'       => date("Y-m-d H:i:s"),
-            'is_free'          => rand(0,2),
             'likes'             => $like,
             'comment'          => 0,
             'status'           => 1,
@@ -66,6 +65,8 @@ class VideoSeed implements BaseInterface
             $insertData['tags'] = $rand->getRandTagActor(5,"TAG");
             $insertData['actors'] = $rand->getRandTagActor(5,"ACTOR");
             $insertData['title'] = $rand->getRandTitle();
+            $insertData['is_free'] = $i%3;
+
             $video = make(VideoService::class)->storeVideo($insertData);
             if($insertData['tags']){
                 $exps = explode(",",$insertData['tags']);
@@ -80,8 +81,7 @@ class VideoSeed implements BaseInterface
                   $data["id"] = null; 
                   $data["name"] = $str; 
                   $data["user_id"] = 1; 
-                  $data["sex"] = 1;
-                  $data['image_url'] = '';
+                  $data["sex"] = 1; 
                   $actor = make(ActorService::class)->storeActor($data); 
                   make(ActorService::class)->createActorRelationship("video",$video->id ,$actor->id );
                 }
