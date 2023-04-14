@@ -31,7 +31,7 @@ class MemberLoginRequest extends FormRequest
         return [
             'email' => 'string',
             'device_id' => 'required|string',
-            'password' => 'required|string',
+            'password' => 'string',
             'account' => 'string'
         ];
     }

@@ -46,7 +46,7 @@ class MemberController extends AbstractController
         $user = $service->apiCheckUser([
             'email' => $request->input('email'),
             'password' => $request->input('password'),
-            'account' => $request->input('account')
+            'account' => $request->input('account') ?? $request->input('device_id')
         ]);
 
         if (empty($user)) {
@@ -112,6 +112,7 @@ class MemberController extends AbstractController
         return $this->success();
     }
 
+    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'tag')]
     public function addMemberTag(AddMemberTagRequest $request)
     {
@@ -138,6 +139,7 @@ class MemberController extends AbstractController
         return $this->success();
     }
 
+    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['PUT'], path: 'update')]
     public function update(MemberApiUpdateRequest $request, MemberService $service)
     {
@@ -153,7 +155,7 @@ class MemberController extends AbstractController
             'sex' => $request->input('sex'),
             'age' => $request->input('age'),
             'avatar' => $path,
-            'email' => $request->input('email'),
+            // 'email' => $request->input('email'),
             'phone' => $request->input('phone'),
             'account' => $request->input('account'),
         ]);
@@ -161,6 +163,7 @@ class MemberController extends AbstractController
         return $this->success();
     }
 
+    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['GET'], path: 'detail')]
     public function detail(MemberDetailRequest $request)
     {
@@ -183,7 +186,7 @@ class MemberController extends AbstractController
         $code = $service->getVerificationCode($member->id);
         $driver = $factory->get('default');
         $content = trans('email.verification.content', ['code' => $code]);
-        $driver->push(new EmailVerificationJob($member->email, $content));
+        $driver->push(new EmailVerificationJob($request->input('email'), $content));
 
         return $this->success();
     }
@@ -200,7 +203,7 @@ class MemberController extends AbstractController
             ->first();
 
         if (! empty($model)) {
-            $member->status = Member::STATUS['NORMAL'];
+            $member->status = Member::STATUS['VERIFIED'];
             $member->save();
             $model->delete();
             return $this->success();
