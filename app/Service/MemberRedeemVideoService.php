@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\MemberRedeemVideo;
-use App\Model\MemberRedeem;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
@@ -25,17 +24,25 @@ class MemberRedeemVideoService extends BaseService
 
     protected $redis;
     protected $logger;
-    protected $memberRedeem;
+    protected $memberRedeemVideo;
     protected $videoService;
 
     public function __construct(
         Redis $redis, 
         LoggerFactory $loggerFactory, 
-        MemberRedeem $memberRedeem
+        MemberRedeemVideo $memberRedeemvideo
     )
     {
         $this->logger = $loggerFactory->get('reply');
         $this->redis = $redis;
-        $this->memberRedeem = $memberRedeem;
+        $this->memberRedeemVideo = $memberRedeemvideo;
     }
+
+    public function checkMemeberUsed(int $memberId,int $videoId)
+    {
+        return $this->memberRedeemVideo
+                    ->where('video_id',$videoId)
+                    ->where('member_id', $memberId)->exists();
+    }
+
 }

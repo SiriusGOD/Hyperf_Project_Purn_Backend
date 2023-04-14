@@ -14,9 +14,12 @@ use App\Model\Member;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
 use App\Service\RedeemService;
+use App\Service\MemberRedeemService;
 use App\Service\MemberService;
 use App\Service\VideoService;
 use Hyperf\Redis\Redis;
+use App\Constants\RedeemCode;
+use App\Constants\VideoCode;
 /**
  * @internal
  * @coversNothing
@@ -28,6 +31,7 @@ class RedeemServiceTest extends HttpTestCase
      */
     protected $client;
     protected $redeem;
+    protected $memberRedeem;
     protected $video;
     protected $redis;
   
@@ -38,6 +42,7 @@ class RedeemServiceTest extends HttpTestCase
         parent::__construct($name, $data, $dataName);
         $this->client = make(Client::class);
         $this->redeem = make(RedeemService::class);
+        $this->memberRedeem = make(MemberRedeemService::class);
         $this->video = make(VideoService::class);
         $this->redis = make(Redis::class);
     }
@@ -107,8 +112,11 @@ class RedeemServiceTest extends HttpTestCase
         $res = $this->redis->exists("redeem:expired:".$expiredCode);
         $this->assertSame(1,$res);
         //兌換代碼 
-        for($i=1 ; $i <= 30 ; $i++){
-            $this->redeem->executeRedeemCode($code ,$i);
+        foreach($redeems_can->toArray() as $rede){
+          $this->redeem->executeRedeemCode($rede["code"] ,$this->testUserId);
+          for($i=rand(10,20) ; $i <= 90 ; $i++){
+              $this->redeem->executeRedeemCode($rede["code"] ,$i);
+          }
         }
         $memberRes = $this->redeem->getMemberRedeemByCode($code ,0);
         $redeemRes = $this->redeem->getRedeemByCode($code);
@@ -130,29 +138,52 @@ class RedeemServiceTest extends HttpTestCase
       }
     }
 
-    //測試兌換member redeem video 
+    //測試 兌換vip diamond free影片
     public function testUserRemeemVideo()
     {
-      $status = 0;
       $memberId = $this->testUserId;
-      $memberRedeemList = $this->redeem->getMemberRedeemList($memberId ,$status);
+      self::userRemeemVideo($memberId ,VideoCode::VIP);
+      self::userRemeemVideo($memberId ,VideoCode::DIAMOND);
+      self::userRemeemVideo($memberId ,VideoCode::FREE);
+    }
+
+    //測試只有單一兌換vip diamond free影片
+    public function testUserSingleRemeemVideo()
+    {
+      $redeemListVip = $this->memberRedeem->getMemberRedeemList(RedeemCode::VIP, 0 ,[1]);
+      $testMemberId = (int)$redeemListVip->toArray()[0]['member_id'];
+      self::userRemeemVideo($testMemberId ,VideoCode::VIP);
+
+      $redeemListVip = $this->memberRedeem->getMemberRedeemList(RedeemCode::DIAMOND, 0 ,[1]);
+      $testMemberId = (int)$redeemListVip->toArray()[0]['member_id'];
+      self::userRemeemVideo($testMemberId , VideoCode::DIAMOND);
+
+      $redeemListVip = $this->memberRedeem->getMemberRedeemList(RedeemCode::FREE, 0 ,[1]);
+      $testMemberId = (int)$redeemListVip->toArray()[0]['member_id'];
+      self::userRemeemVideo($testMemberId ,VideoCode::FREE);
+    }
+
+    //測試兌換member redeem video 
+    public function userRemeemVideo(int $memberId ,int $videoType)
+    {
+      //self::show([$memberId , $videoType]);
+      $successStatus = 0;
+      $memberRedeemList = $this->redeem->getMemberRedeemList($memberId ,$successStatus);
       $memberRedeemList = $memberRedeemList->toArray();
       $memberRedeemCate = array_column($memberRedeemList , 'redeem_category_id') ;
-      $videoStatusF = 1;
-      $tenCostVideos = self::getVideoList($videoStatusF);
-      $videoAry = $tenCostVideos->toArray();
-      $varye = array_column($videoAry , 'is_free') ;
+      $tenCostVideos = self::getPayVideoList($videoType);
       //付費影片
       if(count($memberRedeemList)>0){
-        foreach($tenCostVideos->toArray() as $video){
+        foreach($tenCostVideos->toArray() as $count => $video){
+          if($count==rand(1,9)){
             $videoId = $video["id"];
             $videoCate = $video["is_free"];
             if($this->redeem->canRedeemVideo($memberRedeemCate , $videoCate) ){
               $redeemStatus = $this->redeem->redeemVideo($memberId, $videoId);
-              //self::show($redeemStatus);
               //測試 status 是否一至
               $this->assertSame(true, $redeemStatus);
             }
+          }
         }
       }
     }
