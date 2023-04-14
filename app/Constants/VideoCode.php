@@ -13,9 +13,10 @@ namespace App\Constants;
 
 class VideoCode
 {
-
     public const VIP = 1;
+
     public const DIAMOND = 2;
+
     public const FREE = 0;
 
     // type 1 长横幅 2 短 竖图

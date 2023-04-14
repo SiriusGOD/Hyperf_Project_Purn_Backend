@@ -20,7 +20,6 @@ use App\Request\ImageApiSearchRequest;
 use App\Request\ImageApiSuggestRequest;
 use App\Service\ClickService;
 use App\Service\ImageGroupService;
-use App\Service\ImageService;
 use App\Service\SuggestService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
