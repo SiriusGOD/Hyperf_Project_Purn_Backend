@@ -25,7 +25,7 @@ use App\Request\AddMemberTagRequest;
 use App\Request\MemberDetailRequest;
 use App\Request\MemberLoginRequest;
 use App\Request\MemberRegisterRequest;
-use App\Request\MemberUpdateRequest;
+use App\Request\MemberApiUpdateRequest;
 use App\Request\RegisterVerificationRequest;
 use App\Request\ResetPasswordVerificationRequest;
 use App\Request\SendVerificationRequest;
@@ -46,7 +46,7 @@ class MemberController extends AbstractController
         $user = $service->apiCheckUser([
             'email' => $request->input('email'),
             'password' => $request->input('password'),
-            'account' => $request->input('account'),
+            'account' => $request->input('account')
         ]);
 
         if (empty($user)) {
@@ -58,6 +58,14 @@ class MemberController extends AbstractController
         }
 
         $token = auth()->login($user);
+        // 紀錄登陸ip 與 device
+        $base_service = di(\App\Service\BaseService::class);
+        $ip = $base_service->getIp($request->getHeaders(), $request->getServerParams());
+        $service->updateUser($user->id, [
+            'device' => $request->input('device'),
+            'last_ip' => $ip
+        ]);
+
         $service->saveToken($user->id, $token);
         return $this->success([
             'id' => $user->id,
@@ -73,6 +81,9 @@ class MemberController extends AbstractController
             $path = $service->moveUserAvatar($request->file('avatar'));
         }
 
+        $base_service = di(\App\Service\BaseService::class);
+        $ip = $base_service->getIp($request->getHeaders(), $request->getServerParams());
+
         $user = $service->apiRegisterUser([
             'name' => $request->input('name'),
             'password' => $request->input('password'),
@@ -82,6 +93,8 @@ class MemberController extends AbstractController
             'email' => $request->input('email', ''),
             'phone' => $request->input('phone', ''),
             'account' => $request->input('account', null),
+            'device' => $request->input('device', null),
+            'register_ip' => $ip
         ]);
 
         $token = auth()->login($user);
@@ -126,7 +139,7 @@ class MemberController extends AbstractController
     }
 
     #[RequestMapping(methods: ['PUT'], path: 'update')]
-    public function update(MemberUpdateRequest $request, MemberService $service)
+    public function update(MemberApiUpdateRequest $request, MemberService $service)
     {
         $userId = auth('jwt')->user()->getId();
         $path = '';
@@ -151,7 +164,8 @@ class MemberController extends AbstractController
     #[RequestMapping(methods: ['GET'], path: 'detail')]
     public function detail(MemberDetailRequest $request)
     {
-        $id = $request->input('id');
+        // $id = $request->input('id');
+        $id = auth('jwt')->user()->getId();
 
         return $this->success(Member::find($id)->toArray());
     }

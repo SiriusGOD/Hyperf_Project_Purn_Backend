@@ -13,7 +13,7 @@ namespace App\Request;
 
 use Hyperf\Validation\Rule;
 
-class MemberUpdateRequest extends AuthBaseRequest
+class MemberApiUpdateRequest extends AuthApiBaseRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -21,6 +21,9 @@ class MemberUpdateRequest extends AuthBaseRequest
     public function rules(): array
     {
         $id = 0;
+        if (auth('jwt')->check()) {
+            $id = auth('jwt')->user()->getId();
+        }
         if (! empty($this->input('id'))) {
             $id = $this->input('id');
         }
