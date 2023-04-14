@@ -26,7 +26,7 @@ class SendVerificationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'string',
+            'email' => 'require|string',
             'uuid' => 'string',
         ];
     }

@@ -76,7 +76,7 @@ class MemberService
         // $model->email = $data['email'];
         // $model->phone = $data['phone'];
         $model->status = Member::STATUS['VISITORS'];
-        $model->role_id = Role::API_DEFAULT_USER_ROLE_ID;
+        $model->buy_level_id = Role::API_DEFAULT_USER_ROLE_ID;
         $model->account = $data['account'];
         $model->device = $data['device'];
         $model->register_ip = $data['register_ip'];
@@ -157,6 +157,10 @@ class MemberService
 
         if (! empty($data['account'])) {
             $model->account = $data['account'];
+            // 遊客 -> 會員未驗證
+            if($model -> status == Member::STATUS['VISITORS']){
+                $model -> status = Member::STATUS['NOT_VERIFIED'];
+            }
         }
 
         if (! empty($data['device'])) {
@@ -232,9 +236,9 @@ class MemberService
 
     public function getUserFromEmailOrUuid(?string $email, ?string $uuid)
     {
-        if(!empty($email)){
-            $user = Member::where('email', $email)->first();
-        }
+        // if(!empty($email)){
+        //     $user = Member::where('email', $email)->first();
+        // }
         if(empty($user)) {
             $user = Member::where('account', $uuid)->first();
         }
