@@ -40,7 +40,7 @@ class MemberService
 
     public function apiCheckUser(array $userInfo)
     {
-        $user = $this->getUserFromEmailOrUuid($userInfo['email'], $userInfo['uuid']);
+        $user = $this->getUserFromEmailOrUuid($userInfo['email'], $userInfo['account']);
 
         if (! $user) {
             return false;
@@ -56,7 +56,7 @@ class MemberService
     {
         $name = $data['name'];
         if(empty($name)){
-            $name = Member::VISITOR_NAME. substr(hash('sha256', $data['uuid'], false), 0, 10);
+            $name = Member::VISITOR_NAME. substr(hash('sha256', $data['account'], false), 0, 10);
         }
         $model = new Member();
         $model->name = $name;
@@ -77,7 +77,9 @@ class MemberService
         // $model->phone = $data['phone'];
         $model->status = Member::STATUS['VISITORS'];
         $model->role_id = Role::API_DEFAULT_USER_ROLE_ID;
-        $model->uuid = $data['uuid'];
+        $model->account = $data['account'];
+        $model->device = $data['device'];
+        $model->register_ip = $data['register_ip'];
         $model->save();
 
         return $model;
@@ -153,17 +155,25 @@ class MemberService
             $model->phone = $data['phone'];
         }
 
-        if (! empty($data['uuid'])) {
-            $model->uuid = $data['uuid'];
+        if (! empty($data['account'])) {
+            $model->account = $data['account'];
         }
 
+        if (! empty($data['device'])) {
+            $model->device = $data['device'];
+        }
+
+        if (! empty($data['last_ip'])) {
+            $model->last_ip = $data['last_ip'];
+        }
         $model->save();
     }
 
     // 使用者列表
     public function getList($page, $pagePer)
     {
-        return Member::select()->where('status', 1)->offset(($page - 1) * $pagePer)->limit($pagePer)->get();
+        // 撈取 遊客 註冊未驗證 註冊已驗證 會員
+        return Member::select()->where('status', '<=', 2)->offset(($page - 1) * $pagePer)->limit($pagePer)->get();
     }
 
     // 使用者列表
@@ -175,8 +185,7 @@ class MemberService
     public function storeUser(array $data)
     {
         $model = new Member();
-
-        if (! empty($data['id']) and User::where('id', $data['id'])->exists()) {
+        if (! empty($data['id']) and Member::where('id', $data['id'])->exists()) {
             $model = Member::find($data['id']);
         }
 
@@ -189,8 +198,12 @@ class MemberService
         $model->sex = $data['sex'];
         $model->age = $data['age'];
         $model->avatar = $data['avatar'];
-        $model->email = $data['email'];
-        $model->phone = $data['phone'];
+        if (! empty($data['email'])) {
+            $model->email = $data['email'];
+        }
+        if (! empty($data['phone'])) {
+            $model->phone = $data['phone'];
+        }
         $model->status = $data['status'];
         $model->role_id = empty($model->role_id) ? Role::API_DEFAULT_USER_ROLE_ID : $model->role_id;
         $model->save();
@@ -223,7 +236,7 @@ class MemberService
             $user = Member::where('email', $email)->first();
         }
         if(empty($user)) {
-            $user = Member::where('uuid', $uuid)->first();
+            $user = Member::where('account', $uuid)->first();
         }
 
         if (empty($user)) {

@@ -35,7 +35,6 @@ class MemberDetailRequest extends FormRequest
         $roleIds[] = Role::API_DEFAULT_USER_ROLE_ID;
         return [
             'id' => [
-                'required',
                 'numeric',
                 Rule::exists('members')->whereIn('role_id', $roleIds)->where('status', Member::STATUS['NORMAL']),
             ],

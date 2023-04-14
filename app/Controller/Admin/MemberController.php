@@ -14,7 +14,7 @@ namespace App\Controller\Admin;
 use App\Controller\AbstractController;
 use App\Model\Member;
 use App\Model\User;
-use App\Request\UserUpdateRequest;
+use App\Request\MemberUpdateRequest;
 use App\Service\MemberService;
 use App\Service\RoleService;
 use Hyperf\Di\Annotation\Inject;
@@ -57,7 +57,7 @@ class MemberController extends AbstractController
         $data['datas'] = $users;
         $data['page'] = $page;
         $data['step'] = User::PAGE_PER;
-        $path = '/admin/manager/index';
+        $path = '/admin/member/index';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . ($page - 1);
         $data['navbar'] = trans('default.member_control.member_control');
@@ -66,7 +66,7 @@ class MemberController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'store')]
-    public function store(UserUpdateRequest $request, ResponseInterface $response, MemberService $service): PsrResponseInterface
+    public function store(MemberUpdateRequest $request, ResponseInterface $response, MemberService $service): PsrResponseInterface
     {
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $path = '';
@@ -78,7 +78,7 @@ class MemberController extends AbstractController
         $data['sex'] = $request->input('sex');
         $data['age'] = $request->input('age');
         $data['email'] = $request->input('email');
-        $data['phone'] = $request->input('phone');
+        $data['phone'] = $request->input('phone', );
         $data['status'] = $request->input('status');
         $data['role_id'] = $request->input('role_id');
         $data['password'] = $request->input('password');
