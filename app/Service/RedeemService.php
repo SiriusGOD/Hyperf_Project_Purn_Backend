@@ -31,6 +31,7 @@ class RedeemService extends BaseService
     protected $redeem;
     protected $memberRedeem;
     protected $memberRedeemService;
+    protected $memberRedeemVideoService;
     protected $videoService;
 
   public function __construct(
@@ -39,6 +40,7 @@ class RedeemService extends BaseService
     Redeem $redeem, 
     MemberRedeem $memberRedeem, 
     MemberRedeemService $memberRedeemService,
+    MemberRedeemVideoService $memberRedeemVideoService,
     VideoService $videoService
     )
     {
@@ -47,6 +49,7 @@ class RedeemService extends BaseService
         $this->redeem = $redeem;
         $this->memberRedeem = $memberRedeem;
         $this->memberRedeemService = $memberRedeemService;
+        $this->memberRedeemVideoService = $memberRedeemVideoService;
         $this->videoService = $videoService;
     }
 
@@ -125,7 +128,11 @@ class RedeemService extends BaseService
         // is_free  是否限免 0 免费视频 1vip视频 2金币视频
         //VIP限免
         //self::updateMemberRedeemUsed($code, $memberId); 
-        return self::checkRedeemVideo($discount , $videoDetail);
+        $res=self::checkRedeemVideo($discount , $videoDetail);
+        if($res == false){
+          $res = $this->memberRedeemVideoService->checkMemeberUsed($memberId,  $videoId);
+        }
+        return $res;
     } 
     //判斷這個優惠跟此影片 是否可以觀看 
     public function canRedeemVideo(array $discountAry ,int $videoCate)
@@ -147,33 +154,24 @@ class RedeemService extends BaseService
     //check 使用者是否有兌換影片的權限 
     public function checkRedeemVideo(array $userDiscount ,array $videoDetail)
     {
-        $now = Carbon::now();
-        $canWatch = false;
         //是否限免 0 免费视频 1vip视频 2金币视频
         if(count($userDiscount)>0 ){
-          $memberRedeemCate = array_column($userDiscount , 'redeem_category_id') ;
           foreach($userDiscount as $discount){
             //1 => 'VIP天數'
             if((int)$discount['redeem_category_id'] == 1  && ((int)$videoDetail["is_free"] == 0 || (int)$videoDetail["is_free"] == 2)){
-                $canWatch = true;
-                $this->memberRedeemService->memberRedeemVideo($videoDetail["id"], $discount);
-                return $canWatch;
+                return $this->memberRedeemService->memberRedeemVideo($videoDetail["id"], $discount);
             }
             //2 => '鑽石點數'
             if((int)$discount['redeem_category_id'] == 2 ){
-              $canWatch = true;
-              $this->memberRedeemService->memberRedeemVideo($videoDetail["id"], $discount);
-              return $canWatch;
+              return $this->memberRedeemService->memberRedeemVideo($videoDetail["id"], $discount);
             }
             //3 => '免費觀看次數'
             if((int)$discount['redeem_category_id'] == 3  && ((int)$videoDetail["is_free"] == 0 )){
-              $canWatch = true;
-              $this->memberRedeemService->memberRedeemVideo($videoDetail["id"], $discount);
-              return $canWatch;
+              return $this->memberRedeemService->memberRedeemVideo($videoDetail["id"], $discount);
             }
           }
         }else{
-          return true;
+          return false;
         }
     }  
      

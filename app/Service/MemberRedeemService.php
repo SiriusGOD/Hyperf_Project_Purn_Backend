@@ -26,22 +26,41 @@ class MemberRedeemService extends BaseService
     protected $redis;
     protected $logger;
     protected $memberRedeem;
+    protected $memberRedeemVideo;
     protected $videoService;
 
     public function __construct(
       Redis $redis, 
       LoggerFactory $loggerFactory, 
+      MemberRedeemVideo $memberRedeemVideo,
       MemberRedeem $memberRedeem
     )
     {
         $this->logger = $loggerFactory->get('reply');
         $this->redis = $redis;
         $this->memberRedeem = $memberRedeem;
+        $this->memberRedeemVideo = $memberRedeemVideo;
     }
+    //使用者的優惠
+    public function getMemberRedeemList(int $cateId ,int $status,array $memberId)
+    {
+      return $this->memberRedeem->where("redeem_category_id",$cateId)
+                ->whereNotIn("member_id",$memberId)
+                ->where("status",$status)->get();
+    } 
 
+    //使用者的優惠是否有用過
+    public function checkIsRedeem(int $videoId, array $discount)
+    {
+      return $this->memberRedeemVideo->where("video_id",$videoId)
+                                ->where("redeem_category_id",$discount['redeem_category_id'])
+                                ->where("member_redeem_id",$discount['id'])->exists();
+    } 
     //使用者兌換卷更新使用次數 
     public function memberRedeemVideo(int $videoId, array $discount)
     {
+      if(!self::checkIsRedeem($videoId, $discount))
+      {
         Db::beginTransaction();
         try {
             $memberRedeemVideo = new MemberRedeemVideo();
@@ -71,10 +90,14 @@ class MemberRedeemService extends BaseService
             }
             $model->save();
             Db::commit();
+            return true;
         } catch (\Throwable $ex) {
             $this->logger->error("error:".__LINE__. json_encode($ex));
             Db::rollBack();
             return false;
         }
+      }else{
+            return true;
+      }
     } 
 }

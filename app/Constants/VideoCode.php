@@ -13,6 +13,11 @@ namespace App\Constants;
 
 class VideoCode
 {
+
+    public const VIP = 1;
+    public const DIAMOND = 2;
+    public const FREE = 0;
+
     // type 1 长横幅 2 短 竖图
     public const TYPE = [0 => '未設定', 1 => '长横幅', 2 => '短竖图'];
     // category 类型 0 mv 1 av 2 ai 3 动漫 4  live 5 gay
