@@ -50,7 +50,21 @@ class MemberController extends AbstractController
         ]);
 
         if (empty($user)) {
-            return $this->error(trans('validation.authorize'), 401);
+            $base_service = di(\App\Service\BaseService::class);
+            $ip = $base_service->getIp($request->getHeaders(), $request->getServerParams());
+            $user = $service->apiRegisterUser([
+                'account' => $request->input('account') ?? $request->input('device_id'),
+                'device' => $request->input('device', null),
+                'register_ip' => $ip,
+                'sex' => $request->input('sex', Member::SEX['DEFAULT']),
+                'age' => $request->input('age', 18),
+                'email' => $request->input('email', ''),
+                'phone' => $request->input('phone', ''),
+            ]);
+
+            if (empty($user)) {
+                return $this->error(trans('validation.authorize'), 401);
+            }
         }
 
         if (! $service->checkAndSaveDevice($user->id, $request->input('device_id'))) {

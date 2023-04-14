@@ -30,7 +30,7 @@ class MemberRegisterRequest extends FormRequest
     {
         return [
             'name' => 'string|unique:members',
-            'password' => 'required|string',
+            'password' => 'string',
             'email' => 'email|unique:members',
             'sex' => 'numeric',
             'age' => 'numeric|between:18,130',
