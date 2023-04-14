@@ -187,7 +187,8 @@ class ProductController extends AbstractController
     {
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = (int) auth('session')->user()->id;
-        $data['type'] = Product::TYPE_CORRESPOND_LIST[$request->input('product_type')];
+        // $data['type'] = Product::TYPE_CORRESPOND_LIST[$request->input('product_type')];
+        $data['type'] = $request->input('product_type');
         $data['correspond_id'] = $request->input('product_id') ? $request->input('product_id') : $request->input('correspond_id');
         $data['name'] = $request->input('product_name');
         $data['expire'] = (int) $request->input('expire');
@@ -205,17 +206,18 @@ class ProductController extends AbstractController
         $id = $request->input('id');
         $model = Product::findOrFail($id);
         $model->title = $model->name;
-        switch ($model->type) {
-            case Product::TYPE_CORRESPOND_LIST['image']:
-                $product_type = 'image';
-                break;
-            case Product::TYPE_CORRESPOND_LIST['video']:
-                $product_type = 'video';
-                break;
-            default:
-                $product_type = '';
-                break;
-        }
+        // switch ($model->type) {
+        //     case Product::TYPE_CORRESPOND_LIST['image']:
+        //         $product_type = 'image';
+        //         break;
+        //     case Product::TYPE_CORRESPOND_LIST['video']:
+        //         $product_type = 'video';
+        //         break;
+        //     default:
+        //         $product_type = '';
+        //         break;
+        // }
+        $product_type = $model->type;
         $data['model'] = $model;
         $data['product_type'] = $product_type;
         $data['navbar'] = trans('default.product_control.product_edit');
@@ -328,7 +330,8 @@ class ProductController extends AbstractController
         $correspond_name = json_decode($request->input('correspond_name'), true);
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = (int) auth('session')->user()->id;
-        $data['type'] = Product::TYPE_CORRESPOND_LIST[$request->input('product_type')];
+        // $data['type'] = Product::TYPE_CORRESPOND_LIST[$request->input('product_type')];
+        $data['type'] = $request->input('product_type');
         // $data['correspond_id'] = $request->input('product_id') ? $request->input('product_id') : $request->input('correspond_id');
         // $data['name'] = $request->input('product_name');
         $data['expire'] = (int) $request->input('expire');
