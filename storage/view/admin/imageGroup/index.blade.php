@@ -8,9 +8,9 @@
                     <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                         <div class="row">
 
-                            @if(authPermission('image-create'))
+                            @if(authPermission('image-group-create'))
                                 <div class="col-sm-12 col-md-12 mb-1">
-                                    <a class="btn badge-info" href="/admin/image/create">{{trans('default.image_control.image_insert') ?? '新增圖片'}}</a>
+                                    <a class="btn badge-info" href="/admin/image_group/create">{{trans('default.image_group_control.image_group_insert') ?? '新增套圖'}}</a>
                                 </div>
                             @endif
                         </div>
@@ -31,23 +31,15 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.image_control.image_name') ?? '圖片名稱'}}
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.image_group_control.image_group_name') ?? '套圖名稱'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.image_control.image_thumbnail') ?? '圖片縮圖'}}
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.image_group_control.image_group_thumbnail') ?? '套圖縮圖'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.image_control.image_url') ?? '圖片網址'}}
-                                        </th>
-                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.image_control.image_likes') ?? '圖片按讚數'}}
-                                        </th>
-                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.image_control.image_group_id') ?? '圖片群組序號'}}
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.image_group_control.image_group_url') ?? '套圖網址'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
@@ -70,14 +62,14 @@
                                             <td>{{ $model->likes }}</td>
                                             <td>{{ $model->group_id }}</td>
                                             <td>
-                                                @if(authPermission('image-edit'))
+                                                @if(authPermission('image-group-edit'))
                                                     <div class="row mb-1">
-                                                        <a href="/admin/image/edit?id={{$model->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
+                                                        <a href="/admin/image_group/edit?id={{$model->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
                                                     </div>
                                                 @endif
-                                                    @if(authPermission('image-delete'))
+                                                    @if(authPermission('image-group-delete'))
                                                         <div class="row mb-1">
-                                                            <a href="/admin/image/delete?id={{$model->id}}" class="btn btn-danger">{{trans('default.delete') ?? '刪除'}}</a>
+                                                            <a href="/admin/image_group/delete?id={{$model->id}}" class="btn btn-danger">{{trans('default.delete') ?? '刪除'}}</a>
                                                         </div>
                                                     @endif
                                             </td>
@@ -88,11 +80,9 @@
                                     <tr>
                                         <th rowspan="1" colspan="1">{{trans('default.id') ?? '序號'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.user_name') ?? '使用者名稱'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.image_control.image_name') ?? '圖片名稱'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.image_control.image_thumbnail') ?? '圖片縮圖'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.image_control.image_url') ?? '圖片網址'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.image_control.image_likes') ?? '圖片按讚數'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.image_control.image_group_id') ?? '圖片群組id'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.image_group_control.image_group_name') ?? '圖片名稱'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.image_group_control.image_group_thumbnail') ?? '圖片縮圖'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.image_group_control.image_group_url') ?? '圖片網址'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>
                                     </tfoot>

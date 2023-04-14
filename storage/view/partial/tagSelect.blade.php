@@ -17,5 +17,5 @@
 
     let control = select[0].selectize;
 
-    control.setValue({{$tag_ids}})
+    control.setValue({{$tag_ids ?? '[]'}})
 </script>

@@ -15,7 +15,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{ trans('default.announcement_control.announcement_content') ?? '公告內容'}}</label>
-                                    <input type="text" class="form-control" name="content" id="content" placeholder="" value="{{$model->content ?? ''}}">
+                                    <textarea class="form-control" name="content" id="content" placeholder="{{ trans('default.description_msg_def') ?? '請輸入描述'}}">{{$model->content ?? ''}}</textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{ trans('default.announcement_control.announcement_start_time') ?? '公告上架時間'}}</label>

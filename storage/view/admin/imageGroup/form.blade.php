@@ -7,10 +7,10 @@
                 <div class="card-body">
                     <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                         <div class="row">
-                            <form action="/admin/image/store" method="post" class="col-md-12" enctype="multipart/form-data">
+                            <form action="/admin/image_group/store" method="post" class="col-md-12" enctype="multipart/form-data">
                                 <input type="hidden" name="id" value="{{$model->id ?? null}}">
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">{{ trans('default.image_control.image_name') ?? '名稱'}}</label>
+                                    <label for="exampleInputEmail1">{{ trans('default.image_group_control.image_group_name') ?? '套圖名稱'}}</label>
                                     <input type="text" class="form-control" name="title" id="title" placeholder="{{ trans('default.name_msg_def') ?? '請輸入名稱'}}" value="{{$model->title ?? ''}}">
                                 </div>
                                 <div class="form-group">
@@ -21,13 +21,10 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">{{ trans('default.image_control.image_group_id') ?? '套圖id'}}</label>
-                                    <input type="text" class="form-control" name="group_id" id="group_id" placeholder="{{ trans('default.id_msg_def') ?? '請輸入id'}}" value="{{$model->group_id ?? ''}}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">{{ trans('default.image_control.image_description') ?? '圖片描述'}}</label>
+                                    <label for="exampleInputEmail1">{{ trans('default.image_group_control.image_group_description') ?? '套圖描述'}}</label>
                                     <textarea class="form-control" name="description" id="description" placeholder="{{ trans('default.description_msg_def') ?? '請輸入描述'}}">{{$model->description ?? ''}}</textarea>
                                 </div>
+                                @include('partial.tagSelect')
                                 <button type="submit" class="btn btn-primary">{{ trans('default.submit') ?? '送出'}}</button>
                             </form>
                         </div>

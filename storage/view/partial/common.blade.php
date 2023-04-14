@@ -214,6 +214,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('image-group-index'))
+                    <li class="nav-item">
+                        <a href="/admin/image_group/index" class="nav-link {{$image_group_active ?? ''}}">
+                            <i class="nav-icon fas fa-image"></i>
+                            <p>
+                                {{trans('default.leftbox.image_group') ?? '公告管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

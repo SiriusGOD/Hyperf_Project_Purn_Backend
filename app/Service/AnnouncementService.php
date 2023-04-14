@@ -25,6 +25,7 @@ class AnnouncementService
     {
         $this->redis = $redis;
     }
+
     public function store(array $params): void
     {
         $model = Announcement::where('id', $params['id'])->first();
@@ -41,16 +42,16 @@ class AnnouncementService
         $model->save();
     }
 
-    public function getAnnouncements() : array
+    public function getAnnouncements(): array
     {
-        if($this->redis->exists(self::CACHE_KEY)) {
+        if ($this->redis->exists(self::CACHE_KEY)) {
             return json_decode($this->redis->get(self::CACHE_KEY), true);
         }
 
         return $this->updateCache();
     }
 
-    public function updateCache() : array
+    public function updateCache(): array
     {
         $now = Carbon::now()->toDateTimeString();
         $result = Announcement::where('start_time', '<=', $now)

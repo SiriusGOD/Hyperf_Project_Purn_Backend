@@ -26,11 +26,11 @@ class TagGroup extends Model
     // 每頁筆數
     public const PAGE_PER = 10;
 
-    public const HIDE_LIST = ['顯示','隱藏'];
+    public const HIDE_LIST = ['顯示', '隱藏'];
 
     public const HIDE = [
         'not_hide' => 0,
-        'hide' => 1
+        'hide' => 1,
     ];
 
     /**

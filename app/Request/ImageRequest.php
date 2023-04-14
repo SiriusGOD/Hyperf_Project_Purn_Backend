@@ -28,7 +28,6 @@ class ImageRequest extends AuthBaseRequest
                 Rule::requiredIf(function () {
                     return empty($this->input('id'));
                 }),
-                'image',
             ],
         ];
 

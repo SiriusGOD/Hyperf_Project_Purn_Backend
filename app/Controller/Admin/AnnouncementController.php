@@ -14,7 +14,6 @@ namespace App\Controller\Admin;
 use App\Controller\AbstractController;
 use App\Model\Announcement;
 use App\Request\AnnouncementRequest;
-use App\Request\TagRequest;
 use App\Service\AnnouncementService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
