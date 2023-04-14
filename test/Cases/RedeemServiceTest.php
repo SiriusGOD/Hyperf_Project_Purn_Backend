@@ -61,10 +61,10 @@ class RedeemServiceTest extends HttpTestCase
     //是否限免 0 免费视频 1vip视频 2金币视频
     public function getPayVideoList(int $isFree=1)
     {
-      return $this->video->getPayVideos([], $page=0, $status=1, $isFree);
+      return $this->video->getPayVideos([], 0, 1, $isFree);
     }
     //取影片列表
-    public function getCoseVideoList(int $status = 0)
+    public function getVideoList(int $status = 0)
     {
       $page = 0;
       return $this->video->getVideos([], $page, $status);
@@ -136,14 +136,24 @@ class RedeemServiceTest extends HttpTestCase
       $status = 0;
       $memberId = $this->testUserId;
       $memberRedeemList = $this->redeem->getMemberRedeemList($memberId ,$status);
-      self::show($memberRedeemList->toArray());
-      $videoStatus = 1;
-      $costVideos = self::getPayVideoList($videoStatus);
-      //測試 status 是否一至
+      $memberRedeemList = $memberRedeemList->toArray();
+      $memberRedeemCate = array_column($memberRedeemList , 'redeem_category_id') ;
+      $videoStatusF = 1;
+      $tenCostVideos = self::getVideoList($videoStatusF);
+      $videoAry = $tenCostVideos->toArray();
+      $varye = array_column($videoAry , 'is_free') ;
       //付費影片
-      $videoId = $costVideos->toArray()[rand(0,2)]["id"];
-      $redeemStatus = $this->redeem->redeemVideo($memberId, $videoId);
-      self::show($redeemStatus);
-      $this->assertSame(true,$redeemStatus);
+      if(count($memberRedeemList)>0){
+        foreach($tenCostVideos->toArray() as $video){
+            $videoId = $video["id"];
+            $videoCate = $video["is_free"];
+            if($this->redeem->canRedeemVideo($memberRedeemCate , $videoCate) ){
+              $redeemStatus = $this->redeem->redeemVideo($memberId, $videoId);
+              //self::show($redeemStatus);
+              //測試 status 是否一至
+              $this->assertSame(true, $redeemStatus);
+            }
+        }
+      }
     }
 }

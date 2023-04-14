@@ -83,7 +83,7 @@ class VideoService
     // 取得影片
     public function find(int $id)
     {
-        return $this->model->select('id', 'coins', 'title', 'm3u8', 'cover_thumb', 'tags', 'actors')
+        return $this->model->select('id', 'is_free', 'coins', 'title', 'm3u8', 'cover_thumb', 'tags', 'actors')
             ->where('release_time', '<=', Carbon::now()->toDateTimeString())
             ->where('id', $id)
             ->first();

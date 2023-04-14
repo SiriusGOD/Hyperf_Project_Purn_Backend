@@ -12,10 +12,9 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use App\Model\MemberRedeemVideo;
-use App\Model\MemberRedeem;
 use App\Model\Redeem;
-
+use App\Model\MemberRedeem;
+use App\Constants\RedeemCode;
 use Carbon\Carbon;
 use Hyperf\DbConnection\Db;
 use Hyperf\Database\Model\Collection;
@@ -31,15 +30,15 @@ class RedeemService extends BaseService
     protected $logger;
     protected $redeem;
     protected $memberRedeem;
-    protected $memberRedeemVideo;
+    protected $memberRedeemService;
     protected $videoService;
 
   public function __construct(
     Redis $redis, 
     LoggerFactory $loggerFactory, 
     Redeem $redeem, 
-    MemberRedeem $memberRedeem,
-    MemberRedeemVideo $memberRedeemVideo,
+    MemberRedeem $memberRedeem, 
+    MemberRedeemService $memberRedeemService,
     VideoService $videoService
     )
     {
@@ -47,7 +46,7 @@ class RedeemService extends BaseService
         $this->redis = $redis;
         $this->redeem = $redeem;
         $this->memberRedeem = $memberRedeem;
-        $this->memberRedeemVideo = $memberRedeemVideo;
+        $this->memberRedeemService = $memberRedeemService;
         $this->videoService = $videoService;
     }
 
@@ -64,8 +63,8 @@ class RedeemService extends BaseService
     public function getMemberRedeemByCode(string $code ,int $page)
     {
       $model = $this->memberRedeem->where('redeem_code', $code)
-                          ->offset(MemberRedeem::PAGE_PER * $page)
-                          ->limit(MemberRedeem::PAGE_PER);
+                          ->offset(Redeem::PAGE_PER * $page)
+                          ->limit(Redeem::PAGE_PER);
       return $model->get();
     } 
 
@@ -74,14 +73,14 @@ class RedeemService extends BaseService
     {
       $key = self::CACHE_KEY.":ticket:".$code;
       if($this->redis->exists($key)){
-         $row = $this->redis->get($key);
-         return json_decode($row,true);
+        // $row = $this->redis->get($key);
+        // return json_decode($row,true);
       }
 
       if($row = $this->redeem->where('code', $code)->first()){
           if($row->count == $row->counted){        
-            $this->redis->set($key , json_encode($row->toArray()));
-            $this->redis->expire($key , self::EXPIRE);
+            //$this->redis->set($key , json_encode($row->toArray()));
+            //$this->redis->expire($key , self::EXPIRE);
           }
           return $row->toArray();
       }else{
@@ -99,7 +98,7 @@ class RedeemService extends BaseService
     } 
     
     //使月者兌換卷清單 
-    public function getMemberRedeemList(int $memberId ,int $page , int $status = 0)
+    public function getMemberRedeemList(int $memberId ,int $page , int $status = 0):Collection
     {
       $model = $this->memberRedeem->where('status', $status)
                           ->where('member_id', $memberId)
@@ -128,7 +127,23 @@ class RedeemService extends BaseService
         //self::updateMemberRedeemUsed($code, $memberId); 
         return self::checkRedeemVideo($discount , $videoDetail);
     } 
-    
+    //判斷這個優惠跟此影片 是否可以觀看 
+    public function canRedeemVideo(array $discountAry ,int $videoCate)
+    {
+      if(count($discountAry) > 0){
+        $result = true;
+        switch($videoCate){
+          case 1: //VIP影片
+              $result = !in_array(RedeemCode::FREE, $discountAry);
+          break;
+
+          case 2://付費影片
+              $result = in_array(RedeemCode::DIAMOND, $discountAry);
+          break;
+        }
+      }
+      return $result;
+    }
     //check 使用者是否有兌換影片的權限 
     public function checkRedeemVideo(array $userDiscount ,array $videoDetail)
     {
@@ -136,30 +151,24 @@ class RedeemService extends BaseService
         $canWatch = false;
         //是否限免 0 免费视频 1vip视频 2金币视频
         if(count($userDiscount)>0 ){
+          $memberRedeemCate = array_column($userDiscount , 'redeem_category_id') ;
           foreach($userDiscount as $discount){
             //1 => 'VIP天數'
-              if((int)$discount['redeem_category_id'] == 1  && ((int)$videoDetail["is_free"] == 0 || (int)$videoDetail["is_free"] == 2)){
-                $end = Carbon::create($discount['end']);
-                if($now->timestamp < $end->timestamp){
-                  $canWatch = true;
-                  //self::insetMemberRedeemVideo($videoDetail["id"], $discount);
-                  //self::updateMemberRedeemUsed($discount['redeem_code'], $discount['member_id']);
-                  self::updateMemberRedeemUsed($discount, $videoDetail);
-                  return $canWatch;
-                }
-              }
-            //3 => '免費觀看次數'
-            if((int)$discount['redeem_category_id'] == 3  && ((int)$videoDetail["is_free"] == 0 )){
-              $canWatch = true;
-              self::updateMemberRedeemUsed($discount, $videoDetail);
-              return $canWatch;
+            if((int)$discount['redeem_category_id'] == 1  && ((int)$videoDetail["is_free"] == 0 || (int)$videoDetail["is_free"] == 2)){
+                $canWatch = true;
+                $this->memberRedeemService->memberRedeemVideo($videoDetail["id"], $discount);
+                return $canWatch;
             }
             //2 => '鑽石點數'
             if((int)$discount['redeem_category_id'] == 2 ){
               $canWatch = true;
-              //self::insetMemberRedeemVideo($videoDetail["id"], $discount);
-              //self::updateMemberRedeemUsed($discount['redeem_code'], $discount['member_id'],$discount['redeem_category_id']);
-              self::updateMemberRedeemUsed($discount, $videoDetail);
+              $this->memberRedeemService->memberRedeemVideo($videoDetail["id"], $discount);
+              return $canWatch;
+            }
+            //3 => '免費觀看次數'
+            if((int)$discount['redeem_category_id'] == 3  && ((int)$videoDetail["is_free"] == 0 )){
+              $canWatch = true;
+              $this->memberRedeemService->memberRedeemVideo($videoDetail["id"], $discount);
               return $canWatch;
             }
           }
@@ -168,62 +177,6 @@ class RedeemService extends BaseService
         }
     }  
      
-    //使用者兌換卷更新使用次數 
-    public function insetMemberRedeemVideo(int $videoId, array $discount)
-    {
-        Db::beginTransaction();
-        try {
-            $model = new $this->memberRedeemVideo;
-            $model->member_redeem_id = $discount["id"];
-            $model->video_id = $videoId;
-            $model->redeem_category_id = $discount["redeem_category_id"];
-            $model->updated_at = date("Y-m-d H:i:s"); 
-            $model->created_at = date("Y-m-d H:i:s"); 
-            $model->save();
-            Db::commit();
-        } catch (\Throwable $ex) {
-            $this->logger->error("error:".__LINE__. json_encode($ex));
-            Db::rollBack();
-            return false;
-        }
-    } 
-    //使用者兌換卷更新使用次數 
-    public function updateMemberRedeemUsed(array $discount ,array $videoDetail)
-    {
-            //Db::beginTransaction();
-        try {
-            //記錄
-            $memberRedeemVideo = new $this->memberRedeemVideo;
-            $memberRedeemVideo->member_redeem_id = $discount["id"];
-            $memberRedeemVideo->video_id = $videoDetail["id"];
-            $memberRedeemVideo->redeem_category_id = $discount["redeem_category_id"];
-            $memberRedeemVideo->updated_at = date("Y-m-d H:i:s"); 
-            $memberRedeemVideo->created_at = date("Y-m-d H:i:s"); 
-            $memberRedeemVideo->save();
-            //兌換卷更新
-            $model = $this->memberRedeem->where("redeem_code",$discount["redeem_code"])
-                ->where("member_id",$discount["memberId"])->first();
-            $model->used = $model->used  + 1;
-            if($discount["redeem_category_id"]==2){
-              if( ($model->diamond_point - 1) == 0 ){
-                $model->status = 1;
-              }
-              $model->diamond_point = $model->diamond_point - 1;
-            }
-            if($discount["redeem_category_id"]==3){
-              if( ($model->free_watch - 1) ==0){
-                $model->status = 1;
-              }
-              $model->free_watch = $model->free_watch - 1;
-            }
-            $model->save();
-            //Db::commit();
-        } catch (\Throwable $ex) {
-            $this->logger->error("error:" .json_encode($ex));
-            //Db::rollBack();
-            return false;
-        }
-    } 
     //兌換卷更新使用次數 
     public function updateRedeemCounted(string $code ,$redeemDetail)
     {

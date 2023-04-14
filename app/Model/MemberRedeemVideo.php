@@ -12,11 +12,13 @@ declare(strict_types=1);
 namespace App\Model;
 
 /**
- * @property int $id
- * @property int $member_redeem_id
- * @property int $video_id
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property int $id 
+ * @property int $member_redeem_id 
+ * @property int $video_id 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property int $redeem_category_id 
+ * @property int $member_id 
  */
 class MemberRedeemVideo extends Model
 {
@@ -35,5 +37,5 @@ class MemberRedeemVideo extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'member_redeem_id' => 'integer', 'video_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'member_redeem_id' => 'integer', 'video_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'redeem_category_id' => 'integer', 'member_id' => 'integer'];
 }
