@@ -158,6 +158,7 @@ return [
     ],
 
     'authorize' => '尚未登入，或權限不足',
+    'device_authorize' => '一天只能登入一個裝置',
     'try_limit' => '請稍後重新嘗試',
     'expire_code' => '驗證碼過期',
 

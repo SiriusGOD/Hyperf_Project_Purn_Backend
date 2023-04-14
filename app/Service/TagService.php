@@ -42,9 +42,9 @@ class TagService
         $model->user_id = $userId;
         $model->save();
 
-        if(count($groups) > 0){
+        if (count($groups) > 0) {
             $id = $model->id;
-            $this -> createTagGroupRelationship($groups, $id);
+            $this->createTagGroupRelationship($groups, $id);
         }
     }
 

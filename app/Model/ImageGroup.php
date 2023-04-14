@@ -11,35 +11,26 @@ declare(strict_types=1);
  */
 namespace App\Model;
 
-use Carbon\Carbon;
-use Hyperf\Database\Model\SoftDeletes;
-
 /**
  * @property int $id
  * @property int $user_id
  * @property string $title
- * @property string $title_thumbnail
  * @property string $thumbnail
  * @property string $url
- * @property int $like
- * @property int $group_id
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property Carbon $deleted_at
  * @property string $description
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property string $deleted_at
+ * @property \Hyperf\Database\Model\Collection|Image[] $images
  */
-class Image extends Model
+class ImageGroup extends Model
 {
-    use SoftDeletes;
-
-    public const PAGE_PER = 15;
+    public const PAGE_PER = 10;
 
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected ?string $table = 'images';
+    protected ?string $table = 'image_groups';
 
     /**
      * The attributes that are mass assignable.
@@ -49,7 +40,17 @@ class Image extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'likes' => 'integer', 'group_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    public function images()
+    {
+        return $this->hasMany(Image::class, 'group_id');
+    }
+
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'correspond', 'tag_corresponds', 'correspond_id');
+    }
 
     public function user()
     {

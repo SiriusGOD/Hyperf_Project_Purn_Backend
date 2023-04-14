@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
-use App\Service\AdvertisementService;
 use App\Service\AnnouncementService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;

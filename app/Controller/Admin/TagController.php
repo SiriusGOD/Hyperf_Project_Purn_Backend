@@ -49,10 +49,10 @@ class TagController extends AbstractController
         $step = Tag::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
         $models = Tag::with('user')->leftjoin('tag_has_groups', 'tags.id', 'tag_has_groups.tag_id')
-                ->leftjoin('tag_groups', 'tag_has_groups.tag_group_id', 'tag_groups.id')
-                ->select('tags.*', Db::raw("GROUP_CONCAT(tag_groups.name SEPARATOR ' , ') as group_name "))
-                ->groupBy('tags.id')
-                ->offset(($page - 1) * $step)->limit($step)->get();
+            ->leftjoin('tag_groups', 'tag_has_groups.tag_group_id', 'tag_groups.id')
+            ->select('tags.*', Db::raw("GROUP_CONCAT(tag_groups.name SEPARATOR ' , ') as group_name "))
+            ->groupBy('tags.id')
+            ->offset(($page - 1) * $step)->limit($step)->get();
         $total = Tag::count();
         $data['last_page'] = ceil($total / $step);
         if ($total == 0) {

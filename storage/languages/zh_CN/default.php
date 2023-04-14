@@ -157,7 +157,8 @@ return [
         'member' => '會員管理',
         'classification' => '演員分類管理',
         'tagGroup' => '標籤群組管理',
-        'announcement' => '公告管理'
+        'announcement' => '公告管理',
+        'image_group' => '套圖管理'
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -264,8 +265,17 @@ return [
         'image_thumbnail' => '圖片縮圖',
         'image_url' => '圖片網址',
         'image_likes' => '圖片按讚數',
-        'image_group_id' => '圖片群組序號',
+        'image_group_id' => '套圖 id',
         'image_description' => '圖片描述',
+    ],
+    'image_group_control' => [
+        'image_group_control' => '套圖管理',
+        'image_group_insert' => '新增套圖',
+        'image_group_update' => '套圖更新',
+        'image_group_name' => '套圖名稱',
+        'image_group_thumbnail' => '套圖封面圖縮圖',
+        'image_group_url' => '套圖封面圖網址',
+        'image_group_description' => '套圖描述',
     ],
     // -------------------------------------------------------------------
     // OrderController

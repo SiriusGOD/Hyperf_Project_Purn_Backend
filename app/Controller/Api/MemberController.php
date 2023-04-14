@@ -22,10 +22,10 @@ use App\Model\MemberTag;
 use App\Model\MemberVerification;
 use App\Request\AddMemberFollowRequest;
 use App\Request\AddMemberTagRequest;
+use App\Request\MemberApiUpdateRequest;
 use App\Request\MemberDetailRequest;
 use App\Request\MemberLoginRequest;
 use App\Request\MemberRegisterRequest;
-use App\Request\MemberApiUpdateRequest;
 use App\Request\RegisterVerificationRequest;
 use App\Request\ResetPasswordVerificationRequest;
 use App\Request\SendVerificationRequest;
@@ -46,7 +46,7 @@ class MemberController extends AbstractController
         $user = $service->apiCheckUser([
             'email' => $request->input('email'),
             'password' => $request->input('password'),
-            'account' => $request->input('account')
+            'account' => $request->input('account'),
         ]);
 
         if (empty($user)) {
@@ -54,7 +54,7 @@ class MemberController extends AbstractController
         }
 
         if (! $service->checkAndSaveDevice($user->id, $request->input('device_id'))) {
-            return $this->error(trans('validation.authorize'), 401);
+            return $this->error(trans('validation.device_authorize'), 401);
         }
 
         $token = auth()->login($user);
@@ -63,7 +63,7 @@ class MemberController extends AbstractController
         $ip = $base_service->getIp($request->getHeaders(), $request->getServerParams());
         $service->updateUser($user->id, [
             'device' => $request->input('device'),
-            'last_ip' => $ip
+            'last_ip' => $ip,
         ]);
 
         $service->saveToken($user->id, $token);
@@ -94,7 +94,7 @@ class MemberController extends AbstractController
             'phone' => $request->input('phone', ''),
             'account' => $request->input('account', null),
             'device' => $request->input('device', null),
-            'register_ip' => $ip
+            'register_ip' => $ip,
         ]);
 
         $token = auth()->login($user);
@@ -177,7 +177,7 @@ class MemberController extends AbstractController
         if (auth()->check()) {
             $member = auth()->user();
         } else {
-            $member = $service->getUserFromEmailOrUuid($request->input('email'), $request->input('uuid'));
+            $member = $service->getUserFromEmailOrAccount($request->input('email'), $request->input('uuid'));
         }
 
         $code = $service->getVerificationCode($member->id);
@@ -212,7 +212,7 @@ class MemberController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'verification/reset_password_check')]
     public function checkResetPasswordVerificationCode(ResetPasswordVerificationRequest $request, MemberService $service)
     {
-        $member = $service->getUserFromEmailOrUuid($request->input('email'), $request->input('uuid'));
+        $member = $service->getUserFromEmailOrAccount($request->input('email'), $request->input('uuid'));
 
         if (empty($member)) {
             return $this->error(trans('validation.exists', ['attribute' => 'email or uuid']), 400);

@@ -12,13 +12,13 @@ declare(strict_types=1);
 namespace App\Model;
 
 /**
- * @property int $id 
- * @property int $member_redeem_id 
- * @property int $video_id 
- * @property \Carbon\Carbon $created_at 
- * @property \Carbon\Carbon $updated_at 
- * @property int $redeem_category_id 
- * @property int $member_id 
+ * @property int $id
+ * @property int $member_redeem_id
+ * @property int $video_id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property int $redeem_category_id
+ * @property int $member_id
  */
 class MemberRedeemVideo extends Model
 {

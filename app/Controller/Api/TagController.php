@@ -12,9 +12,8 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
-use App\Service\TagService;
 use App\Service\TagGroupService;
-use App\Request\TagGroupSearchRequest;
+use App\Service\TagService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;

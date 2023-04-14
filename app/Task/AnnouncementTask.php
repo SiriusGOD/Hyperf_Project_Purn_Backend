@@ -11,7 +11,6 @@ declare(strict_types=1);
  */
 namespace App\Task;
 
-use App\Model\Advertisement;
 use App\Model\Announcement;
 use App\Service\AdvertisementService;
 use App\Service\AnnouncementService;
@@ -38,9 +37,8 @@ class AnnouncementTask
 
     public function execute()
     {
-
         $now = Carbon::now()->toDateTimeString();
-        if (!$this->redis->exists(AdvertisementService::CACHE_KEY)) {
+        if (! $this->redis->exists(AdvertisementService::CACHE_KEY)) {
             $this->logger->info('無公告直接更新');
             return $this->service->updateCache();
         }
