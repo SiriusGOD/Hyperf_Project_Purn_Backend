@@ -84,13 +84,28 @@ class VideoService
     public function find(int $id)
     {
         return $this->model->select('id', 'coins', 'title', 'm3u8', 'cover_thumb', 'tags', 'actors')
-            ->where('release_time', '>=', Carbon::now()->toDateTimeString())
+            ->where('release_time', '<=', Carbon::now()->toDateTimeString())
             ->where('id', $id)
             ->first();
     }
 
+    // 付費影片列表
+    public function getPayVideos(?array $tagIds, int $page = 0, int $status = 9, $ifFree): Collection
+    {
+        $query=self::baseVideos($tagIds, $page, $status);
+        if($ifFree !=false){
+            $query = $query->where('is_free',$ifFree); 
+        } 
+        return $query->get();
+    }
     // 影片列表
     public function getVideos(?array $tagIds, int $page = 0, int $status = 9): Collection
+    {
+        $query=self::baseVideos($tagIds,  $page,$status);
+        return $query->get();
+    }
+    // 影片
+    public function baseVideos(?array $tagIds, int $page = 0, int $status = 9)
     {
         $videoIds = [];
         $query = $this->model;
@@ -104,7 +119,7 @@ class VideoService
         //      'tags',
         //  ]);
         // }
-        $query = $query->where('release_time', '>=', Carbon::now()->toDateTimeString());
+        $query = $query->where('release_time', '<=', Carbon::now()->toDateTimeString());
         if ($status != 9) {
             $query->where('status', $status);
         }
@@ -113,7 +128,7 @@ class VideoService
             $query = $query->whereIn('id', $videoIds);
         }
 
-        return $query->get();
+        return $query;
     }
 
     // 影片列表

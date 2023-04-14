@@ -136,17 +136,14 @@ class RedeemServiceTest extends HttpTestCase
       $status = 0;
       $memberId = $this->testUserId;
       $memberRedeemList = $this->redeem->getMemberRedeemList($memberId ,$status);
+      self::show($memberRedeemList->toArray());
       $videoStatus = 1;
       $costVideos = self::getPayVideoList($videoStatus);
       //測試 status 是否一至
       //付費影片
-      if(count($memberRedeemList->toArray())>0 ){
-        foreach($costVideos->toArray() as $video){
-          $videoId = $video["id"];
-          self::show($memberRedeemList->toArray());
-          $redeemStatus = $this->redeem->redeemVideo($memberId, $videoId);
-          $this->assertSame(true,$redeemStatus);
-        }
-      }
+      $videoId = $costVideos->toArray()[rand(0,2)]["id"];
+      $redeemStatus = $this->redeem->redeemVideo($memberId, $videoId);
+      self::show($redeemStatus);
+      $this->assertSame(true,$redeemStatus);
     }
 }

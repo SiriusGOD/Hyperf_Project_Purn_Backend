@@ -135,7 +135,7 @@ class RedeemService extends BaseService
         $now = Carbon::now();
         $canWatch = false;
         //是否限免 0 免费视频 1vip视频 2金币视频
-        if($videoDetail["is_free"]!=0){
+        if(count($userDiscount)>0 ){
           foreach($userDiscount as $discount){
             //1 => 'VIP天數'
               if((int)$discount['redeem_category_id'] == 1  && ((int)$videoDetail["is_free"] == 0 || (int)$videoDetail["is_free"] == 2)){
