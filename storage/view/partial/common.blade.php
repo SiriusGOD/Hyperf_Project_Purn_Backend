@@ -117,7 +117,7 @@
                 @if(authPermission('tagGroup-index'))
                     <li class="nav-item">
                         <a href="/admin/tag_group/index" class="nav-link {{$tag_group_active ?? ''}}">
-                            <i class="nav-icon fas fa-tag"></i>
+                            <i class="nav-icon fas fa-tags"></i>
                             <p>
                                 {{trans('default.leftbox.tagGroup') ?? '標籤群組管理'}}
                             </p>

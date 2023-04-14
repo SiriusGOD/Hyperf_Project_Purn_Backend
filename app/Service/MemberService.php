@@ -46,21 +46,27 @@ class MemberService
             return false;
         }
 
-        if (password_verify($userInfo['password'], $user->password)) {
-            return $user;
+        if(! empty($userInfo['password'])){
+            if (password_verify($userInfo['password'], $user->password)) {
+                return $user;
+            }
+            return false;
         }
-        return false;
+        
+        return $user;
     }
 
     public function apiRegisterUser(array $data): Member
     {
         $name = $data['name'];
-        if (empty($name)) {
-            $name = Member::VISITOR_NAME . substr(hash('sha256', $data['account'], false), 0, 10);
+        if(empty($name)){
+            $name = Member::VISITOR_NAME. substr(hash('sha256', $this->randomStr(), false), 0, 10);
         }
         $model = new Member();
         $model->name = $name;
-        $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
+        if(!empty($data['password'])){
+            $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
         $model->sex = $data['sex'];
         $model->age = $data['age'];
         $model->avatar = $model->avatar ?? '';
@@ -76,7 +82,7 @@ class MemberService
         // $model->email = $data['email'];
         // $model->phone = $data['phone'];
         $model->status = Member::STATUS['VISITORS'];
-        $model->role_id = Role::API_DEFAULT_USER_ROLE_ID;
+        $model->buy_level_id = Role::API_DEFAULT_USER_ROLE_ID;
         $model->account = $data['account'];
         $model->device = $data['device'];
         $model->register_ip = $data['register_ip'];
@@ -157,6 +163,10 @@ class MemberService
 
         if (! empty($data['account'])) {
             $model->account = $data['account'];
+            // 遊客 -> 會員未驗證
+            if($model -> status == Member::STATUS['VISITORS']){
+                $model -> status = Member::STATUS['NOT_VERIFIED'];
+            }
         }
 
         if (! empty($data['device'])) {
@@ -232,11 +242,11 @@ class MemberService
 
     public function getUserFromEmailOrAccount(?string $email, ?string $account)
     {
-        if (! empty($email)) {
-            $user = Member::where('email', $email)->first();
-        }
-        if (empty($user)) {
-            $user = Member::where('account', $account)->first();
+        // if(!empty($email)){
+        //     $user = Member::where('email', $email)->first();
+        // }
+        if(empty($user)) {
+            $user = Member::where('account', $uuid)->first();
         }
 
         if (empty($user)) {
@@ -304,5 +314,18 @@ class MemberService
         $model->save();
 
         return $model->code;
+    }
+
+    // 亂處產生一個string
+    public function randomStr($length = 8)
+    {
+        $url = '';
+        $charray = array_merge(range('a', 'z'), range('0', '9'));
+        $max = count($charray) - 1;
+        for ($i = 0; $i < $length; ++$i) {
+            $randomChar = mt_rand(0, $max);
+            $url .= $charray[$randomChar];
+        }
+        return $url;
     }
 }

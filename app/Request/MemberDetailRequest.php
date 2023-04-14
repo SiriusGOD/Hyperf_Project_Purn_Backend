@@ -36,7 +36,7 @@ class MemberDetailRequest extends FormRequest
         return [
             'id' => [
                 'numeric',
-                Rule::exists('members')->whereIn('role_id', $roleIds)->where('status', Member::STATUS['NORMAL']),
+                Rule::exists('members')->whereIn('role_id', $roleIds)->where('status', '<=', Member::STATUS['VERIFIED']),
             ],
         ];
     }
