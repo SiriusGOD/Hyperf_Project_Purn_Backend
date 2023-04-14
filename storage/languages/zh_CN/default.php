@@ -157,7 +157,8 @@ return [
         'member' => '會員管理',
         'classification' => '演員分類管理',
         'tagGroup' => '標籤群組管理',
-        'announcement' => '公告管理'
+        'announcement' => '公告管理',
+        'memberLevel' => '會員等級管理',
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -339,6 +340,13 @@ return [
         'hide' => '隱藏',
         'not_hide' => '顯示',
         'tag_group_name' => '標籤群組名稱',
+    ],
+    // -------------------------------------------------------------------
+    // MemberLevelController
+    'member_level_control' => [
+        'member_level_control' => '會員等級管理',
+        'member_level_insert' => '新增會員等級',
+        'member_level_edit' => '編輯會員等級',
     ],
     // -------------------------------------------------------------------
 ];

@@ -68,7 +68,7 @@ class MemberController extends AbstractController
         }
 
         if (! $service->checkAndSaveDevice($user->id, $request->input('device_id'))) {
-            return $this->error(trans('validation.authorize'), 401);
+            return $this->error(trans('validation.change_device_limit'), 400);
         }
 
         $token = auth()->login($user);
