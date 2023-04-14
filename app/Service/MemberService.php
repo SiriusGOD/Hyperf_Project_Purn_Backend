@@ -40,7 +40,7 @@ class MemberService
 
     public function apiCheckUser(array $userInfo)
     {
-        $user = $this->getUserFromEmailOrUuid($userInfo['email'], $userInfo['account']);
+        $user = $this->getUserFromEmailOrAccount($userInfo['email'], $userInfo['account']);
 
         if (! $user) {
             return false;
@@ -55,8 +55,8 @@ class MemberService
     public function apiRegisterUser(array $data): Member
     {
         $name = $data['name'];
-        if(empty($name)){
-            $name = Member::VISITOR_NAME. substr(hash('sha256', $data['account'], false), 0, 10);
+        if (empty($name)) {
+            $name = Member::VISITOR_NAME . substr(hash('sha256', $data['account'], false), 0, 10);
         }
         $model = new Member();
         $model->name = $name;
@@ -230,13 +230,13 @@ class MemberService
         return $this->createVerificationCode($memberId);
     }
 
-    public function getUserFromEmailOrUuid(?string $email, ?string $uuid)
+    public function getUserFromEmailOrAccount(?string $email, ?string $account)
     {
-        if(!empty($email)){
+        if (! empty($email)) {
             $user = Member::where('email', $email)->first();
         }
-        if(empty($user)) {
-            $user = Member::where('account', $uuid)->first();
+        if (empty($user)) {
+            $user = Member::where('account', $account)->first();
         }
 
         if (empty($user)) {

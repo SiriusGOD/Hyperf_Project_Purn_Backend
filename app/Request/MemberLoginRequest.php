@@ -32,7 +32,7 @@ class MemberLoginRequest extends FormRequest
             'email' => 'string',
             'device_id' => 'required|string',
             'password' => 'required|string',
-            'account' => 'string'
+            'account' => 'string',
         ];
     }
 }

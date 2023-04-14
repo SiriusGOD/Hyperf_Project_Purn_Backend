@@ -78,7 +78,7 @@ class MemberController extends AbstractController
         $data['sex'] = $request->input('sex');
         $data['age'] = $request->input('age');
         $data['email'] = $request->input('email');
-        $data['phone'] = $request->input('phone', );
+        $data['phone'] = $request->input('phone');
         $data['status'] = $request->input('status');
         $data['role_id'] = $request->input('role_id');
         $data['password'] = $request->input('password');

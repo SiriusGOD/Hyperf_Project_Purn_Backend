@@ -92,18 +92,20 @@ class VideoService
     // 付費影片列表
     public function getPayVideos(?array $tagIds, int $page = 0, int $status = 9, $ifFree): Collection
     {
-        $query=self::baseVideos($tagIds, $page, $status);
-        if($ifFree !=false){
-            $query = $query->where('is_free',$ifFree); 
-        } 
+        $query = self::baseVideos($tagIds, $page, $status);
+        if ($ifFree != false) {
+            $query = $query->where('is_free', $ifFree);
+        }
         return $query->get();
     }
+
     // 影片列表
     public function getVideos(?array $tagIds, int $page = 0, int $status = 9): Collection
     {
-        $query=self::baseVideos($tagIds,  $page,$status);
+        $query = self::baseVideos($tagIds, $page, $status);
         return $query->get();
     }
+
     // 影片
     public function baseVideos(?array $tagIds, int $page = 0, int $status = 9)
     {
