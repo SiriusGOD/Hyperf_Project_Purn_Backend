@@ -246,7 +246,7 @@ class MemberService
         //     $user = Member::where('email', $email)->first();
         // }
         if(empty($user)) {
-            $user = Member::where('account', $uuid)->first();
+            $user = Member::where('account', $account)->first();
         }
 
         if (empty($user)) {

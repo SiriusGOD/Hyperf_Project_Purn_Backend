@@ -158,8 +158,8 @@ return [
         'classification' => '演員分類管理',
         'tagGroup' => '標籤群組管理',
         'announcement' => '公告管理',
-        'memberLevel' => '會員等級管理',,
-        'image_group' => '套圖管理'
+        'memberLevel' => '會員等級管理',
+        'image_group' => '套圖管理',
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -357,6 +357,11 @@ return [
         'member_level_control' => '會員等級管理',
         'member_level_insert' => '新增會員等級',
         'member_level_edit' => '編輯會員等級',
+        'member_level_duration' => '持續天數',
+        'member_level_type' => [
+            'vip' => \App\Model\MemberLevel::TYPE_NAME['vip'],
+            'diamond' => \App\Model\MemberLevel::TYPE_NAME['diamond'],
+        ],
     ],
     // -------------------------------------------------------------------
 ];
