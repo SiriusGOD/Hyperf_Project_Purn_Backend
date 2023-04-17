@@ -32,6 +32,7 @@ class RedeemApiTest extends HttpTestCase
     protected $memberRedeem;
     protected $video;
     protected $redis;
+    protected $token;
   
     protected $testUserId = 1;
 
@@ -45,17 +46,31 @@ class RedeemApiTest extends HttpTestCase
         $this->redis = make(Redis::class);
     }
 
-    //user取可用兌換卷
-    public function userMemberRedeem($userId)
+    //取可用兌換卷
+    public function testMemberRedeemApiFalse()
     {
-      $user = Member::where('id',$userId)->first();
+      $memberId = 7;
+      $user = Member::where('id',$memberId)->first();
       $token = auth()->login($user);
-      $videoId = rand(1,2);
-      $videoDetail  =$this->video->find($videoId);
-
-      make(MemberService::class)->saveToken($userId, $token);
+      $this->token = $token; 
+      make(MemberService::class)->saveToken($user->id, $token);
       $data = $this->client->post('/api/redeem/videoRedeem', [
-          'video_id' => $videoId 
+          'video_id' => 1
+      ], [
+          'Authorization' => 'Bearer ' . $token,
+      ]);
+      $this->assertSame(true, empty($data['data']['models']));
+    }
+  
+    //取可用兌換卷
+    public function testMemberRedeemApi()
+    {
+      $user = Member::where('id',1)->first();
+      $token = auth()->login($user);
+      $this->token = $token; 
+      make(MemberService::class)->saveToken($user->id, $token);
+      $data = $this->client->post('/api/redeem/videoRedeem', [
+          'video_id' => 1
       ], [
           'Authorization' => 'Bearer ' . $token,
       ]);
@@ -65,38 +80,35 @@ class RedeemApiTest extends HttpTestCase
     //取可用兌換卷
     public function test1MemberRedeemApiList()
     {
-      $user = Member::first();
+      $user = Member::where('id',1)->first();
       $token = auth()->login($user);
+      $this->token = $token; 
       make(MemberService::class)->saveToken($user->id, $token);
-      
-      $data = $this->client->get('/api/redeem/videoRedeemList',["page"=>0], [
+      $data = $this->client->get('/api/redeem/videoRedeemList',
+      [
+        "page" => 0
+      ], 
+      [
           'Authorization' => 'Bearer ' . $token,
       ]);
-      print_r([11123 ,$data]); 
-      $this->assertSame(200, (int)$data['code']);
-
+      $this->assertSame(1, (int)$data['data']['models'][0]["member_id"]);
     }
+
     //取可用兌換卷
-    public function test1MemberRedeemApi()
+    public function testUsedMemberRedeemApiList()
     {
-      $user = Member::first();
+      $memberId = 1;
+      $user = Member::where('id',$memberId)->first();
       $token = auth()->login($user);
+      $this->token = $token; 
       make(MemberService::class)->saveToken($user->id, $token);
-      $data = $this->client->post('/api/redeem/videoRedeem', [
-          'video_id' => 1
-      ], [
+      $data = $this->client->get('/api/redeem/usedVideoRedeemList',
+      [
+        "page" => 0
+      ], 
+      [
           'Authorization' => 'Bearer ' . $token,
       ]);
-
-      print_r([$data]); 
-      $this->assertSame(1, (int)$data['data']['models']);
-      
-      $data = $this->client->get('/api/redeem/videoRedeemList', [
-          'Authorization' => 'Bearer ' . $token,
-      ]);
-      print_r([$data]); 
-      //$this->assertSame(200, (int)$data['code']);
-
+      $this->assertSame($memberId, (int)$data['data']['models'][0]["member_id"]);
     }
-
 }
