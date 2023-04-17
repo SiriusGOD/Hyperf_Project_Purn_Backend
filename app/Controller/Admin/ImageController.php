@@ -17,6 +17,7 @@ use App\Model\TagCorrespond;
 use App\Request\ImageRequest;
 use App\Service\ImageService;
 use App\Service\TagService;
+use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -49,9 +50,16 @@ class ImageController extends AbstractController
         // 顯示幾筆
         $step = Image::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = Image::with(['user'])->offset(($page - 1) * $step)->limit($step);
+        $query = Image::with(['user'])->offset(($page - 1) * $step)->limit($step)
+            ->leftJoin('clicks', function($join) {
+                $join->on('images.id', '=', 'clicks.type_id')->where('clicks.type', Image::class);
+            })
+            ->leftJoin('likes', function($join) {
+                $join->on('images.id', '=', 'likes.type_id')->where('likes.type', Image::class);
+            })
+            ->select('images.*', Db::raw('clicks.count as click_count'), Db::raw('likes.count as like_count'));
         $models = $query->get();
-        $query = Image::select('*');
+        $query = Image::select('image.*, clicks.count');
         $total = $query->count();
         $data['last_page'] = ceil($total / $step);
         if ($total == 0) {

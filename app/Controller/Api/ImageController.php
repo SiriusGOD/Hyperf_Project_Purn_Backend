@@ -13,6 +13,7 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Model\Image;
+use App\Model\ImageGroup;
 use App\Request\ClickRequest;
 use App\Request\ImageApiLikeRequest;
 use App\Request\ImageApiListRequest;
@@ -20,6 +21,7 @@ use App\Request\ImageApiSearchRequest;
 use App\Request\ImageApiSuggestRequest;
 use App\Service\ClickService;
 use App\Service\ImageService;
+use App\Service\LikeService;
 use App\Service\SuggestService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
@@ -76,16 +78,6 @@ class ImageController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['POST'], path: 'like')]
-    public function like(ImageApiLikeRequest $request)
-    {
-        $id = $request->input('id');
-        $model = Image::find($id);
-        ++$model->like;
-        $model->save();
-        return $this->success(['id' => $id, 'like' => $model->like]);
-    }
-
     #[RequestMapping(methods: ['POST'], path: 'click')]
     public function saveClick(ClickRequest $request, ClickService $service)
     {
@@ -100,5 +92,13 @@ class ImageController extends AbstractController
         $result = $service->getPopularClick(Image::class);
 
         return $this->success($result);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'like')]
+    public function saveLike(ClickRequest $request, LikeService $service)
+    {
+        $id = (int) $request->input('id');
+        $service->addLike(Image::class, $id);
+        return $this->success([]);
     }
 }

@@ -14,11 +14,13 @@ namespace App\Controller\Api;
 use App\Constants\Apicode;
 use App\Constants\Constants;
 use App\Controller\AbstractController;
+use App\Model\ImageGroup;
 use App\Model\Video;
 use App\Request\ClickRequest;
 use App\Request\VideoApiSuggestRequest;
 use App\Service\ActorService;
 use App\Service\ClickService;
+use App\Service\LikeService;
 use App\Service\SuggestService;
 use App\Service\TagService;
 use App\Service\VideoService;
@@ -180,5 +182,13 @@ class VideoController extends AbstractController
         $result = $service->getPopularClick(Video::class);
 
         return $this->success($result);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'like')]
+    public function saveLike(ClickRequest $request, LikeService $service)
+    {
+        $id = (int) $request->input('id');
+        $service->addLike(Video::class, $id);
+        return $this->success([]);
     }
 }

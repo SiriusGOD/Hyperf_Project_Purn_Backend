@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Click;
+use App\Model\ClickDetail;
 use Carbon\Carbon;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
@@ -49,6 +50,10 @@ class ClickService
 
         ++$model->count;
         $model->save();
+
+        if (auth('jwt')->check()) {
+            $this->createClickDetail($model->id, auth('jwt')->user()->getId());
+        }
     }
 
     public function calculatePopularClick(string $type)
@@ -88,5 +93,13 @@ class ClickService
         $model->count = 0;
 
         return $model;
+    }
+
+    public function createClickDetail(int $clickId, int $memberId) : void
+    {
+        $model = new ClickDetail();
+        $model->click_id = $clickId;
+        $model->member_id = $memberId;
+        $model->save();
     }
 }

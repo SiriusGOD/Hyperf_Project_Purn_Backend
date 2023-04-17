@@ -47,6 +47,10 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.image_control.image_clicks') ?? '圖片觀看次數'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.image_control.image_group_id') ?? '圖片群組序號'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
@@ -67,7 +71,8 @@
                                             <td>
                                                 <a href="{{ env('APP_HOST', '') . $model->url }}" target="_blank">link</a>
                                             </td>
-                                            <td>{{ $model->likes }}</td>
+                                            <td>{{ $model->like_count ?? 0 }}</td>
+                                            <td>{{ $model->click_count ?? 0 }}</td>
                                             <td>{{ $model->group_id }}</td>
                                             <td>
                                                 @if(authPermission('image-edit'))
