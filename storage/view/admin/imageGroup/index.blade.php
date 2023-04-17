@@ -15,6 +15,20 @@
                             @endif
                         </div>
                         <div class="row">
+                            <form action="/admin/image_group/index" method="get" class="col-md-12">
+                                <div class="form-row">
+                                    <div class="form-group col-md-3">
+                                        <label>{{trans('default.image_group_control.image_group_name') ?? '套圖名稱'}}</label>
+                                        <input type="text" class="form-control" name="title" aria-describedby="title" value="{{$title ?? ''}}">
+                                    </div>
+                                </div>
+                                @include('partial.tagSelect')
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">search</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="row">
                             <div class="col-sm-12">
                                 <table id="example2" class="table table-bordered table-hover dataTable dtr-inline"
                                        aria-describedby="example2_info">

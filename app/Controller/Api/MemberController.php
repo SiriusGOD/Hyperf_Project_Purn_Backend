@@ -15,6 +15,7 @@ use App\Constants\ErrorCode;
 use App\Controller\AbstractController;
 use App\Job\EmailVerificationJob;
 use App\Middleware\Auth\ApiAuthMiddleware;
+use App\Middleware\LoginLimitMiddleware;
 use App\Middleware\TryLimitMiddleware;
 use App\Model\Member;
 use App\Model\MemberFollow;
@@ -36,20 +37,26 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\Redis\Redis;
 
 #[Controller]
 class MemberController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'login')]
+    #[Middleware(LoginLimitMiddleware::class)]
     public function login(MemberLoginRequest $request, MemberService $service)
     {
-        $user = $service->apiCheckUser([
+        $user = $service->apiGetUser([
             'email' => $request->input('email'),
-            'password' => $request->input('password'),
             'account' => $request->input('account') ?? $request->input('device_id')
         ]);
 
-        if (empty($user)) {
+        if (!empty($user)) {
+            $check = $service->checkPassword($request->input('password'), $user->password);
+            if (!$check and !empty($user->password)) {
+                return $this->error(trans('validation.authorize'), 401);
+            }
+        } else {
             $base_service = di(\App\Service\BaseService::class);
             $ip = $base_service->getIp($request->getHeaders(), $request->getServerParams());
             $user = $service->apiRegisterUser([
@@ -80,38 +87,9 @@ class MemberController extends AbstractController
             'last_ip' => $ip,
         ]);
 
+        $service->createOrUpdateLoginLimitRedisKey($ip);
+
         $service->saveToken($user->id, $token);
-        return $this->success([
-            'id' => $user->id,
-            'token' => $token,
-        ]);
-    }
-
-    #[RequestMapping(methods: ['POST'], path: 'register')]
-    public function register(MemberRegisterRequest $request, MemberService $service)
-    {
-        $path = '';
-        if ($request->hasFile('avatar')) {
-            $path = $service->moveUserAvatar($request->file('avatar'));
-        }
-
-        $base_service = di(\App\Service\BaseService::class);
-        $ip = $base_service->getIp($request->getHeaders(), $request->getServerParams());
-
-        $user = $service->apiRegisterUser([
-            'name' => $request->input('name'),
-            'password' => $request->input('password'),
-            'sex' => $request->input('sex', Member::SEX['DEFAULT']),
-            'age' => $request->input('age', 18),
-            'avatar' => $path,
-            'email' => $request->input('email', ''),
-            'phone' => $request->input('phone', ''),
-            'account' => $request->input('account', null),
-            'device' => $request->input('device', null),
-            'register_ip' => $ip,
-        ]);
-
-        $token = auth()->login($user);
         return $this->success([
             'id' => $user->id,
             'token' => $token,
@@ -194,7 +172,7 @@ class MemberController extends AbstractController
         if (auth()->check()) {
             $member = auth()->user();
         } else {
-            $member = $service->getUserFromEmailOrAccount($request->input('email'), $request->input('uuid'));
+            $member = $service->getUserFromAccount($request->input('uuid'));
         }
 
         $code = $service->getVerificationCode($member->id);
@@ -229,10 +207,10 @@ class MemberController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'verification/reset_password_check')]
     public function checkResetPasswordVerificationCode(ResetPasswordVerificationRequest $request, MemberService $service)
     {
-        $member = $service->getUserFromEmailOrAccount($request->input('email'), $request->input('uuid'));
+        $member = $service->getUserFromAccount($request->input('uuid'));
 
         if (empty($member)) {
-            return $this->error(trans('validation.exists', ['attribute' => 'email or uuid']), 400);
+            return $this->error(trans('validation.exists', ['attribute' => 'uuid']), 400);
         }
 
         $now = Carbon::now()->toDateTimeString();
