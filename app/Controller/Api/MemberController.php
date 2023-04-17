@@ -53,7 +53,7 @@ class MemberController extends AbstractController
 
         if (!empty($user)) {
             $check = $service->checkPassword($request->input('password'), $user->password);
-            if (!$check) {
+            if (!$check and !empty($user->password)) {
                 return $this->error(trans('validation.authorize'), 401);
             }
         } else {
