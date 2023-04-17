@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Middleware;
 
+use Carbon\Carbon;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface as HttpResponse;
 use Hyperf\Logger\LoggerFactory;
@@ -21,11 +22,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class TryLimitMiddleware implements MiddlewareInterface
+class LoginLimitMiddleware implements MiddlewareInterface
 {
-    public const TRY_LIMIT_CACHE_KEY = 'try_limit:';
-
-    public const TRY_LIMIT_EXPIRE_SECOND = 60;
+    public const LOGIN_LIMIT_CACHE_KEY = 'login_limit:';
 
     protected ContainerInterface $container;
 
@@ -45,19 +44,20 @@ class TryLimitMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $ip = $this->getIP($request->getServerParams());
-        $path = make(RequestInterface::class)->path();
-        $key = self::TRY_LIMIT_CACHE_KEY . $path . ':' . $ip;
-        $this->logger->info('try limit redis key : ' . $key);
+        $now = Carbon::now()->timestamp;
+        $tomorrow = Carbon::tomorrow()->setHour(0)->setMinute(0)->setSecond(0)->timestamp;
+        $expire = $tomorrow - $now;
 
-        if ($this->redis->exists($key)) {
+        $ip = $this->getIP($request->getServerParams());
+        $key = self::LOGIN_LIMIT_CACHE_KEY . $ip;
+        $this->logger->info('login limit redis key : ' . $key);
+
+        if ($this->redis->exists($key) and $this->redis->get($key) >= 3) {
             return $this->response->json([
                 'code' => 405,
                 'msg' => trans('validation.try_limit'),
             ]);
         }
-
-        $this->redis->set($key, 'true', self::TRY_LIMIT_EXPIRE_SECOND);
 
         return $handler->handle($request);
     }

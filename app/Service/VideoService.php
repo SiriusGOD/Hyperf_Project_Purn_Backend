@@ -321,7 +321,7 @@ class VideoService
                 ->pluck('correspond_id')
                 ->toArray();
 
-            $query = $query->whereIn('id', $ids);
+            $query = $query->whereIn('videos.id', $ids);
         }
 
         return $query;

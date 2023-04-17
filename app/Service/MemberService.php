@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Middleware\LoginLimitMiddleware;
 use App\Model\Member;
 use App\Model\MemberFollow;
 use App\Model\MemberVerification;
@@ -38,22 +39,23 @@ class MemberService
         $this->logger = $loggerFactory->get('reply');
     }
 
-    public function apiCheckUser(array $userInfo)
+    public function apiGetUser(array $userInfo)
     {
-        $user = $this->getUserFromEmailOrAccount($userInfo['email'], $userInfo['account']);
+        $user = $this->getUserFromAccount($userInfo['account']);
 
         if (! $user) {
             return false;
         }
-
-        if(! empty($userInfo['password'])){
-            if (password_verify($userInfo['password'], $user->password)) {
-                return $user;
-            }
-            return false;
-        }
         
         return $user;
+    }
+
+    public function checkPassword($plain, $hash) : bool
+    {
+        if (password_verify($plain, $hash)) {
+            return true;
+        }
+        return false;
     }
 
     public function apiRegisterUser(array $data): Member
@@ -240,14 +242,9 @@ class MemberService
         return $this->createVerificationCode($memberId);
     }
 
-    public function getUserFromEmailOrAccount(?string $email, ?string $account)
+    public function getUserFromAccount(?string $account)
     {
-        // if(!empty($email)){
-        //     $user = Member::where('email', $email)->first();
-        // }
-        if(empty($user)) {
-            $user = Member::where('account', $account)->first();
-        }
+        $user = Member::where('account', $account)->first();
 
         if (empty($user)) {
             return false;
@@ -327,5 +324,18 @@ class MemberService
             $url .= $charray[$randomChar];
         }
         return $url;
+    }
+
+    public function createOrUpdateLoginLimitRedisKey(string $ip)
+    {
+        $now = Carbon::now()->timestamp;
+        $tomorrow = Carbon::tomorrow()->setHour(0)->setMinute(0)->setSecond(0)->timestamp;
+        $expire = $tomorrow - $now;
+
+        if($this->redis->exists(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $ip)){
+            $this->redis->incr(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $ip);
+        } else {
+            $this->redis->set(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $ip, 0, $expire);
+        }
     }
 }

@@ -46,20 +46,16 @@ class ImageGroupController extends AbstractController
     }
 
     #[RequestMapping(methods: ['GET'], path: 'index')]
-    public function index(RequestInterface $request)
+    public function index(RequestInterface $request, ImageGroupService $service)
     {
         // 顯示幾筆
         $step = ImageGroup::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = ImageGroup::with(['user'])->offset(($page - 1) * $step)
-            ->limit($step)
-            ->leftJoin('clicks', function($join) {
-                $join->on('image_groups.id', '=', 'clicks.type_id')->where('clicks.type', ImageGroup::class);
-            })
-            ->leftJoin('likes', function($join) {
-                $join->on('image_groups.id', '=', 'likes.type_id')->where('likes.type', ImageGroup::class);
-            })
-            ->select('image_groups.*', Db::raw('clicks.count as click_count'), Db::raw('likes.count as like_count'));
+        $query = $service->adminSearchImageGroupQuery([
+            'page' => $page,
+            'title' => $request->input('title'),
+            'tag_ids' => $request->input('tags'),
+        ]);
         $models = $query->get();
         $query = ImageGroup::select('*');
         $total = $query->count();
@@ -73,6 +69,8 @@ class ImageGroupController extends AbstractController
         $data['datas'] = $models;
         $data['page'] = $page;
         $data['step'] = $step;
+        $data['title'] = $request->input('title');
+        $data['tag_ids'] = json_encode(TagService::tagIdsToInt($request->input('tags')));
         $path = '/admin/image_group/index';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . ($page - 1);
