@@ -18,6 +18,7 @@ use App\Request\ImageRequest;
 use App\Service\ImageGroupService;
 use App\Service\ImageService;
 use App\Service\TagService;
+use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -50,7 +51,15 @@ class ImageGroupController extends AbstractController
         // 顯示幾筆
         $step = ImageGroup::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = ImageGroup::with(['user'])->offset(($page - 1) * $step)->limit($step);
+        $query = ImageGroup::with(['user'])->offset(($page - 1) * $step)
+            ->limit($step)
+            ->leftJoin('clicks', function($join) {
+                $join->on('image_groups.id', '=', 'clicks.type_id')->where('clicks.type', ImageGroup::class);
+            })
+            ->leftJoin('likes', function($join) {
+                $join->on('image_groups.id', '=', 'likes.type_id')->where('likes.type', ImageGroup::class);
+            })
+            ->select('image_groups.*', Db::raw('clicks.count as click_count'), Db::raw('likes.count as like_count'));
         $models = $query->get();
         $query = ImageGroup::select('*');
         $total = $query->count();

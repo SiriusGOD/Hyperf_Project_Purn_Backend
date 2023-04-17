@@ -129,6 +129,7 @@ return [
         'end_duration' => '最大時長',
         'release_time' => '上架時間',
         'like' => '點讚數',
+        'click' => '觀看次數',
     ],
 
     // actor
@@ -266,6 +267,7 @@ return [
         'image_thumbnail' => '圖片縮圖',
         'image_url' => '圖片網址',
         'image_likes' => '圖片按讚數',
+        'image_clicks' => '圖片觀看次數',
         'image_group_id' => '套圖 id',
         'image_description' => '圖片描述',
     ],
@@ -277,6 +279,8 @@ return [
         'image_group_thumbnail' => '套圖封面圖縮圖',
         'image_group_url' => '套圖封面圖網址',
         'image_group_description' => '套圖描述',
+        'image_group_clicks' => '套圖觀看次數',
+        'image_group_likes' => '套圖按讚數',
     ],
     // -------------------------------------------------------------------
     // OrderController

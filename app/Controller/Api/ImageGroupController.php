@@ -20,6 +20,7 @@ use App\Request\ImageApiSearchRequest;
 use App\Request\ImageApiSuggestRequest;
 use App\Service\ClickService;
 use App\Service\ImageGroupService;
+use App\Service\LikeService;
 use App\Service\SuggestService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
@@ -90,5 +91,13 @@ class ImageGroupController extends AbstractController
         $result = $service->getPopularClick(ImageGroup::class);
 
         return $this->success($result);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'like')]
+    public function saveLike(ClickRequest $request, LikeService $service)
+    {
+        $id = (int) $request->input('id');
+        $service->addLike(ImageGroup::class, $id);
+        return $this->success([]);
     }
 }
