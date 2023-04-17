@@ -12,11 +12,13 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
+use App\Constants\RedeemCode;
 use App\Model\Role;
-use App\Model\User;
+use App\Model\Redeem;
+use App\Util\URand;
 use App\Service\PermissionService;
+use App\Service\RedeemService;
 use App\Service\RoleService;
-use App\Service\UserService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
@@ -27,7 +29,7 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
 #[Controller]
 #[Middleware(middleware: 'App\\Middleware\\PermissionMiddleware')]
-class RoleController extends AbstractController
+class RedeemController extends AbstractController
 {
     protected RenderInterface $render;
 
@@ -37,48 +39,50 @@ class RoleController extends AbstractController
         $this->render = $render;
     }
 
-    public function index(RequestInterface $request, RoleService $service)
+    #[RequestMapping(methods: ['GET'], path: 'index')]
+    public function index(RequestInterface $request, RedeemService $redeemService)
     {
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $users = $service->getAll($page, User::PAGE_PER);
-        $total = $service->allCount();
-        $data['last_page'] = ceil($total / User::PAGE_PER);
+        $redeems = $redeemService->redeemList($page);
+        $total = $redeemService->allCount();
+        $data['last_page'] = ceil($total / Redeem::PAGE_PER);
         if ($total == 0) {
             $data['last_page'] = 1;
         }
         $data['total'] = $total;
-        $data['datas'] = $users;
+        $data['datas'] = $redeems;
         $data['page'] = $page;
         $data['step'] = 10;
-        $path = '/admin/role/index';
+        $data['category'] = RedeemCode::CATEGORY;
+        $path = '/admin/redeem/index';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . ($page - 1);
-        $data['navbar'] = trans('default.role_control.role');
-        $data['role_active'] = 'active';
-        return $this->render->render('admin.role.index', $data);
+        $data['navbar'] = trans('default.redeem.title');
+        $data['redeem_active'] = 'active';
+        return $this->render->render('admin.redeem.index', $data);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'store')]
-    public function store(RequestInterface $request, ResponseInterface $response, RoleService $service, PermissionService $permissionService): PsrResponseInterface
+    public function store(RequestInterface $request, ResponseInterface $response, RedeemService $redeemService): PsrResponseInterface
     {
         $data['id'] = $request->input('id') ? $request->input('id') : null;
-        $data['name'] = $request->input('name');
-        $data['type'] = $request->input('type', 0);
-        $role = $service->storeRole($data);
-        $permissions = $request->input('permissions');
-        $permissionService->storePermission($permissions, $role->id);
-        return $response->redirect('/admin/role/index');
+        $all = $request->all();
+        $res=$redeemService->store($all);
+        if($res==false){
+          return $response->redirect('/admin/redeem/create');
+        } 
+        return $response->redirect('/admin/redeem/index');
     }
 
     #[RequestMapping(methods: ['GET'], path: 'create')]
-    public function create(PermissionService $permissionService)
+    public function create()
     {
-        $data['navbar'] = trans('default.role_control.role_insert');
+        $data['navbar'] = trans('default.redeem.insert');
         $data['role'] = new Role();
-        $data['role_active'] = 'active';
+        $data['code'] = URand::randomString(10);
+        $data['redeem_active'] = 'active';
         $data['rolePermission'] = [];
-        $data['permissions'] = $permissionService->parseData();
-        return $this->render->render('admin.role.form', $data);
+        return $this->render->render('admin.redeem.form', $data);
     }
 
     #[RequestMapping(methods: ['GET'], path: 'edit')]
@@ -86,19 +90,18 @@ class RoleController extends AbstractController
     {
         $id = $request->input('id');
         $data['role'] = $service->findRole(intval($id));
-        $data['navbar'] = trans('default.role_control.role_update');
-        $data['role_active'] = 'active';
+        $data['navbar'] = trans('default.redeem.role_update');
+        $data['redeem_active'] = 'active';
         $data['rolePermission'] = $permissionService->getRolePermission($id);
         $data['permissions'] = $permissionService->parseData();
-        return $this->render->render('admin.role.form', $data);
+        return $this->render->render('admin.redeem.form', $data);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'delete')]
-    public function delete(RequestInterface $request, ResponseInterface $response, RoleService $service, UserService $userService): PsrResponseInterface
+    public function delete(RequestInterface $request, ResponseInterface $response, RedeemService $redeemService): PsrResponseInterface
     {
-        $roleId = $request->input('id');
-        $service->delRole($roleId);
-        $userService->userRoleUpdate($roleId);
-        return $response->redirect('/admin/role/index');
+        $id = $request->input('id');
+        $redeemService->updateStatus($id , 1);
+        return $response->redirect('/admin/redeem/index');
     }
 }

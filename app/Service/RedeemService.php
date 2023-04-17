@@ -66,6 +66,35 @@ class RedeemService extends BaseService
               ->first();
       }
 
+      // 取得兌換卷 
+      public function find(int $id)
+      {
+          $model = new $this->redeem->find($id);
+          if( $model->save() ){
+            return true;
+          }else{
+            return false;
+          }
+      }
+      // store兌換卷 
+      public function store(array $datas)
+      {
+          if(empty($datas["id"]) ){
+             unset($datas["id"]); 
+          }
+          $model = new $this->redeem;
+          foreach($datas as $key =>$val){
+              $model->$key = $val;
+          }
+          $model->category_name =RedeemCode::CATEGORY[$model->category_id];
+
+          if($model->save()){
+            return true;
+          }else{
+            return false;
+          }
+      }
+
       // 使用者兌換卷 by code
       public function getMemberRedeemByCode(string $code, int $page)
       {
@@ -80,14 +109,14 @@ class RedeemService extends BaseService
       {
           $key = self::CACHE_KEY . ':ticket:' . $code;
           if ($this->redis->exists($key)) {
-              // $row = $this->redis->get($key);
-              // return json_decode($row,true);
+               $row = $this->redis->get($key);
+               return json_decode($row,true);
           }
 
           if ($row = $this->redeem->where('code', $code)->first()) {
               if ($row->count == $row->counted) {
-                  // $this->redis->set($key , json_encode($row->toArray()));
-                  // $this->redis->expire($key , self::EXPIRE);
+                   $this->redis->set($key , json_encode($row->toArray()));
+                   $this->redis->expire($key , self::EXPIRE);
               }
               return $row->toArray();
           } else {
@@ -95,11 +124,23 @@ class RedeemService extends BaseService
           }
       }
 
-      // 兌換卷清單
-      public function redeemList(int $page, int $status = 0)
+      //計算總數
+      public function allCount()
       {
-          $model = $this->redeem->where('status', $status)
-              ->offset(Redeem::PAGE_PER * $page)
+          return  $this->redeem->count();
+      }
+
+      // 兌換卷清單
+      public function redeemList(int $page, $status = true)
+      {
+          $model = $this->redeem;
+          if($status==0 || $status==1){
+             // $model = $this->redeem->where('status', $status);
+          }
+          if($page==1){
+            $page=0;
+          }
+          $model = $this->redeem->offset(Redeem::PAGE_PER * $page)
               ->limit(Redeem::PAGE_PER);
           return $model->get();
       }
@@ -112,6 +153,12 @@ class RedeemService extends BaseService
               ->offset(Redeem::PAGE_PER * $page)
               ->limit(Redeem::PAGE_PER);
           return $model->get();
+      }
+
+      // 更新優惠裝態
+      public function updateStatus(int $id ,int $status)
+      {
+          return $this->memberRedeem->where('id', $id)->udpate(['status'=>$status]);
       }
 
       // 取會員優惠 清單

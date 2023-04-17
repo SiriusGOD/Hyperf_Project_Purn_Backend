@@ -27,6 +27,7 @@ class RedeemSeed implements BaseInterface
         $model->vip_days= rand(1,20);
         $model->free_watch = 0;
         $model->status = 0;
+        $model->content = "";
         $model->start = date("Y-m-d H:i:s");
         $model->end = date('Y-m-d H:i:s', strtotime('+1 month'));;
         $model->save();
@@ -42,6 +43,7 @@ class RedeemSeed implements BaseInterface
         $model->free_watch = 0;
         $model->status = 0;
         $model->start = date("Y-m-d H:i:s");
+        $model->content = "";
         $model->end = date('Y-m-d H:i:s', strtotime('+1 month'));;
         $model->save();
 
@@ -49,6 +51,7 @@ class RedeemSeed implements BaseInterface
         $model->title = '優惠劵台北市好捧'.URand::getRandTitle(10);
         $model->code = URand::randomString(10);
         $model->count = 2;
+        $model->content = "";
         $model->category_id = 3;
         $model->category_name = RedeemCode::CATEGORY[3];
         $model->diamond_point = 0;
@@ -62,6 +65,7 @@ class RedeemSeed implements BaseInterface
 
         $model = new \App\Model\Redeem();
         $model->title = '優惠劵台北市好捧'.URand::getRandTitle(10);
+        $model->content = "";
         $model->code = URand::randomString(10);
         $model->count = rand(1,20);
         $model->category_id = 3;

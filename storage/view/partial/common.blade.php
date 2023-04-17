@@ -94,6 +94,18 @@
                         </a>
                     </li>
                 @endif
+
+                @if(authPermission('redeem-index'))
+                    <li class="nav-item">
+                        <a href="/admin/redeem/index" class="nav-link {{$redeem_active ?? ''}}">
+                            <i class="nav-icon fas fa-money-bill"></i>
+                            <p>
+                            {{trans('default.leftbox.redeem') ?? '優惠卷管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
+
                 @if(authPermission('role-index'))
                     <li class="nav-item">
                         <a href="/admin/role/index" class="nav-link {{$role_active ?? ''}}">
