@@ -158,8 +158,8 @@ return [
         'classification' => '演員分類管理',
         'tagGroup' => '標籤群組管理',
         'announcement' => '公告管理',
-        'memberLevel' => '會員等級管理',,
-        'image_group' => '套圖管理'
+        'memberLevel' => '會員等級管理',
+        'image_group' => '套圖管理',
     ],
     // -------------------------------------------------------------------
     // UserController
