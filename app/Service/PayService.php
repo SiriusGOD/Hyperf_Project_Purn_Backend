@@ -37,6 +37,7 @@ class PayService
             $result['data']['pay_url'] = 'http://test.pay/' . $this->randomURL();
             $result['data']['pay_way'] = 'test';
             $result['data']['pay_proxy'] = 'online';
+            $result['data']['pay_order_id'] = 'test_order_id';
         } else {
             // 正式 (test)
             // 撈取商品資料
