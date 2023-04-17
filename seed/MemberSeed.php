@@ -38,7 +38,7 @@ class MemberSeed implements BaseInterface
         $model->role_id = 2;
         $model->save();
 
-        for($i=1 ; $i<=20 ;$i++)
+        for($i=1 ; $i<=80 ;$i++)
         {
           $model = new \App\Model\Member();
           $model->name = 'test'.$i;

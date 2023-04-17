@@ -55,7 +55,7 @@ class MemberRedeemService extends BaseService
     //使用者的優惠List
     public function getRedeemList(int $memberId ,int $page = 0 )
     {
-      $query = $this->memberRedeem->whereNotIn("member_id",$memberId);
+      $query = $this->memberRedeem->where("member_id",$memberId);
       $query = $query->offset(MemberRedeem::PAGE_PER * $page)->limit(MemberRedeem::PAGE_PER);
       return $query->get(); 
     } 
