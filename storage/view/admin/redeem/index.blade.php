@@ -37,7 +37,7 @@
                                             <td>{{ $row->counted }}</td>
                                             <td>
                                                 @if(authPermission('redeem-edit'))
-                                                    <a href="/admin/redeem/edit?id={{$redeem->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
+                                                    <a href="/admin/redeem/edit?id={{$row->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
                                                 @endif
 
                                                 @if(authPermission('redeem-delete'))

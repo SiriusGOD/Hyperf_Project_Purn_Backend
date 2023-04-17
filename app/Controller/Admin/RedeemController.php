@@ -86,14 +86,12 @@ class RedeemController extends AbstractController
     }
 
     #[RequestMapping(methods: ['GET'], path: 'edit')]
-    public function edit(RequestInterface $request, RoleService $service, PermissionService $permissionService)
+    public function edit(RequestInterface $request, RedeemService $redeemService)
     {
         $id = $request->input('id');
-        $data['role'] = $service->findRole(intval($id));
-        $data['navbar'] = trans('default.redeem.role_update');
+        $data['model'] = $redeemService->find((int)$id);
+        $data['navbar'] = trans('default.redeem.edit');
         $data['redeem_active'] = 'active';
-        $data['rolePermission'] = $permissionService->getRolePermission($id);
-        $data['permissions'] = $permissionService->parseData();
         return $this->render->render('admin.redeem.form', $data);
     }
 

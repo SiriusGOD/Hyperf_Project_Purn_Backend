@@ -41,6 +41,7 @@
                                         @endforeach
                                     </select>
                                 </div>
+
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{ trans('default.redeem.status') ?? '狀態'}}</label>
                                     <select class="form-control form-control-lg" name="status">

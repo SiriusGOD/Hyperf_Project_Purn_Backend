@@ -136,8 +136,9 @@ return [
     // redeem
     'redeem' => [
         'insert' => '新增優惠卷',
+        'edit' => '編輯優惠卷',
         'delete' => '停用',
-        'title' => '兌換名稱',
+        'title' => '優惠卷',
         'category' => '兌換分類',
         'content' => '兌換內容',
         'code' => '兌換代碼',

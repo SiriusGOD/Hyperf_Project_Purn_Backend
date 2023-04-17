@@ -69,12 +69,7 @@ class RedeemService extends BaseService
       // 取得兌換卷 
       public function find(int $id)
       {
-          $model = new $this->redeem->find($id);
-          if( $model->save() ){
-            return true;
-          }else{
-            return false;
-          }
+          return $this->redeem->find($id);
       }
       // store兌換卷 
       public function store(array $datas)
@@ -82,11 +77,15 @@ class RedeemService extends BaseService
           if(empty($datas["id"]) ){
              unset($datas["id"]); 
           }
-          $model = new $this->redeem;
+          if (Redeem::where('id', $datas['id'])->exists()) {
+              $model = Redeem::where('id', $datas['id'])->first();
+          } else {
+              $model = new Redeem();
+          }
           foreach($datas as $key =>$val){
               $model->$key = $val;
           }
-          $model->category_name =RedeemCode::CATEGORY[$model->category_id];
+          $model->category_name = RedeemCode::CATEGORY[$model->category_id];
 
           if($model->save()){
             return true;
