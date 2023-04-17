@@ -13,9 +13,6 @@ namespace App\Service;
 
 use App\Model\Click;
 use App\Model\ClickDetail;
-use Carbon\Carbon;
-use Hyperf\DbConnection\Db;
-use Hyperf\Redis\Redis;
 
 class LikeService
 {
@@ -40,6 +37,14 @@ class LikeService
         }
     }
 
+    public function createLikeDetail(int $clickId, int $memberId): void
+    {
+        $model = new ClickDetail();
+        $model->click_id = $clickId;
+        $model->member_id = $memberId;
+        $model->save();
+    }
+
     private function createLike(array $data): Click
     {
         $model = new Click();
@@ -48,13 +53,5 @@ class LikeService
         $model->count = 0;
 
         return $model;
-    }
-
-    public function createLikeDetail(int $clickId, int $memberId) : void
-    {
-        $model = new ClickDetail();
-        $model->click_id = $clickId;
-        $model->member_id = $memberId;
-        $model->save();
     }
 }

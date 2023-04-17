@@ -39,7 +39,7 @@ class MemberRedeemVideoService extends BaseService
         $this->memberRedeemVideo = $memberRedeemvideo;
     }
 
-    //己兌換列表  
+    // 己兌換列表
     public function usedRedeemList(int $memberId, int $page)
     {
         $query = $this->memberRedeemVideo;
@@ -48,10 +48,11 @@ class MemberRedeemVideoService extends BaseService
         $query = $query->with('memberRedeem');
         $query = $query->where('member_id', $memberId);
         $query = $query->offset(MemberRedeemVideo::PAGE_PER * $page)
-                        ->limit(MemberRedeemVideo::PAGE_PER);
-        return $query->get(); 
+            ->limit(MemberRedeemVideo::PAGE_PER);
+        return $query->get();
     }
-    //是否己兌換過
+
+    // 是否己兌換過
     public function checkMemeberUsed(int $memberId, int $videoId)
     {
         return $this->memberRedeemVideo

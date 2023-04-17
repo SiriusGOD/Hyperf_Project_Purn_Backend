@@ -18,7 +18,6 @@ use App\Request\ImageRequest;
 use App\Service\ImageGroupService;
 use App\Service\ImageService;
 use App\Service\TagService;
-use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;

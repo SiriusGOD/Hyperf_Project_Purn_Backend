@@ -84,6 +84,14 @@ class ClickService
         return $this->calculatePopularClick($type);
     }
 
+    public function createClickDetail(int $clickId, int $memberId): void
+    {
+        $model = new ClickDetail();
+        $model->click_id = $clickId;
+        $model->member_id = $memberId;
+        $model->save();
+    }
+
     private function createClick(array $data): Click
     {
         $model = new Click();
@@ -93,13 +101,5 @@ class ClickService
         $model->count = 0;
 
         return $model;
-    }
-
-    public function createClickDetail(int $clickId, int $memberId) : void
-    {
-        $model = new ClickDetail();
-        $model->click_id = $clickId;
-        $model->member_id = $memberId;
-        $model->save();
     }
 }

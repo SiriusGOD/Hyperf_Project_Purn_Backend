@@ -44,21 +44,22 @@ class MemberRedeemService extends BaseService
         $this->memberRedeem = $memberRedeem;
         $this->memberRedeemVideo = $memberRedeemVideo;
     }
-    //使用者的優惠
-    public function getMemberRedeemList(int $cateId ,int $status,array $memberId)
+
+    // 使用者的優惠
+    public function getMemberRedeemList(int $cateId, int $status, array $memberId)
     {
-      return $this->memberRedeem->where("redeem_category_id",$cateId)
-                ->whereNotIn("member_id",$memberId)
-                ->where("status",$status)->get();
-    } 
-  
-    //使用者的優惠List
-    public function getRedeemList(int $memberId ,int $page = 0 )
+        return $this->memberRedeem->where('redeem_category_id', $cateId)
+            ->whereNotIn('member_id', $memberId)
+            ->where('status', $status)->get();
+    }
+
+    // 使用者的優惠List
+    public function getRedeemList(int $memberId, int $page = 0)
     {
-      $query = $this->memberRedeem->where("member_id",$memberId);
-      $query = $query->offset(MemberRedeem::PAGE_PER * $page)->limit(MemberRedeem::PAGE_PER);
-      return $query->get(); 
-    } 
+        $query = $this->memberRedeem->where('member_id', $memberId);
+        $query = $query->offset(MemberRedeem::PAGE_PER * $page)->limit(MemberRedeem::PAGE_PER);
+        return $query->get();
+    }
 
     // 使用者的優惠是否有用過
     public function checkIsRedeem(int $videoId, array $discount)

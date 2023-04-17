@@ -26,7 +26,6 @@ use App\Request\AddMemberTagRequest;
 use App\Request\MemberApiUpdateRequest;
 use App\Request\MemberDetailRequest;
 use App\Request\MemberLoginRequest;
-use App\Request\MemberRegisterRequest;
 use App\Request\RegisterVerificationRequest;
 use App\Request\ResetPasswordVerificationRequest;
 use App\Request\SendVerificationRequest;
@@ -37,7 +36,6 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\Redis\Redis;
 
 #[Controller]
 class MemberController extends AbstractController
@@ -48,12 +46,12 @@ class MemberController extends AbstractController
     {
         $user = $service->apiGetUser([
             'email' => $request->input('email'),
-            'account' => $request->input('account') ?? $request->input('device_id')
+            'account' => $request->input('account') ?? $request->input('device_id'),
         ]);
 
-        if (!empty($user)) {
+        if (! empty($user)) {
             $check = $service->checkPassword($request->input('password'), $user->password);
-            if (!$check and !empty($user->password)) {
+            if (! $check and ! empty($user->password)) {
                 return $this->error(trans('validation.authorize'), 401);
             }
         } else {

@@ -66,32 +66,32 @@ class RedeemService extends BaseService
               ->first();
       }
 
-      // 取得兌換卷 
+      // 取得兌換卷
       public function find(int $id)
       {
           return $this->redeem->find($id);
       }
-      // store兌換卷 
+
+      // store兌換卷
       public function store(array $datas)
       {
-          if(empty($datas["id"]) ){
-             unset($datas["id"]); 
+          if (empty($datas['id'])) {
+              unset($datas['id']);
           }
           if (Redeem::where('id', $datas['id'])->exists()) {
               $model = Redeem::where('id', $datas['id'])->first();
           } else {
               $model = new Redeem();
           }
-          foreach($datas as $key =>$val){
-              $model->$key = $val;
+          foreach ($datas as $key => $val) {
+              $model->{$key} = $val;
           }
           $model->category_name = RedeemCode::CATEGORY[$model->category_id];
 
-          if($model->save()){
-            return true;
-          }else{
-            return false;
+          if ($model->save()) {
+              return true;
           }
+          return false;
       }
 
       // 使用者兌換卷 by code
@@ -108,36 +108,35 @@ class RedeemService extends BaseService
       {
           $key = self::CACHE_KEY . ':ticket:' . $code;
           if ($this->redis->exists($key)) {
-               $row = $this->redis->get($key);
-               return json_decode($row,true);
+              $row = $this->redis->get($key);
+              return json_decode($row, true);
           }
 
           if ($row = $this->redeem->where('code', $code)->first()) {
               if ($row->count == $row->counted) {
-                   $this->redis->set($key , json_encode($row->toArray()));
-                   $this->redis->expire($key , self::EXPIRE);
+                  $this->redis->set($key, json_encode($row->toArray()));
+                  $this->redis->expire($key, self::EXPIRE);
               }
               return $row->toArray();
-          } else {
-              return false;
           }
+          return false;
       }
 
-      //計算總數
+      // 計算總數
       public function allCount()
       {
-          return  $this->redeem->count();
+          return $this->redeem->count();
       }
 
       // 兌換卷清單
       public function redeemList(int $page, $status = true)
       {
           $model = $this->redeem;
-          if($status==0 || $status==1){
-             // $model = $this->redeem->where('status', $status);
+          if ($status == 0 || $status == 1) {
+              // $model = $this->redeem->where('status', $status);
           }
-          if($page==1){
-            $page=0;
+          if ($page == 1) {
+              $page = 0;
           }
           $model = $this->redeem->offset(Redeem::PAGE_PER * $page)
               ->limit(Redeem::PAGE_PER);
@@ -155,9 +154,9 @@ class RedeemService extends BaseService
       }
 
       // 更新優惠裝態
-      public function updateStatus(int $id ,int $status)
+      public function updateStatus(int $id, int $status)
       {
-          return $this->memberRedeem->where('id', $id)->udpate(['status'=>$status]);
+          return $this->memberRedeem->where('id', $id)->udpate(['status' => $status]);
       }
 
       // 取會員優惠 清單

@@ -11,14 +11,12 @@ declare(strict_types=1);
  */
 namespace App\Controller\Admin;
 
-use App\Controller\AbstractController;
 use App\Constants\RedeemCode;
-use App\Model\Role;
+use App\Controller\AbstractController;
 use App\Model\Redeem;
-use App\Util\URand;
-use App\Service\PermissionService;
+use App\Model\Role;
 use App\Service\RedeemService;
-use App\Service\RoleService;
+use App\Util\URand;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
@@ -67,10 +65,10 @@ class RedeemController extends AbstractController
     {
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $all = $request->all();
-        $res=$redeemService->store($all);
-        if($res==false){
-          return $response->redirect('/admin/redeem/create');
-        } 
+        $res = $redeemService->store($all);
+        if ($res == false) {
+            return $response->redirect('/admin/redeem/create');
+        }
         return $response->redirect('/admin/redeem/index');
     }
 
@@ -89,7 +87,7 @@ class RedeemController extends AbstractController
     public function edit(RequestInterface $request, RedeemService $redeemService)
     {
         $id = $request->input('id');
-        $data['model'] = $redeemService->find((int)$id);
+        $data['model'] = $redeemService->find((int) $id);
         $data['navbar'] = trans('default.redeem.edit');
         $data['redeem_active'] = 'active';
         return $this->render->render('admin.redeem.form', $data);
@@ -99,7 +97,7 @@ class RedeemController extends AbstractController
     public function delete(RequestInterface $request, ResponseInterface $response, RedeemService $redeemService): PsrResponseInterface
     {
         $id = $request->input('id');
-        $redeemService->updateStatus($id , 1);
+        $redeemService->updateStatus($id, 1);
         return $response->redirect('/admin/redeem/index');
     }
 }

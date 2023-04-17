@@ -46,11 +46,11 @@ class MemberService
         if (! $user) {
             return false;
         }
-        
+
         return $user;
     }
 
-    public function checkPassword($plain, $hash) : bool
+    public function checkPassword($plain, $hash): bool
     {
         if (password_verify($plain, $hash)) {
             return true;
@@ -61,12 +61,12 @@ class MemberService
     public function apiRegisterUser(array $data): Member
     {
         $name = $data['name'];
-        if(empty($name)){
-            $name = Member::VISITOR_NAME. substr(hash('sha256', $this->randomStr(), false), 0, 10);
+        if (empty($name)) {
+            $name = Member::VISITOR_NAME . substr(hash('sha256', $this->randomStr(), false), 0, 10);
         }
         $model = new Member();
         $model->name = $name;
-        if(!empty($data['password'])){
+        if (! empty($data['password'])) {
             $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
         }
         $model->sex = $data['sex'];
@@ -166,8 +166,8 @@ class MemberService
         if (! empty($data['account'])) {
             $model->account = $data['account'];
             // 遊客 -> 會員未驗證
-            if($model -> status == Member::STATUS['VISITORS']){
-                $model -> status = Member::STATUS['NOT_VERIFIED'];
+            if ($model->status == Member::STATUS['VISITORS']) {
+                $model->status = Member::STATUS['NOT_VERIFIED'];
             }
         }
 
@@ -302,17 +302,6 @@ class MemberService
         return $result;
     }
 
-    protected function createVerificationCode(int $memberId): string
-    {
-        $model = new MemberVerification();
-        $model->member_id = $memberId;
-        $model->code = str_random();
-        $model->expired_at = Carbon::now()->addMinutes(self::EXPIRE_VERIFICATION_MINUTE)->toDateTimeString();
-        $model->save();
-
-        return $model->code;
-    }
-
     // 亂處產生一個string
     public function randomStr($length = 8)
     {
@@ -332,10 +321,21 @@ class MemberService
         $tomorrow = Carbon::tomorrow()->setHour(0)->setMinute(0)->setSecond(0)->timestamp;
         $expire = $tomorrow - $now;
 
-        if($this->redis->exists(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $ip)){
+        if ($this->redis->exists(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $ip)) {
             $this->redis->incr(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $ip);
         } else {
             $this->redis->set(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $ip, 0, $expire);
         }
+    }
+
+    protected function createVerificationCode(int $memberId): string
+    {
+        $model = new MemberVerification();
+        $model->member_id = $memberId;
+        $model->code = str_random();
+        $model->expired_at = Carbon::now()->addMinutes(self::EXPIRE_VERIFICATION_MINUTE)->toDateTimeString();
+        $model->save();
+
+        return $model->code;
     }
 }

@@ -14,7 +14,6 @@ namespace App\Controller\Api;
 use App\Constants\Apicode;
 use App\Constants\Constants;
 use App\Controller\AbstractController;
-use App\Model\ImageGroup;
 use App\Model\Video;
 use App\Request\ClickRequest;
 use App\Request\VideoApiSuggestRequest;

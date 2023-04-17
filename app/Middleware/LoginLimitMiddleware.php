@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Middleware;
 
 use Carbon\Carbon;
-use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface as HttpResponse;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;

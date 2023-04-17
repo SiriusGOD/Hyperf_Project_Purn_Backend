@@ -51,10 +51,10 @@ class ImageController extends AbstractController
         $step = Image::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
         $query = Image::with(['user'])->offset(($page - 1) * $step)->limit($step)
-            ->leftJoin('clicks', function($join) {
+            ->leftJoin('clicks', function ($join) {
                 $join->on('images.id', '=', 'clicks.type_id')->where('clicks.type', Image::class);
             })
-            ->leftJoin('likes', function($join) {
+            ->leftJoin('likes', function ($join) {
                 $join->on('images.id', '=', 'likes.type_id')->where('likes.type', Image::class);
             })
             ->select('images.*', Db::raw('clicks.count as click_count'), Db::raw('likes.count as like_count'));

@@ -13,7 +13,6 @@ namespace App\Controller\Admin;
 
 use App\Constants\VideoCode;
 use App\Controller\AbstractController;
-use App\Model\Image;
 use App\Model\Video;
 use App\Request\VideoRequest;
 use App\Service\ActorService;

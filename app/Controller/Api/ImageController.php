@@ -13,9 +13,7 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Model\Image;
-use App\Model\ImageGroup;
 use App\Request\ClickRequest;
-use App\Request\ImageApiLikeRequest;
 use App\Request\ImageApiListRequest;
 use App\Request\ImageApiSearchRequest;
 use App\Request\ImageApiSuggestRequest;

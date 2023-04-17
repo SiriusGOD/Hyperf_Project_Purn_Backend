@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\ActorCorrespond;
-use App\Model\Image;
 use App\Model\MemberHasVideo;
 use App\Model\TagCorrespond;
 use App\Model\Video;
@@ -291,10 +290,10 @@ class VideoService
     {
         $step = Video::PAGE_PER;
         $query = Video::offset(($params['page'] - 1) * $step)->limit($step)
-            ->leftJoin('clicks', function($join) {
+            ->leftJoin('clicks', function ($join) {
                 $join->on('videos.id', '=', 'clicks.type_id')->where('clicks.type', Video::class);
             })
-            ->leftJoin('likes', function($join) {
+            ->leftJoin('likes', function ($join) {
                 $join->on('videos.id', '=', 'likes.type_id')->where('likes.type', Video::class);
             })
             ->select('videos.*', Db::raw('clicks.count as click_count'), Db::raw('likes.count as like_count'));

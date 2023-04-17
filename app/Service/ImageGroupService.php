@@ -14,7 +14,6 @@ namespace App\Service;
 use App\Model\ImageGroup;
 use App\Model\Tag;
 use App\Model\TagCorrespond;
-use App\Model\Video;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Database\Model\Collection;
 use Hyperf\DbConnection\Db;
@@ -124,16 +123,16 @@ class ImageGroupService
         $page = $params['page'];
         $query = ImageGroup::with(['user'])->offset(($page - 1) * $step)
             ->limit($step)
-            ->leftJoin('clicks', function($join) {
+            ->leftJoin('clicks', function ($join) {
                 $join->on('image_groups.id', '=', 'clicks.type_id')->where('clicks.type', ImageGroup::class);
             })
-            ->leftJoin('likes', function($join) {
+            ->leftJoin('likes', function ($join) {
                 $join->on('image_groups.id', '=', 'likes.type_id')->where('likes.type', ImageGroup::class);
             })
             ->select('image_groups.*', Db::raw('clicks.count as click_count'), Db::raw('likes.count as like_count'));
 
-        if (!empty($params['title'])) {
-            $query = $query->where('title', 'like', '%'. $params['title'] .'%');
+        if (! empty($params['title'])) {
+            $query = $query->where('title', 'like', '%' . $params['title'] . '%');
         }
 
         if (! empty($params['tag_ids'])) {
