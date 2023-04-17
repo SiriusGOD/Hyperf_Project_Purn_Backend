@@ -42,7 +42,7 @@ class PayService
             // 撈取商品資料
             $product = Product::find($prod_id)->toArray();
 
-            $member_aff = 'testcode'; // 之後改成從redis獲取
+            $member_aff = 'testcode'; // 之後改成從redis獲取 (邀请码)
             $data['app_name'] = env('APP_NAME');
             $data['app_type'] = ($oauth_type == 'web') ? 'pc' : $oauth_type;
             $data['aff'] = "{$member_aff}:{$prod_id}"; // 区分 '邀請碼 :产品'

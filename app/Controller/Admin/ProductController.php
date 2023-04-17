@@ -15,6 +15,7 @@ use App\Controller\AbstractController;
 use App\Model\Image;
 use App\Model\Product;
 use App\Model\Video;
+use App\Model\MemberLevel;
 use App\Request\ProductMultipleStoreRequest;
 use App\Request\ProductRequest;
 use App\Service\ProductService;
@@ -104,6 +105,9 @@ class ProductController extends AbstractController
                 case 'video':
                     $model = Video::findOrFail($id);
                     break;
+                case 'member':
+                    $model = MemberLevel::findOrFail($id);
+                    break;
             }
         }
         $model->expire = Product::EXPIRE['no'];
@@ -124,6 +128,7 @@ class ProductController extends AbstractController
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
         $product_type = $request->input('product_type');
         $product_name = $request->input('product_name');
+
         if (! empty($product_type)) {
             switch ($product_type) {
                 case 'image':
@@ -132,8 +137,11 @@ class ProductController extends AbstractController
                 case 'video':
                     $type_class = Product::TYPE_CORRESPOND_LIST['video'];
                     break;
+                case 'member':
+                    $type_class = Product::TYPE_CORRESPOND_LIST['member'];
+                    break;
                 default:
-                    $type_class = '';
+                    $type_class = Product::TYPE_CORRESPOND_LIST['image'];
                     break;
             }
             $query = $type_class::select('*');
@@ -154,6 +162,9 @@ class ProductController extends AbstractController
                         break;
                     case 'video':
                         $products[$key]->img_thumb = $value->cover_thumb;
+                        break;
+                    case 'member':
+                        $products[$key]->title = $value->name;
                         break;
                     default:
                         # code...
@@ -241,8 +252,11 @@ class ProductController extends AbstractController
                 case 'video':
                     $type_class = Product::TYPE_CORRESPOND_LIST['video'];
                     break;
+                case 'member':
+                    $type_class = Product::TYPE_CORRESPOND_LIST['member'];
+                    break;
                 default:
-                    $type_class = '';
+                    $type_class = Product::TYPE_CORRESPOND_LIST['image'];
                     break;
             }
             $query = $type_class::select('*');
@@ -263,6 +277,9 @@ class ProductController extends AbstractController
                         break;
                     case 'video':
                         $products[$key]->img_thumb = $value->cover_thumb;
+                        break;
+                    case 'member':
+                        $products[$key]->title = $value->name;
                         break;
                     default:
                         # code...
@@ -303,6 +320,9 @@ class ProductController extends AbstractController
             case 'video':
                 $type_class = Product::TYPE_CORRESPOND_LIST['video'];
                 break;
+            case 'member':
+                $type_class = Product::TYPE_CORRESPOND_LIST['member'];
+                break;
             default:
                 $type_class = '';
                 break;
@@ -312,6 +332,7 @@ class ProductController extends AbstractController
         foreach ($data as $key => $value) {
             $model = $type_class::findOrFail($value);
             array_push($product_id_arr, $value);
+            if(empty($model->title))$model->title = $model->name;
             array_push($product_name_arr, $model->title);
         }
         $data['model'] = $model;

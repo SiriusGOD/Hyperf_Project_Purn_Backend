@@ -49,7 +49,7 @@ class MemberController extends AbstractController
             'account' => $request->input('account') ?? $request->input('device_id')
         ]);
 
-        if (empty($user)) {
+        if (empty($user) && empty($request->input('account')) && empty($request->input('password'))) {
             $base_service = di(\App\Service\BaseService::class);
             $ip = $base_service->getIp($request->getHeaders(), $request->getServerParams());
             $user = $service->apiRegisterUser([
@@ -65,6 +65,8 @@ class MemberController extends AbstractController
             if (empty($user)) {
                 return $this->error(trans('validation.authorize'), 401);
             }
+        }else if(empty($user) && !empty($request->input('account'))){
+            return $this->error(trans('validation.authorize'), 401);
         }
 
         if (! $service->checkAndSaveDevice($user->id, $request->input('device_id'))) {
@@ -112,6 +114,7 @@ class MemberController extends AbstractController
         ]);
 
         $token = auth()->login($user);
+        $service->saveToken($user->id, $token);
         return $this->success([
             'id' => $user->id,
             'token' => $token,

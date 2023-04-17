@@ -33,16 +33,18 @@ class Product extends Model
 
     public const PAGE_PER = 10;
 
-    public const TYPE_LIST = ['image', 'video'];
+    public const TYPE_LIST = ['image', 'video', 'member'];
 
     public const TYPE_LIST_NAME = [
         'image' => '圖片',
         'video' => '影片',
+        'member' => '會員'
     ];
 
     public const TYPE_CORRESPOND_LIST = [
         'image' => 'App\Model\Image',
         'video' => 'App\Model\Video',
+        'member' => 'App\Model\MemberLevel',
     ];
 
     public const CURRENCY = [
