@@ -12,7 +12,7 @@ class ModifyOrdersTable extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('pay_order_id')->comment('產生支付鏈接後回傳的訂單編號')->after('order_number');
+            $table->string('pay_order_id')->comment('產生支付鏈接後回傳的訂單編號')->index()->after('order_number');
         });
     }
 
