@@ -38,4 +38,19 @@ class MemberRedeemVideo extends Model
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'member_redeem_id' => 'integer', 'video_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'redeem_category_id' => 'integer', 'member_id' => 'integer'];
+
+    public function member()
+    {
+        return $this->belongsTo(Member::class);
+    }
+
+    public function memberRedeem()
+    {
+        return $this->belongsTo(MemberRedeem::class);
+    }
+
+    public function video()
+    {
+        return $this->belongsTo(Video::class);
+    }
 }

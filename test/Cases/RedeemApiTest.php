@@ -18,6 +18,7 @@ use App\Service\MemberRedeemService;
 use App\Service\MemberService;
 use App\Service\VideoService;
 use Hyperf\Redis\Redis;
+
 /**
  * @internal
  * @coversNothing
@@ -33,10 +34,14 @@ class RedeemApiTest extends HttpTestCase
     protected $video;
     protected $redis;
     protected $token;
+    protected $loggerFactory;
+    protected $logger;
   
     protected $testUserId = 1;
 
-    public function __construct($name = null, array $data = [], $dataName = '')
+  public function __construct($name = null, 
+                              array $data = [], 
+                              $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
         $this->client = make(Client::class);
@@ -46,7 +51,7 @@ class RedeemApiTest extends HttpTestCase
         $this->redis = make(Redis::class);
     }
 
-    //取可用兌換卷
+    //使用者沒有兌換卷
     public function testMemberRedeemApiFalse()
     {
       $memberId = 7;

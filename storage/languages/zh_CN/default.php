@@ -29,6 +29,7 @@ return [
         'tag' => '標籤',
         'image' => '圖片',
         'member' => '會員',
+        'redeem' => '兌換卷',
     ],
     'user_name' => '使用者名稱',
     'list' => '列表',
@@ -132,6 +133,30 @@ return [
         'click' => '觀看次數',
     ],
 
+    // redeem
+    'redeem' => [
+        'insert' => '新增優惠卷',
+        'delete' => '停用',
+        'title' => '兌換名稱',
+        'category' => '兌換分類',
+        'content' => '兌換內容',
+        'code' => '兌換代碼',
+        'count' => '可兌換次數',
+        'counted' => '己兌換次數',
+        'status_type' => [
+            0 => '可用',
+            1 => '不可用',
+        ],
+        'category_name' => '兌換卷分類',
+        'status' => '裝態',
+        'categories' => [
+            1 => 'VIP天數',
+            2 => '鑽石點數',
+            3 => '免費觀看次數',
+        ],
+        'end_time' => '結束時間',
+        'start_time' => '開始時間',
+    ],
     // actor
     'actor' => [
         'insert' => '新增',
@@ -161,6 +186,7 @@ return [
         'announcement' => '公告管理',
         'memberLevel' => '會員等級管理',
         'image_group' => '套圖管理',
+        'redeem' => '優惠卷管理',
     ],
     // -------------------------------------------------------------------
     // UserController

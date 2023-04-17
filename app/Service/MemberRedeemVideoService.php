@@ -38,12 +38,17 @@ class MemberRedeemVideoService extends BaseService
         $this->redis = $redis;
         $this->memberRedeemVideo = $memberRedeemvideo;
     }
+
     //己兌換列表  
     public function usedRedeemList(int $memberId, int $page)
     {
         $query = $this->memberRedeemVideo;
+        $query = $query->with('member');
+        $query = $query->with('video:title');
+        $query = $query->with('memberRedeem');
         $query = $query->where('member_id', $memberId);
-        $query = $query->offset(MemberRedeemVideo::PAGE_PER * $page)->limit(MemberRedeemVideo::PAGE_PER);
+        $query = $query->offset(MemberRedeemVideo::PAGE_PER * $page)
+                        ->limit(MemberRedeemVideo::PAGE_PER);
         return $query->get(); 
     }
     //是否己兌換過
