@@ -377,17 +377,17 @@ class ProductController extends AbstractController
         $product_type = $request->input('product_type');
         $product_name = $request->input('product_name');
         if (! empty($product_type)) {
-            switch ($product_type) {
-                case 'image':
-                    $product_type = Product::TYPE_CORRESPOND_LIST['image'];
-                    break;
-                case 'video':
-                    $product_type = Product::TYPE_CORRESPOND_LIST['video'];
-                    break;
-                default:
-                    $product_type = '';
-                    break;
-            }
+            // switch ($product_type) {
+            //     case 'image':
+            //         $product_type = Product::TYPE_CORRESPOND_LIST['image'];
+            //         break;
+            //     case 'video':
+            //         $product_type = Product::TYPE_CORRESPOND_LIST['video'];
+            //         break;
+            //     default:
+            //         $product_type = '';
+            //         break;
+            // }
             $query = Product::select('*')->where('type', $product_type);
             $query_tatal = Product::select('*')->where('type', $product_type);
             if (! empty($product_name)) {
@@ -399,8 +399,16 @@ class ProductController extends AbstractController
             $total = $query_tatal->count();
             $data['last_page'] = ceil($total / $step);
         } else {
-            $products = '';
-            $total = 0;
+            $query = Product::select('*');
+            $query_tatal = Product::select('*');
+            if (! empty($product_name)) {
+                $query = $query->where('name', 'like', '%' . $product_name . '%');
+                $query_tatal = $query_tatal->where('name', 'like', '%' . $product_name . '%');
+            }
+            $query = $query->offset(($page - 1) * $step)->limit($step);
+            $products = $query->get();
+            $total = $query_tatal->count();
+            $data['last_page'] = ceil($total / $step);
         }
         if ($total == 0) {
             $data['last_page'] = 1;
