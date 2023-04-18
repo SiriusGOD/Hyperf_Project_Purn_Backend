@@ -91,11 +91,11 @@ class VideoService
     }
 
     // 付費影片列表
-    public function getPayVideos(?array $tagIds, int $page = 0, int $status = 9, $ifFree): Collection
+    public function getPayVideos(?array $tagIds, int $page = 0, int $status = 9, $isFree): Collection
     {
         $query = self::baseVideos($tagIds, $page, $status);
-        if ($ifFree != false) {
-            $query = $query->where('is_free', $ifFree);
+        if ($isFree>=0) {
+            $query = $query->where('is_free', $isFree);
         }
         return $query->get();
     }
