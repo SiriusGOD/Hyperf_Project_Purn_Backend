@@ -11,9 +11,11 @@ declare(strict_types=1);
  */
 namespace App\Request;
 
+use App\Model\MemberLevel;
 use Hyperf\Validation\Request\FormRequest;
+use Hyperf\Validation\Rule;
 
-class MemberRegisterRequest extends FormRequest
+class MemberLevelStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,14 +31,13 @@ class MemberRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'string|unique:members',
-            'password' => 'string',
-            'email' => 'email|unique:members',
-            'sex' => 'numeric',
-            'age' => 'numeric|between:18,130',
-            'phone' => 'numeric',
-            'address' => 'string',
-            'account' => 'string|unique:members',
+            'id' => 'numeric',
+            'type' => ['required', Rule::in([
+                MemberLevel::TYPE_LIST[0],
+                MemberLevel::TYPE_LIST[1],
+            ])],
+            'name' => 'required|max:255',
+            'duration' => 'required|numeric',
         ];
     }
 }

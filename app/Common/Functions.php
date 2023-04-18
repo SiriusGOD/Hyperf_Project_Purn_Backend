@@ -491,3 +491,22 @@ if (! function_exists('ipInArray')) {
         return false;
     }
 }
+
+/**
+ * 字符串安全
+ * @param $string
+ * @return array
+ */
+if (! function_exists('JAddSlashes')) {
+    function JAddSlashes($string)
+    {
+        if (is_array($string)) {
+            foreach ($string as $key => $val) {
+                $string[$key] = JAddSlashes($val);
+            }
+        } else {
+            $string = addslashes(htmlspecialchars(trim($string)));
+        }
+        return $string;
+    }
+}

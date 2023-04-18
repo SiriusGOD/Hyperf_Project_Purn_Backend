@@ -355,10 +355,12 @@ return [
         'product_type_array' => [
             \App\Model\Product::TYPE_CORRESPOND_LIST['image'] => '圖片',
             \App\Model\Product::TYPE_CORRESPOND_LIST['video'] => '影片',
+            \App\Model\Product::TYPE_CORRESPOND_LIST['member'] => '會員',
         ],
         'product_type_msg' => [
             'image' => '圖片',
             'video' => '影片',
+            'member' => '會員',
         ]
     ],
     // -------------------------------------------------------------------
@@ -388,6 +390,11 @@ return [
         'member_level_control' => '會員等級管理',
         'member_level_insert' => '新增會員等級',
         'member_level_edit' => '編輯會員等級',
+        'member_level_duration' => '持續天數',
+        'member_level_type' => [
+            'vip' => \App\Model\MemberLevel::TYPE_NAME['vip'],
+            'diamond' => \App\Model\MemberLevel::TYPE_NAME['diamond'],
+        ],
     ],
     // -------------------------------------------------------------------
 ];

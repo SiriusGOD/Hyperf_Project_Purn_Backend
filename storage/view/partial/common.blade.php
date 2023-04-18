@@ -216,6 +216,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('memberLevel-index'))
+                    <li class="nav-item">
+                        <a href="/admin/member_level/index" class="nav-link {{$member_level_active ?? ''}}">
+                            <i class="nav-icon fas fa-user-plus"></i>
+                            <p>
+                                {{trans('default.leftbox.memberLevel') ?? '會員等級管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
                 @if(authPermission('announcement-index'))
                     <li class="nav-item">
                         <a href="/admin/announcement/index" class="nav-link {{$announcement_active ?? ''}}">

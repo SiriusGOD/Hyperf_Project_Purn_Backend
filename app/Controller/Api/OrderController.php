@@ -58,7 +58,8 @@ class OrderController extends AbstractController
         $pay_res = $pay_service->getPayUrl($user_id, $prod_id, $payment_type, $oauth_type, $pay_proxy, $ip);
         if (isset($pay_res['success']) && $pay_res['success'] == true) {
             // 建立訂單
-            $result = $service->createOrder($user_id, $prod_id, $payment_type, str_replace('&amp;', '&', $pay_res['data']['pay_url']), $pay_proxy);
+            $pay_order_id = isset($pay_res['data']['pay_order_id']) ? $pay_res['data']['pay_order_id'] : '';
+            $result = $service->createOrder($user_id, $prod_id, $payment_type, str_replace('&amp;', '&', $pay_res['data']['pay_url']), $pay_proxy, $pay_order_id);
             $pay_res['data']['order_num'] = $result;
             if ($result != false) {
                 return $this->success($pay_res['data'], '訂單新增成功');

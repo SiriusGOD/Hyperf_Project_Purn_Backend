@@ -14,9 +14,10 @@ namespace App\Service;
 use App\Model\Order;
 use App\Model\OrderDetail;
 use App\Model\Product;
-use App\Model\User;
+use App\Model\Member;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
+use Hyperf\Logger\LoggerFactory;
 
 class OrderService
 {
@@ -26,9 +27,12 @@ class OrderService
 
     protected Redis $redis;
 
-    public function __construct(Redis $redis)
+    protected \Psr\Log\LoggerInterface $logger;
+
+    public function __construct(Redis $redis, LoggerFactory $loggerFactory)
     {
         $this->redis = $redis;
+        $this->logger = $loggerFactory->get('Order');
     }
 
     // 取得訂單
@@ -95,10 +99,10 @@ class OrderService
     }
 
     // 建立訂單
-    public function createOrder($user_id, $prod_id, $payment_type, $pay_url, $pay_proxy)
+    public function createOrder($user_id, $prod_id, $payment_type, $pay_url, $pay_proxy, $pay_order_id)
     {
         // 撈取會員資料
-        $user = User::find($user_id)->toArray();
+        $user = Member::find($user_id)->toArray();
         // 撈取商品資料
         $product = Product::find($prod_id)->toArray();
 
@@ -112,6 +116,7 @@ class OrderService
             'pay_way' => Order::PAY_WAY_MAP_NEW[$payment_type],
             'pay_url' => $pay_url,
             'pay_proxy' => $pay_proxy,
+            'pay_order_id' => $pay_order_id,
         ];
         $data['product'] = [
             'product_id' => $prod_id,
@@ -119,7 +124,7 @@ class OrderService
             'product_currency' => $product['currency'],
             'product_selling_price' => $product['selling_price'],
         ];
-
+        
         // 新增訂單
         return $this->storeOrder($data);
     }
@@ -134,10 +139,12 @@ class OrderService
             $model = new Order();
             $model->user_id = $data['order']['user_id'];
             $model->order_number = $order_number;
+            $model->pay_order_id = $data['order']['pay_order_id'];
+            $model->pay_third_id = '';
             $model->address = '';
-            $model->email = $data['order']['email'];
+            $model->email = isset($data['order']['email']) ? $data['order']['email'] : '';
             $model->mobile = '';
-            $model->telephone = $data['order']['telephone'];
+            $model->telephone = isset($data['order']['telephone']) ? $data['order']['telephone'] : '';
             $model->payment_type = $data['order']['payment_type'];
             $model->currency = $data['order']['currency'];
             $model->total_price = $data['order']['total_price'];
@@ -162,6 +169,7 @@ class OrderService
             $this->updateCache($data['order']['user_id']);
             return $order_number;
         } catch (\Throwable $ex) {
+            $this->logger->error($ex->getMessage(), $data);
             Db::rollBack();
             return false;
         }
