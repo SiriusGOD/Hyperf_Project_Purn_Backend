@@ -133,7 +133,7 @@ class RedeemService extends BaseService
       {
           $model = $this->redeem;
           if ($status == 0 || $status == 1) {
-               $model = $model->where('status', $status);
+              $model = $model->where('status', $status);
           }
           if ($page == 1) {
               $page = 0;

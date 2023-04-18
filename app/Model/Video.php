@@ -67,6 +67,8 @@ class Video extends Model
 
     public const PAGE_PER = 10;
 
+    protected array $appends = ['model_type'];
+
     /**
      * The table associated with the model.
      *
@@ -92,5 +94,10 @@ class Video extends Model
     public function tags()
     {
         return $this->morphToMany(Tag::class, 'correspond', 'tag_corresponds', 'correspond_id');
+    }
+
+    protected function getModelTypeAttribute()
+    {
+        return self::class;
     }
 }

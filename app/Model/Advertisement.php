@@ -33,6 +33,8 @@ class Advertisement extends Model
 
     public const PAGE_PER = 10;
 
+    protected array $appends = ['model_type'];
+
     /**
      * The table associated with the model.
      *
@@ -49,4 +51,9 @@ class Advertisement extends Model
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'position' => 'integer', 'expire' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    protected function getModelTypeAttribute()
+    {
+        return self::class;
+    }
 }

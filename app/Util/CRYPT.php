@@ -11,13 +11,14 @@ declare(strict_types=1);
  */
 namespace App\Util;
 
-class CRYPT 
+class CRYPT
 {
     public $ENCRYPTION_KEY;
+
     // 定义加密密钥
     public function __construct()
     {
-      self::$ENCRYPTION_KEY = env('ENCRYPT_KEY');
+        self::$ENCRYPTION_KEY = env('ENCRYPT_KEY');
     }
 
     // 加密函数
@@ -30,7 +31,7 @@ class CRYPT
         // 获取初始化向量长度
         $iv = openssl_random_pseudo_bytes($ivlen);
         // 生成随机初始化向量
-        $ciphertext_raw = openssl_encrypt($plaintext, $cipher, $ENCRYPTION_KEY,  OPENSSL_RAW_DATA, $iv);
+        $ciphertext_raw = openssl_encrypt($plaintext, $cipher, $ENCRYPTION_KEY, OPENSSL_RAW_DATA, $iv);
         $hmac = hash_hmac('sha256', $ciphertext_raw, $ENCRYPTION_KEY, true);
         // 计算 HMAC
         return base64_encode($iv . $hmac . $ciphertext_raw);

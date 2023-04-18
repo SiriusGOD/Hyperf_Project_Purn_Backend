@@ -21,8 +21,10 @@ class RedeemCode
 
     // type 1 长横幅 2 短 竖图
     public const CATEGORY = [self::VIP => 'VIP天數', self::DIAMOND => '鑽石點數', self::FREE => '免費觀看次數'];
-    //停用 
+
+    // 停用
     public const DISABLE = 1;
-    //可用 
+
+    // 可用
     public const ABLE = 0;
 }

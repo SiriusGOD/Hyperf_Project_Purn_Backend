@@ -13,6 +13,7 @@ namespace App\Service;
 
 use App\Model\ActorCorrespond;
 use App\Model\MemberHasVideo;
+use App\Model\Tag;
 use App\Model\TagCorrespond;
 use App\Model\Video;
 use Carbon\Carbon;
@@ -95,21 +96,21 @@ class VideoService
     public function getPayVideos(?array $tagIds, int $page = 0, int $status = 9, $isFree): Collection
     {
         $query = self::baseVideos($tagIds, $page, $status);
-        if ($isFree>=0) {
+        if ($isFree >= 0) {
             $query = $query->where('is_free', $isFree);
         }
         return $query->get();
     }
 
     // 影片列表
-    public function getVideos(?array $tagIds, int $page = 0, int $status = 9): Collection
+    public function getVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER): Collection
     {
-        $query = self::baseVideos($tagIds, $page, $status);
+        $query = self::baseVideos($tagIds, $page, $status, $limit);
         return $query->get();
     }
 
     // 影片
-    public function baseVideos(?array $tagIds, int $page = 0, int $status = 9)
+    public function baseVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER)
     {
         $videoIds = [];
         $query = $this->model;
@@ -118,16 +119,12 @@ class VideoService
                 ->whereIn('tag_id', $tagIds)
                 ->pluck('correspond_id');
         }
-        // if(!empty($tagIds)){
-        //  $query = $query->with([
-        //      'tags',
-        //  ]);
-        // }
+
         $query = $query->where('release_time', '<=', Carbon::now()->toDateTimeString());
         if ($status != 9) {
             $query->where('status', $status);
         }
-        $query = $query->offset(Video::PAGE_PER * $page)->limit(Video::PAGE_PER);
+        $query = $query->offset($limit * $page)->limit($limit);
         if (! empty($videoIds)) {
             $query = $query->whereIn('id', $videoIds);
         }
@@ -217,20 +214,28 @@ class VideoService
      * @param mixed $limit
      * @param mixed $page
      */
-    public function searchVideo(string $title, $compare, int $length, $page)
+    public function searchVideo(string $title, $compare, int $length, $page, int $limit = Video::PAGE_PER)
     {
-        # if ($this->redis->exists(self::CACHE_KEY.$name)) {
-        #  $jsonResult = $this->redis->get(self::CACHE_KEY.$name);
-        #  return json_decode($jsonResult, true);
-        # }
+        $tagIds = Tag::where('name', 'like', '%' . $title . '%')->get()->pluck('id')->toArray();
+        $ids = [];
+        if (! empty($tagIds)) {
+            $ids = TagCorrespond::where('correspond_type', Video::class)
+                ->whereIn('tag_id', $tagIds)
+                ->get()
+                ->pluck('correspond_id');
+        }
         $model = Video::where('title', 'like', "%{$title}%")
-            ->where('release_time', '>=', Carbon::now()->toDateTimeString());
+            ->where('release_time', '<=', Carbon::now()->toDateTimeString());
         if ($compare > 0 && $length > 0) {
             if ($compare == 1) {
                 $model = $model->where('duration', '>=', $length);
             } else {
                 $model = $model->where('duration', '<=', $length);
             }
+        }
+
+        if (! empty($ids)) {
+            $model->whereIn('id', $ids);
         }
         // $this->redis->set(self::COUNT_KEY, $model, self::COUNT_EXPIRE);
         return $model->offset(Video::PAGE_PER * $page)->limit(Video::PAGE_PER)->get();
@@ -252,12 +257,12 @@ class VideoService
         $this->redis->set(self::CACHE_KEY . '0,0', json_encode($result), self::EXPIRE);
     }
 
-    public function getVideosBySuggest(array $suggest, int $page): array
+    public function getVideosBySuggest(array $suggest, int $page, int $inputLimit = Video::PAGE_PER): array
     {
         $result = [];
         $useIds = [];
         foreach ($suggest as $value) {
-            $limit = $value['proportion'] * Video::PAGE_PER;
+            $limit = $value['proportion'] * $inputLimit;
             if ($limit < 1) {
                 break;
             }
@@ -275,7 +280,7 @@ class VideoService
                 'tags',
             ])
                 ->whereIn('id', $ids)
-                ->where('release_time', '>=', Carbon::now()->toDateTimeString())
+                ->where('release_time', '<=', Carbon::now()->toDateTimeString())
                 ->offset($limit * $page)
                 ->limit($limit)
                 ->get()

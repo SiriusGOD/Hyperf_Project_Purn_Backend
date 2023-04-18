@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\Image;
 use App\Model\ImageGroup;
 use App\Model\Tag;
 use App\Model\TagCorrespond;
@@ -35,7 +36,7 @@ class ImageGroupService
         return $model;
     }
 
-    public function getImageGroups(?array $tagIds, int $page): Collection
+    public function getImageGroups(?array $tagIds, int $page, $limit = ImageGroup::PAGE_PER): Collection
     {
         $imageIds = [];
         if (! empty($tagIds)) {
@@ -48,8 +49,8 @@ class ImageGroupService
         $query = ImageGroup::with([
             'tags', 'images',
         ])
-            ->offset(ImageGroup::PAGE_PER * $page)
-            ->limit(ImageGroup::PAGE_PER);
+            ->offset($limit * $page)
+            ->limit($limit);
 
         if (! empty($imageIds)) {
             $query = $query->whereIn('id', $imageIds);
@@ -58,7 +59,7 @@ class ImageGroupService
         return $query->get();
     }
 
-    public function getImageGroupsByKeyword(string $keyword, int $page): Collection
+    public function getImageGroupsByKeyword(string $keyword, int $page, int $limit = Image::PAGE_PER): Collection
     {
         $tagIds = Tag::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
         $imageIds = [];
@@ -73,8 +74,8 @@ class ImageGroupService
             'tags', 'images',
         ])
             ->orWhere('title', 'like', '%' . $keyword . '%')
-            ->offset(ImageGroup::PAGE_PER * $page)
-            ->limit(ImageGroup::PAGE_PER);
+            ->offset($limit * $page)
+            ->limit($limit);
 
         if (! empty($imageIds)) {
             $query = $query->orWhereIn('id', $imageIds);
@@ -83,12 +84,12 @@ class ImageGroupService
         return $query->get();
     }
 
-    public function getImageGroupsBySuggest(array $suggest, int $page): array
+    public function getImageGroupsBySuggest(array $suggest, int $page, int $inputLimit = ImageGroup::PAGE_PER): array
     {
         $result = [];
         $useImageIds = [];
         foreach ($suggest as $value) {
-            $limit = $value['proportion'] * ImageGroup::PAGE_PER;
+            $limit = $value['proportion'] * $inputLimit;
             if ($limit < 1) {
                 break;
             }
