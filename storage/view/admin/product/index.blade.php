@@ -92,7 +92,9 @@
                                                 {{trans('default.product_control.product_type_msg')[$model->type]}}
                                             </td>
                                             <td>{{ $model->name}}</td>
-                                            <td>{{ $model->currency}}</td>
+                                            <td>
+                                                {{trans('default.product_control.product_currency_msg')[$model->currency]}}
+                                            </td>
                                             <td>{{ $model->selling_price}}</td>
                                             <td>{{ $model->start_time}}</td>
                                             <td>{{ $model->end_time}}</td>

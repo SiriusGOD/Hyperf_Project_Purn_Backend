@@ -47,10 +47,11 @@ class Product extends Model
         'member' => 'App\Model\MemberLevel',
     ];
 
-    public const CURRENCY = [
+    public const CURRENCY = ['CNY','COIN'];
+
+    public const CURRENCY_NAME = [
         'CNY' => '人民幣',
-        'USD' => '美金',
-        'TWD' => '台幣',
+        'COIN' => '現金點數'
     ];
 
     /**
