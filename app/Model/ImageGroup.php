@@ -12,16 +12,20 @@ declare(strict_types=1);
 namespace App\Model;
 
 /**
- * @property int $id
- * @property int $user_id
- * @property string $title
- * @property string $thumbnail
- * @property string $url
- * @property string $description
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property string $deleted_at
- * @property \Hyperf\Database\Model\Collection|Image[] $images
+ * @property int $id 
+ * @property int $user_id 
+ * @property string $title 
+ * @property string $thumbnail 
+ * @property string $url 
+ * @property string $description 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property string $deleted_at 
+ * @property int $pay_type 
+ * @property-read \Hyperf\Database\Model\Collection|Image[] $images 
+ * @property-read \Hyperf\Database\Model\Collection|Tag[] $tags 
+ * @property-read User $user 
+ * @property-read mixed $model_type 
  */
 class ImageGroup extends Model
 {
@@ -42,7 +46,7 @@ class ImageGroup extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'pay_type' => 'integer'];
 
     protected array $appends = ['model_type'];
 

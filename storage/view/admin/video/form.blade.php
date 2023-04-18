@@ -98,6 +98,14 @@
                                     <label for="exampleInputEmail1">{{trans('default.video.release_time') ?? '上架時間'}}</label>
                                     <input type="text" class="form-control" name="release_time" placeholder="name" value="{{$video->release_time ?? \Carbon\Carbon::now()}}">
                                 </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{ trans('default.video.pay_type') ?? '套圖描述'}}</label>
+                                    <select name="pay_type">
+                                        @foreach(trans('default.video.pay_type_types') as $key => $value)
+                                            <option value="{{ $key }}" @if($key == ($model->pay_type ?? null)) @endif>{{ $value }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <button type="submit"
                                         class="btn btn-primary">{{trans('default.submit') ?? '送出'}}</button>
                             </form>

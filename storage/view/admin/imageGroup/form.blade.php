@@ -24,6 +24,14 @@
                                     <label for="exampleInputEmail1">{{ trans('default.image_group_control.image_group_description') ?? '套圖描述'}}</label>
                                     <textarea class="form-control" name="description" id="description" placeholder="{{ trans('default.description_msg_def') ?? '請輸入描述'}}">{{$model->description ?? ''}}</textarea>
                                 </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{ trans('default.image_group_control.image_group_pay_type') ?? '套圖描述'}}</label>
+                                    <select name="pay_type">
+                                        @foreach(trans('default.image_group_control.image_group_pay_type_types') as $key => $value)
+                                            <option value="{{ $key }}" @if($key == ($model->pay_type ?? null)) @endif>{{ $value }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 @include('partial.tagSelect')
                                 <button type="submit" class="btn btn-primary">{{ trans('default.submit') ?? '送出'}}</button>
                             </form>
