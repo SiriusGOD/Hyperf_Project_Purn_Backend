@@ -82,7 +82,7 @@ class MemberService
         // $model->email = $data['email'];
         // $model->phone = $data['phone'];
         $model->status = Member::STATUS['VISITORS'];
-        $model->buy_level_id = Role::API_DEFAULT_USER_ROLE_ID;
+        $model->member_level_status = Role::API_DEFAULT_USER_ROLE_ID;
         $model->account = $data['account'];
         $model->device = $data['device'];
         $model->register_ip = $data['register_ip'];
