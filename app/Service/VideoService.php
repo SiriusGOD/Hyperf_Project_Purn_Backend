@@ -48,12 +48,6 @@ class VideoService
         $this->memberHasVideo = $memberHasVideo;
     }
 
-    // 我收藏的影片
-    public function myStageVideo(int $memberId, int $page = 0)
-    {
-        $model = $this->memberHasVideo->where('member_id', $memberId)->offset(MemberHasVideo::PAGE_PER * $page)->limit(MemberHasVideo::PAGE_PER);
-        return $model->get();
-    }
   
     // 我收藏的影片
     public function myStageVideo(int $memberId, int $page = 0)
