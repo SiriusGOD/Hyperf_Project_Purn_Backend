@@ -188,6 +188,7 @@ return [
         'memberLevel' => '會員等級管理',
         'image_group' => '套圖管理',
         'redeem' => '優惠卷管理',
+        'coin' => '點數管理',
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -398,6 +399,18 @@ return [
         'member_level_type' => [
             'vip' => \App\Model\MemberLevel::TYPE_NAME['vip'],
             'diamond' => \App\Model\MemberLevel::TYPE_NAME['diamond'],
+        ],
+    ],
+    // -------------------------------------------------------------------
+    // CoinController
+    'coin_control' => [
+        'coin_control' => '點數管理',
+        'coin_insert' => '新增點數類別',
+        'coin_edit' => '編輯點數類別',
+        'points' => '點數',
+        'coin_type' => [
+            'cash' => \App\Model\Coin::TYPE_NAME['cash'],
+            'diamond' => \App\Model\Coin::TYPE_NAME['diamond'],
         ],
     ],
     // -------------------------------------------------------------------
