@@ -57,7 +57,7 @@ class Member extends Model implements Authenticatable
 
     protected array $hidden = ['password'];
 
-    protected array $appends = ['is_first'];
+    protected array $appends = ['is_selected_tag'];
 
     public function getJwtIdentifier()
     {
@@ -84,7 +84,7 @@ class Member extends Model implements Authenticatable
         return ['guard' => 'api'];
     }
 
-    protected function getIsFirstAttribute()
+    protected function getIsSelectedTagAttribute()
     {
         $query = MemberTag::where('member_id', $this->id)->count();
         if(empty($query))return 0;
