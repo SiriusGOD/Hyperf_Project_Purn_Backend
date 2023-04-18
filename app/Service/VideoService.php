@@ -49,38 +49,6 @@ class VideoService
     }
 
   
-    // 我收藏的影片
-    public function myStageVideo(int $memberId, int $page = 0)
-    {
-        $model = $this->memberHasVideo->where('member_id', $memberId)->offset(MemberHasVideo::PAGE_PER * $page)->limit(MemberHasVideo::PAGE_PER);
-        return $model->get();
-    }
-
-    // 收藏影片
-    public function storeStageVideo(int $videoId, int $memberId)
-    {
-        if (! $this->memberHasVideo->where('member_id', $memberId)->where('video_id', $videoId)->exists()) {
-            $model = $this->memberHasVideo;
-            $model->video_id = $videoId;
-            $model->member_id = $memberId;
-            if ($model->save()) {
-                return true;
-            }
-            $this->logger->error('error');
-            return false;
-        }
-        return true;
-    }
-
-    // 收藏影片
-    public function delStageVideo(array $ids)
-    {
-        if ($this->memberHasVideo->whereIn('id', $ids)->delete()) {
-            $this->logger->info('success');
-            return true;
-        }
-        return false;
-    }
 
     // 取得影片
     public function find(int $id)

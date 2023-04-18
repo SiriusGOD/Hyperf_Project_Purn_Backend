@@ -18,6 +18,7 @@ use App\Model\Video;
 use App\Request\ClickRequest;
 use App\Request\VideoApiSuggestRequest;
 use App\Service\ActorService;
+use App\Service\StageVideoService;
 use App\Service\ClickService;
 use App\Service\LikeService;
 use App\Service\SuggestService;
@@ -64,42 +65,6 @@ class VideoController extends AbstractController
         return $this->success([]);
     }
 
-    // 儲存影片
-    #[RequestMapping(methods: ['POST'], path: 'stageVideo')]
-    public function stageVideo(RequestInterface $request, VideoService $videoService)
-    {
-        $videoId = $request->input('video_id');
-        $userId = auth('jwt')->user()->getId();
-        if (! $userId) {
-            return $this->error(Apicode::USER_NOT_FOUND_MSG, Apicode::USER_NOT_FOUND);
-        }
-        $videoService->storeStageVideo($videoId, $userId);
-        return $this->success([]);
-    }
-
-    // 儲存影片
-    #[RequestMapping(methods: ['GET'], path: 'stagelist')]
-    public function stageList(RequestInterface $request, VideoService $service)
-    {
-        $videoId = $request->input('video_id');
-        $userId = auth('jwt')->user()->getId();
-        if (! $userId) {
-            return $this->error(Apicode::USER_NOT_FOUND_MSG, Apicode::USER_NOT_FOUND);
-        }
-        $page = (int) $request->input('page', 0);
-        $data = [];
-        $data['models'] = $service->myStageVideo($userId, $page);
-        $data['page'] = $page;
-        $data['step'] = Constants::DEFAULT_PAGE_PER;
-        $path = '/api/image/list';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        if ($page == 1) {
-            $data['prev'] = '';
-        } else {
-            $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
-        }
-        return $this->success($data);
-    }
 
     #[RequestMapping(methods: ['GET'], path: 'count')]
     public function count(VideoService $service)

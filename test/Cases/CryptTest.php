@@ -48,9 +48,7 @@ class CryptTest extends HttpTestCase
     {
         $data = ["page"=>1];
         $data = ["page"=>CRYPT::encrypt(json_encode($data) )];
-        print_r($data);
         $res1 = $this->client->get('/api/actor/list',$data);
-        
         $this->assertSame(200, (int) $res1['code']);
    }
 }
