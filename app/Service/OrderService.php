@@ -17,6 +17,7 @@ use App\Model\Product;
 use App\Model\Member;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
+use Hyperf\Logger\LoggerFactory;
 
 class OrderService
 {
@@ -26,9 +27,12 @@ class OrderService
 
     protected Redis $redis;
 
-    public function __construct(Redis $redis)
+    protected \Psr\Log\LoggerInterface $logger;
+
+    public function __construct(Redis $redis, LoggerFactory $loggerFactory)
     {
         $this->redis = $redis;
+        $this->logger = $loggerFactory->get('Order');
     }
 
     // 取得訂單
@@ -136,6 +140,7 @@ class OrderService
             $model->user_id = $data['order']['user_id'];
             $model->order_number = $order_number;
             $model->pay_order_id = $data['order']['pay_order_id'];
+            $model->pay_third_id = '';
             $model->address = '';
             $model->email = isset($data['order']['email']) ? $data['order']['email'] : '';
             $model->mobile = '';
@@ -164,7 +169,7 @@ class OrderService
             $this->updateCache($data['order']['user_id']);
             return $order_number;
         } catch (\Throwable $ex) {
-            var_dump($ex->getMessage());
+            $this->logger->error($ex->getMessage(), $data);
             Db::rollBack();
             return false;
         }

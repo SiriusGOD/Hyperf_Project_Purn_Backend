@@ -13,34 +13,24 @@ namespace App\Model;
 
 /**
  * @property int $id
- * @property char $type
- * @property varchar $name
- * @property int $duration
+ * @property int $member_id
+ * @property varchar $member_level_type
+ * @property int $member_level_id
+ * @property varchar $order_number
+ * @property \Carbon\Carbon $start_time
+ * @property \Carbon\Carbon $end_time
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon $deleted_at
  */
-class MemberLevel extends Model
+class BuyMemberLevel extends Model
 {
-    public const PAGE_PER = 10;
-
-    public const TYPE_LIST = ['vip','diamond'];
-
-    public const TYPE_NAME = [
-        'vip' => 'VIP',
-        'diamond' => '鑽石'
-    ];
-
-    public const TYPE_VALUE = [
-        'vip' => 1,
-        'diamond' => 2
-    ];
-
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected ?string $table = 'member_levels';
+    protected ?string $table = 'buy_member_levels';
 
     /**
      * The attributes that are mass assignable.
@@ -50,6 +40,6 @@ class MemberLevel extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'duration' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'member_level_id' => 'integer', 'start_time' => 'datetime', 'end_time' => 'datetime', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'updated_at' => 'deleted_at'];
 
 }
