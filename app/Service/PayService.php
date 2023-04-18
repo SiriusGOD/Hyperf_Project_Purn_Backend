@@ -11,15 +11,15 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use App\Model\Order;
-use App\Model\Product;
+use App\Model\BuyMemberLevel;
 use App\Model\Member;
 use App\Model\MemberLevel;
-use App\Model\BuyMemberLevel;
-use Hyperf\Redis\Redis;
-use Hyperf\Logger\LoggerFactory;
-use Hyperf\DbConnection\Db;
+use App\Model\Order;
+use App\Model\Product;
 use Carbon\Carbon;
+use Hyperf\DbConnection\Db;
+use Hyperf\Logger\LoggerFactory;
+use Hyperf\Redis\Redis;
 
 class PayService
 {
@@ -38,7 +38,7 @@ class PayService
     }
 
     // 產生支付鏈接
-    public function getPayUrl($user_id, $prod_id, $payment_type, $oauth_type, $pay_proxy, $ip)
+    public function getPayUrl($user_id, $prod_id, $payment_type, $oauth_type, $pay_proxy, $ip): bool|array|string
     {
         // 測試
         if (env('APP_ENV') != 'production') {
@@ -46,7 +46,7 @@ class PayService
             $result['data']['pay_url'] = 'http://test.pay/' . $this->randomURL();
             $result['data']['pay_way'] = 'test';
             $result['data']['pay_proxy'] = 'online';
-            $result['data']['pay_order_id'] = 'test_order_id_'.$this->randomURL();
+            $result['data']['pay_order_id'] = 'test_order_id_' . $this->randomURL();
         } else {
             // 正式 (test)
             // 撈取商品資料
@@ -67,7 +67,7 @@ class PayService
 
             $result = $this->curlPost(env('PAY_URL'), $data);
 
-            if (!isset($result['success']) && $result['success'] != true) {
+            if (! isset($result['success']) && $result['success'] != true) {
                 $this->logger->error('生成支付鏈接失敗', $result);
             }
         }
@@ -134,7 +134,7 @@ class PayService
     {
         $this->logger->info('呼叫回調函式', $data);
         $signdata = $data;
-        if (isset($data['success']) && $data['success'] == 200) { //付款成功
+        if (isset($data['success']) && $data['success'] == 200) { // 付款成功
             // 簽名驗證
             unset($signdata['sign']);
             $sign = $this->make_sign_callback($signdata, env('PAY_SIGNKEY'));
@@ -145,15 +145,15 @@ class PayService
 
             // 查詢對應訂單
             $order = Order::join('order_details', 'orders.id', 'order_details.order_id')
-                    ->select('orders.id', 'orders.user_id', 'orders.order_number', 'order_details.product_id', 'orders.status', 'orders.total_price')
-                    ->where('pay_order_id', $data['order_id'])->first();
-            if(empty($order)){
+                ->select('orders.id', 'orders.user_id', 'orders.order_number', 'order_details.product_id', 'orders.status', 'orders.total_price')
+                ->where('pay_order_id', $data['order_id'])->first();
+            if (empty($order)) {
                 $this->logger->error('查無對應系統訂單', $data);
                 return '查無對應系統訂單';
             }
 
             // 比對訂單狀態 須為訂單成立狀態
-            if($order->status != Order::ORDER_STATUS['create']){
+            if ($order->status != Order::ORDER_STATUS['create']) {
                 $data['sys_order_id'] = $order->id;
                 $this->logger->error('該訂單狀態並非訂單成立', $data);
                 return '該訂單狀態並非訂單成立';
@@ -161,111 +161,108 @@ class PayService
 
             // 確認訂單對應商品是否存在
             $product = Product::where('id', $order->product_id)->first();
-            if(empty($product)){
+            if (empty($product)) {
                 $this->logger->error('查無對應系統訂單的商品', $data);
                 return '查無對應系統訂單的商品';
             }
 
             // 確認訂單對應商品是否是上架狀態
-            if($product->expire != Product::EXPIRE['no']){
+            if ($product->expire != Product::EXPIRE['no']) {
                 $this->logger->error('此商品已下架', $data);
                 return '此商品已下架';
             }
 
             // 確認訂單用戶是否存在
             $member = Member::where('id', $order->user_id)->where('status', '<', Member::STATUS['DISABLE'])->first();
-            if(empty($member)){
+            if (empty($member)) {
                 $this->logger->error('查無訂單用戶', $data);
                 return '查無訂單用戶';
             }
 
             // 更新訂單狀態
             try {
-                $order_amount = $order -> total_price;
+                $order_amount = $order->total_price;
                 $real_pay_amount = $data['pay_money'];
                 Db::beginTransaction();
                 // 誤差在人民幣４元內都是正常
                 if ($order_amount > 0 && ($real_pay_amount >= ($order_amount - 4))) {
-                    $order -> pay_third_id = $data['third_id'];
-                    $order -> pay_amount = (double)$real_pay_amount;
-                    $order -> updated_at = date('Y-m-d H:i:s', (int)$data['pay_time']);
-                    $order -> status = Order::ORDER_STATUS['finish'];
-                    $order -> save();
+                    $order->pay_third_id = $data['third_id'];
+                    $order->pay_amount = (float) $real_pay_amount;
+                    $order->updated_at = date('Y-m-d H:i:s', (int) $data['pay_time']);
+                    $order->status = Order::ORDER_STATUS['finish'];
+                    $order->save();
 
                     // 會員卡
-                    if($product -> type == Product::TYPE_LIST[2]){
+                    if ($product->type == Product::TYPE_LIST[2]) {
                         // 獲取會員卡天數
-                        $member_level = MemberLevel::where('id', $product -> correspond_id)->first();
-                        $duration = $member_level -> duration;
-                        $level = $member_level -> type;
+                        $member_level = MemberLevel::where('id', $product->correspond_id)->first();
+                        $duration = $member_level->duration;
+                        $level = $member_level->type;
                         // 確認該會員是否已有會員資格
                         // 沒有會員資格
-                        if($member -> member_level_status != MemberLevel::TYPE_VALUE['vip'] && $member -> member_level_status != MemberLevel::TYPE_VALUE['diamond']){
+                        if ($member->member_level_status != MemberLevel::TYPE_VALUE['vip'] && $member->member_level_status != MemberLevel::TYPE_VALUE['diamond']) {
                             // 新增會員的會員等級持續時間
                             $now = Carbon::now();
                             $buy_member_level = new BuyMemberLevel();
-                            $buy_member_level -> member_id = $member -> id;
-                            $buy_member_level -> member_level_type = $level;
-                            $buy_member_level -> member_level_id = $member_level -> id;
-                            $buy_member_level -> order_number = $order -> order_number;
-                            $buy_member_level -> start_time = $now -> toDateTimeString();
-                            $buy_member_level -> end_time = $now -> addDays($duration) -> toDateTimeString();
-                            $buy_member_level -> save();
-                            
-                            // 更新會員的會員等級
-                            $member -> member_level_status = MemberLevel::TYPE_VALUE[$level];
-                            $member -> save();
+                            $buy_member_level->member_id = $member->id;
+                            $buy_member_level->member_level_type = $level;
+                            $buy_member_level->member_level_id = $member_level->id;
+                            $buy_member_level->order_number = $order->order_number;
+                            $buy_member_level->start_time = $now->toDateTimeString();
+                            $buy_member_level->end_time = $now->addDays($duration)->toDateTimeString();
+                            $buy_member_level->save();
 
-                            var_dump("新增");
-                        }else{
+                            // 更新會員的會員等級
+                            $member->member_level_status = MemberLevel::TYPE_VALUE[$level];
+                            $member->save();
+
+                            var_dump('新增');
+                        } else {
                             // 有會員資格
-                            $buy_member_level = BuyMemberLevel::where('member_id', $member -> id)
+                            $buy_member_level = BuyMemberLevel::where('member_id', $member->id)
                                 ->where('member_level_type', $level)
                                 ->whereNull('deleted_at')
                                 ->first();
-                            if(empty($buy_member_level)){
+                            if (empty($buy_member_level)) {
                                 // 新增會員的會員等級持續時間
                                 $now = Carbon::now();
                                 $buy_member_level = new BuyMemberLevel();
-                                $buy_member_level -> member_id = $member -> id;
-                                $buy_member_level -> member_level_type = $level;
-                                $buy_member_level -> member_level_id = $member_level -> id;
-                                $buy_member_level -> order_number = $order -> order_number;
-                                $buy_member_level -> start_time = $now -> toDateTimeString();
-                                $buy_member_level -> end_time = $now -> addDays($duration) -> toDateTimeString();
-                                $buy_member_level -> save();
+                                $buy_member_level->member_id = $member->id;
+                                $buy_member_level->member_level_type = $level;
+                                $buy_member_level->member_level_id = $member_level->id;
+                                $buy_member_level->order_number = $order->order_number;
+                                $buy_member_level->start_time = $now->toDateTimeString();
+                                $buy_member_level->end_time = $now->addDays($duration)->toDateTimeString();
+                                $buy_member_level->save();
 
-                                if($level == 'diamond' && $member -> member_level_status != MemberLevel::TYPE_VALUE[$level]){
+                                if ($level == 'diamond' && $member->member_level_status != MemberLevel::TYPE_VALUE[$level]) {
                                     // 更新會員的會員等級
-                                    $member -> member_level_status = MemberLevel::TYPE_VALUE[$level];
-                                    $member -> save();
+                                    $member->member_level_status = MemberLevel::TYPE_VALUE[$level];
+                                    $member->save();
                                 }
-                                var_dump("更新 -> 新增一筆");
-                            }else{
-                                $end_time = $buy_member_level -> end_time;
-                                $buy_member_level -> end_time = Carbon::parse($end_time) -> addDays($duration) -> toDateTimeString();
-                                $buy_member_level -> save();
-                                var_dump( "更新 -> 延長");
+                                var_dump('更新 -> 新增一筆');
+                            } else {
+                                $end_time = $buy_member_level->end_time;
+                                $buy_member_level->end_time = Carbon::parse($end_time)->addDays($duration)->toDateTimeString();
+                                $buy_member_level->save();
+                                var_dump('更新 -> 延長');
                             }
-                            
                         }
-                    }else{
-                        // 儲值點數 現金點數 鑽石點數
                     }
-                }else{
+                    // 儲值點數 現金點數 鑽石點數
                 }
+
                 Db::commit();
             } catch (\Throwable $th) {
-                //throw $th;
+                // throw $th;
                 Db::rollBack();
                 $this->logger->error('error:' . __LINE__ . json_encode($th->getMessage()));
                 var_dump($th->getMessage());
             }
-
         }
     }
 
-    #签名 对接第三方支付的签名
+    # 签名 对接第三方支付的签名
     public function make_sign_callback($array, $signKey = '')
     {
         if (empty($array)) {

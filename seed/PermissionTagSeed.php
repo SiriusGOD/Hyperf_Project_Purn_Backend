@@ -18,6 +18,7 @@ class PermissionTagSeed implements BaseInterface
             'tag' => [
                 'tag-index',
                 'tag-create',
+                'tag_edit',
                 'tag-list'
             ],
         ];

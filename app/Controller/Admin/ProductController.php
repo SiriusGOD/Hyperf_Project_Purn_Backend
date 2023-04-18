@@ -13,9 +13,9 @@ namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Model\Image;
+use App\Model\MemberLevel;
 use App\Model\Product;
 use App\Model\Video;
-use App\Model\MemberLevel;
 use App\Request\ProductMultipleStoreRequest;
 use App\Request\ProductRequest;
 use App\Service\ProductService;
@@ -332,7 +332,9 @@ class ProductController extends AbstractController
         foreach ($data as $key => $value) {
             $model = $type_class::findOrFail($value);
             array_push($product_id_arr, $value);
-            if(empty($model->title))$model->title = $model->name;
+            if (empty($model->title)) {
+                $model->title = $model->name;
+            }
             array_push($product_name_arr, $model->title);
         }
         $data['model'] = $model;

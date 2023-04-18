@@ -13,8 +13,8 @@ namespace App\Model;
 
 /**
  * @property int $id
- * @property char $type
- * @property varchar $name
+ * @property string $type
+ * @property string $name
  * @property int $duration
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
@@ -23,16 +23,16 @@ class MemberLevel extends Model
 {
     public const PAGE_PER = 10;
 
-    public const TYPE_LIST = ['vip','diamond'];
+    public const TYPE_LIST = ['vip', 'diamond'];
 
     public const TYPE_NAME = [
         'vip' => 'VIP',
-        'diamond' => '鑽石'
+        'diamond' => '鑽石',
     ];
 
     public const TYPE_VALUE = [
         'vip' => 1,
-        'diamond' => 2
+        'diamond' => 2,
     ];
 
     /**
@@ -51,5 +51,4 @@ class MemberLevel extends Model
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'duration' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
-
 }

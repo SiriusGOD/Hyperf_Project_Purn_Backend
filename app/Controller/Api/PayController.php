@@ -11,9 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Controller\Api;
 
-use App\Constants\ErrorCode;
 use App\Controller\AbstractController;
-use App\Model\Order;
 use App\Service\PayService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
@@ -23,7 +21,7 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 class PayController extends AbstractController
 {
     /**
-     * 支付 回調函式
+     * 支付 回調函式.
      */
     #[RequestMapping(methods: ['POST'], path: 'notifyPayAction')]
     public function notifyPayAction(RequestInterface $request, PayService $service)

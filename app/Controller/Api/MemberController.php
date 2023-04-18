@@ -54,9 +54,9 @@ class MemberController extends AbstractController
             if (! $check and ! empty($user->password)) {
                 return $this->error(trans('validation.authorize'), 401);
             }
-        }else if(empty($user) && !empty($request->input('account'))){
+        } elseif (empty($user) && ! empty($request->input('account'))) {
             return $this->error(trans('validation.authorize'), 401);
-        }else {
+        } else {
             $base_service = di(\App\Service\BaseService::class);
             $ip = $base_service->getIp($request->getHeaders(), $request->getServerParams());
             $user = $service->apiRegisterUser([

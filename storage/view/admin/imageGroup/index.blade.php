@@ -89,11 +89,11 @@
                                                         <a href="/admin/image_group/edit?id={{$model->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
                                                     </div>
                                                 @endif
-                                                    @if(authPermission('image-group-delete'))
-                                                        <div class="row mb-1">
-                                                            <a href="/admin/image_group/delete?id={{$model->id}}" class="btn btn-danger">{{trans('default.delete') ?? '刪除'}}</a>
-                                                        </div>
-                                                    @endif
+                                                @if(authPermission('image-group-delete'))
+                                                    <div class="row mb-1">
+                                                        <a href="/admin/image_group/delete?id={{$model->id}}" class="btn btn-danger">{{trans('default.delete') ?? '刪除'}}</a>
+                                                    </div>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach

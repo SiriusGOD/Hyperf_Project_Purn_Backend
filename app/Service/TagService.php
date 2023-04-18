@@ -35,17 +35,24 @@ class TagService
         return Tag::all();
     }
 
-    public function createTag(string $name, int $userId, array $groups): void
+    public function createTag(array $params): void
     {
         $model = new Tag();
-        $model->name = $name;
-        $model->user_id = $userId;
+        if (! empty($params['id'])) {
+            $model = Tag::find($params['id']);
+        }
+        $model->name = $params['name'];
+        $model->user_id = $params['user_id'];
+        $model->hot_order = $params['hot_order'];
         $model->save();
 
-        if (count($groups) > 0) {
+        if (count($params['groups']) > 0) {
             $id = $model->id;
-            $this->createTagGroupRelationship($groups, $id);
+            $this->createTagGroupRelationship($params['group_id'], $id);
         }
+
+        $this->redis->del(self::POPULAR_TAG_CACHE_KEY);
+        $this->getPopularTag();
     }
 
     // 影片TAG關聯
@@ -101,25 +108,30 @@ class TagService
             return json_decode($this->redis->get(self::POPULAR_TAG_CACHE_KEY), true);
         }
 
-        $collect = $this->calculatePopularTag();
+        $tags = Tag::where('hot_order', '>=', 1)
+            ->orderBy('hot_order')
+            ->get();
 
-        return $collect->toArray();
+        $collect = $this->calculatePopularTag($tags->pluck('id')->toArray());
+
+        $result = $this->generatePopularTags($tags->toArray(), $collect->toArray());
+
+        if (! empty($result)) {
+            $this->redis->set(self::POPULAR_TAG_CACHE_KEY, json_encode($result));
+        }
+
+        return $result;
     }
 
-    public function calculatePopularTag()
+    public function calculatePopularTag(array $hotTagIds)
     {
-        $models = MemberTag::groupBy('tag_id')
+        return MemberTag::groupBy('tag_id')
             ->select('tag_id', Db::raw('sum(count) as total'), 'tags.name')
             ->join('tags', 'tags.id', '=', 'member_tags.tag_id')
             ->orderByDesc('total')
+            ->whereNotIn('tag_id', $hotTagIds)
             ->limit(10)
             ->get();
-
-        if (! empty($models)) {
-            $this->redis->set(self::POPULAR_TAG_CACHE_KEY, $models->toJson());
-        }
-
-        return $models;
     }
 
     public static function tagIdsToInt(?array $tags): array
@@ -151,5 +163,19 @@ class TagService
                 $model->save();
             }
         }
+    }
+
+    protected function generatePopularTags(array $tags, array $popularTag)
+    {
+        $result = [];
+        foreach ($tags as $tag) {
+            $result[] = [
+                'tag_id' => $tag['id'],
+                'count' => PHP_INT_MAX,
+                'name' => $tag['name'],
+            ];
+        }
+
+        return array_merge($result, $popularTag);
     }
 }

@@ -11,6 +11,8 @@ declare(strict_types=1);
  */
 namespace App\Request;
 
+use Hyperf\Validation\Rule;
+
 class TagRequest extends AuthBaseRequest
 {
     /**
@@ -18,8 +20,18 @@ class TagRequest extends AuthBaseRequest
      */
     public function rules(): array
     {
+        $id = 0;
+        if (! empty($this->input('id'))) {
+            $id = $this->input('id');
+        }
+
         return [
             'name' => 'required|string|between:1,50',
+            'hot_order' => [
+                'required',
+                'numeric',
+                Rule::unique('tags')->ignore($id),
+            ],
         ];
     }
 }

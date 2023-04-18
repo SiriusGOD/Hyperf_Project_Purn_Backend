@@ -49,7 +49,6 @@ class VideoService
         $this->memberHasVideo = $memberHasVideo;
     }
 
-  
     // 我收藏的影片
     public function myStageVideo(int $memberId, int $page = 0)
     {

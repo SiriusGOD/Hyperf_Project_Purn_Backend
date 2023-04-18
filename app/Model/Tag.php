@@ -11,14 +11,14 @@ declare(strict_types=1);
  */
 namespace App\Model;
 
-use Carbon\Carbon;
-
 /**
  * @property int $id
  * @property int $user_id
  * @property string $name
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property int $hot_order
+ * @property User $user
  */
 class Tag extends Model
 {
@@ -40,7 +40,9 @@ class Tag extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'hot_order' => 'integer'];
+
+    protected array $hidden = [''];
 
     public function user()
     {

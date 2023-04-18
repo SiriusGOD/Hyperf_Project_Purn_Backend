@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\MemberLevel;
-use Carbon\Carbon;
 use Hyperf\Redis\Redis;
 
 class MemberLevelService
@@ -25,6 +24,7 @@ class MemberLevelService
     {
         $this->redis = $redis;
     }
+
     public function store(array $params): void
     {
         $model = MemberLevel::where('id', $params['id'])->first();

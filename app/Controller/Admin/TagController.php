@@ -76,9 +76,17 @@ class TagController extends AbstractController
     public function store(TagRequest $request, ResponseInterface $response, TagService $service): PsrResponseInterface
     {
         $userId = auth('session')->user()->getId();
+        $id = $request->input('id');
         $name = $request->input('name');
-        $groups = $request->input('groups');
-        $service->createTag($name, $userId, $groups);
+        $groups = $request->input('groups', []);
+        $hotOrder = $request->input('hot_order');
+        $service->createTag([
+            'id' => $id,
+            'user_id' => $userId,
+            'name' => $name,
+            'groups' => $groups,
+            'hot_order' => $hotOrder,
+        ]);
         return $response->redirect('/admin/tag/index');
     }
 
@@ -88,6 +96,16 @@ class TagController extends AbstractController
         $data['navbar'] = trans('default.tag_control.tag_insert');
         $data['tag_active'] = 'active';
         $data['tag_group_ids'] = '';
+        return $this->render->render('admin.tag.form', $data);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'edit')]
+    public function edit(RequestInterface $request)
+    {
+        $data['navbar'] = trans('default.tag_control.tag_edit');
+        $data['tag_active'] = 'active';
+        $data['tag_group_ids'] = '';
+        $data['model'] = Tag::find($request->input('id'));
         return $this->render->render('admin.tag.form', $data);
     }
 }

@@ -11,13 +11,13 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\Member;
 use App\Model\Order;
 use App\Model\OrderDetail;
 use App\Model\Product;
-use App\Model\Member;
 use Hyperf\DbConnection\Db;
-use Hyperf\Redis\Redis;
 use Hyperf\Logger\LoggerFactory;
+use Hyperf\Redis\Redis;
 
 class OrderService
 {
@@ -124,7 +124,7 @@ class OrderService
             'product_currency' => $product['currency'],
             'product_selling_price' => $product['selling_price'],
         ];
-        
+
         // 新增訂單
         return $this->storeOrder($data);
     }

@@ -13,6 +13,10 @@
                                     <label for="exampleInputEmail1">{{ trans('default.tag_control.tag_name') ?? '名稱'}}</label>
                                     <input type="text" class="form-control" name="name" id="name" placeholder="{{ trans('default.web_name_def') ?? '請輸入名稱'}}" value="{{$model->name ?? ''}}">
                                 </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{ trans('default.tag_control.tag_hot_order') ?? '熱門標籤排序'}} {{ trans('default.tag_control.tag_hot_order_desc') ?? '0不排序'}}</label>
+                                    <input type="text" class="form-control" name="hot_order" id="hot_order" placeholder="{{ trans('default.web_name_def') ?? '請輸入名稱'}}" value="{{$model->hot_order ?? ''}}">
+                                </div>
                                 @include('partial.tagGroupSelect')
                                 <button type="submit" class="btn btn-primary">{{ trans('default.submit') ?? '送出'}}</button>
                             </form>

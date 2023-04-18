@@ -38,7 +38,7 @@ class Product extends Model
     public const TYPE_LIST_NAME = [
         'image' => '圖片',
         'video' => '影片',
-        'member' => '會員'
+        'member' => '會員',
     ];
 
     public const TYPE_CORRESPOND_LIST = [

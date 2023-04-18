@@ -17,7 +17,6 @@ use Hyperf\ExceptionHandler\Formatter\FormatterInterface;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Server\ServerFactory;
 use Hyperf\Utils\ApplicationContext;
-use HyperfExt\Auth\Contracts\AuthManagerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -340,20 +339,6 @@ if (! function_exists('response')) {
     }
 }
 
-if (! function_exists('auth')) {
-    /**
-     * Auth认证辅助方法.
-     * @return mixed
-     */
-    function auth(string $guard = null)
-    {
-        if (is_null($guard)) {
-            $guard = config('auth.default.guard');
-        }
-        return make(AuthManagerInterface::class)->guard($guard);
-    }
-}
-
 if (! function_exists('convert_bytes')) {
     function convert_bytes($number): string
     {
@@ -492,7 +477,7 @@ if (! function_exists('ipInArray')) {
     }
 }
 
-/**
+/*
  * 字符串安全
  * @param $string
  * @return array
