@@ -35,6 +35,8 @@ class MemberLevel extends Model
         'diamond' => 2
     ];
 
+    public const NO_MEMBER_LEVEL = 0;
+
     /**
      * The table associated with the model.
      *
