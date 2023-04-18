@@ -46,6 +46,18 @@ class AdvertisementService
         return $result;
     }
 
+    public function getAdvertisementBySearch(int $page, int $limit = 1): array
+    {
+        $now = Carbon::now()->toDateTimeString();
+        return Advertisement::select('id', 'name', 'image_url', 'url', 'position', 'start_time', 'end_time', 'buyer', 'expire', 'created_at', 'updated_at')
+            ->where('start_time', '<=', $now)
+            ->where('end_time', '>=', $now)
+            ->offset($page * $limit)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+    }
+
     // 更新快取
     public function updateCache(): void
     {

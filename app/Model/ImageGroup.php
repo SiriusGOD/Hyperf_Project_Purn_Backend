@@ -27,6 +27,8 @@ class ImageGroup extends Model
 {
     public const PAGE_PER = 10;
 
+    public string $modelType = self::class;
+
     /**
      * The table associated with the model.
      */
@@ -42,6 +44,8 @@ class ImageGroup extends Model
      */
     protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
+    protected array $appends = ['model_type'];
+
     public function images()
     {
         return $this->hasMany(Image::class, 'group_id');
@@ -55,5 +59,10 @@ class ImageGroup extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    protected function getModelTypeAttribute()
+    {
+        return self::class;
     }
 }
