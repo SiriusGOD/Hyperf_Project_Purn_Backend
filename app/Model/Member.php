@@ -57,6 +57,8 @@ class Member extends Model implements Authenticatable
 
     protected array $hidden = ['password'];
 
+    protected array $appends = ['is_first'];
+
     public function getJwtIdentifier()
     {
         return $this->getKey();
@@ -80,5 +82,12 @@ class Member extends Model implements Authenticatable
     public function getJwtCustomClaims(): array
     {
         return ['guard' => 'api'];
+    }
+
+    protected function getIsFirstAttribute()
+    {
+        $query = MemberTag::where('member_id', $this->id)->count();
+        if(empty($query))return 0;
+        return 1;
     }
 }
