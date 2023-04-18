@@ -13,24 +13,25 @@ namespace App\Util;
 
 class CRYPT 
 {
-    protected $ENCRYPTION_KEY;
+    public $ENCRYPTION_KEY;
     // 定义加密密钥
     public function __construct()
     {
-        $this->ENCRYPTION_KEY = env('ENCRYPT_KEY');
+      self::$ENCRYPTION_KEY = env('ENCRYPT_KEY');
     }
 
     // 加密函数
     public static function encrypt($plaintext)
     {
+        $ENCRYPTION_KEY = env('ENCRYPT_KEY');
         $cipher = 'AES-256-CBC';
         // 加密算法
         $ivlen = openssl_cipher_iv_length($cipher);
         // 获取初始化向量长度
         $iv = openssl_random_pseudo_bytes($ivlen);
         // 生成随机初始化向量
-        $ciphertext_raw = openssl_encrypt($plaintext, $cipher, self::$ENCRYPTION_KEY,  OPENSSL_RAW_DATA, $iv);
-        $hmac = hash_hmac('sha256', $ciphertext_raw, self::$ENCRYPTION_KEY, true);
+        $ciphertext_raw = openssl_encrypt($plaintext, $cipher, $ENCRYPTION_KEY,  OPENSSL_RAW_DATA, $iv);
+        $hmac = hash_hmac('sha256', $ciphertext_raw, $ENCRYPTION_KEY, true);
         // 计算 HMAC
         return base64_encode($iv . $hmac . $ciphertext_raw);
         // 对 HMAC 和密文进行编码

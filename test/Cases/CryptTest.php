@@ -15,6 +15,7 @@ use HyperfTest\HttpTestCase;
 use App\Service\RedeemService;
 use App\Service\MemberRedeemService;
 use App\Service\VideoService;
+use App\Util\CRYPT;
 use Hyperf\Redis\Redis;
 /**
  * @internal
@@ -45,8 +46,11 @@ class CryptTest extends HttpTestCase
 
     public function testApiList()
     {
-        $countRes = $this->client->get('/api/actor/list',['page'=>1]);
-        $res1 = $this->client->get('/api/actor/list');
+        $data = ["page"=>1];
+        $data = ["page"=>CRYPT::encrypt(json_encode($data) )];
+        print_r($data);
+        $res1 = $this->client->get('/api/actor/list',$data);
+        
         $this->assertSame(200, (int) $res1['code']);
    }
 }

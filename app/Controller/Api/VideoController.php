@@ -23,6 +23,7 @@ use App\Service\LikeService;
 use App\Service\SuggestService;
 use App\Service\TagService;
 use App\Service\VideoService;
+use App\Service\RedeemService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -51,7 +52,7 @@ class VideoController extends AbstractController
 
     // 影片兌換
     #[RequestMapping(methods: ['POST'], path: 'videoRedeem')]
-    public function videoRedeem(RequestInterface $request, VideoService $videoService)
+    public function videoRedeem(RequestInterface $request, RedeemService $redeemService)
     {
         $videoId = $request->input('video_id');
         $code = $request->input('redeem_code');
@@ -59,7 +60,7 @@ class VideoController extends AbstractController
         if (! $userId) {
             return $this->error(Apicode::USER_NOT_FOUND_MSG, Apicode::USER_NOT_FOUND);
         }
-        $videoService->redeemVideo($videoId, $userId, $code);
+        $redeemService->redeemVideo($videoId, $userId, $code);
         return $this->success([]);
     }
 

@@ -129,16 +129,16 @@ class RedeemService extends BaseService
       }
 
       // 兌換卷清單
-      public function redeemList(int $page, $status = true)
+      public function redeemList(int $page, $status)
       {
           $model = $this->redeem;
           if ($status == 0 || $status == 1) {
-              // $model = $this->redeem->where('status', $status);
+               $model = $model->where('status', $status);
           }
           if ($page == 1) {
               $page = 0;
           }
-          $model = $this->redeem->offset(Redeem::PAGE_PER * $page)
+          $model = $model->offset(Redeem::PAGE_PER * $page)
               ->limit(Redeem::PAGE_PER);
           return $model->get();
       }

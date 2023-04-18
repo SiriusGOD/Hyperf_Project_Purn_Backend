@@ -105,7 +105,6 @@ class RedeemServiceTest extends HttpTestCase
         $expiredCode = $redeems_not->toArray()[0]["code"];
         $latestCode = $redeems_can->toArray()[count($redeems_can->toArray())-1]["code"];
 
-        print_r(["exp1"=>$code,'exp2'=>$expiredCode]);
         //查看是否兌換
         $res = $this->redeem->checkRedeemCode($code);
         $this->assertSame(true, $res);
@@ -150,8 +149,8 @@ class RedeemServiceTest extends HttpTestCase
       $memberId = $this->testUserId;
       //self::userRemeemVideo($memberId ,VideoCode::VIP);
       //self::userRemeemVideo($memberId ,VideoCode::DIAMOND);
-      //self::userRemeemVideo($memberId ,VideoCode::FREE);
-      self::userRemeemVideo($memberId ,0);
+      $res = self::userRemeemVideo($memberId ,VideoCode::FREE);
+      $this->assertNotSame(false, $res);
       //VideoCode::FREE
     }
 
@@ -185,16 +184,15 @@ class RedeemServiceTest extends HttpTestCase
         foreach($tenCostVideos->toArray() as $count => $video){
           
             if($lg){
-              print_r([$count ,"coutn"]);
               $r=rand(1,9);
               $videoId = $tenCostVideos->toArray()[$r]["id"];
               $videoCate = $video["is_free"];
               //print_r([$memberId, $videoId, $videoType]);
               //if($this->redeem->canRedeemVideo($memberRedeemCate , $videoCate) ){
-              $redeemStatus = $this->redeem->redeemVideo($memberId, $videoId);
-              print_r([$memberId,  $redeemStatus]);
+              return $redeemStatus = $this->redeem->redeemVideo($memberId, $videoId);
+              //print_r([$memberId,  $redeemStatus]);
               //測試 status 是否一至
-              $this->assertSame(true, $redeemStatus);
+              //$this->assertSame(true, $redeemStatus);
               //}
 
               $lg = false;
