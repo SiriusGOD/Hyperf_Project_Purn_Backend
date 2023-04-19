@@ -30,6 +30,9 @@ return [
         'image' => '圖片',
         'member' => '會員',
         'redeem' => '兌換卷',
+        'taggroup'=>'標籤群組管理',
+        'actorclassification'=>'操作日誌',
+        'userstep'=>'操作日誌',
     ],
     'user_name' => '使用者名稱',
     'list' => '列表',
@@ -133,6 +136,13 @@ return [
         'click' => '觀看次數',
     ],
 
+    'user-step'=>[
+      'index' => '列表',
+      'username' => '管理者',
+      'action' => '操作',
+      'comment' => '說明',
+      'title' => '操作日誌'
+    ],
     // redeem
     'redeem' => [
         'insert' => '新增優惠卷',
@@ -188,6 +198,7 @@ return [
         'memberLevel' => '會員等級管理',
         'image_group' => '套圖管理',
         'redeem' => '優惠卷管理',
+        'user-step'=>'操作日誌',
     ],
     // -------------------------------------------------------------------
     // UserController

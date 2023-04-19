@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Permission;
+use App\Model\UserStep;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
@@ -19,7 +20,7 @@ use Hyperf\Redis\Redis;
 class PermissionService
 {
     protected \Psr\Log\LoggerInterface $logger;
-
+    public $redis;
     public function __construct(Redis $redis, LoggerFactory $loggerFactory)
     {
         $this->redis = $redis;
@@ -81,12 +82,24 @@ class PermissionService
         $callBackStr = explode('Controller', $callBackStr[1]);
         $key = strtolower($callBackStr[0]) . '-' . $callbacks[1];
         $flag = self::checkPermission($key);
+        self::recordStep($key);
         if ($flag) {
             return true;
         }
         return false;
     }
 
+    // 記錄使用者的操作日誌
+    public function recordStep(string $key)
+    {
+        $model = new UserStep();
+        $model->user_id = auth('session')->user()->id; 
+        $model->user_name = auth('session')->user()->name; 
+        $model->role_id = auth('session')->user()->role_id; 
+        $model->action = $key; 
+        $model->comment = cutStrLang($key) ; 
+        $model->save(); 
+    }
     // 使用者的權限
     public function checkPermission(string $key)
     {

@@ -246,6 +246,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('user-step-index'))
+                    <li class="nav-item">
+                        <a href="/admin/user_step/index" class="nav-link {{$user_step_active ?? ''}}">
+                            <i class="nav-icon fas fa-image"></i>
+                            <p>
+                                {{trans('default.leftbox.user-step') ?? '公告管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

@@ -23,7 +23,7 @@ class MemberSeed implements BaseInterface
         $model->email = 'admin@admin.com';
         $model->phone = '012345678';
         $model->status = 1;
-        $model->buy_level_id =0;
+        $model->member_level_status =0;
         $model->save();
 
         $model = new \App\Model\Member();
@@ -35,14 +35,14 @@ class MemberSeed implements BaseInterface
         $model->email = 'test@test.com';
         $model->phone = '098765432';
         $model->status = 1;
-        $model->buy_level_id =0;
+        $model->member_level_status =0;
         $model->save();
 
         for($i=1 ; $i<=20 ;$i++)
         {
           $model = new \App\Model\Member();
           $model->name = 'test'.$i;
-        $model->buy_level_id =0;
+          $model->member_level_status =0;
           $model->password = password_hash('quH25df15Ed', PASSWORD_DEFAULT);
           $model->sex = 1;
           $model->age = 20;
