@@ -17,18 +17,37 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Hyperf\Logger\LoggerFactory;
 
 class CorsMiddleware implements MiddlewareInterface
 {
     protected ContainerInterface $container;
+    /**
+     * @var LoggerFactory
+     */
+    protected $loggerFactory;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, LoggerFactory $loggerFactory)
     {
         $this->container = $container;
+        $this->loggerFactory = $loggerFactory;
+    }
+    protected function logRequest(ServerRequestInterface $request)
+    {
+        $method = $request->getMethod();
+        $path = $request->getUri()->getPath();
+        $queryParams = $request->getQueryParams();
+        $body = $request->getParsedBody();
+        $ip = $request->getHeaderLine('X-Forwarded-For') ?: $request->getServerParams()['remote_addr'] ?? '-';
+
+        $logger = $this->loggerFactory->get('cors');
+        $logger->info(sprintf('%s %s %s %s %s', $method, $path, json_encode($queryParams), json_encode($body), $ip));
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        // 寫入跨域請求日誌
+        $this->logRequest($request);
         $response = Context::get(ResponseInterface::class);
         $response = $response->withHeader('Access-Control-Allow-Origin', '*')
             ->withHeader('Access-Control-Allow-Credentials', 'true')
