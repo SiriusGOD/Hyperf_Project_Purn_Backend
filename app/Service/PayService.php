@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\Coin;
 use App\Model\Order;
 use App\Model\Product;
 use App\Model\Member;
@@ -250,15 +251,21 @@ class PayService
                             
                         }
                     }else{
-                        // 儲值點數 現金點數 鑽石點數
+                        // 儲值點數 現金點數
+                        // 查詢商品的點數
+                        $coin = Coin::where('id', $product -> correspond_id)->first();
+                        $points = (int)$coin -> points;
+                        $member -> coins = $member -> coins + $points;
+                        $member -> save();
                     }
                 }else{
                 }
                 Db::commit();
+                $this->logger->info('執行結束', $data);
             } catch (\Throwable $th) {
                 //throw $th;
                 Db::rollBack();
-                $this->logger->error('error:' . __LINE__ . json_encode($th->getMessage()));
+                $this->logger->error('notifyPayAction  error:' . __LINE__ . json_encode($th->getMessage()));
                 var_dump($th->getMessage());
             }
 
