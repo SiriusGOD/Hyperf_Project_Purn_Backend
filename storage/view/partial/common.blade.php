@@ -249,9 +249,9 @@
                 @if(authPermission('user-step-index'))
                     <li class="nav-item">
                         <a href="/admin/user_step/index" class="nav-link {{$user_step_active ?? ''}}">
-                            <i class="nav-icon fas fa-image"></i>
+                            <i class="nav-icon fas fa-chalkboard"></i>
                             <p>
-                                {{trans('default.leftbox.user-step') ?? '公告管理'}}
+                                {{trans('default.leftbox.user-step') ?? '操作日誌'}}
                             </p>
                         </a>
                     </li>
