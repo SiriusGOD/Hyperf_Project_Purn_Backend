@@ -37,7 +37,10 @@
                                             colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.member_level_control.member_level_duration') ?? '持續天數'}}
                                         </th>
-                                        
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
+                                            aria-label="CSS grade: activate to sort column ascending">{{trans('default.action') ?? '動作'}}
+                                        </th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -47,6 +50,13 @@
                                             <td class="sorting_1 dtr-control">{{ trans('default.member_level_control.member_level_type')[$model->type] }}</td>
                                             <td>{{ $model->name }}</td>
                                             <td>{{ $model->duration }}</td>
+                                            <td>
+                                            @if(authPermission('memberLevel-edit'))
+                                                <div class="row mb-1">
+                                                <a href="/admin/member_level/edit?id={{$model->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
+                                                </div>
+                                            @endif
+                                            </td>
                                         </tr>
                                     @endforeach
                                     </tbody>
@@ -56,6 +66,7 @@
                                         <th rowspan="1" colspan="1">{{trans('default.type') ?? '類型'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.name') ?? '名稱'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.member_level_control.member_level_duration') ?? '持續天數'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>
                                     </tfoot>
                                 </table>

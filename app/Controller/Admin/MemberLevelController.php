@@ -87,4 +87,14 @@ class MemberLevelController extends AbstractController
         ]);
         return $response->redirect('/admin/member_level/index');
     }
+
+    #[RequestMapping(methods: ['GET'], path: 'edit')]
+    public function edit(RequestInterface $request)
+    {
+        $id = $request->input('id');
+        $data['model'] = MemberLevel::findOrFail($id);
+        $data['navbar'] = trans('default.member_level_control.member_level_edit');
+        $data['memberLevel_active'] = 'active';
+        return $this->render->render('admin.memberLevel.form', $data);
+    }
 }
