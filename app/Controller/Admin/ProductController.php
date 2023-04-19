@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
+use App\Model\Coin;
 use App\Model\Image;
 use App\Model\Product;
 use App\Model\Video;
@@ -99,14 +100,31 @@ class ProductController extends AbstractController
         $product_type = $request->input('product_type');
         if (! empty($product_type)) {
             switch ($product_type) {
-                case 'image':
+                case 'image': 
                     $model = Image::findOrFail($id);
+                    // 現金點數 或 鑽石點數(先寫死1顆)
+                    $data['currency'] = Product::CURRENCY[1];
                     break;
                 case 'video':
                     $model = Video::findOrFail($id);
+                    // 現金點數 或 鑽石點數(先寫死1顆)
+                    $data['currency'] = Product::CURRENCY[1];
                     break;
                 case 'member':
                     $model = MemberLevel::findOrFail($id);
+                    // 會員卡 -> 使用現金購買
+                    $data['currency'] = Product::CURRENCY[0];
+                    break;
+                case 'points':
+                    $model = Coin::findOrFail($id);
+                    if($model -> type == Coin::TYPE_LIST[0]){
+                        // 現金點數 -> 使用現金購買
+                        $data['currency'] = Product::CURRENCY[0];
+                    }
+                    if($model -> type == Coin::TYPE_LIST[1]){
+                        // 鑽石點數 -> 使用現金點數購買
+                        $data['currency'] = Product::CURRENCY[1];
+                    }
                     break;
             }
         }
@@ -140,6 +158,9 @@ class ProductController extends AbstractController
                 case 'member':
                     $type_class = Product::TYPE_CORRESPOND_LIST['member'];
                     break;
+                case 'points':
+                    $type_class = Product::TYPE_CORRESPOND_LIST['points'];
+                    break;
                 default:
                     $type_class = Product::TYPE_CORRESPOND_LIST['image'];
                     break;
@@ -164,6 +185,7 @@ class ProductController extends AbstractController
                         $products[$key]->img_thumb = $value->cover_thumb;
                         break;
                     case 'member':
+                    case 'points':
                         $products[$key]->title = $value->name;
                         break;
                     default:
@@ -217,18 +239,32 @@ class ProductController extends AbstractController
         $id = $request->input('id');
         $model = Product::findOrFail($id);
         $model->title = $model->name;
-        // switch ($model->type) {
-        //     case Product::TYPE_CORRESPOND_LIST['image']:
-        //         $product_type = 'image';
-        //         break;
-        //     case Product::TYPE_CORRESPOND_LIST['video']:
-        //         $product_type = 'video';
-        //         break;
-        //     default:
-        //         $product_type = '';
-        //         break;
-        // }
         $product_type = $model->type;
+        switch ($product_type) {
+            case 'image':
+                // 現金點數 或 鑽石點數(先寫死1顆)
+                $data['currency'] = Product::CURRENCY[1];
+                break;
+            case 'video':
+                // 現金點數 或 鑽石點數(先寫死1顆)
+                $data['currency'] = Product::CURRENCY[1];
+                break;
+            case 'member':
+                // 會員卡 -> 使用現金購買
+                $data['currency'] = Product::CURRENCY[0];
+                break;
+            case 'points':
+                $coin = Coin::findOrFail($model->correspond_id);
+                if($coin -> type == Coin::TYPE_LIST[0]){
+                    // 現金點數 -> 使用現金購買
+                    $data['currency'] = Product::CURRENCY[0];
+                }
+                if($coin -> type == Coin::TYPE_LIST[1]){
+                    // 鑽石點數 -> 使用現金點數購買
+                    $data['currency'] = Product::CURRENCY[1];
+                }
+                break;
+        }
         $data['model'] = $model;
         $data['product_type'] = $product_type;
         $data['navbar'] = trans('default.product_control.product_edit');
@@ -255,6 +291,9 @@ class ProductController extends AbstractController
                 case 'member':
                     $type_class = Product::TYPE_CORRESPOND_LIST['member'];
                     break;
+                case 'points':
+                    $type_class = Product::TYPE_CORRESPOND_LIST['points'];
+                    break;
                 default:
                     $type_class = Product::TYPE_CORRESPOND_LIST['image'];
                     break;
@@ -279,6 +318,7 @@ class ProductController extends AbstractController
                         $products[$key]->img_thumb = $value->cover_thumb;
                         break;
                     case 'member':
+                    case 'points':
                         $products[$key]->title = $value->name;
                         break;
                     default:
@@ -311,17 +351,27 @@ class ProductController extends AbstractController
     #[RequestMapping(methods: ['GET'], path: 'multipleInsert')]
     public function multipleInsert(RequestInterface $request, ProductService $service)
     {
-        $data = json_decode($request->input('data'), true);
+        $insert_data = json_decode($request->input('data'), true);
         $type = urldecode($request->input('type'));
+        
         switch ($type) {
             case 'image':
                 $type_class = Product::TYPE_CORRESPOND_LIST['image'];
+                // 現金點數 或 鑽石點數(先寫死1顆)
+                $data['currency'] = Product::CURRENCY[1];
                 break;
             case 'video':
                 $type_class = Product::TYPE_CORRESPOND_LIST['video'];
+                // 現金點數 或 鑽石點數(先寫死1顆)
+                $data['currency'] = Product::CURRENCY[1];
                 break;
             case 'member':
                 $type_class = Product::TYPE_CORRESPOND_LIST['member'];
+                // 會員卡 -> 使用現金購買
+                $data['currency'] = Product::CURRENCY[0];
+                break;
+            case 'points':
+                $type_class = Product::TYPE_CORRESPOND_LIST['points'];
                 break;
             default:
                 $type_class = '';
@@ -329,12 +379,24 @@ class ProductController extends AbstractController
         }
         $product_id_arr = [];
         $product_name_arr = [];
-        foreach ($data as $key => $value) {
+        foreach ($insert_data as $key => $value) {
             $model = $type_class::findOrFail($value);
             array_push($product_id_arr, $value);
             if(empty($model->title))$model->title = $model->name;
             array_push($product_name_arr, $model->title);
+
+            if($type == 'points'){
+                if($model -> type == Coin::TYPE_LIST[0]){
+                    // 現金點數 -> 使用現金購買
+                    $data['currency'] = Product::CURRENCY[0];
+                }
+                if($model -> type == Coin::TYPE_LIST[1]){
+                    // 鑽石點數 -> 使用現金點數購買
+                    $data['currency'] = Product::CURRENCY[1];
+                }
+            }
         }
+        
         $data['model'] = $model;
         $data['product_type'] = $type;
         $data['product_id_arr'] = json_encode($product_id_arr);

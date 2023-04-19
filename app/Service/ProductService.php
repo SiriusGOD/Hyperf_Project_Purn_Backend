@@ -52,6 +52,9 @@ class ProductService
         $model = Product::findOrNew($data['id']);
         $model->user_id = $data['user_id'];
         $model->type = $data['type'];
+        if($data['type'] == Product::TYPE_LIST[0] || $data['type'] == Product::TYPE_LIST[1]){
+            $model->diamond_price = Product::DIAMOND_PRICE;
+        }
         $model->correspond_id = $data['correspond_id'];
         $model->name = $data['name'];
         $model->expire = $data['expire'];

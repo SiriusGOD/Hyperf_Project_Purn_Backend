@@ -357,11 +357,13 @@ return [
             \App\Model\Product::TYPE_CORRESPOND_LIST['image'] => '圖片',
             \App\Model\Product::TYPE_CORRESPOND_LIST['video'] => '影片',
             \App\Model\Product::TYPE_CORRESPOND_LIST['member'] => '會員',
+            \App\Model\Product::TYPE_CORRESPOND_LIST['points'] => '點數',
         ],
         'product_type_msg' => [
             'image' => '圖片',
             'video' => '影片',
             'member' => '會員',
+            'points' => '點數',
         ],
         'product_currency_msg' => [
             'CNY' => '人民幣',

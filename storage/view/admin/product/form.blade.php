@@ -25,12 +25,21 @@
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_currency') ?? '商品幣別'}}</label>
                                     <select class="form-control form-control-lg" name="product_currency">
-                                        <option value="{{\App\Model\Product::CURRENCY[0]}}" {{($model->currency ?? '') == \App\Model\Product::CURRENCY[0] ? 'selected' : ''}}>
+                                        @if($currency == \App\Model\Product::CURRENCY[0])
+                                            <option value="{{\App\Model\Product::CURRENCY[0]}}" {{($model->currency ?? '') == \App\Model\Product::CURRENCY[0] ? 'selected' : ''}}>
+                                                {{\App\Model\Product::CURRENCY_NAME['CNY']}}
+                                            </option>
+                                        @elseif($currency == \App\Model\Product::CURRENCY[1])
+                                            <option value="{{\App\Model\Product::CURRENCY[1]}}" {{($model->currency ?? '') == \App\Model\Product::CURRENCY[1] ? 'selected' : ''}}>
+                                                {{\App\Model\Product::CURRENCY_NAME['COIN']}}
+                                            </option>
+                                        @endif
+                                        <!-- <option value="{{\App\Model\Product::CURRENCY[0]}}" {{($model->currency ?? '') == \App\Model\Product::CURRENCY[0] ? 'selected' : ''}}>
                                             {{\App\Model\Product::CURRENCY_NAME['CNY']}}
                                         </option>
                                         <option value="{{\App\Model\Product::CURRENCY[1]}}" {{($model->currency ?? '') == \App\Model\Product::CURRENCY[1] ? 'selected' : ''}}>
                                             {{\App\Model\Product::CURRENCY_NAME['COIN']}}
-                                        </option>
+                                        </option> -->
                                     </select>
                                 </div>
                                 <div class="form-group">
