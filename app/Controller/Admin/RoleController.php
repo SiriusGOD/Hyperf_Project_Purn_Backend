@@ -24,6 +24,8 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\View\RenderInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
+use Hyperf\Validation\Contract\ValidatorFactoryInterface;
+use Hyperf\Di\Annotation\Inject;
 
 #[Controller]
 #[Middleware(middleware: 'App\\Middleware\\PermissionMiddleware')]
@@ -31,12 +33,16 @@ class RoleController extends AbstractController
 {
     protected RenderInterface $render;
 
+    #[Inject]
+    protected ValidatorFactoryInterface $validationFactory;
+
     public function __construct(RenderInterface $render)
     {
         parent::__construct();
         $this->render = $render;
     }
 
+    #[RequestMapping(methods: ['GET'], path: 'index')]
     public function index(RequestInterface $request, RoleService $service)
     {
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
