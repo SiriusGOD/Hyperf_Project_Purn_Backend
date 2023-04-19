@@ -72,7 +72,7 @@ class OrderController extends AbstractController
     public function edit(RequestInterface $request)
     {
         $id = $request->input('id');
-        $data['model'] = Order::join('users', 'orders.user_id', 'users.id')->select('orders.*', 'users.name')->findOrFail($id);
+        $data['model'] = Order::join('members', 'orders.user_id', 'members.id')->select('orders.*', 'members.name')->findOrFail($id);
         $data['model_details'] = Order::join('order_details', 'orders.id', 'order_details.order_id')->select('order_details.*')->where('orders.id', $id)->get();
         $data['navbar'] = trans('default.order_control.order_edit');
         $data['order_active'] = 'active';
