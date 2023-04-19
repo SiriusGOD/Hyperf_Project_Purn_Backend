@@ -29,7 +29,9 @@ use App\Request\MemberLoginRequest;
 use App\Request\RegisterVerificationRequest;
 use App\Request\ResetPasswordVerificationRequest;
 use App\Request\SendVerificationRequest;
+use App\Request\AddFollowerRequest;
 use App\Service\MemberService;
+use App\Service\MemberFollowService;
 use Carbon\Carbon;
 use Hyperf\AsyncQueue\Driver\DriverFactory;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -227,6 +229,19 @@ class MemberController extends AbstractController
         }
 
         return $this->error(trans('validation.expire_code'), 400);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'addMemberIdsFollow')]
+    public function addMemberIdsFollow(AddFollowerRequest $request, MemberFollowService $memberFollowService)
+    {
+        $follow_ids = $request->input('ids');
+        $type = $request->input('type');
+        $userId = auth('jwt')->user()->getId();
+        $res = $memberFollowService->addTagsFlower($type, $userId, $follow_ids);
+        if ($res) {
+            return $this->success();
+        }
+        return $this->error('該會員已追蹤', ErrorCode::BAD_REQUEST);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'addFollow')]
