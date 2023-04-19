@@ -23,6 +23,13 @@ return [
     'titles' => [
         'role' => '角色',
         'roles' => '角色',
+        'actor' => '演員',
+        'order' => '訂單',
+        'product' => '產品',
+        'video' => '影片',
+        'imagegroup'=> '套圖',
+        'memberlevel'=> '員會等級',
+        'announcement'=> '公告',
         'user' => '使用者',
         'manager' => '管理者',
         'advertisement' => '廣告',
