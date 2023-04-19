@@ -100,7 +100,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{ trans('default.video.pay_type') ?? '套圖描述'}}</label>
-                                    <select name="pay_type">
+                                    <select name="pay_type" class="form-control">
                                         @foreach(trans('default.video.pay_type_types') as $key => $value)
                                             <option value="{{ $key }}" @if($key == ($model->pay_type ?? null)) @endif>{{ $value }}</option>
                                         @endforeach

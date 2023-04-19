@@ -13,6 +13,7 @@ namespace App\Service;
 
 class MailService
 {
+    //TODO finish email
     public function send(string $address, string $content): bool
     {
         return true;

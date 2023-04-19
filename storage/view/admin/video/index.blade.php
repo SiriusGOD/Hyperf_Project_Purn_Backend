@@ -99,7 +99,7 @@
                                             <td> {{ $const::IS_FREE[$video->is_free]}}</td>
                                             <td> {{ $video->click_count ?? 0 }}</td>
                                             <td> {{ $video->like_count ?? 0 }}</td>
-                                            <td>{{ trans('image_group_pay_type_types')[$model->pay_type] }}</td>
+                                            <td>{{ trans('default.image_group_control.image_group_pay_type_types')[$video->pay_type] }}</td>
                                             <td> {{ $const::IS_HIDE[$video->is_hide]}}</td>
                                             <td>
                                                 @if(authPermission('video-edit'))

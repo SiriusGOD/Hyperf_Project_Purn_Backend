@@ -146,4 +146,9 @@ class ImageService
 
         return $result;
     }
+
+    public function getImagesByImageGroup(int $groupId)
+    {
+        return Image::where('group_id', $groupId)->get();
+    }
 }

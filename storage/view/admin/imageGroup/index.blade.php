@@ -87,7 +87,7 @@
                                             </td>
                                             <td>{{ $model->click_count ?? 0 }}</td>
                                             <td>{{ $model->like_count ?? 0 }}</td>
-                                            <td>{{ trans('image_group_pay_type_types')[$model->pay_type] }}</td>
+                                            <td>{{ trans('default.image_group_control.image_group_pay_type_types')[$model->pay_type] }}</td>
                                             <td>
                                                 @if(authPermission('image-group-edit'))
                                                     <div class="row mb-1">

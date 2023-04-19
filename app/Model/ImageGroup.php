@@ -38,6 +38,8 @@ class ImageGroup extends Model
      */
     protected ?string $table = 'image_groups';
 
+    public const DEFAULT_FREE_LIMIT = 3;
+
     /**
      * The attributes that are mass assignable.
      */
@@ -68,5 +70,10 @@ class ImageGroup extends Model
     protected function getModelTypeAttribute()
     {
         return self::class;
+    }
+
+    public function imagesLimit()
+    {
+        return $this->hasMany(Image::class, 'group_id')->limit(self::DEFAULT_FREE_LIMIT);
     }
 }
