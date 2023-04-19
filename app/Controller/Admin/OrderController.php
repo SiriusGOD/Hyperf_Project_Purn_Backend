@@ -46,7 +46,7 @@ class OrderController extends AbstractController
         // 顯示幾筆
         $step = Order::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = Order::join('users', 'orders.user_id', 'users.id')->select('orders.*', 'users.name')->offset(($page - 1) * $step)->limit($step);
+        $query = Order::join('members', 'orders.user_id', 'members.id')->select('orders.*', 'members.name')->offset(($page - 1) * $step)->limit($step);
         $orders = $query->get();
         $query = Order::select('*');
         $total = $query->count();
