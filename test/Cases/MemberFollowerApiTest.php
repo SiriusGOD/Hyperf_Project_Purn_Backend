@@ -21,11 +21,11 @@ use App\Service\MemberService;
  */
 class MemberFollowerApiTest extends HttpTestCase
 {
-     /**
-     * @var Client
-     */
-    protected $client;
-    protected $redis;
+   /**
+   * @var Client
+   */
+  protected $client;
+  protected $redis;
 
   public function __construct($name = null, 
                               array $data = [], 
@@ -42,13 +42,12 @@ class MemberFollowerApiTest extends HttpTestCase
       $user = Member::where('id',$memberId)->first();
       $token = auth()->login($user);
       make(MemberService::class)->saveToken($user->id, $token);
-      $data = $this->client->post('/api/member/addMemberTagsFollow', [
-          'ids' => [1,2,3,5],
-          'type' => "image",
+      $data = $this->client->post('/api/member/addMemberIdsFollow', [
+          'ids' => [1,2,3,5,9,11,15],
+          'type' => "tag",
       ], [
           'Authorization' => 'Bearer ' . $token,
       ]);
-      //print_r([ $data]);
       $this->assertSame(200, $data['code']);
     }
   
