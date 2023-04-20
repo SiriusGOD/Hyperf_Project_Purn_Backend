@@ -32,7 +32,13 @@ class TagService
 
     public function getTags(): Collection
     {
-        return Tag::all();
+        $list = Tag::all();
+        foreach ($list as $key => $value) {
+            if(!empty($value -> img)){
+                $list[$key] -> img = env('IMG_DOMAIN').$value -> img;
+            }
+        }
+        return $list;
     }
 
     public function createTag(array $params): void

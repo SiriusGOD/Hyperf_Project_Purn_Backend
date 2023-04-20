@@ -8,9 +8,9 @@
                     <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                         <div class="row">
 
-                            @if(authPermission('memberLevel-create'))
+                            @if(authPermission('coin-create'))
                                 <div class="col-sm-12 col-md-12 mb-1">
-                                    <a class="btn badge-info" href="/admin/member_level/create">{{trans('default.member_level_control.member_level_insert') ?? '新增會員等級'}}</a>
+                                    <a class="btn badge-info" href="/admin/coin/create">{{trans('default.coin_control.coin_insert') ?? '新增點數類別'}}</a>
                                 </div>
                             @endif
                         </div>
@@ -35,25 +35,26 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.member_level_control.member_level_duration') ?? '持續天數'}}
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.coin_control.points') ?? '點數'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
                                             aria-label="CSS grade: activate to sort column ascending">{{trans('default.action') ?? '動作'}}
                                         </th>
+                                        
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach($datas as $model)
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $model->id }}</td>
-                                            <td class="sorting_1 dtr-control">{{ trans('default.member_level_control.member_level_type')[$model->type] }}</td>
+                                            <td class="sorting_1 dtr-control">{{ trans('default.coin_control.coin_type')[$model->type] }}</td>
                                             <td>{{ $model->name }}</td>
-                                            <td>{{ $model->duration }}</td>
+                                            <td>{{ $model->points }}</td>
                                             <td>
-                                            @if(authPermission('memberLevel-edit'))
+                                            @if(authPermission('coin-edit'))
                                                 <div class="row mb-1">
-                                                <a href="/admin/member_level/edit?id={{$model->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
+                                                <a href="/admin/coin/edit?id={{$model->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
                                                 </div>
                                             @endif
                                             </td>
@@ -65,7 +66,7 @@
                                         <th rowspan="1" colspan="1">{{trans('default.id') ?? '序號'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.type') ?? '類型'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.name') ?? '名稱'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.member_level_control.member_level_duration') ?? '持續天數'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.coin_control.points') ?? '點數'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>
                                     </tfoot>

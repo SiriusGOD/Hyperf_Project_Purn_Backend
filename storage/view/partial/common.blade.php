@@ -196,6 +196,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('coin-index'))
+                    <li class="nav-item">
+                        <a href="/admin/coin/index" class="nav-link {{$coin_active ?? ''}}">
+                            <i class="nav-icon fas fa-boxes"></i>
+                            <p>
+                                {{trans('default.leftbox.coin') ?? '點數管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
                 @if(authPermission('product-index'))
                     <li class="nav-item">
                         <a href="/admin/product/index" class="nav-link {{$product_active ?? ''}}">

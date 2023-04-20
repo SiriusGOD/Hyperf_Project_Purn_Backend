@@ -12,11 +12,17 @@
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_choose_type') ?? '選擇商品類型'}}</label>
                                     <select  class="form-control-sm" name="product_type" >
                                         <option value="">選擇商品類型</option>
-                                    @foreach(\App\Model\Product::TYPE_LIST as $type)
+                                    <!-- @foreach(\App\Model\Product::TYPE_LIST as $type)
                                         <option value="{{$type}}" {{$product_type == $type ? 'selected' : ''}}>
                                             {{\App\Model\Product::TYPE_LIST_NAME[$type]}}
                                         </option>
-                                    @endforeach
+                                    @endforeach -->
+                                        <option value="{{\App\Model\Product::TYPE_LIST[0]}}" {{$product_type == \App\Model\Product::TYPE_LIST[0] ? 'selected' : ''}}>
+                                            {{\App\Model\Product::TYPE_LIST_NAME['image']}}
+                                        </option>
+                                        <option value="{{\App\Model\Product::TYPE_LIST[1]}}" {{$product_type == \App\Model\Product::TYPE_LIST[1] ? 'selected' : ''}}>
+                                            {{\App\Model\Product::TYPE_LIST_NAME['video']}}
+                                        </option>
                                     </select>
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_name') ?? '名稱'}}: </label>
                                     <input type="text" name="product_name" id="product_name" value="" placeholder="請輸入影片或圖片名稱">

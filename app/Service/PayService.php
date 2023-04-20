@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\Coin;
 use App\Model\BuyMemberLevel;
 use App\Model\Member;
 use App\Model\MemberLevel;
@@ -248,15 +249,17 @@ class PayService
                                 var_dump('更新 -> 延長');
                             }
                         }
+                    }else{
+                        // 儲值點數 現金點數 鑽石點數
                     }
-                    // 儲值點數 現金點數 鑽石點數
+                }else{
                 }
-
                 Db::commit();
+                $this->logger->info('執行結束', $data);
             } catch (\Throwable $th) {
                 // throw $th;
                 Db::rollBack();
-                $this->logger->error('error:' . __LINE__ . json_encode($th->getMessage()));
+                $this->logger->error('notifyPayAction  error:' . __LINE__ . json_encode($th->getMessage()));
                 var_dump($th->getMessage());
             }
         }

@@ -13,36 +13,30 @@ namespace App\Model;
 
 /**
  * @property int $id
- * @property string $type
- * @property string $name
- * @property int $duration
+ * @property char $type
+ * @property varchar $name
+ * @property int $points
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  */
-class MemberLevel extends Model
+class Coin extends Model
 {
     public const PAGE_PER = 10;
 
-    public const TYPE_LIST = ['vip', 'diamond'];
+    public const TYPE_LIST = ['cash','diamond'];
 
     public const TYPE_NAME = [
-        'vip' => 'VIP',
-        'diamond' => '鑽石',
+        'cash' => '現金',
+        'diamond' => '鑽石'
     ];
 
-    public const TYPE_VALUE = [
-        'vip' => 1,
-        'diamond' => 2,
-    ];
-
-    public const NO_MEMBER_LEVEL = 0;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected ?string $table = 'member_levels';
+    protected ?string $table = 'coins';
 
     /**
      * The attributes that are mass assignable.
@@ -52,5 +46,6 @@ class MemberLevel extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'duration' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'points' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
 }

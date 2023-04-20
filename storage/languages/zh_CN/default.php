@@ -205,6 +205,7 @@ return [
         'memberLevel' => '會員等級管理',
         'image_group' => '套圖管理',
         'redeem' => '優惠卷管理',
+        'coin' => '點數管理',
         'user-step'=>'操作日誌',
     ],
     // -------------------------------------------------------------------
@@ -377,11 +378,17 @@ return [
             \App\Model\Product::TYPE_CORRESPOND_LIST['image'] => '圖片',
             \App\Model\Product::TYPE_CORRESPOND_LIST['video'] => '影片',
             \App\Model\Product::TYPE_CORRESPOND_LIST['member'] => '會員',
+            \App\Model\Product::TYPE_CORRESPOND_LIST['points'] => '點數',
         ],
         'product_type_msg' => [
             'image' => '圖片',
             'video' => '影片',
             'member' => '會員',
+            'points' => '點數',
+        ],
+        'product_currency_msg' => [
+            'CNY' => '人民幣',
+            'COIN' => '現金點數'
         ]
     ],
     // -------------------------------------------------------------------
@@ -415,6 +422,18 @@ return [
         'member_level_type' => [
             'vip' => \App\Model\MemberLevel::TYPE_NAME['vip'],
             'diamond' => \App\Model\MemberLevel::TYPE_NAME['diamond'],
+        ],
+    ],
+    // -------------------------------------------------------------------
+    // CoinController
+    'coin_control' => [
+        'coin_control' => '點數管理',
+        'coin_insert' => '新增點數類別',
+        'coin_edit' => '編輯點數類別',
+        'points' => '點數',
+        'coin_type' => [
+            'cash' => \App\Model\Coin::TYPE_NAME['cash'],
+            'diamond' => \App\Model\Coin::TYPE_NAME['diamond'],
         ],
     ],
     // -------------------------------------------------------------------

@@ -33,25 +33,32 @@ class Product extends Model
 
     public const PAGE_PER = 10;
 
-    public const TYPE_LIST = ['image', 'video', 'member'];
+    public const TYPE_LIST = ['image', 'video', 'member', 'points'];
 
     public const TYPE_LIST_NAME = [
         'image' => '圖片',
         'video' => '影片',
         'member' => '會員',
+        'points' => '點數',
     ];
 
     public const TYPE_CORRESPOND_LIST = [
         'image' => 'App\Model\Image',
         'video' => 'App\Model\Video',
         'member' => 'App\Model\MemberLevel',
+        'points' => 'App\Model\Coin',
     ];
 
-    public const CURRENCY = [
+    public const CURRENCY = ['CNY','COIN','DIAMOND'];
+
+    public const CURRENCY_NAME = [
         'CNY' => '人民幣',
-        'USD' => '美金',
-        'TWD' => '台幣',
+        'COIN' => '現金點數',
+        'DIAMOND' => '鑽石點數',
     ];
+
+    // 套圖 影片預設鑽石價錢
+    public const DIAMOND_PRICE = 1;
 
     /**
      * The table associated with the model.
