@@ -99,27 +99,46 @@ class OrderService
     }
 
     // 建立訂單
-    public function createOrder($user_id, $prod_id, $payment_type, $pay_url, $pay_proxy, $pay_order_id)
+    public function createOrder($arr)
     {
         // 撈取會員資料
-        $user = Member::find($user_id)->toArray();
+        // $user = Member::find($user_id)->toArray();
+        $user = $arr['user'];
         // 撈取商品資料
-        $product = Product::find($prod_id)->toArray();
+        // $product = Product::find($prod_id)->toArray();
+        $product = $arr['product'];
 
         $data['order'] = [
             'user_id' => $user['id'],
             'email' => $user['email'],
             'telephone' => $user['phone'],
-            'payment_type' => $payment_type,
-            'currency' => $product['currency'],
-            'total_price' => $product['selling_price'] ?? 0,
-            'pay_way' => Order::PAY_WAY_MAP_NEW[$payment_type],
-            'pay_url' => $pay_url,
-            'pay_proxy' => $pay_proxy,
-            'pay_order_id' => $pay_order_id,
+            'payment_type' => $arr['payment_type'],
+            // 'currency' => $product['currency'],
+            // 'total_price' => $product['selling_price'] ?? 0,
+            'pay_way' => Order::PAY_WAY_MAP_NEW[$arr['payment_type']],
+            'pay_url' => $arr['pay_url'] ?? '',
+            'pay_proxy' => $arr['pay_proxy'],
+            'pay_order_id' => $arr['pay_order_id'] ?? '',
         ];
+        switch ($arr['pay_method']) {
+            case 'cash':
+            case 'coin':
+                $data['order']['currency'] = $product['currency'];
+                $data['order']['total_price'] = $product['selling_price'] ?? 0;
+                break;
+
+            case 'diamond_coin':
+                $data['order']['currency'] = Order::PAY_CURRENCY['diamond_coin'];
+                $data['order']['total_price'] = $product['diamond_price'] ?? Product::DIAMOND_PRICE;
+                break;
+            
+            default:
+                $data['order']['currency'] = Order::PAY_CURRENCY[$arr['pay_method']];
+                $data['order']['total_price'] = Product::QUOTA;
+                break;
+        }
         $data['product'] = [
-            'product_id' => $prod_id,
+            'product_id' => $arr['prod_id'],
             'product_name' => $product['name'],
             'product_currency' => $product['currency'],
             'product_selling_price' => $product['selling_price'],

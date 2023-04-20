@@ -39,7 +39,7 @@ class PayService
     }
 
     // 產生支付鏈接
-    public function getPayUrl($user_id, $prod_id, $payment_type, $oauth_type, $pay_proxy, $ip)
+    public function getPayUrl($arr): bool|array|string
     {
         // 測試
         if (env('APP_ENV') != 'production') {
@@ -51,17 +51,18 @@ class PayService
         } else {
             // 正式 (test)
             // 撈取商品資料
-            $product = Product::find($prod_id)->toArray();
+            // $product = Product::find($arr['prod_id'])->toArray();
+            $product = $arr['product'];
 
             $member_aff = 'testcode'; // 之後改成從redis獲取 (邀请码)
             $data['app_name'] = env('APP_NAME');
-            $data['app_type'] = ($oauth_type == 'web') ? 'pc' : $oauth_type;
-            $data['aff'] = "{$member_aff}:{$prod_id}"; // 区分 '邀請碼 :产品'
+            $data['app_type'] = ($arr['oauth_type'] == 'web') ? 'pc' : $arr['oauth_type'];
+            $data['aff'] = "{$member_aff}:{$arr['prod_id']}"; // 区分 '邀請碼 :产品'
             $data['amount'] = (string) $product['selling_price'];
             $sign = $this->make_sign_pay($data, env('PAY_SIGNKEY'));
-            $data['ip'] = $ip;
-            $data['pay_type'] = Order::PAY_WAY_MAP_NEW[$payment_type];
-            $data['type'] = isset($pay_proxy) ? $pay_proxy : 'online';
+            $data['ip'] = $arr['ip'];
+            $data['pay_type'] = Order::PAY_WAY_MAP_NEW[$arr['payment_type']];
+            $data['type'] = isset($arr['pay_proxy']) ? $arr['pay_proxy'] : 'online';
             $data['sign'] = $sign;
             $data['is_sdk'] = 0; // 未知欄位
             $data['product'] = 'vip'; // vip or coins
@@ -213,7 +214,21 @@ class PayService
                             $buy_member_level -> end_time = $now -> addDays($duration) -> toDateTimeString();
                             $buy_member_level -> save();
                             
-                            // 更新會員的會員等級
+                            // 更新會員的會員等級 
+                            // 當是購買鑽石或vip會員1天卡 則會限制當天觀看數為50部
+                            if($duration == 1){
+                                switch ($level) {
+                                    case 'vip':
+                                        $member -> vip_quota = MemberLevel::LIMIT_QUOTA;
+                                        break;
+                                    case 'diamond':
+                                        $member -> diamond_quota = MemberLevel::LIMIT_QUOTA;
+                                        break;
+                                    default:
+                                        # code...
+                                        break;
+                                }
+                            }
                             $member -> member_level_status = MemberLevel::TYPE_VALUE[$level];
                             $member -> save();
 
@@ -238,7 +253,16 @@ class PayService
 
                                 if($level == 'diamond' && $member -> member_level_status != MemberLevel::TYPE_VALUE[$level]){
                                     // 更新會員的會員等級
+                                    // 當是購買鑽石或vip會員1天卡 則會限制當天觀看數為50部
+                                    if($duration == 1){
+                                        $member -> diamond_quota = MemberLevel::LIMIT_QUOTA;
+                                    }
                                     $member -> member_level_status = MemberLevel::TYPE_VALUE[$level];
+                                    $member -> save();
+                                }
+
+                                if($duration == 1 && $level == 'vip'){
+                                    $member -> vip_quota = MemberLevel::LIMIT_QUOTA;
                                     $member -> save();
                                 }
                                 var_dump("更新 -> 新增一筆");
@@ -252,11 +276,10 @@ class PayService
                         }
                     }else{
                         // 儲值點數 現金點數
-                        // 查詢商品的點數
-                        $coin = Coin::where('id', $product -> correspond_id)->first();
-                        $points = (int)$coin -> points;
-                        $member -> coins = $member -> coins + $points;
+                        $coin = Coin::where('id', $product -> correspond_id) -> first();
+                        $member -> coins = (double)$member -> coins + $coin -> points;
                         $member -> save();
+                        var_dump( "儲值現金點數成功");
                     }
                 }else{
                 }

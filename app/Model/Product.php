@@ -60,6 +60,9 @@ class Product extends Model
     // 套圖 影片預設鑽石價錢
     public const DIAMOND_PRICE = 1;
 
+    // 觀看次數
+    public const QUOTA = 1;
+
     /**
      * The table associated with the model.
      *
