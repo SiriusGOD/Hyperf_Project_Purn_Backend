@@ -12,7 +12,9 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\ActorCorrespond;
+use App\Model\ImageGroup;
 use App\Model\MemberHasVideo;
+use App\Model\Order;
 use App\Model\Tag;
 use App\Model\TagCorrespond;
 use App\Model\Video;
@@ -69,14 +71,14 @@ class VideoService
     }
 
     // 影片列表
-    public function getVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER): Collection
+    public function getVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER, array $withoutIds = []): Collection
     {
-        $query = self::baseVideos($tagIds, $page, $status, $limit);
+        $query = self::baseVideos($tagIds, $page, $status, $limit, $withoutIds);
         return $query->get();
     }
 
     // 影片
-    public function baseVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER)
+    public function baseVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER, array $withoutIds = [])
     {
         $videoIds = [];
         $query = $this->model;
@@ -93,6 +95,10 @@ class VideoService
         $query = $query->offset($limit * $page)->limit($limit);
         if (! empty($videoIds)) {
             $query = $query->whereIn('id', $videoIds);
+        }
+
+        if (! empty($withoutIds)) {
+            $query = $query->whereNotIn('id', $withoutIds);
         }
 
         return $query;
@@ -296,5 +302,21 @@ class VideoService
         }
 
         return $query;
+    }
+
+    public function isPay(int $id, int $memberId): bool
+    {
+        return Order::where('orders.user_id', $memberId)
+            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+            ->join('products', 'order_details.product_id', '=', 'products.id')
+            ->where('products.type', Video::class)
+            ->where('products.correspond_id', $id)
+            ->where('orders.status', Order::ORDER_STATUS['finish'])
+            ->exists();
+    }
+
+    public function getPayVideo(int $id): Video|Collection|\Hyperf\Database\Model\Model|array|null
+    {
+        return Video::find($id);
     }
 }

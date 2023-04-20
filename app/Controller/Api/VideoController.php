@@ -16,9 +16,12 @@ use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Model\Video;
 use App\Request\ClickRequest;
+use App\Request\GetPayImageRequest;
 use App\Request\VideoApiSuggestRequest;
 use App\Service\ActorService;
 use App\Service\ClickService;
+use App\Service\ImageGroupService;
+use App\Service\ImageService;
 use App\Service\LikeService;
 use App\Service\RedeemService;
 use App\Service\SuggestService;
@@ -153,5 +156,20 @@ class VideoController extends AbstractController
         $id = (int) $request->input('id');
         $service->addLike(Video::class, $id);
         return $this->success([]);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'pay_video')]
+    public function getPayVideo(GetPayImageRequest $request, VideoService $service)
+    {
+        $id = (int) $request->input('id');
+        $memberId = auth()->user()->getId();
+
+        if (! $service->isPay($id, $memberId)) {
+            return $this->error(trans('validation.is_not_pay'));
+        }
+
+        $data = $service->getPayVideo($id)->toArray();
+
+        return $this->success($data);
     }
 }

@@ -43,7 +43,7 @@ class ImageGroupService
         return $model;
     }
 
-    public function getImageGroups(?array $tagIds, int $page, $limit = ImageGroup::PAGE_PER): Collection
+    public function getImageGroups(?array $tagIds, int $page, $limit = ImageGroup::PAGE_PER, array $withoutIds = []): Collection
     {
         $imageIds = [];
         if (! empty($tagIds)) {
@@ -61,6 +61,10 @@ class ImageGroupService
 
         if (! empty($imageIds)) {
             $query = $query->whereIn('id', $imageIds);
+        }
+
+        if (! empty($withoutIds)) {
+            $query = $query->whereNotIn('id', $withoutIds);
         }
 
         return $query->get();

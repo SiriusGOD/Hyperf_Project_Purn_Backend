@@ -171,11 +171,7 @@ class SearchService
         $clickService = make(ClickService::class);
         $clicks = $clickService->calculatePopularClick(ImageGroup::class, $remain, $page, $hotImageIds);
 
-        $ids = [];
-
-        foreach ($clicks as $click) {
-            $ids[] = $click['id'];
-        }
+        $ids = $this->getIds($clicks);
 
         $clickImageGroups = ImageGroup::with(['tags', 'imagesLimit'])->whereIn('id', $ids)->get()->toArray();
         $clickImageGroupsArr = $this->sortClickAndModels($clicks, $clickImageGroups);
@@ -186,7 +182,9 @@ class SearchService
             return $result;
         }
 
-        $imageGroups = $this->imageGroupService->getImageGroups(null, $page, $remain)->toArray();
+        $ids = $this->getIds($result);
+
+        $imageGroups = $this->imageGroupService->getImageGroups(null, $page, $remain, $ids)->toArray();
 
         return array_merge($result, $imageGroups);
     }
@@ -224,11 +222,7 @@ class SearchService
         $clickService = make(ClickService::class);
         $clicks = $clickService->calculatePopularClick(Video::class, $remain, $page, $hotVideoIds);
 
-        $ids = [];
-
-        foreach ($clicks as $click) {
-            $ids[] = $click['id'];
-        }
+        $ids = $this->getIds($clicks);
 
         $clickVideos = Video::with('tags')->whereIn('id', $ids)->get()->toArray();
         $clickVideosArr = $this->sortClickAndModels($clicks, $clickVideos);
@@ -244,5 +238,16 @@ class SearchService
         $videos = $this->videoService->getVideos(null, $page, 9, $remain)->toArray();
 
         return array_merge($videos, $result);
+    }
+
+    protected function getIds(array $models) : array
+    {
+        $result = [];
+
+        foreach ($models as $model) {
+            $result[] = $model['id'];
+        }
+
+        return $result;
     }
 }
