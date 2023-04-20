@@ -19,7 +19,6 @@ namespace App\Service;
  */
 
 use App\Model\Member;
-use App\Model\UsersInviteReceiveLog;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
@@ -27,9 +26,6 @@ use Hyperf\Utils\Cache\Cache;
 use App\Model\MemberInviteReceiveLog;
 use App\Model\Order;
 use App\Service\MemberInviteStatService;
-use Carbon\Carbon;
-use Hyperf\Database\Model\Collection;
-use Hyperf\DbConnection\Db;
 /**
  * Class ProxyService.
  */
@@ -119,10 +115,10 @@ class ProxyService
      * 我的累计总推广收益.
      * @return float|string
      */
-    public function getTotalAmount($aff, MemberInviteStartService $service )
+    public function getTotalAmount($aff, MemberInviteStatService $service )
     {
         /** @var \UsersInviteStatModel $state */
-        is_null($inviteStat) && $inviteStat = $service::getRow($aff);
+        is_null($inviteStat) && $inviteStat = $service->getRow($aff);
         if (is_null($inviteStat)) {
             return 0.00;
         }
@@ -144,7 +140,7 @@ class ProxyService
       return Member::query()
           ->select(['id', 'nickname', 'is_reg', 'regdate'])
           ->where('invited_by', $aff)
-          ->orderByDesc('uid')
+          ->orderByDesc('id')
           ->offset($offset)
           ->limit($limit)
           ->get()

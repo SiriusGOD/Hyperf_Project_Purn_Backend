@@ -45,7 +45,7 @@ class MemberFollowService
                 ->whereNull('deleted_at')
                 ->exists();
 
-            if (! empty($model)) {
+            if (empty($model)) {
                 $model = new MemberFollow();
                 $model->member_id = $userId;
                 $model->correspond_type = MemberFollow::TYPE_CORRESPOND_LIST[$tag];

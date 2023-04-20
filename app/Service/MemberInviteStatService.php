@@ -162,9 +162,9 @@ class MemberInviteStatService extends BaseService
     /**
      * @return null|\Illuminate\Database\Eloquent\Builder|Model|object
      */
-    public static function getRow($uid)
+    public function getRow($uid)
     {
-        return Member::find($uid);
+        return Member::where("aff",$uid)->first();
     }
 
     /**
@@ -202,6 +202,7 @@ class MemberInviteStatService extends BaseService
         if (is_null($userStat)) {
             $userStat = self::initRow($invite_by);
         }
+
         if(MemberInviteReceiveLog::where(['order_sn'=>$order->order_number])->exists()){
             $logger = $this->loggerFactory->get('cors');
             $msg = "order_sn：{$order->order_id} 已经计算收益~";
@@ -220,6 +221,7 @@ class MemberInviteStatService extends BaseService
             'invite_by' => $fromMember->invited_by,
             'type'      => MemberInviteReceiveLog::TYPE_ZHI
           ])->exists();
+
         MemberInviteReceiveLog::create([
             'uid'          => $fromMember->aff,
             'invite_by'    => $fromMember->invited_by,
@@ -380,7 +382,7 @@ class MemberInviteStatService extends BaseService
      * 大于当前代理等级的数量.
      * @return int
      */
-    public static function calcCurrentProxySub(UsersInviteStatModel $inviteUserStat)
+    public function calcCurrentProxySub(MemberInviteStat $memberinviteStat)
     {
         return Member::select('members.invited_by', 'users_invite_stat.*')
             ->join('users_invite_stat', 'users_invite_stat.uid', '=', 'members.aff')

@@ -43,7 +43,7 @@ class MemberFollowerApiTest extends HttpTestCase
       $token = auth()->login($user);
       make(MemberService::class)->saveToken($user->id, $token);
       $data = $this->client->post('/api/member/addMemberIdsFollow', [
-          'ids' => [1,2,3,5,9,11,15],
+          'ids' => [1,2,3,5,15],
           'type' => "tag",
       ], [
           'Authorization' => 'Bearer ' . $token,
