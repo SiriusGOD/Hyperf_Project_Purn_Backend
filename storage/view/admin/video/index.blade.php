@@ -82,6 +82,10 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.video.hot_order') ?? '大家都在看排序'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.video.is_hide') ?? '隐藏'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
@@ -100,6 +104,7 @@
                                             <td> {{ $video->click_count ?? 0 }}</td>
                                             <td> {{ $video->like_count ?? 0 }}</td>
                                             <td>{{ trans('default.image_group_control.image_group_pay_type_types')[$video->pay_type] }}</td>
+                                            <td> {{ $video->hot_order ?? 0 }}</td>
                                             <td> {{ $const::IS_HIDE[$video->is_hide]}}</td>
                                             <td>
                                                 @if(authPermission('video-edit'))
@@ -130,6 +135,7 @@
                                         <th rowspan="1" colspan="1">{{trans('default.video.click') ?? '觀看次數'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.video.like') ?? '點讚數'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.video.pay_type') ?? '影片付費方式'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.video.hot_order') ?? '大家都在看排序'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.video.is_hide') ?? '隐藏'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>

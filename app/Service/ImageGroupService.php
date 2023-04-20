@@ -24,6 +24,7 @@ class ImageGroupService
 {
     public function storeImageGroup(array $data): ImageGroup
     {
+        $refresh = false;
         $model = ImageGroup::findOrNew($data['id']);
         $model->user_id = $data['user_id'];
         $model->title = $data['title'];
@@ -33,6 +34,10 @@ class ImageGroupService
         }
         $model->description = $data['description'];
         $model->pay_type = $data['pay_type'];
+        if($model->hot_order != $data['hot_order']) {
+            $refresh = true;
+        }
+        $model->hot_order = $data['hot_order'];
         $model->save();
 
         return $model;
@@ -151,8 +156,7 @@ class ImageGroupService
         return $query;
     }
 
-    //TODO finish is pay
-    public function isPay(int $id, int $memberId) : bool
+    public function isPay(int $id, int $memberId): bool
     {
         return Order::where('orders.user_id', $memberId)
             ->join('order_details', 'orders.id', '=', 'order_details.order_id')

@@ -69,6 +69,10 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.image_group_control.image_group_hot_order') ?? '大家都在看排序'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
                                             aria-label="CSS grade: activate to sort column ascending">{{trans('default.action') ?? '動作'}}
                                         </th>
                                     </tr>
@@ -88,6 +92,7 @@
                                             <td>{{ $model->click_count ?? 0 }}</td>
                                             <td>{{ $model->like_count ?? 0 }}</td>
                                             <td>{{ trans('default.image_group_control.image_group_pay_type_types')[$model->pay_type] }}</td>
+                                            <td>{{ $model->hot_order ?? 0 }}</td>
                                             <td>
                                                 @if(authPermission('image-group-edit'))
                                                     <div class="row mb-1">
@@ -113,6 +118,7 @@
                                         <th rowspan="1" colspan="1">{{trans('default.image_group_control.image_group_clicks') ?? '套圖觀看次數'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.image_group_control.image_group_likes') ?? '套圖點讚數'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.image_group_control.image_group_pay_type') ?? '套圖付費方式'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.image_group_control.image_group_hot_order') ?? '大家都在看排序'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>
                                     </tfoot>

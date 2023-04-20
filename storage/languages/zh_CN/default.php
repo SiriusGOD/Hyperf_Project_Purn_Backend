@@ -135,8 +135,10 @@ return [
         'pay_type_types' => [
             0 => '免費',
             1 => 'vip',
-            2 => '鑽石'
-        ]
+            2 => '鑽石',
+        ],
+        'hot_order' => '大家都在看排序',
+        'hot_order_desc' => '0 不排序，越小越前面',
     ],
 
     // redeem
@@ -322,7 +324,9 @@ return [
             0 => '免費',
             1 => 'vip',
             2 => '鑽石'
-        ]
+        ],
+        'image_group_hot_order' => '大家都在看排序',
+        'image_group_hot_order_desc' => ' 0 不排序，越小越前面',
     ],
     // -------------------------------------------------------------------
     // OrderController

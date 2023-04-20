@@ -11,7 +11,10 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\ImageGroup;
+use App\Model\Video;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\Redis\Redis;
 
 class SearchService
 {
@@ -21,17 +24,23 @@ class SearchService
 
     public const ADVERTISEMENT_PAGE_PER = 10;
 
-    public $videoService;
+    public const POPULAR_CACHE_KEY = 'search:popular:';
 
-    public $imageGroupService;
+    public VideoService $videoService;
 
-    public $advertisementService;
+    public ImageGroupService $imageGroupService;
+
+    public AdvertisementService $advertisementService;
 
     public string $url;
 
     public string $baseUrl;
 
-    public function __construct(ImageGroupService $imageGroupService, VideoService $videoService, AdvertisementService $advertisementService, RequestInterface $request)
+    public function __construct(
+        ImageGroupService $imageGroupService,
+        VideoService $videoService,
+        AdvertisementService $advertisementService,
+        RequestInterface $request)
     {
         $this->imageGroupService = $imageGroupService;
         $this->videoService = $videoService;
@@ -79,6 +88,20 @@ class SearchService
         return $this->generateAdvertisements($result, $advertisements);
     }
 
+    //TODO 可以做快取去優化，但是需要增加非同步 task 去處理
+    public function popular(int $page): array
+    {
+        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, self::ADVERTISEMENT_PAGE_PER);
+        $imageGroups = $this->popularImageGroups($page);
+        $videos = $this->popularVideos($page);
+
+        $result = [];
+
+        $result = $this->generateImageGroups($result, $imageGroups);
+        $result = $this->generateVideos($result, $videos);
+        return $this->generateAdvertisements($result, $advertisements);
+    }
+
     protected function generateAdvertisements(array $result, array $advertisements): array
     {
         foreach ($advertisements as $advertisement) {
@@ -106,9 +129,9 @@ class SearchService
         foreach ($imageGroups as $imageGroup) {
             $imageGroup['thumbnail'] = $this->baseUrl . $imageGroup['thumbnail'];
             $imageGroup['url'] = $this->baseUrl . $imageGroup['url'];
-            foreach ($imageGroup['images'] as $key => $image) {
-                $imageGroup['images'][$key]['thumbnail'] = $this->baseUrl . $imageGroup['images'][$key]['thumbnail'];
-                $imageGroup['images'][$key]['url'] = $this->baseUrl . $imageGroup['images'][$key]['url'];
+            foreach ($imageGroup['images_limit'] as $key => $image) {
+                $imageGroup['images_limit'][$key]['thumbnail'] = $this->baseUrl . $imageGroup['images_limit'][$key]['thumbnail'];
+                $imageGroup['images_limit'][$key]['url'] = $this->baseUrl . $imageGroup['images_limit'][$key]['url'];
             }
 
             $result[] = $imageGroup;
@@ -128,5 +151,98 @@ class SearchService
         }
 
         return $result;
+    }
+
+    protected function popularImageGroups(int $page): array
+    {
+        $hotImages = ImageGroup::where('hot_order', '>=', 1)
+            ->with(['tags', 'imagesLimit'])
+            ->orderBy('hot_order')
+            ->offset($page * self::IMAGE_GROUP_PAGE_PER)
+            ->limit(self::IMAGE_GROUP_PAGE_PER)
+            ->get();
+
+        $remain = self::IMAGE_GROUP_PAGE_PER - $hotImages->count();
+        if ($remain == 0) {
+            return $hotImages->toArray();
+        }
+
+        $hotImageIds = $hotImages->pluck('id')->toArray();
+        $clickService = make(ClickService::class);
+        $clicks = $clickService->calculatePopularClick(ImageGroup::class, $remain, $page, $hotImageIds);
+
+        $ids = [];
+
+        foreach ($clicks as $click) {
+            $ids[] = $click['id'];
+        }
+
+        $clickImageGroups = ImageGroup::with(['tags', 'imagesLimit'])->whereIn('id', $ids)->get()->toArray();
+        $clickImageGroupsArr = $this->sortClickAndModels($clicks, $clickImageGroups);
+        $remain = $remain - count($clickImageGroups);
+        $result = array_merge($clickImageGroupsArr, $hotImages->toArray());
+
+        if ($remain == 0) {
+            return $result;
+        }
+
+        $imageGroups = $this->imageGroupService->getImageGroups(null, $page, $remain)->toArray();
+
+        return array_merge($result, $imageGroups);
+    }
+
+    protected function sortClickAndModels(array $clicks, array $models): array
+    {
+        $result = [];
+        foreach ($models as $model) {
+            foreach ($clicks as $click) {
+                if ($click['id'] == $model['id']) {
+                    $model['total'] = $click['total'];
+                    $result[] = $model;
+                }
+            }
+        }
+
+        return \Hyperf\Collection\collect($result)->sortByDesc('total')->toArray();
+    }
+
+    protected function popularVideos(int $page): array
+    {
+        $hotVideos = Video::with('tags')
+            ->where('hot_order', '>=', 1)
+            ->orderBy('hot_order')
+            ->offset($page * self::IMAGE_GROUP_PAGE_PER)
+            ->limit(self::IMAGE_GROUP_PAGE_PER)
+            ->get();
+
+        $remain = self::VIDEO_PAGE_PER - $hotVideos->count();
+        if ($remain == 0) {
+            return $hotVideos->toArray();
+        }
+
+        $hotVideoIds = $hotVideos->pluck('id')->toArray();
+        $clickService = make(ClickService::class);
+        $clicks = $clickService->calculatePopularClick(Video::class, $remain, $page, $hotVideoIds);
+
+        $ids = [];
+
+        foreach ($clicks as $click) {
+            $ids[] = $click['id'];
+        }
+
+        $clickVideos = Video::with('tags')->whereIn('id', $ids)->get()->toArray();
+        $clickVideosArr = $this->sortClickAndModels($clicks, $clickVideos);
+
+        $remain = $remain - count($clickVideos);
+
+        $result = array_merge($clickVideosArr, $hotVideos->toArray());
+
+        if ($remain == 0) {
+            return $result;
+        }
+
+        $videos = $this->videoService->getVideos(null, $page, 9, $remain)->toArray();
+
+        return array_merge($videos, $result);
     }
 }

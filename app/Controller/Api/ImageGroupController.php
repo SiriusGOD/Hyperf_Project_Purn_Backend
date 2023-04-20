@@ -109,7 +109,7 @@ class ImageGroupController extends AbstractController
         $id = (int) $request->input('id');
         $memberId = auth()->user()->getId();
 
-        if (!$service->isPay($id, $memberId)) {
+        if (! $service->isPay($id, $memberId)) {
             return $this->error(trans('validation.is_not_pay'));
         }
 

@@ -104,6 +104,7 @@ class ImageGroupController extends AbstractController
         }
         $data['description'] = $request->input('description', '');
         $data['pay_type'] = $request->input('pay_type');
+        $data['hot_order'] = $request->input('hot_order');
         $image = $groupService->storeImageGroup($data);
         $tagService->createTagRelationshipArr(ImageGroup::class, $image->id, $request->input('tags'));
         return $response->redirect('/admin/image_group/index');

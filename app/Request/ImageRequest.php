@@ -24,6 +24,7 @@ class ImageRequest extends AuthBaseRequest
             'title' => 'required|string|between:1,50',
             'group_id' => 'numeric',
             'id' => 'numeric',
+            'hot_order' => 'numeric',
             'image' => [
                 Rule::requiredIf(function () {
                     return empty($this->input('id'));

@@ -106,6 +106,10 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">{{trans('default.video.hot_order') ?? '大家都在看排序'}}{{ trans('default.video.hot_order_desc') }}</label>
+                                        <input type="text" class="form-control" name="hot_order" placeholder="hot_order" value="{{$video->hot_order ?? 0}}">
+                                    </div>
                                 <button type="submit"
                                         class="btn btn-primary">{{trans('default.submit') ?? '送出'}}</button>
                             </form>
