@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 /**
  * This file is part of Hyperf.
@@ -11,7 +10,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-/*
+/**
  *
  * 新 代理模板处理   一级
  * @author
@@ -20,36 +19,39 @@ namespace App\Service;
  */
 
 use App\Model\Member;
-use App\Model\Order;
 use App\Model\UsersInviteReceiveLog;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
+use Hyperf\Utils\Cache\Cache;
+use App\Model\MemberInviteReceiveLog;
+use App\Model\Order;
+use App\Service\MemberInviteStatService;
+use Carbon\Carbon;
+use Hyperf\Database\Model\Collection;
+use Hyperf\DbConnection\Db;
 /**
  * Class ProxyService.
  */
 class ProxyService
 {
     public const CACHE_KEY = 'redeem';
-
     public const EXPIRE = 3600;
 
     protected $redis;
-
     protected $logger;
-
     protected $redeem;
-
+    protected $memberInviteStatService;
     protected $memberRedeemVideoService;
 
     public function __construct(
         Redis $redis,
         LoggerFactory $loggerFactory,
-        MemberInviteStateService $memberInviteStartService
+        MemberInviteStatService $memberInviteStatService
     ) {
         $this->logger = $loggerFactory->get('reply');
         $this->redis = $redis;
-        $this->memberRedeemVideoService = $memberInviteStartService;
+        $this->memberInviteStatService = $memberInviteStatService;
     }
 
     /**
@@ -57,7 +59,7 @@ class ProxyService
      */
     public function tuiProxyDetail(Order $order, Member $fromMember)
     {
-        $flag = $this->memberRedeemVideoService->calcProxyZhi($order, $fromMember);
+        $flag = $this->memberInviteStatService->calcProxyZhi($order, $fromMember);
 
         co(function () use ($fromMember) {
             // 异步执行，错误了不影响整体
@@ -66,7 +68,7 @@ class ProxyService
             while ($invited_by) {
                 /** @var \MemberModel $member */
                 $member = Member::find($invited_by);
-                Member::clearFor($member);
+                //Member::clearFor($member);
                 $invited_by = $member->invited_by;
                 if (! $invited_by) {
                     break;
@@ -93,13 +95,13 @@ class ProxyService
     public static function getMyProxyAmount($aff, $condition = [], $anys = 'reach_amount')
     {
         $condition[] = ['invite_by', '=', $aff];
-        return UsersInviteReceiveLog::where($condition)->sum($anys);
+        return MemberInviteReceiveLog::where($condition)->sum($anys);
     }
 
     public static function getMyProxyNumber($aff, $condition = [])
     {
         $condition[] = ['invite_by', '=', $aff];
-        return UsersInviteReceiveLog::where($condition)->count('id');
+        return MemberInviteReceiveLog::where($condition)->count('id');
     }
 
     /**
@@ -117,10 +119,10 @@ class ProxyService
      * 我的累计总推广收益.
      * @return float|string
      */
-    public static function getTotalAmount($aff, \UsersInviteStatModel $inviteStat = null)
+    public function getTotalAmount($aff, MemberInviteStartService $service )
     {
-        /* @var \UsersInviteStatModel $state */
-        is_null($inviteStat) && $inviteStat = \UsersInviteStatModel::getRow($aff);
+        /** @var \UsersInviteStatModel $state */
+        is_null($inviteStat) && $inviteStat = $service::getRow($aff);
         if (is_null($inviteStat)) {
             return 0.00;
         }
@@ -137,27 +139,23 @@ class ProxyService
      */
     public static function getUserInvitedList($aff, $limit = 50, $offset = 0, $page = 0)
     {
-        $data = cached("invite:{$aff}:{$page}")->expired(600)
-            ->serializerPHP()
-            ->fetch(function () use (
-                $aff,
-                $offset,
-                $limit
-            ) {
-                return \MemberModel::select(['uid', 'nickname', 'is_reg', 'regdate'])
-                    ->where('invited_by', $aff)
-                    ->orderByDesc('uid')
-                    ->offset($offset)
-                    ->limit($limit)
-                    ->get()->map(function ($item) {
-                        $item->code = generate_code($item->uid);
-                        $item->regdate_str = date('Y-m-d H:i', $item->regdate);
-                        unset($item->uid);
-                        return $item;
-                    })
-                    ->values();
-            });
 
-        return $data ? $data : [];
+      $data = Cache::remember('invite:' . $aff . ':' . $page, 600, function () use ($aff, $offset, $limit) {
+      return Member::query()
+          ->select(['id', 'nickname', 'is_reg', 'regdate'])
+          ->where('invited_by', $aff)
+          ->orderByDesc('uid')
+          ->offset($offset)
+          ->limit($limit)
+          ->get()
+          ->map(function ($item) {
+              $item->code = generate_code($item->uid);
+              $item->regdate_str = date('Y-m-d H:i', $item->regdate);
+              unset($item->uid);
+              return $item;
+          })
+          ->values();
+      });
+      return $data ? $data : [];
     }
 }

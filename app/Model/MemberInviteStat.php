@@ -21,12 +21,12 @@ namespace App\Model;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  */
-class MemberInviteStart extends Model
+class MemberInviteStat extends Model
 {
     /**
      * The table associated with the model.
      */
-    protected ?string $table = 'member_invite_start';
+    protected ?string $table = 'member_invite_stat';
 
     /**
      * The attributes that are mass assignable.
