@@ -18,7 +18,6 @@ use App\Model\Video;
 use App\Request\ClickRequest;
 use App\Request\VideoApiSuggestRequest;
 use App\Service\ActorService;
-use App\Service\StageVideoService;
 use App\Service\ClickService;
 use App\Service\LikeService;
 use App\Service\RedeemService;
@@ -64,7 +63,6 @@ class VideoController extends AbstractController
         $redeemService->redeemVideo($videoId, $userId, $code);
         return $this->success([]);
     }
-
 
     #[RequestMapping(methods: ['GET'], path: 'count')]
     public function count(VideoService $service)

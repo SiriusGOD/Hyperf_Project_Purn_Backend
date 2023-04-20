@@ -17,15 +17,15 @@ use App\Model\User;
 use App\Service\PermissionService;
 use App\Service\RoleService;
 use App\Service\UserService;
+use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
+use Hyperf\Validation\Contract\ValidatorFactoryInterface;
 use Hyperf\View\RenderInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
-use Hyperf\Validation\Contract\ValidatorFactoryInterface;
-use Hyperf\Di\Annotation\Inject;
 
 #[Controller]
 #[Middleware(middleware: 'App\\Middleware\\PermissionMiddleware')]

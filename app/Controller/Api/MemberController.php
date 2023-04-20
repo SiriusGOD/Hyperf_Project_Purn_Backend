@@ -21,6 +21,7 @@ use App\Model\Member;
 use App\Model\MemberFollow;
 use App\Model\MemberTag;
 use App\Model\MemberVerification;
+use App\Request\AddFollowerRequest;
 use App\Request\AddMemberFollowRequest;
 use App\Request\AddMemberTagRequest;
 use App\Request\MemberApiUpdateRequest;
@@ -29,9 +30,8 @@ use App\Request\MemberLoginRequest;
 use App\Request\RegisterVerificationRequest;
 use App\Request\ResetPasswordVerificationRequest;
 use App\Request\SendVerificationRequest;
-use App\Request\AddFollowerRequest;
-use App\Service\MemberService;
 use App\Service\MemberFollowService;
+use App\Service\MemberService;
 use Carbon\Carbon;
 use Hyperf\AsyncQueue\Driver\DriverFactory;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -52,11 +52,11 @@ class MemberController extends AbstractController
         ]);
 
         if (! empty($user)) {
-            $check = $service->checkPassword($request->input('password'), $user->password);
+            $check = $service->checkPassword($request->input('password', ''), $user->password);
             if (! $check and ! empty($user->password)) {
                 return $this->error(trans('validation.authorize'), 401);
             }
-        } elseif (empty($user) && ! empty($request->input('account'))) {
+        } elseif (! empty($request->input('account')) and ! empty($request->input('device_id'))) {
             return $this->error(trans('validation.authorize'), 401);
         } else {
             $base_service = di(\App\Service\BaseService::class);
@@ -89,7 +89,7 @@ class MemberController extends AbstractController
             'last_ip' => $ip,
         ]);
 
-        $service->createOrUpdateLoginLimitRedisKey($ip);
+        $service->createOrUpdateLoginLimitRedisKey($request->input('device_id'));
 
         $service->saveToken($user->id, $token);
         return $this->success([

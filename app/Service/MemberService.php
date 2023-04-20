@@ -315,16 +315,16 @@ class MemberService
         return $url;
     }
 
-    public function createOrUpdateLoginLimitRedisKey(string $ip)
+    public function createOrUpdateLoginLimitRedisKey(string $deviceId)
     {
         $now = Carbon::now()->timestamp;
         $tomorrow = Carbon::tomorrow()->setHour(0)->setMinute(0)->setSecond(0)->timestamp;
         $expire = $tomorrow - $now;
 
-        if ($this->redis->exists(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $ip)) {
-            $this->redis->incr(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $ip);
+        if ($this->redis->exists(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $deviceId)) {
+            $this->redis->incr(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $deviceId);
         } else {
-            $this->redis->set(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $ip, 0, $expire);
+            $this->redis->set(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $deviceId, 1, $expire);
         }
     }
 

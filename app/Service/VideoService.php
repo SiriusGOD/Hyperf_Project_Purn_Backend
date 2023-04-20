@@ -49,7 +49,6 @@ class VideoService
         $this->memberHasVideo = $memberHasVideo;
     }
 
-
     // 取得影片
     public function find(int $id)
     {

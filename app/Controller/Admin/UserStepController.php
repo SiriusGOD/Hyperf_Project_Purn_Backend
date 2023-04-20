@@ -43,7 +43,7 @@ class UserStepController extends AbstractController
         // 顯示幾筆
         $step = UserStep::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $query = UserStep::select('*')->offset(($page - 1) * $step)->orderBy("id","desc")->limit($step);
+        $query = UserStep::select('*')->offset(($page - 1) * $step)->orderBy('id', 'desc')->limit($step);
         $actors = $query->get();
         $total = $query->count();
         $data['last_page'] = ceil($total / $step);
@@ -63,5 +63,4 @@ class UserStepController extends AbstractController
         $data['paginator'] = $paginator->toArray();
         return $this->render->render('admin.userStep.index', $data);
     }
-
 }

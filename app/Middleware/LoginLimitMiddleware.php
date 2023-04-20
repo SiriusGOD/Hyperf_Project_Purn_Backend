@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Middleware;
 
-use Carbon\Carbon;
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface as HttpResponse;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
@@ -43,12 +43,16 @@ class LoginLimitMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $now = Carbon::now()->timestamp;
-        $tomorrow = Carbon::tomorrow()->setHour(0)->setMinute(0)->setSecond(0)->timestamp;
-        $expire = $tomorrow - $now;
+        $deviceId = make(RequestInterface::class)->input('device_id');
 
-        $ip = $this->getIP($request->getServerParams());
-        $key = self::LOGIN_LIMIT_CACHE_KEY . $ip;
+        if (empty($deviceId)) {
+            return $this->response->json([
+                'code' => 403,
+                'msg' => trans('validation.required', ['attribute' => 'device_id']),
+            ]);
+        }
+
+        $key = self::LOGIN_LIMIT_CACHE_KEY . $deviceId;
         $this->logger->info('login limit redis key : ' . $key);
 
         if ($this->redis->exists($key) and $this->redis->get($key) >= 3) {
@@ -59,18 +63,5 @@ class LoginLimitMiddleware implements MiddlewareInterface
         }
 
         return $handler->handle($request);
-    }
-
-    public function getIP(array $params)
-    {
-        if (! empty($params['http_client_ip'])) {
-            $ip = $params['http_client_ip'];
-        } elseif (! empty($params['http_x_forwarded_for'])) {
-            $ip = $params['http_x_forwarded_for'];
-        } else {
-            $ip = $params['remote_addr'];
-        }
-
-        return $ip;
     }
 }

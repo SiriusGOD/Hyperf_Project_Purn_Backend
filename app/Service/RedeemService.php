@@ -129,7 +129,7 @@ class RedeemService extends BaseService
       }
 
       // 兌換卷清單
-      public function redeemList(int $page, $status=false)
+      public function redeemList(int $page, $status = false)
       {
           $model = $this->redeem;
           if ($status == 0 || $status == 1) {

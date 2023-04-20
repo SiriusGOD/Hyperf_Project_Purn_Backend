@@ -19,8 +19,10 @@ use Hyperf\Redis\Redis;
 
 class PermissionService
 {
-    protected \Psr\Log\LoggerInterface $logger;
     public $redis;
+
+    protected \Psr\Log\LoggerInterface $logger;
+
     public function __construct(Redis $redis, LoggerFactory $loggerFactory)
     {
         $this->redis = $redis;
@@ -93,13 +95,14 @@ class PermissionService
     public function recordStep(string $key)
     {
         $model = new UserStep();
-        $model->user_id = auth('session')->user()->id; 
-        $model->user_name = auth('session')->user()->name; 
-        $model->role_id = auth('session')->user()->role_id; 
-        $model->action = $key; 
-        $model->comment = cutStrLang($key) ; 
-        $model->save(); 
+        $model->user_id = auth('session')->user()->id;
+        $model->user_name = auth('session')->user()->name;
+        $model->role_id = auth('session')->user()->role_id;
+        $model->action = $key;
+        $model->comment = cutStrLang($key);
+        $model->save();
     }
+
     // 使用者的權限
     public function checkPermission(string $key)
     {

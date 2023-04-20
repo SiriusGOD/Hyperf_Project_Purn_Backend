@@ -17,8 +17,10 @@ use Hyperf\Redis\Redis;
 
 class RoleService
 {
-    protected \Psr\Log\LoggerInterface $logger;
     public $redis;
+
+    protected \Psr\Log\LoggerInterface $logger;
+
     public function __construct(Redis $redis, LoggerFactory $loggerFactory)
     {
         $this->redis = $redis;

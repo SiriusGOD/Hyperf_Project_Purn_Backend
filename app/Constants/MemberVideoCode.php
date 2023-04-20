@@ -11,8 +11,8 @@ declare(strict_types=1);
  */
 namespace App\Constants;
 
-class MemberVideoCode 
+class MemberVideoCode
 {
-    //專屬推廌,最新推廌,大家都在看 
+    // 專屬推廌,最新推廌,大家都在看
     public const DEFAULT = [1, 2, 3];
 }
