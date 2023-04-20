@@ -13,6 +13,7 @@ namespace App\Service;
 
 use App\Model\Image;
 use App\Model\ImageGroup;
+use App\Model\Order;
 use App\Model\Tag;
 use App\Model\TagCorrespond;
 use Hyperf\Database\Model\Builder;
@@ -23,6 +24,7 @@ class ImageGroupService
 {
     public function storeImageGroup(array $data): ImageGroup
     {
+        $refresh = false;
         $model = ImageGroup::findOrNew($data['id']);
         $model->user_id = $data['user_id'];
         $model->title = $data['title'];
@@ -31,6 +33,11 @@ class ImageGroupService
             $model->url = $data['url'];
         }
         $model->description = $data['description'];
+        $model->pay_type = $data['pay_type'];
+        if($model->hot_order != $data['hot_order']) {
+            $refresh = true;
+        }
+        $model->hot_order = $data['hot_order'];
         $model->save();
 
         return $model;
@@ -47,7 +54,7 @@ class ImageGroupService
         }
 
         $query = ImageGroup::with([
-            'tags', 'images',
+            'tags', 'imagesLimit',
         ])
             ->offset($limit * $page)
             ->limit($limit);
@@ -147,5 +154,16 @@ class ImageGroupService
         }
 
         return $query;
+    }
+
+    public function isPay(int $id, int $memberId): bool
+    {
+        return Order::where('orders.user_id', $memberId)
+            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+            ->join('products', 'order_details.product_id', '=', 'products.id')
+            ->where('products.type', ImageGroup::class)
+            ->where('products.correspond_id', $id)
+            ->where('orders.status', Order::ORDER_STATUS['finish'])
+            ->exists();
     }
 }

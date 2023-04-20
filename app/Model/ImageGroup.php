@@ -21,11 +21,19 @@ namespace App\Model;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
+ * @property int $pay_type
+ * @property int $hot_order
  * @property \Hyperf\Database\Model\Collection|Image[] $images
+ * @property \Hyperf\Database\Model\Collection|Tag[] $tags
+ * @property User $user
+ * @property mixed $model_type
+ * @property \Hyperf\Database\Model\Collection|Image[] $imagesLimit
  */
 class ImageGroup extends Model
 {
     public const PAGE_PER = 10;
+
+    public const DEFAULT_FREE_LIMIT = 3;
 
     public string $modelType = self::class;
 
@@ -42,7 +50,7 @@ class ImageGroup extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'pay_type' => 'integer', 'hot_order' => 'integer'];
 
     protected array $appends = ['model_type'];
 
@@ -59,6 +67,11 @@ class ImageGroup extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function imagesLimit()
+    {
+        return $this->hasMany(Image::class, 'group_id')->limit(self::DEFAULT_FREE_LIMIT);
     }
 
     protected function getModelTypeAttribute()

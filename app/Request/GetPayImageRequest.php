@@ -9,13 +9,17 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-namespace App\Service;
+namespace App\Request;
 
-class MailService
+class GetPayImageRequest extends AuthApiBaseRequest
 {
-    // TODO finish email
-    public function send(string $address, string $content): bool
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
     {
-        return true;
+        return [
+            'id' => 'required|numeric',
+        ];
     }
 }

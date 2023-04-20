@@ -56,7 +56,7 @@ class ClickService
         }
     }
 
-    public function calculatePopularClick(string $type)
+    public function calculatePopularClick(string $type, int $limit = self::POPULAR_LIMIT, int $page = 0, array $ids = [])
     {
         $endDate = Carbon::now();
         $startDate = $endDate->copy()->subDays(self::POPULAR_DAY);
@@ -64,8 +64,10 @@ class ClickService
             ->whereBetween('statistical_date', [$startDate->toDateString(), $endDate->toDateString()])
             ->groupBy(['type_id'])
             ->select(DB::raw('type_id as id'), Db::raw('sum(count) as total'))
+            ->whereNotIn('type_id', $ids)
             ->orderByDesc('total')
-            ->limit(self::POPULAR_LIMIT)
+            ->offset($page * $limit)
+            ->limit($limit)
             ->get();
 
         if (! empty($models)) {

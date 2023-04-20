@@ -141,6 +141,14 @@ return [
         'release_time' => '上架時間',
         'like' => '點讚數',
         'click' => '觀看次數',
+        'pay_type' => '影片付費方式',
+        'pay_type_types' => [
+            0 => '免費',
+            1 => 'vip',
+            2 => '鑽石',
+        ],
+        'hot_order' => '大家都在看排序',
+        'hot_order_desc' => '0 不排序，越小越前面',
     ],
 
     'user-step'=>[
@@ -330,6 +338,14 @@ return [
         'image_group_description' => '套圖描述',
         'image_group_clicks' => '套圖觀看次數',
         'image_group_likes' => '套圖按讚數',
+        'image_group_pay_type' => '套圖付費方式',
+        'image_group_pay_type_types' => [
+            0 => '免費',
+            1 => 'vip',
+            2 => '鑽石'
+        ],
+        'image_group_hot_order' => '大家都在看排序',
+        'image_group_hot_order_desc' => ' 0 不排序，越小越前面',
     ],
     // -------------------------------------------------------------------
     // OrderController

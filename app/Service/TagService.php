@@ -104,7 +104,7 @@ class TagService
             ->where('correspond_id', $classId)
             ->delete();
         foreach ($tagIds as $tagId) {
-            $this->createTagRelationship($className, $classId, $tagId);
+            $this->createTagRelationship($className, $classId, (int) $tagId);
         }
     }
 

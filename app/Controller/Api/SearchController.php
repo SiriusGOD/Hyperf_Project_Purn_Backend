@@ -19,6 +19,7 @@ use App\Service\SearchService;
 use App\Service\SuggestService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
+use Hyperf\HttpServer\Contract\RequestInterface;
 
 #[Controller]
 class SearchController extends AbstractController
@@ -66,7 +67,22 @@ class SearchController extends AbstractController
         $data['models'] = $models;
         $data['page'] = $page;
         $data['step'] = 100;
-        $path = '/api/video/suggest';
+        $path = '/api/search/suggest';
+        $data['next'] = $path . '?page=' . ($page + 1);
+        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        return $this->success($data);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'popular')]
+    public function popular(RequestInterface $request, SearchService $service)
+    {
+        $page = (int) $request->input('page', 0);
+        $models = $service->popular($page);
+        $data = [];
+        $data['models'] = $models;
+        $data['page'] = $page;
+        $data['step'] = 100;
+        $path = '/api/search/popular';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
         return $this->success($data);
