@@ -37,6 +37,10 @@ class MemberLevel extends Model
 
     public const NO_MEMBER_LEVEL = 0;
 
+    // 體驗卡1天的觀看數限制
+    public const LIMIT_QUOTA = 50;
+    public const ZERO_QUOTA = 0;
+
     /**
      * The table associated with the model.
      *

@@ -67,6 +67,12 @@ class Video extends Model
 
     public const PAGE_PER = 10;
 
+    public const VIDEO_TYPE = [
+        'free' => 0,
+        'vip' => 1,
+        'diamond' => 2
+    ];
+
     protected array $appends = ['model_type'];
 
     /**

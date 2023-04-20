@@ -20,7 +20,7 @@ use Hyperf\Crontab\Annotation\Crontab;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
-#[Crontab(name: 'MemberLevelTask', rule: '00 05 * * *', callback: 'execute', memo: '會員等級變更任務')]
+#[Crontab(name: 'MemberLevelTask', rule: '* * * * *', callback: 'execute', memo: '會員等級變更任務')]
 class MemberLevelTask
 {
     protected Redis $redis;
@@ -59,6 +59,7 @@ class MemberLevelTask
                             // 變更會員狀態
                             $up_member = Member::where('id', $member -> id)->first();
                             $up_member -> member_level_status = MemberLevel::NO_MEMBER_LEVEL;
+                            $up_member -> vip_quota = 0;
                             $up_member -> save();
                         }
                     }
@@ -70,7 +71,7 @@ class MemberLevelTask
                                     ->first();
                     if(!empty($member_level)){
                         if($member_level -> end_time <= $now){
-                            // 移除到期會員VIP
+                            // 移除到期會員鑽石
                             $member_level -> deleted_at = $now;
                             $member_level -> save();
 
@@ -85,13 +86,23 @@ class MemberLevelTask
                                 $vip -> save();
 
                                 $status = MemberLevel::NO_MEMBER_LEVEL;
+                                $vip_quota_flag = true;
                             }else{
                                 // vip 沒超過時間
                                 $status = MemberLevel::TYPE_VALUE['vip'];
+                                $diamond_quota_flag = true;
                             }
                             // 變更會員狀態
                             $up_member = Member::where('id', $member -> id)->first();
                             $up_member -> member_level_status = $status;
+                            if($diamond_quota_flag){
+                                // 鑽石次數歸0
+                                $up_member -> diamond_quota = 0;
+                            }
+                            if($vip_quota_flag){
+                                // vip次數歸0
+                                $up_member -> vip_quota = 0;
+                            }
                             $up_member -> save();
                         }
                     }
