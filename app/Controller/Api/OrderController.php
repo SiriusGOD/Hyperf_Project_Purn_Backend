@@ -14,6 +14,8 @@ namespace App\Controller\Api;
 use App\Constants\ErrorCode;
 use App\Controller\AbstractController;
 use App\Model\Coin;
+use App\Model\Image;
+use App\Model\ImageGroup;
 use App\Model\Order;
 use App\Model\Product;
 use App\Model\Member;
@@ -190,6 +192,13 @@ class OrderController extends AbstractController
                 if($product['type'] != Product::TYPE_LIST[0] && $product['type'] != Product::TYPE_LIST[1]){
                     return $this->error('該商品不可使用VIP觀看次數購買', ErrorCode::BAD_REQUEST);
                 }
+                // 如果是圖片，確認圖片是否是vip或免費影片
+                if($product['type'] != Product::TYPE_LIST[0]){
+                    $img = ImageGroup::where('id', $product['correspond_id']) -> first() -> toArray();
+                    if($img['pay_type'] == ImageGroup::IMAGE_GROUP_TYPE['diamond']){
+                        return $this->error('該商品不可使用VIP觀看次數購買', ErrorCode::BAD_REQUEST);
+                    }
+                } 
                 // 如果是影片，確認影片是否是vip或免費影片
                 if($product['type'] != Product::TYPE_LIST[1]){
                     $video = Video::where('id', $product['correspond_id']) -> first() -> toArray();
@@ -221,7 +230,10 @@ class OrderController extends AbstractController
                 }
                 // 如果是圖片，確認圖片是否是免費圖片
                 if($product['type'] != Product::TYPE_LIST[0]){
-                    // 還沒寫
+                    $img = ImageGroup::where('id', $product['correspond_id']) -> first() -> toArray();
+                    if($img['pay_type'] != ImageGroup::IMAGE_GROUP_TYPE['free']){
+                        return $this->error('該商品不可使用免費觀看次數購買', ErrorCode::BAD_REQUEST);
+                    }
                 } 
                 // 如果是影片，確認影片是否是免費影片
                 if($product['type'] != Product::TYPE_LIST[1]){
