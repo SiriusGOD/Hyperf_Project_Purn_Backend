@@ -12,13 +12,18 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Constants\RedeemCode;
+use App\Model\MemberInviteReceiveLog;
+use App\Model\MemberInviteStat;
 use App\Model\Member;
-use App\Model\MemberInviteStart;
+use App\Model\Order;
+use Hyperf\Logger\LoggerFactory;
+use Hyperf\Redis\Redis;
 
-class MemberInviteStateService extends BaseService
+class MemberInviteStatService extends BaseService
 {
+
 /**
- * class UsersInviteStatModel
+ * class MemberInviteStat
  *
  * @property int $id
  * @property int $uid
@@ -46,7 +51,19 @@ class MemberInviteStateService extends BaseService
 
     public $timestamps = false;
     protected $appends = ['level_str'];
+    protected $loggerFactory;
+    protected $redis;
+    protected $redeem;
+    protected $memberInviteStateService;
 
+
+    public function __construct(
+        Redis $redis,
+        LoggerFactory $loggerFactory,
+    ) {
+        $this->loggerFactory = $loggerFactory;
+        $this->redis = $redis;
+    }
     public function getLevelStrAttribute()
     {
        //$level = max(1,$this->getAttribute('level'));
@@ -118,27 +135,28 @@ class MemberInviteStateService extends BaseService
             ]
         ],//累计直推1付费会员
     ];
+
     const RATE_GAP = 0.06;//跨级分层收益固定比例
 
 
     /**
      * @param $uid
-     * @return \Illuminate\Database\Eloquent\Builder|Model|object|null
+     * @return \Illuminate\Database\Eloquent\Builder||object|null
      */
     static function getRow($uid)
     {
-        return Member::where(['id' => $uid])->first();
+        return Member::find($uid);
     }
 
     /**
      * @param $uid
      * @param int $level
-     * @return Model|UsersInviteStatModel
+     * @return |MemberInviteStat
      */
-    static function initRow($uid, $level = self::LEVEL_1)
+    public function initRow($uid, $level = self::LEVEL_1)
     {
         return MemberInviteStart::create([
-            'uid'        => $uid,
+            'member_id'        => $uid,
             'd_coins'    => 0,
             'k_coins'    => 0,
             'differ_num' => 0,
@@ -150,8 +168,8 @@ class MemberInviteStateService extends BaseService
 
     /**
      * 直推收益统计
-     * @param OrdersModel $order
-     * @param MemberModel $fromMember
+     * @param Orders $order
+     * @param Member $fromMember
      * @return bool
      */
     public function calcProxyZhi(Order $order, Member $fromMember)
@@ -162,26 +180,28 @@ class MemberInviteStateService extends BaseService
         //计算跨级收益
         //计算当前等级
         $invite_by = $fromMember->invited_by;
-        /** @var \UsersInviteStatModel $userStat */
+        /** @var \MemberInviteStat $userStat */
         $userStat = self::getRow($invite_by);
         if (is_null($userStat)) {
             $userStat = self::initRow($invite_by);
         }
-        if(UsersInviteReceiveLogModel::where(['order_sn'=>$order->order_id])->exists()){
-            errLog("order_sn：{$order->order_id} 已经计算收益~");
+        if(MemberInviteReceiveLog::where(['order_sn'=>$order->order_number])->exists()){
+            $logger = $this->loggerFactory->get('cors');
+            $msg = "order_sn：{$order->order_id} 已经计算收益~";
+            $logger->info(sprintf('%s ', $msg) );
             return ;
         }
-        $orderAmount = $order->amount / 100;
+        $orderAmount = $order->pay_amount / 100;
         $nowLevel = max($userStat->level, self::LEVEL_1);
         $nowRate = self::LEVEL[$nowLevel]['rate'];
         $reach_amount = round($orderAmount * $nowRate, 2);
         //若不存在：不同的人付费加1 ，存在就不处理
-        $exists = \UsersInviteReceiveLogModel::where([
+        $exists = MemberInviteReceiveLog::where([
             'uid'       => $fromMember->aff,
             'invite_by' => $fromMember->invited_by,
-            'type'      => \UsersInviteReceiveLogModel::TYPE_ZHI
+            'type'      => MemberInviteReceiveLog::TYPE_ZHI
         ])->exists();
-        \UsersInviteReceiveLogModel::create([
+        MemberInviteReceiveLog::create([
             'uid'          => $fromMember->aff,
             'invite_by'    => $fromMember->invited_by,
             'order_sn'     => $order->order_id,
@@ -189,7 +209,7 @@ class MemberInviteStateService extends BaseService
             'reach_amount' => $reach_amount,
             'level'        => $nowLevel,
             'rate'         => $nowRate,
-            'type'         => \UsersInviteReceiveLogModel::TYPE_ZHI,
+            'type'         => MemberInviteReceiveLog::TYPE_ZHI,
             'created_date' => date("Y-m-d H:i:s"),
         ]);
         $update = [];
@@ -199,25 +219,25 @@ class MemberInviteStateService extends BaseService
         }
         $isOk = $userStat->update($update);
         if ($isOk) {
-            $flag = \MemberModel::where(['aff' => $fromMember->invited_by])->update([
+            $flag = Member::where(['aff' => $fromMember->invited_by])->update([
                 'tui_coins' => \DB::raw("tui_coins+{$reach_amount}"),
                 'total_tui_coins' => \DB::raw("total_tui_coins+{$reach_amount}")
             ]);
             //记录日志
-            $flag && \MemberCoinrecordModel::addExpend([
-                'action'      => \MemberCoinrecordModel::ACTION_IN_PROXY_ZHI,
+            $flag && \MemberCoinrecord::addExpend([
+                'action'      => MemberCoinrecord::ACTION_IN_PROXY_ZHI,
                 'uid'         => $fromMember->uid,
                 'desc'        => "[直推收益] {$reach_amount}",
                 'totalcoin'   => $reach_amount,
                 'reachcoin'   => $reach_amount,
                 'touid'       => $fromMember->invited_by,
                 'relation_id' => $order->id,
-                'coin_type'   => \MemberCoinrecordModel::COIN_TYPE_BLANCE
+                'coin_type'   => MemberCoinrecord::COIN_TYPE_BLANCE
             ]);
             self::updateStatLevel($userStat);//因为直推有变动计算当前等级
             //async_task_cgi(function () use ($order, $fromMember, $userStat) {
                 // 异步执行，错误了不影响整体
-                UsersInviteStatModel::calcProxyKua($order, $fromMember, $fromMember->inviteMember, $userStat);
+            self::calcProxyKua($order, $fromMember, $fromMember->inviteMember, $userStat);
             //});
             return true;
         }
@@ -226,18 +246,18 @@ class MemberInviteStateService extends BaseService
 
     /**
      * 跨级收益统计
-     * @param OrdersModel $originOrder 来源订单
-     * @param MemberModel $originMember 来源用户
-     * @param MemberModel $inviteUser 待计算收益跨级用户
-     * @param UsersInviteStatModel $inviteUserStat 跨级用户邀请状态
+     * @param Orders $originOrder 来源订单
+     * @param Member $originMember 来源用户
+     * @param Member $inviteUser 待计算收益跨级用户
+     * @param MemberInviteStat $inviteUserStat 跨级用户邀请状态
      * @param bool $flag  false 第一次进入   true 循环进入
      * @return bool
      */
-    static function calcProxyKua(
-        OrdersModel $originOrder,
-        MemberModel $originMember,
-        MemberModel $inviteUser,
-        UsersInviteStatModel $inviteUserStat,
+    public function calcProxyKua(
+        Orders $originOrder,
+        Member $originMember,
+        Member $inviteUser,
+        MemberInviteStat $inviteUserStat,
         $flag = false
     ) {
         $msg =  "calcProxyKua: originMember:{$originMember->aff} inviteUser:{$inviteUser->aff} invited_by:{$inviteUser->invited_by} flag:{$flag}".PHP_EOL;
@@ -252,7 +272,7 @@ class MemberInviteStateService extends BaseService
         if (!$invite_by) {
             return false;
         }
-        /** @var \UsersInviteStatModel $userStat */
+        /** @var \MemberInviteStat $userStat */
         $userStat = self::getRow($invite_by);
         if (is_null($userStat)) {
             $userStat = self::initRow($invite_by);
@@ -266,41 +286,44 @@ class MemberInviteStateService extends BaseService
             if($userStat->differ_num){
                 self::updateStatLevel($userStat);
             }
-            errLog("no-next:".$msg);
+
+            $logger = $this->loggerFactory->get('cors');
+            $msg = "no-next:".$msg;
+            $logger->info(sprintf('%s ', $msg) );
             return false;
         }
 
         $reach_amount = round($orderAmount * self::RATE_GAP, 2);//固定 6% 跨级收益
-        \UsersInviteReceiveLogModel::create([
-            'uid'          => $originMember->aff,
+        MemberInviteReceiveLog::create([
+            'member_id'          => $originMember->aff,
             'invite_by'    => $invite_by,
             'order_sn'     => $originOrder->order_id,
             'amount'       => $orderAmount,
             'reach_amount' => $reach_amount,
             'level'        => $nowLevel,
             'rate'         => self::RATE_GAP,
-            'type'         => \UsersInviteReceiveLogModel::TYPE_KUA,
+            'type'         => MemberInviteReceiveLog::TYPE_KUA,
             'created_date' => date("Y-m-d H:i:s"),
         ]);
         //到账
-        $flag = \MemberModel::where(['aff' => $invite_by])->update([
+        $flag = Member::where(['aff' => $invite_by])->update([
             'tui_coins' => \DB::raw("tui_coins+{$reach_amount}"),
             'total_tui_coins' => \DB::raw("total_tui_coins+{$reach_amount}")
         ]);
         //记录日志
-        $flag && \MemberCoinrecordModel::addExpend([
-            'action'      => \MemberCoinrecordModel::ACTION_IN_PROXY_ZHI,
+        $flag && \MemberCoinrecord::addExpend([
+            'action'      => \MemberCoinrecord::ACTION_IN_PROXY_ZHI,
             'uid'         => $originMember->aff,
             'desc'        => "[跨级收益] {$reach_amount}",
             'totalcoin'   => $reach_amount,
             'reachcoin'   => $reach_amount,
             'touid'       => $invite_by,
             'relation_id' => $originMember->id,
-            'coin_type'   => \MemberCoinrecordModel::COIN_TYPE_BLANCE
+            'coin_type'   => \MemberCoinrecord::COIN_TYPE_BLANCE
         ]);
         self::updateStatLevel($userStat);
-        /** @var MemberModel $inviteMember */
-        $inviteMember = MemberModel::where('aff', '=', $invite_by)->first();
+        /** @var Member $inviteMember */
+        $inviteMember = Member::where('aff', '=', $invite_by)->first();
         if (is_null($inviteMember) || !$inviteMember->invited_by || $inviteMember->build_id) {
             return false;
         }
@@ -310,20 +333,20 @@ class MemberInviteStateService extends BaseService
 
     /**
      * 大于当前代理等级的数量
-     * @param UsersInviteStatModel $inviteUserStat
+     * @param MemberInviteStat $inviteUserStat
      * @return int
      */
-    static function calcCurrentProxy(UsersInviteStatModel $inviteUserStat)
+    static function calcCurrentProxy(MemberInviteStat $inviteUserStat)
     {
-        return MemberModel::select('members.invited_by', 'users_invite_stat.*')
+        return Member::select('members.invited_by', 'users_invite_stat.*')
             ->join('users_invite_stat', 'users_invite_stat.uid', '=', 'members.aff')
             ->where('members.invited_by', $inviteUserStat->uid)
             ->where('users_invite_stat.level', '>=', $inviteUserStat->level)
             ->count();
     }
-    static function calcCurrentProxySub(UsersInviteStatModel $inviteUserStat)
+    static function calcCurrentProxySub(MemberInviteStat $inviteUserStat)
     {
-        return MemberModel::select('members.invited_by', 'users_invite_stat.*')
+        return Member::select('members.invited_by', 'users_invite_stat.*')
             ->join('users_invite_stat', 'users_invite_stat.uid', '=', 'members.aff')
             ->where('members.invited_by', $inviteUserStat->uid)
             ->where('users_invite_stat.level', '<=', $inviteUserStat->level)
@@ -332,16 +355,16 @@ class MemberInviteStateService extends BaseService
 
     /**
      * 更新代理等级
-     * @param UsersInviteStatModel $inviteUserStat
+     * @param MemberInviteStat $inviteUserStat
      * @return bool
      */
-    static function updateStatLevel(UsersInviteStatModel $inviteUserStat)
+    static function updateStatLevel(MemberInviteStat $inviteUserStat)
     {
         if (is_null($inviteUserStat)) {
             return;
         }
-        /** @var UsersInviteStatModel $inviteUserStat */
-        $inviteUserStat = UsersInviteStatModel::find($inviteUserStat->id);
+        /** @var MemberInviteStat $inviteUserStat */
+        $inviteUserStat = MemberInviteStat::find($inviteUserStat->id);
         $level = $inviteUserStat->level;
         if ($level == self::LEVEL_5) {
             return;
@@ -353,7 +376,7 @@ class MemberInviteStateService extends BaseService
         $need = self::LEVEL[$level + 1];
         if ($inviteUserStat->differ_num >= $need['vip'] && $currentNum >= $need['level_rule']['number']) {
             $inviteUserStat->increment('level', 1);
-            $member = MemberModel::find($inviteUserStat->uid);
+            $member = Member::find($inviteUserStat->uid);
             if ($member->invited_by && !$member->build_id) {
                 $nextUserStat = self::getRow($member->invited_by);
                 if (!is_null($nextUserStat)) {
