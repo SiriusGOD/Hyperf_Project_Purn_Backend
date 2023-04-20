@@ -20,7 +20,7 @@ use Hyperf\Crontab\Annotation\Crontab;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
-#[Crontab(name: 'MemberLevelTask', rule: '* * * * *', callback: 'execute', memo: '會員等級變更任務')]
+#[Crontab(name: 'MemberLevelTask', rule: '00 05 * * *', callback: 'execute', memo: '會員等級變更任務')]
 class MemberLevelTask
 {
     protected Redis $redis;
