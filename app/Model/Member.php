@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Model;
 
+use Hyperf\DbConnection\Db;
 use Hyperf\DbConnection\Model\Model;
 use Qbhy\HyperfAuth\Authenticatable;
 
@@ -53,11 +54,11 @@ class Member extends Model implements Authenticatable
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'sex' => 'integer', 'age' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'role_id' => 'integer', 'coins' => 'double', 'diamond_coins' => 'double'];
+    protected array $casts = ['id' => 'integer', 'sex' => 'integer', 'age' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'role_id' => 'integer', 'coins' => 'double', 'diamond_coins' => 'double', 'diamond_quota' => 'integer', 'vip_quota' => 'integer', 'free_quota' => 'integer'];
 
     protected array $hidden = ['password'];
 
-    protected array $appends = ['is_selected_tag'];
+    protected array $appends = ['is_selected_tag', 'is_vip_experience', 'is_diamond_experience'];
 
     public function getJwtIdentifier()
     {
@@ -84,10 +85,27 @@ class Member extends Model implements Authenticatable
         return ['guard' => 'api'];
     }
 
+    // 確認是否為第一次登入app
     protected function getIsSelectedTagAttribute()
     {
         $query = MemberTag::where('member_id', $this->id)->count();
         if(empty($query))return 0;
+        return 1;
+    }
+
+    // 確認是否為VIP體驗會員
+    protected function getIsVipExperienceAttribute()
+    {
+        $date = BuyMemberLevel::select(Db::raw("DATEDIFF(end_time, start_time) as date"))->where('member_id', $this->id)->where('member_level_type', 'vip')->whereNull('deleted_at')->first();
+        if(empty($date))return 0;
+        return 1;
+    }
+
+    // 確認是否為鑽石體驗會員
+    protected function getIsDiamondExperienceAttribute()
+    {
+        $date = BuyMemberLevel::select(Db::raw("DATEDIFF(end_time, start_time) as date"))->where('member_id', $this->id)->where('member_level_type', 'diamond')->whereNull('deleted_at')->first();
+        if(empty($date))return 0;
         return 1;
     }
 }
