@@ -36,11 +36,10 @@ class AdvertisementRequest extends FormRequest
             'name' => 'required|max:255',
             'url' => 'required|max:255',
             'position' => ['required', Rule::in([
-                Advertisement::POSITION['top_banner'],
-                Advertisement::POSITION['bottom_banner'],
+                Advertisement::POSITION['banner'],
                 Advertisement::POSITION['popup_window'],
                 Advertisement::POSITION['ad_image'],
-                Advertisement::POSITION['ad_link'],
+                Advertisement::POSITION['ad_full'],
             ])],
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_date',

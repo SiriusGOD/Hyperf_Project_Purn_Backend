@@ -27,7 +27,7 @@ namespace App\Model;
  */
 class Advertisement extends Model
 {
-    public const POSITION = ['top_banner' => 1, 'bottom_banner' => 2, 'popup_window' => 3, 'ad_image' => 4, 'ad_link' => 5];
+    public const POSITION = ['banner' => 1, 'ad_full' => 2, 'popup_window' => 3, 'ad_image' => 4];
 
     public const EXPIRE = ['no' => 0, 'yes' => 1];
 

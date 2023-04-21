@@ -107,7 +107,7 @@ class AdvertisementController extends AbstractController
         $data['advertisement_active'] = 'active';
         $model = new Advertisement();
         $model->expire = Advertisement::EXPIRE['no'];
-        $model->position = Advertisement::POSITION['top_banner'];
+        $model->position = Advertisement::POSITION['banner'];
         $data['model'] = $model;
         return $this->render->render('admin.advertisement.form', $data);
     }

@@ -33,20 +33,17 @@
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.place') ?? '位置'}}</label>
                                     <select name="position" class="form-control form-control-lg">
-                                        <option value="{{\App\Model\Advertisement::POSITION['top_banner']}}" {{($model->position ?? '') == \App\Model\Advertisement::POSITION['top_banner'] ? 'selected' : ''}}>
-                                            {{trans('default.ad_control.ad_banner_up') ?? '上 banner'}}
+                                        <option value="{{\App\Model\Advertisement::POSITION['banner']}}" {{($model->position ?? '') == \App\Model\Advertisement::POSITION['banner'] ? 'selected' : ''}}>
+                                            {{trans('default.ad_control.ad_banner') ?? 'banner'}}
                                         </option>
-                                        <option value="{{\App\Model\Advertisement::POSITION['bottom_banner']}}" {{($model->position ?? '') == \App\Model\Advertisement::POSITION['bottom_banner'] ? 'selected' : ''}}>
-                                            {{trans('default.ad_control.ad_banner_down') ?? '下 banner'}}
+                                        <option value="{{\App\Model\Advertisement::POSITION['ad_full']}}" {{($model->position ?? '') == \App\Model\Advertisement::POSITION['ad_full'] ? 'selected' : ''}}>
+                                            {{trans('default.ad_control.ad_full') ?? '滿版廣告'}}
                                         </option>
                                         <option value="{{\App\Model\Advertisement::POSITION['popup_window']}}" {{($model->position ?? '') == \App\Model\Advertisement::POSITION['popup_window'] ? 'selected' : ''}}>
                                             {{trans('default.ad_control.ad_banner_pop') ?? '彈窗 banner'}}
                                         </option>
                                         <option value="{{\App\Model\Advertisement::POSITION['ad_image']}}" {{($model->position ?? '') == \App\Model\Advertisement::POSITION['ad_image'] ? 'selected' : ''}}>
                                             {{trans('default.ad_control.ad_image') ?? '圖片廣告'}}
-                                        </option>
-                                        <option value="{{\App\Model\Advertisement::POSITION['ad_link']}}" {{($model->position ?? '') == \App\Model\Advertisement::POSITION['ad_link'] ? 'selected' : ''}}>
-                                            {{trans('default.ad_control.ad_link') ?? '友情鏈接'}}
                                         </option>
                                     </select>
                                 </div>
