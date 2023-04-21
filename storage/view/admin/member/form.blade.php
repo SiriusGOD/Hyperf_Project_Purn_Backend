@@ -49,7 +49,7 @@
                                            value="{{$user->email}}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_phone') ?? '電子郵件'}}</label>
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_phone') ?? '手機'}}</label>
                                     <input type="text" class="form-control" name="phone" id="phone"
                                            value="{{$user->phone}}">
                                 </div>
@@ -60,6 +60,47 @@
                                             <option value="{{$key}}" @if($key == $user->status) selected=true @endif>{{$value}}</option>
                                         @endforeach
                                     </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_level') ?? '會員等級'}}</label>
+                                    <select class="form-control form-control-lg" name="member_level_status">
+                                        @foreach(trans('select.level') as $key => $value)
+                                            <option value="{{$key}}" @if($key == $user->member_level_status) selected=true @endif>{{$value}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_level_start') ?? '會員等級起始時間'}}</label>
+                                    <input type="text" class="form-control" name="start_time" placeholder="name" value="{{$user->start_time ?? \Carbon\Carbon::now()}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_level_end') ?? '會員等級結束時間'}}</label>
+                                    <input type="text" class="form-control" name="end_time" id="end_time" placeholder="name" value="{{$user->end_time ?? \Carbon\Carbon::now()}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_coin') ?? '現金點數'}}</label>
+                                    <input type="text" class="form-control" name="coins" id="coins"
+                                           value="{{$user->coins}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_diamond_coins') ?? '鑽石點數'}}</label>
+                                    <input type="text" class="form-control" name="diamond_coins" id="diamond_coins" value="{{$user->diamond_coins}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_diamond_quota') ?? '鑽石觀看次數'}}</label>
+                                    <input type="text" class="form-control" name="diamond_quota" id="diamond_quota" value="{{$user->diamond_quota}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_vip_quota') ?? 'VIP觀看次數'}}</label>
+                                    <input type="text" class="form-control" name="vip_quota" id="vip_quota" value="{{$user->vip_quota}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_free_quota') ?? '免費觀看次數'}}</label>
+                                    <input type="text" class="form-control" name="free_quota" id="free_quota" value="{{$user->free_quota}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_free_quota_limit') ?? '免費觀看次數上限'}}</label>
+                                    <input type="text" class="form-control" name="free_quota_limit" id="free_quota_limit" value="{{$user->free_quota_limit}}">
                                 </div>
                                 <button type="submit"
                                         class="btn btn-primary">{{trans('default.submit') ?? '送出'}}</button>
@@ -75,5 +116,26 @@
         </div>
         <!-- /.col -->
     </div>
-
+    <script>
+        $(function() {
+            $('input[name="start_time"]').daterangepicker({
+                singleDatePicker: true,
+                timePicker:true,
+                timePicker24Hour: true,
+                showDropdowns: true,
+                locale: {
+                    format: 'YYYY-M-DD HH:mm:00'
+                }
+            });
+            $('input[name="end_time"]').daterangepicker({
+                singleDatePicker: true,
+                timePicker:true,
+                timePicker24Hour: true,
+                showDropdowns: true,
+                locale: {
+                    format: 'YYYY-M-DD HH:mm:00'
+                }
+            });
+        });
+    </script>
 @endsection

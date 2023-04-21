@@ -235,6 +235,8 @@ return [
         'manager_status' => '狀態',
         'GoogleAtuh'=> 'GOOGLE 驗證碼',
     ],
+    // -------------------------------------------------------------------
+    // member_control
     'member_control' => [
         'member_control' => '會員',
         'member_insert' => '新增會員',
@@ -247,6 +249,15 @@ return [
         'member_email' => '電子郵件',
         'member_phone' => '手機',
         'member_status' => '狀態',
+        'member_level' => '會員等級',
+        'member_coin' => '現金點數',
+        'member_diamond_coins' => '鑽石點數',
+        'member_diamond_quota' => '鑽石觀看次數',
+        'member_vip_quota' => 'VIP觀看次數',
+        'member_free_quota' => '免費觀看次數',
+        'member_free_quota_limit' => '免費觀看次數上限',
+        'member_level_start' => '會員等級起始時間',
+        'member_level_end' => '會員等級結束時間',
     ],
     // -------------------------------------------------------------------
     // RoleController
