@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Model;
 
+use Hyperf\Database\Model\SoftDeletes;
 /**
  * @property int $id
  * @property int $member_id
@@ -25,6 +26,7 @@ namespace App\Model;
  */
 class BuyMemberLevel extends Model
 {
+    use SoftDeletes;
     /**
      * The table associated with the model.
      *

@@ -230,8 +230,8 @@ class MemberService
         $model->save();
 
         if($data['member_level_status'] > MemberLevel::NO_MEMBER_LEVEL){
-            if (! empty($data['id']) and BuyMemberLevel::where('member_id', $data['id'])->where('member_level_type', MemberLevel::TYPE_LIST[$data['member_level_status']-1])->exists()) {
-                $buy_model = BuyMemberLevel::where('member_id', $data['id'])->where('member_level_type', MemberLevel::TYPE_LIST[$data['member_level_status']-1])->first();
+            if (! empty($data['id']) and BuyMemberLevel::where('member_id', $data['id'])->where('member_level_type', MemberLevel::TYPE_LIST[$data['member_level_status']-1])->whereNull('deleted_at')->exists()) {
+                $buy_model = BuyMemberLevel::where('member_id', $data['id'])->where('member_level_type', MemberLevel::TYPE_LIST[$data['member_level_status']-1])->whereNull('deleted_at')->first();
                 $buy_model -> start_time = $data['start_time'];
                 $buy_model -> end_time = $data['end_time'];
                 $buy_model -> save();
