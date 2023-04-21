@@ -40,8 +40,7 @@ class SearchService
         VideoService $videoService,
         AdvertisementService $advertisementService,
         RequestInterface $request
-    )
-    {
+    ) {
         $this->imageGroupService = $imageGroupService;
         $this->videoService = $videoService;
         $this->advertisementService = $advertisementService;

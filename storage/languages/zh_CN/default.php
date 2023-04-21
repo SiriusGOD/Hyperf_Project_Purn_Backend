@@ -215,6 +215,7 @@ return [
         'redeem' => '優惠卷管理',
         'coin' => '點數管理',
         'user-step'=>'操作日誌',
+        'activity' => '用戶日誌',
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -460,6 +461,12 @@ return [
             'cash' => \App\Model\Coin::TYPE_NAME['cash'],
             'diamond' => \App\Model\Coin::TYPE_NAME['diamond'],
         ],
+    ],
+    // -------------------------------------------------------------------
+    // ActivityController
+    'activity_control' => [
+        'activity_control' => '用戶日誌',
+        'activity_last_activity' => '最後活動時間',
     ],
     // -------------------------------------------------------------------
 ];

@@ -13,7 +13,6 @@ namespace App\Service;
 
 use App\Model\ActorCorrespond;
 use App\Model\BuyMemberLevel;
-use App\Model\ImageGroup;
 use App\Model\Member;
 use App\Model\MemberHasVideo;
 use App\Model\MemberLevel;
@@ -332,6 +331,11 @@ class VideoService
         return $this->orderCheck($id, $memberId);
     }
 
+    public function getPayVideo(int $id): Video|Collection|\Hyperf\Database\Model\Model|array|null
+    {
+        return Video::find($id);
+    }
+
     protected function orderCheck(int $id, int $memberId): bool
     {
         return Order::where('orders.user_id', $memberId)
@@ -341,10 +345,5 @@ class VideoService
             ->where('products.correspond_id', $id)
             ->where('orders.status', Order::ORDER_STATUS['finish'])
             ->exists();
-    }
-
-    public function getPayVideo(int $id): Video|Collection|\Hyperf\Database\Model\Model|array|null
-    {
-        return Video::find($id);
     }
 }

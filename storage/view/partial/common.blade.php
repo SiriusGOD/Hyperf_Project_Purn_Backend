@@ -266,6 +266,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('user-step-index'))
+                    <li class="nav-item">
+                        <a href="/admin/activity/index" class="nav-link {{$activity_active ?? ''}}">
+                            <i class="nav-icon fas fa-chalkboard"></i>
+                            <p>
+                                {{trans('default.leftbox.activity') ?? '用戶日誌'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->
