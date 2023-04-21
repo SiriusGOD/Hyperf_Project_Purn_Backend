@@ -13,7 +13,7 @@ namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Model\Coin;
-use App\Model\Image;
+use App\Model\ImageGroup;
 use App\Model\MemberLevel;
 use App\Model\Product;
 use App\Model\Video;
@@ -101,7 +101,7 @@ class ProductController extends AbstractController
         if (! empty($product_type)) {
             switch ($product_type) {
                 case 'image':
-                    $model = Image::findOrFail($id);
+                    $model = ImageGroup::findOrFail($id);
                     // 現金點數 或 鑽石點數(先寫死1顆)
                     $data['currency'] = Product::CURRENCY[1];
                     break;
@@ -166,14 +166,18 @@ class ProductController extends AbstractController
                     break;
             }
             $query = $type_class::select('*');
-            $query_tatal = $type_class::select('*');
+            $query_total = $type_class::select('*');
+            if($product_type == Product::TYPE_LIST[0] || $product_type == Product::TYPE_LIST[1]){
+                $query = $query->whereNull('deleted_at');
+                $query_total = $query_total->whereNull('deleted_at');
+            }
             if (! empty($product_name)) {
                 $query = $query->where('title', 'like', '%' . $product_name . '%');
-                $query_tatal = $query_tatal->where('title', 'like', '%' . $product_name . '%');
+                $query_total = $query_total->where('title', 'like', '%' . $product_name . '%');
             }
             $query = $query->offset(($page - 1) * $step)->limit($step);
             $products = $query->get();
-            $total = $query_tatal->count();
+            $total = $query_total->count();
             $data['last_page'] = ceil($total / $step);
 
             foreach ($products as $key => $value) {

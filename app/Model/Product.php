@@ -43,7 +43,7 @@ class Product extends Model
     ];
 
     public const TYPE_CORRESPOND_LIST = [
-        'image' => 'App\Model\Image',
+        'image' => 'App\Model\ImageGroup',
         'video' => 'App\Model\Video',
         'member' => 'App\Model\MemberLevel',
         'points' => 'App\Model\Coin',
