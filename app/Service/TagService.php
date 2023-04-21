@@ -34,8 +34,8 @@ class TagService
     {
         $list = Tag::all();
         foreach ($list as $key => $value) {
-            if(!empty($value -> img)){
-                $list[$key] -> img = env('IMG_DOMAIN').$value -> img;
+            if (! empty($value->img)) {
+                $list[$key]->img = env('IMG_DOMAIN') . $value->img;
             }
         }
         return $list;

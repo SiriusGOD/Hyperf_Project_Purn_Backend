@@ -26,12 +26,15 @@ namespace App\Model;
  */
 class MemberInviteReceiveLog extends Model
 {
-    const TYPE_ZHI = 0;
-    const TYPE_KUA = 1;
-    const TYPE = [
+    public const TYPE_ZHI = 0;
+
+    public const TYPE_KUA = 1;
+
+    public const TYPE = [
         self::TYPE_ZHI => '直推收益',
         self::TYPE_KUA => '跨级收益',
     ];
+
     /**
      * The table associated with the model.
      */

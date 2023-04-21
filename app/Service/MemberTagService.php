@@ -18,7 +18,9 @@ use Hyperf\Redis\Redis;
 class MemberTagService
 {
     public const CACHE_KEY = 'member:tag:';
+
     protected Redis $redis;
+
     protected \Psr\Log\LoggerInterface $logger;
 
     public function __construct(Redis $redis, LoggerFactory $loggerFactory)
@@ -26,31 +28,29 @@ class MemberTagService
         $this->redis = $redis;
         $this->logger = $loggerFactory->get('reply');
     }
-    
-    //member tag推廌用
+
+    // member tag推廌用
     public function addMemberTag(array $data)
     {
-        if (MemberTag::where('member_id',$data['member_id'])->where('tag_id', $data['tag_id'])->exists()) {
+        if (MemberTag::where('member_id', $data['member_id'])->where('tag_id', $data['tag_id'])->exists()) {
             $model = MemberTag::where('member_id', $data['member_id'])->where('tag_id', $data['tag_id'])->first();
-            $model->count = $model->count +1; 
+            $model->count = $model->count + 1;
         } else {
             $wg = new \Hyperf\Utils\WaitGroup();
             $wg->add(1);
             $model = new MemberTag();
-            co(function() use ($model, $wg, $data){
-              $model->member_id = $data['member_id'];
-              $model->tag_id = $data['tag_id'];
-              $model->count = 1;
-              $model->save();
-              $wg->done();             
+            co(function () use ($model, $wg, $data) {
+                $model->member_id = $data['member_id'];
+                $model->tag_id = $data['tag_id'];
+                $model->count = 1;
+                $model->save();
+                $wg->done();
             });
             $wg->wait();
         }
-        if($model->save()){
-          return true;
-        }else{
-          return false;
+        if ($model->save()) {
+            return true;
         }
+        return false;
     }
-
 }

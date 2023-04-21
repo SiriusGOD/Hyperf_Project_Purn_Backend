@@ -18,6 +18,7 @@ use Qbhy\HyperfAuth\Authenticatable;
 /**
  * @property int $id
  * @property string $name
+ * @property string $account
  * @property string $password
  * @property int $sex
  * @property int $age
@@ -27,8 +28,24 @@ use Qbhy\HyperfAuth\Authenticatable;
  * @property int $status
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property int $role_id
  * @property string $uuid
+ * @property int $member_level_status
+ * @property string $device
+ * @property string $register_ip
+ * @property string $last_ip
+ * @property string $coins
+ * @property string $diamond_coins
+ * @property int $diamond_quota
+ * @property int $vip_quota
+ * @property int $free_quota
+ * @property string $aff
+ * @property int $invited_by
+ * @property int $invited_num
+ * @property string $tui_coins
+ * @property string $total_tui_coins
+ * @property mixed $is_selected_tag
+ * @property mixed $is_vip_experience
+ * @property mixed $is_diamond_experience
  */
 class Member extends Model implements Authenticatable
 {
@@ -54,7 +71,7 @@ class Member extends Model implements Authenticatable
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'sex' => 'integer', 'age' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'role_id' => 'integer', 'coins' => 'double', 'diamond_coins' => 'double', 'diamond_quota' => 'integer', 'vip_quota' => 'integer', 'free_quota' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'sex' => 'integer', 'age' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'member_level_status' => 'integer', 'diamond_quota' => 'integer', 'vip_quota' => 'integer', 'free_quota' => 'integer', 'invited_by' => 'integer', 'invited_num' => 'integer'];
 
     protected array $hidden = ['password'];
 
@@ -89,23 +106,29 @@ class Member extends Model implements Authenticatable
     protected function getIsSelectedTagAttribute()
     {
         $query = MemberTag::where('member_id', $this->id)->count();
-        if(empty($query))return 0;
+        if (empty($query)) {
+            return 0;
+        }
         return 1;
     }
 
     // 確認是否為VIP體驗會員
     protected function getIsVipExperienceAttribute()
     {
-        $date = BuyMemberLevel::select(Db::raw("DATEDIFF(end_time, start_time) as date"))->where('member_id', $this->id)->where('member_level_type', 'vip')->whereNull('deleted_at')->first();
-        if(empty($date))return 0;
+        $date = BuyMemberLevel::select(Db::raw('DATEDIFF(end_time, start_time) as date'))->where('member_id', $this->id)->where('member_level_type', 'vip')->whereNull('deleted_at')->first();
+        if (empty($date)) {
+            return 0;
+        }
         return 1;
     }
 
     // 確認是否為鑽石體驗會員
     protected function getIsDiamondExperienceAttribute()
     {
-        $date = BuyMemberLevel::select(Db::raw("DATEDIFF(end_time, start_time) as date"))->where('member_id', $this->id)->where('member_level_type', 'diamond')->whereNull('deleted_at')->first();
-        if(empty($date))return 0;
+        $date = BuyMemberLevel::select(Db::raw('DATEDIFF(end_time, start_time) as date'))->where('member_id', $this->id)->where('member_level_type', 'diamond')->whereNull('deleted_at')->first();
+        if (empty($date)) {
+            return 0;
+        }
         return 1;
     }
 }

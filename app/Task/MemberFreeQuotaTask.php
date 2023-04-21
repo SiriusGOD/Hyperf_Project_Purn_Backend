@@ -36,11 +36,11 @@ class MemberFreeQuotaTask
 
         // 撈取所有沒有被禁用的會員
         $members = Member::where('status', '<', Member::STATUS['DISABLE'])->get();
-        if(!empty($members)){
+        if (! empty($members)) {
             foreach ($members as $key => $member) {
-                if($member -> free_quota != $member -> free_quota_limit){
-                    $member -> free_quota = $member -> free_quota_limit;
-                    $member -> save();
+                if ($member->free_quota != $member->free_quota_limit) {
+                    $member->free_quota = $member->free_quota_limit;
+                    $member->save();
                 }
             }
         }

@@ -22,17 +22,17 @@ class ProxyCode
     public const LEVEL_4 = 4; // 至尊星耀
 
     public const COIN_RATE = [
-      1=>   ['money'=> 1000  , 'rate'=> 0.1 ],
-      2=>   ['money'=> 2000  , 'rate'=> 0.12],
-      3=>   ['money'=> 5000  , 'rate'=> 0.14],
-      4=>   ['money'=> 10000 , 'rate'=> 0.16],
-      5=>   ['money'=> 20000 , 'rate'=> 0.18],
-      7=>   ['money'=> 40000 , 'rate'=> 0.20],
-      8=>   ['money'=> 70000 , 'rate'=> 0.23],
-      9=>   ['money'=> 100000, 'rate'=> 0.26],
-      10=>  ['money'=> 100000, 'rate'=> 0.30]
+        1 => ['money' => 1000, 'rate' => 0.1],
+        2 => ['money' => 2000, 'rate' => 0.12],
+        3 => ['money' => 5000, 'rate' => 0.14],
+        4 => ['money' => 10000, 'rate' => 0.16],
+        5 => ['money' => 20000, 'rate' => 0.18],
+        7 => ['money' => 40000, 'rate' => 0.20],
+        8 => ['money' => 70000, 'rate' => 0.23],
+        9 => ['money' => 100000, 'rate' => 0.26],
+        10 => ['money' => 100000, 'rate' => 0.30],
     ];
-  
+
     public const LEVEL = [
         self::LEVEL_4 => [
             'rate' => 0.1,

@@ -11,33 +11,15 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use App\Constants\RedeemCode;
+use App\Model\Member;
 use App\Model\MemberInviteReceiveLog;
 use App\Model\MemberInviteStat;
-use App\Model\Member;
 use App\Model\Order;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
 class MemberInviteStatService extends BaseService
 {
-
-
-    protected $loggerFactory;
-    protected $redis;
-    protected $redeem;
-    protected $memberInviteStateService;
-
-
-    public function __construct(
-        Redis $redis,
-        LoggerFactory $loggerFactory,
-    ) {
-        $this->loggerFactory = $loggerFactory;
-        $this->redis = $redis;
-    }
-
-
     /**
      * 代理等级&规则
      * 收益来源：直推收益 | 跨级收益
@@ -110,6 +92,14 @@ class MemberInviteStatService extends BaseService
 
     public $timestamps = false;
 
+    protected $loggerFactory;
+
+    protected $redis;
+
+    protected $redeem;
+
+    protected $memberInviteStateService;
+
     /**
      * class UsersInviteStatModel.
      *
@@ -137,6 +127,14 @@ class MemberInviteStatService extends BaseService
 
     protected $appends = ['level_str'];
 
+    public function __construct(
+        Redis $redis,
+        LoggerFactory $loggerFactory,
+    ) {
+        $this->loggerFactory = $loggerFactory;
+        $this->redis = $redis;
+    }
+
     public function getLevelStrAttribute()
     {
         // $level = max(1,$this->getAttribute('level'));
@@ -145,33 +143,34 @@ class MemberInviteStatService extends BaseService
     }
 
     /**
+     * @param mixed $uid
      * @return null|\Illuminate\Database\Eloquent\Builder|Model|object
      */
     public function getRow($uid)
     {
-        return Member::where("aff",$uid)->first();
+        return Member::where('aff', $uid)->first();
     }
 
     /**
      * @param int $level
+     * @param mixed $uid
      * @return |MemberInviteStat
      */
     public function initRow($uid, $level = self::LEVEL_1)
     {
-        //return MemberInviteStart::create([
+        // return MemberInviteStart::create([
         //    'uid' => $uid,
         //    'd_coins' => 0,
         //    'k_coins' => 0,
         //    'differ_num' => 0,
         //    'level' => $level,
         //    'created' => date('Y-m-d H:i:s'),
-        //]);
+        // ]);
     }
 
     /**
      * 直推收益统计
      * @param Orders $order
-     * @param Member $fromMember
      * @return bool
      */
     public function calcProxyZhi(Order $order, Member $fromMember)
@@ -188,43 +187,43 @@ class MemberInviteStatService extends BaseService
             $userStat = self::initRow($invite_by);
         }
 
-        if(MemberInviteReceiveLog::where(['order_sn'=>$order->order_number])->exists()){
+        if (MemberInviteReceiveLog::where(['order_sn' => $order->order_number])->exists()) {
             $logger = $this->loggerFactory->get('cors');
             $msg = "order_sn：{$order->order_id} 已经计算收益~";
-            $logger->info(sprintf('%s ', $msg) );
-            return ;
+            $logger->info(sprintf('%s ', $msg));
+            return;
         }
 
         $orderAmount = $order->pay_amount / 100;
         $nowLevel = max($userStat->level, self::LEVEL_1);
         $nowRate = self::LEVEL[$nowLevel]['rate'];
         $reach_amount = round($orderAmount * $nowRate, 2);
-        
-        //若不存在：不同的人付费加1 ，存在就不处理
+
+        // 若不存在：不同的人付费加1 ，存在就不处理
         $exists = MemberInviteReceiveLog::where([
-            'uid'       => $fromMember->aff,
+            'uid' => $fromMember->aff,
             'invite_by' => $fromMember->invited_by,
-            'type'      => MemberInviteReceiveLog::TYPE_ZHI
-          ])->exists();
+            'type' => MemberInviteReceiveLog::TYPE_ZHI,
+        ])->exists();
 
         MemberInviteReceiveLog::create([
-            'uid'          => $fromMember->aff,
-            'invite_by'    => $fromMember->invited_by,
-            'order_sn'     => $order->order_id,
-            'amount'       => $orderAmount,
+            'uid' => $fromMember->aff,
+            'invite_by' => $fromMember->invited_by,
+            'order_sn' => $order->order_id,
+            'amount' => $orderAmount,
             'reach_amount' => $reach_amount,
-            'level'        => $nowLevel,
-            'rate'         => $nowRate,
-            'type'         => MemberInviteReceiveLog::TYPE_ZHI,
-            'created_date' => date("Y-m-d H:i:s"),
+            'level' => $nowLevel,
+            'rate' => $nowRate,
+            'type' => MemberInviteReceiveLog::TYPE_ZHI,
+            'created_date' => date('Y-m-d H:i:s'),
         ]);
         $update = [];
-       // $update['d_coins'] = \DB::raw("d_coins+{$reach_amount}"); // 用户被邀请的直推加收益
-       // if (! $exists) {
+        // $update['d_coins'] = \DB::raw("d_coins+{$reach_amount}"); // 用户被邀请的直推加收益
+        // if (! $exists) {
        //     $update['differ_num'] = \DB::raw('differ_num+1');
-       // }
-       // $isOk = $userStat->update($update);
-       // if ($isOk) {
+        // }
+        // $isOk = $userStat->update($update);
+        // if ($isOk) {
        //     $flag = Member::where(['aff' => $fromMember->invited_by])->update([
        //         'tui_coins' => \DB::raw("tui_coins+{$reach_amount}"),
        //         'total_tui_coins' => \DB::raw("total_tui_coins+{$reach_amount}"),
@@ -262,11 +261,11 @@ class MemberInviteStatService extends BaseService
        //     self::calcProxyKua($order, $fromMember, $fromMember->inviteMember, $userStat);
        //     //});
        //     return true;
-       // }
+        // }
         return false;
     }
 
-    /**
+    /*
      * 跨级收益统计
      * @param OrdersModel $originOrder 来源订单
      * @param MemberModel $originMember 来源用户
@@ -363,7 +362,7 @@ class MemberInviteStatService extends BaseService
    //     return self::calcProxyKua($originOrder, $originMember, $inviteMember->inviteMember, $userStat, true);
    // }
 
-    /**
+    /*
      * 大于当前代理等级的数量.
      * @return int
      */
@@ -376,12 +375,12 @@ class MemberInviteStatService extends BaseService
 //            ->count();
 //    }
 
-    /**
+    /*
      * 更新代理等级.
      * @return bool
      */
-    //function updateStatLevel(MemberInviteStat $inviteUserStat)
-    //{
+    // function updateStatLevel(MemberInviteStat $inviteUserStat)
+    // {
     //    if (is_null($inviteUserStat)) {
     //        return;
     //    }
@@ -406,5 +405,5 @@ class MemberInviteStatService extends BaseService
     //            }
     //        }
     //    }
-    //}
+    // }
 }

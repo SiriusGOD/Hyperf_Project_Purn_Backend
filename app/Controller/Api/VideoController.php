@@ -20,8 +20,6 @@ use App\Request\GetPayImageRequest;
 use App\Request\VideoApiSuggestRequest;
 use App\Service\ActorService;
 use App\Service\ClickService;
-use App\Service\ImageGroupService;
-use App\Service\ImageService;
 use App\Service\LikeService;
 use App\Service\RedeemService;
 use App\Service\SuggestService;

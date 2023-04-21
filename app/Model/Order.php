@@ -40,12 +40,12 @@ class Order extends Model
     public const PAY_WAY_TEXT = ['wechat' => '微信支付', 'bankcard' => '银联支付', 'alipay' => '支付宝支付', 'ecny' => '数字人民币支付', 'visa' => 'VISA支付', 'agent' => '商家代理支付'];
 
     public const PAY_CURRENCY = [
-        'cny' => 'CNY', 
-        'coin' => 'COIN', 
-        'diamond_coin' => 'DIAMOND', 
-        'diamond_quota' => 'DIAMOND_QUOTA', 
-        'vip_quota' => 'VIP_QUOTA', 
-        'free_quota' => 'FREE_QUOTA'
+        'cny' => 'CNY',
+        'coin' => 'COIN',
+        'diamond_coin' => 'DIAMOND',
+        'diamond_quota' => 'DIAMOND_QUOTA',
+        'vip_quota' => 'VIP_QUOTA',
+        'free_quota' => 'FREE_QUOTA',
     ];
 
     /**

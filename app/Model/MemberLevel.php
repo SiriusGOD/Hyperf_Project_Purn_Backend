@@ -13,6 +13,7 @@ namespace App\Model;
 
 /**
  * @property int $id
+ * @property int $user_id
  * @property string $type
  * @property string $name
  * @property int $duration
@@ -39,6 +40,7 @@ class MemberLevel extends Model
 
     // 體驗卡1天的觀看數限制
     public const LIMIT_QUOTA = 50;
+
     public const ZERO_QUOTA = 0;
 
     /**
@@ -56,5 +58,5 @@ class MemberLevel extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'duration' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'duration' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

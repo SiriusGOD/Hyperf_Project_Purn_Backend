@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Coin;
-use Carbon\Carbon;
 use Hyperf\Redis\Redis;
 
 class CoinService
@@ -25,6 +24,7 @@ class CoinService
     {
         $this->redis = $redis;
     }
+
     public function store(array $params): void
     {
         $model = Coin::where('id', $params['id'])->first();

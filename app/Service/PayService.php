@@ -11,8 +11,8 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use App\Model\Coin;
 use App\Model\BuyMemberLevel;
+use App\Model\Coin;
 use App\Model\Member;
 use App\Model\MemberLevel;
 use App\Model\Order;
@@ -206,31 +206,31 @@ class PayService
                             // 新增會員的會員等級持續時間
                             $now = Carbon::now();
                             $buy_member_level = new BuyMemberLevel();
-                            $buy_member_level -> member_id = $member -> id;
-                            $buy_member_level -> member_level_type = $level;
-                            $buy_member_level -> member_level_id = $member_level -> id;
-                            $buy_member_level -> order_number = $order -> order_number;
-                            $buy_member_level -> start_time = $now -> toDateTimeString();
-                            $buy_member_level -> end_time = $now -> addDays($duration) -> toDateTimeString();
-                            $buy_member_level -> save();
-                            
-                            // 更新會員的會員等級 
+                            $buy_member_level->member_id = $member->id;
+                            $buy_member_level->member_level_type = $level;
+                            $buy_member_level->member_level_id = $member_level->id;
+                            $buy_member_level->order_number = $order->order_number;
+                            $buy_member_level->start_time = $now->toDateTimeString();
+                            $buy_member_level->end_time = $now->addDays($duration)->toDateTimeString();
+                            $buy_member_level->save();
+
+                            // 更新會員的會員等級
                             // 當是購買鑽石或vip會員1天卡 則會限制當天觀看數為50部
-                            if($duration == 1){
+                            if ($duration == 1) {
                                 switch ($level) {
                                     case 'vip':
-                                        $member -> vip_quota = MemberLevel::LIMIT_QUOTA;
+                                        $member->vip_quota = MemberLevel::LIMIT_QUOTA;
                                         break;
                                     case 'diamond':
-                                        $member -> diamond_quota = MemberLevel::LIMIT_QUOTA;
+                                        $member->diamond_quota = MemberLevel::LIMIT_QUOTA;
                                         break;
                                     default:
                                         # code...
                                         break;
                                 }
                             }
-                            $member -> member_level_status = MemberLevel::TYPE_VALUE[$level];
-                            $member -> save();
+                            $member->member_level_status = MemberLevel::TYPE_VALUE[$level];
+                            $member->save();
 
                             var_dump('新增');
                         } else {
@@ -254,34 +254,34 @@ class PayService
                                 if ($level == 'diamond' && $member->member_level_status != MemberLevel::TYPE_VALUE[$level]) {
                                     // 更新會員的會員等級
                                     // 當是購買鑽石或vip會員1天卡 則會限制當天觀看數為50部
-                                    if($duration == 1){
-                                        $member -> diamond_quota = MemberLevel::LIMIT_QUOTA;
+                                    if ($duration == 1) {
+                                        $member->diamond_quota = MemberLevel::LIMIT_QUOTA;
                                     }
-                                    $member -> member_level_status = MemberLevel::TYPE_VALUE[$level];
-                                    $member -> save();
+                                    $member->member_level_status = MemberLevel::TYPE_VALUE[$level];
+                                    $member->save();
                                 }
 
-                                if($duration == 1 && $level == 'vip'){
-                                    $member -> vip_quota = MemberLevel::LIMIT_QUOTA;
-                                    $member -> save();
+                                if ($duration == 1 && $level == 'vip') {
+                                    $member->vip_quota = MemberLevel::LIMIT_QUOTA;
+                                    $member->save();
                                 }
-                                var_dump("更新 -> 新增一筆");
-                            }else{
-                                $end_time = $buy_member_level -> end_time;
-                                $buy_member_level -> end_time = Carbon::parse($end_time) -> addDays($duration) -> toDateTimeString();
-                                $buy_member_level -> save();
-                                var_dump( "更新 -> 延長");
+                                var_dump('更新 -> 新增一筆');
+                            } else {
+                                $end_time = $buy_member_level->end_time;
+                                $buy_member_level->end_time = Carbon::parse($end_time)->addDays($duration)->toDateTimeString();
+                                $buy_member_level->save();
+                                var_dump('更新 -> 延長');
                             }
                         }
-                    }else{
+                    } else {
                         // 儲值點數 現金點數
-                        $coin = Coin::where('id', $product -> correspond_id) -> first();
-                        $member -> coins = (double)$member -> coins + $coin -> points;
-                        $member -> save();
-                        var_dump( "儲值現金點數成功");
+                        $coin = Coin::where('id', $product->correspond_id)->first();
+                        $member->coins = (float) $member->coins + $coin->points;
+                        $member->save();
+                        var_dump('儲值現金點數成功');
                     }
-                }else{
                 }
+
                 Db::commit();
                 $this->logger->info('執行結束', $data);
             } catch (\Throwable $th) {

@@ -100,7 +100,7 @@ class ProductController extends AbstractController
         $product_type = $request->input('product_type');
         if (! empty($product_type)) {
             switch ($product_type) {
-                case 'image': 
+                case 'image':
                     $model = Image::findOrFail($id);
                     // 現金點數 或 鑽石點數(先寫死1顆)
                     $data['currency'] = Product::CURRENCY[1];
@@ -117,11 +117,11 @@ class ProductController extends AbstractController
                     break;
                 case 'points':
                     $model = Coin::findOrFail($id);
-                    if($model -> type == Coin::TYPE_LIST[0]){
+                    if ($model->type == Coin::TYPE_LIST[0]) {
                         // 現金點數 -> 使用現金購買
                         $data['currency'] = Product::CURRENCY[0];
                     }
-                    if($model -> type == Coin::TYPE_LIST[1]){
+                    if ($model->type == Coin::TYPE_LIST[1]) {
                         // 鑽石點數 -> 使用現金點數購買
                         $data['currency'] = Product::CURRENCY[1];
                     }
@@ -255,11 +255,11 @@ class ProductController extends AbstractController
                 break;
             case 'points':
                 $coin = Coin::findOrFail($model->correspond_id);
-                if($coin -> type == Coin::TYPE_LIST[0]){
+                if ($coin->type == Coin::TYPE_LIST[0]) {
                     // 現金點數 -> 使用現金購買
                     $data['currency'] = Product::CURRENCY[0];
                 }
-                if($coin -> type == Coin::TYPE_LIST[1]){
+                if ($coin->type == Coin::TYPE_LIST[1]) {
                     // 鑽石點數 -> 使用現金點數購買
                     $data['currency'] = Product::CURRENCY[1];
                 }
@@ -353,7 +353,7 @@ class ProductController extends AbstractController
     {
         $insert_data = json_decode($request->input('data'), true);
         $type = urldecode($request->input('type'));
-        
+
         switch ($type) {
             case 'image':
                 $type_class = Product::TYPE_CORRESPOND_LIST['image'];
@@ -387,18 +387,18 @@ class ProductController extends AbstractController
             }
             array_push($product_name_arr, $model->title);
 
-            if($type == 'points'){
-                if($model -> type == Coin::TYPE_LIST[0]){
+            if ($type == 'points') {
+                if ($model->type == Coin::TYPE_LIST[0]) {
                     // 現金點數 -> 使用現金購買
                     $data['currency'] = Product::CURRENCY[0];
                 }
-                if($model -> type == Coin::TYPE_LIST[1]){
+                if ($model->type == Coin::TYPE_LIST[1]) {
                     // 鑽石點數 -> 使用現金點數購買
                     $data['currency'] = Product::CURRENCY[1];
                 }
             }
         }
-        
+
         $data['model'] = $model;
         $data['product_type'] = $type;
         $data['product_id_arr'] = json_encode($product_id_arr);

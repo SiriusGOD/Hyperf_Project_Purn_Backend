@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 /**
  * This file is part of Hyperf.
@@ -11,7 +12,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\MemberFollow;
-use App\Service\MemberTagService;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
@@ -23,10 +23,12 @@ class MemberFollowService
 
     public const EXPIRE_VERIFICATION_MINUTE = 10;
 
+    public $memberTagService;
+
     protected Redis $redis;
 
     protected \Psr\Log\LoggerInterface $logger;
-    public $memberTagService;
+
     public function __construct(Redis $redis, LoggerFactory $loggerFactory, MemberTagService $memberTagService)
     {
         $this->redis = $redis;
@@ -53,10 +55,10 @@ class MemberFollowService
                 $model->save();
             }
 
-            if($type==MemberFollow::TYPE_CORRESPOND_LIST["tag"]){
-              $data["member_id"] =  $userId; 
-              $data["tag_id"] =  $follow_id; 
-              $this->memberTagService->addMemberTag($data);
+            if ($type == MemberFollow::TYPE_CORRESPOND_LIST['tag']) {
+                $data['member_id'] = $userId;
+                $data['tag_id'] = $follow_id;
+                $this->memberTagService->addMemberTag($data);
             }
         }
         return true;

@@ -14,7 +14,6 @@ namespace App\Service;
 use App\Model\ImageGroup;
 use App\Model\Video;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\Redis\Redis;
 
 class SearchService
 {
@@ -40,7 +39,8 @@ class SearchService
         ImageGroupService $imageGroupService,
         VideoService $videoService,
         AdvertisementService $advertisementService,
-        RequestInterface $request)
+        RequestInterface $request
+    )
     {
         $this->imageGroupService = $imageGroupService;
         $this->videoService = $videoService;
@@ -88,7 +88,7 @@ class SearchService
         return $this->generateAdvertisements($result, $advertisements);
     }
 
-    //TODO 可以做快取去優化，但是需要增加非同步 task 去處理
+    // TODO 可以做快取去優化，但是需要增加非同步 task 去處理
     public function popular(int $page): array
     {
         $advertisements = $this->advertisementService->getAdvertisementBySearch($page, self::ADVERTISEMENT_PAGE_PER);
@@ -240,7 +240,7 @@ class SearchService
         return array_merge($videos, $result);
     }
 
-    protected function getIds(array $models) : array
+    protected function getIds(array $models): array
     {
         $result = [];
 

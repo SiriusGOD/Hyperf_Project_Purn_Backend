@@ -23,13 +23,12 @@ class Coin extends Model
 {
     public const PAGE_PER = 10;
 
-    public const TYPE_LIST = ['cash','diamond'];
+    public const TYPE_LIST = ['cash', 'diamond'];
 
     public const TYPE_NAME = [
         'cash' => '現金',
-        'diamond' => '鑽石'
+        'diamond' => '鑽石',
     ];
-
 
     /**
      * The table associated with the model.
@@ -47,5 +46,4 @@ class Coin extends Model
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'points' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
-
 }

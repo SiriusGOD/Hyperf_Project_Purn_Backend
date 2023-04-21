@@ -12,8 +12,11 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\ActorCorrespond;
+use App\Model\BuyMemberLevel;
 use App\Model\ImageGroup;
+use App\Model\Member;
 use App\Model\MemberHasVideo;
+use App\Model\MemberLevel;
 use App\Model\Order;
 use App\Model\Tag;
 use App\Model\TagCorrespond;
@@ -305,6 +308,31 @@ class VideoService
     }
 
     public function isPay(int $id, int $memberId): bool
+    {
+        $member = Member::find($memberId);
+        $imageGroup = Video::find($id);
+
+        if ($imageGroup->pay_type > $member->member_level_status or $member->member_level_status == MemberLevel::NO_MEMBER_LEVEL) {
+            return $this->orderCheck($id, $memberId);
+        }
+
+        $memberLevelType = array_flip(MemberLevel::TYPE_VALUE);
+        $buyMemberLevel = BuyMemberLevel::where('member_id', $memberId)->where('member_level_type', $memberLevelType[$member->member_level_status])->first();
+        if (empty($buyMemberLevel)) {
+            return false;
+        }
+        $endTime = Carbon::parse($buyMemberLevel->end_time);
+        $startTime = Carbon::parse($buyMemberLevel->start_time);
+        $diff = $endTime->diffInDays($startTime);
+        if (abs($diff) > 1) {
+            return true;
+        }
+
+        var_dump('all fail');
+        return $this->orderCheck($id, $memberId);
+    }
+
+    protected function orderCheck(int $id, int $memberId): bool
     {
         return Order::where('orders.user_id', $memberId)
             ->join('order_details', 'orders.id', '=', 'order_details.order_id')

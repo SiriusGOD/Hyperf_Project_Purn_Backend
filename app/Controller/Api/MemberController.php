@@ -231,7 +231,7 @@ class MemberController extends AbstractController
         return $this->error(trans('validation.expire_code'), 400);
     }
 
-    //追蹤多個標籤
+    // 追蹤多個標籤
     #[RequestMapping(methods: ['POST'], path: 'addMemberIdsFollow')]
     public function addMemberIdsFollow(AddFollowerRequest $request, MemberFollowService $memberFollowService)
     {

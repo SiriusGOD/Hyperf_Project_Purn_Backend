@@ -49,7 +49,7 @@ class Product extends Model
         'points' => 'App\Model\Coin',
     ];
 
-    public const CURRENCY = ['CNY','COIN','DIAMOND'];
+    public const CURRENCY = ['CNY', 'COIN', 'DIAMOND'];
 
     public const CURRENCY_NAME = [
         'CNY' => '人民幣',

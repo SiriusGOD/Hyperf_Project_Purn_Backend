@@ -126,12 +126,10 @@ class OrderService
                 $data['order']['currency'] = $product['currency'];
                 $data['order']['total_price'] = $product['selling_price'] ?? 0;
                 break;
-
             case 'diamond_coin':
                 $data['order']['currency'] = Order::PAY_CURRENCY['diamond_coin'];
                 $data['order']['total_price'] = $product['diamond_price'] ?? Product::DIAMOND_PRICE;
                 break;
-            
             default:
                 $data['order']['currency'] = Order::PAY_CURRENCY[$arr['pay_method']];
                 $data['order']['total_price'] = Product::QUOTA;

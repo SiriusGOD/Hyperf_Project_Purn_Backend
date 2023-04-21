@@ -1,23 +1,30 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Model\Coin;
-use App\Service\CoinService;
 use App\Request\CoinStoreRequest;
+use App\Service\CoinService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
+use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
-use Hyperf\HttpServer\Annotation\RequestMapping;
-use Hyperf\View\RenderInterface;
-use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Hyperf\Paginator\Paginator;
 use Hyperf\Validation\Contract\ValidatorFactoryInterface;
+use Hyperf\View\RenderInterface;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
 #[Controller]
 #[Middleware(middleware: 'App\\Middleware\\PermissionMiddleware')]
@@ -83,7 +90,7 @@ class CoinController extends AbstractController
             'user_id' => $userId,
             'type' => $type,
             'name' => $name,
-            'points' => $points
+            'points' => $points,
         ]);
         return $response->redirect('/admin/coin/index');
     }

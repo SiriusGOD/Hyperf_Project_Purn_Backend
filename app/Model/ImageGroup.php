@@ -35,10 +35,10 @@ class ImageGroup extends Model
 
     public const DEFAULT_FREE_LIMIT = 3;
 
-    public const IMAGE_GROUP_TYPE = [
+    public const IMAGE_GROUP_PAY_TYPE = [
         'free' => 0,
         'vip' => 1,
-        'diamond' => 2
+        'diamond' => 2,
     ];
 
     public string $modelType = self::class;
