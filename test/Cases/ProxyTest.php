@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace HyperfTest\Cases;
-use App\Constants\ProxyCode;
+use App\Service\ProxyService;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
 
@@ -31,19 +31,59 @@ class ProxyTest extends HttpTestCase
         $this->client = make(Client::class);
     }
 
+    public function testApiList300()
+    {
+        $money = 3000;
+        $rate = 0.14;
+        $service = make(ProxyService::class);
+        $res = $service->returnRateMoney($money ,1); 
+
+        $this->assertSame(number_format($res,2), number_format($money *  $rate ,2) );
+
+        $res = $service->returnRateMoney($money ,2); 
+        $this->assertSame(number_format($res,2), number_format($money * 0.25 *  $rate ,2) );
+
+        $res = $service->returnRateMoney($money ,3); 
+        $this->assertSame(number_format($res,2), number_format($money * 0.15 *  $rate ,2) );
+
+        $res = $service->returnRateMoney($money ,4); 
+        $this->assertSame(number_format($res,2), number_format($money * 0.1 *  $rate ,2) );
+    }
+
+    public function testApiList200()
+    {
+        $money = 2000;
+        $rate = 0.12;
+        $service = make(ProxyService::class);
+        $res = $service->returnRateMoney($money ,1); 
+        print_r( [number_format($res,2), number_format($money *  $rate ,2)] );
+        $this->assertSame((float)$res, (float)$money * $rate);
+
+        $res = $service->returnRateMoney($money ,2); 
+        $this->assertSame((float)$res, (float)$money * 0.25 * $rate);
+
+        $res = $service->returnRateMoney($money ,3); 
+        $this->assertSame((float)$res, (float)$money * 0.15 * $rate);
+
+        $res = $service->returnRateMoney($money ,4); 
+        $this->assertSame((float)$res, (float)$money * 0.1 * $rate);
+    }
+
     public function testApiList()
     {
         $money = 1000;
-        //$countRes = $this->client->get('/api/actor/count');
-        //$count = (int)$countRes['data']["count"];
-        foreach(ProxyCode::COIN_RATE as $key => $data){
-          if( $money < ProxyCode::COIN_RATE[$key]["money"] ){
+        $service = make(ProxyService::class);
+        $res = $service->returnRateMoney($money ,1); 
+        $this->assertSame((float)100, $res);
 
-          }elseif($money > ProxyCode::COIN_RATE[$key]["money"] ){
+        $res = $service->returnRateMoney($money ,2); 
+        $this->assertSame((float)25, $res);
 
-          } 
-        }
-        //$this->assertSame(200, (int) $res2['code']);
+        $res = $service->returnRateMoney($money ,3); 
+        $this->assertSame((float)15, $res);
+
+        $res = $service->returnRateMoney($money ,4); 
+        $this->assertSame((float)10, $res);
    }
 
 }
