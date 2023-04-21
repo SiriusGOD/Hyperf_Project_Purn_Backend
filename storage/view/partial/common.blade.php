@@ -199,7 +199,7 @@
                 @if(authPermission('coin-index'))
                     <li class="nav-item">
                         <a href="/admin/coin/index" class="nav-link {{$coin_active ?? ''}}">
-                            <i class="nav-icon fas fa-boxes"></i>
+                            <i class="nav-icon fas fa-coins"></i>
                             <p>
                                 {{trans('default.leftbox.coin') ?? '點數管理'}}
                             </p>
