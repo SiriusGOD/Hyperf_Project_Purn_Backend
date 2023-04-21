@@ -14,6 +14,8 @@ namespace App\Service;
 use App\Middleware\LoginLimitMiddleware;
 use App\Model\Member;
 use App\Model\MemberFollow;
+use App\Model\BuyMemberLevel;
+use App\Model\MemberLevel;
 use App\Model\MemberVerification;
 use App\Model\Role;
 use App\Model\User;
@@ -217,8 +219,33 @@ class MemberService
             $model->phone = $data['phone'];
         }
         $model->status = $data['status'];
-        $model->role_id = empty($model->role_id) ? Role::API_DEFAULT_USER_ROLE_ID : $model->role_id;
+        $model->member_level_status = $data['member_level_status'];
+        $model->coins = $data['coins'];
+        $model->diamond_coins = $data['diamond_coins'];
+        $model->diamond_quota = $data['diamond_quota'];
+        $model->vip_quota = $data['vip_quota'];
+        $model->free_quota = $data['free_quota'];
+        $model->free_quota_limit = $data['free_quota_limit'];
+
         $model->save();
+
+        if($data['member_level_status'] > MemberLevel::NO_MEMBER_LEVEL){
+            if (! empty($data['id']) and BuyMemberLevel::where('member_id', $data['id'])->where('member_level_type', MemberLevel::TYPE_LIST[$data['member_level_status']-1])->exists()) {
+                $buy_model = BuyMemberLevel::where('member_id', $data['id'])->where('member_level_type', MemberLevel::TYPE_LIST[$data['member_level_status']-1])->first();
+                $buy_model -> start_time = $data['start_time'];
+                $buy_model -> end_time = $data['end_time'];
+                $buy_model -> save();
+            }else{
+                $buy_model = new BuyMemberLevel();
+                $buy_model -> member_id = $model -> id;
+                $buy_model -> member_level_type = MemberLevel::TYPE_LIST[$data['member_level_status']-1];
+                $buy_model -> member_level_id = 0;
+                $buy_model -> order_number = '';
+                $buy_model -> start_time = $data['start_time'];
+                $buy_model -> end_time = $data['end_time'];
+                $buy_model->save();
+            }
+        }
     }
 
     public function deleteUser($id)

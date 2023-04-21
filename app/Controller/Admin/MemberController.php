@@ -82,6 +82,15 @@ class MemberController extends AbstractController
         $data['status'] = $request->input('status');
         $data['role_id'] = $request->input('role_id');
         $data['password'] = $request->input('password');
+        $data['member_level_status'] = $request->input('member_level_status', 0);
+        $data['start_time'] = $request->input('start_time');
+        $data['end_time'] = $request->input('end_time');
+        $data['coins'] = $request->input('coins', 0);
+        $data['diamond_coins'] = $request->input('diamond_coins', 0);
+        $data['diamond_quota'] = $request->input('diamond_quota', 0);
+        $data['vip_quota'] = $request->input('vip_quota', 0);
+        $data['free_quota'] = $request->input('free_quota', 1);
+        $data['free_quota_limit'] = $request->input('free_quota_limit', 1);
         $service->storeUser($data);
         return $response->redirect('/admin/member/index');
     }
@@ -102,7 +111,14 @@ class MemberController extends AbstractController
     public function edit(RequestInterface $request, MemberService $service, RoleService $roleService)
     {
         $id = $request->input('id');
-        $user = Member::findOrFail($id);
+        $user = Member::rightJoin('buy_member_levels', function ($join) {
+                            $join->on('members.id', '=', 'buy_member_levels.member_id')
+                                ->orWhereNull('buy_member_levels.member_id')
+                                ->whereNull('buy_member_levels.deleted_at');
+                        })
+                        ->select('members.*', 'buy_member_levels.start_time', 'buy_member_levels.end_time')
+                        ->where('members.id', $id)
+                        ->first();
         $data['user'] = $user;
         $data['navbar'] = trans('default.member_control.member_update');
         $data['member_active'] = 'active';
