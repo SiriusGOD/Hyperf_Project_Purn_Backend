@@ -8,7 +8,7 @@
                     <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                         <div class="row">
 
-                            @if(authPermission('tag-create'))
+                            @if(authPermission('tagGroup-create'))
                                 <div class="col-sm-12 col-md-12 mb-1">
                                     <a class="btn badge-info" href="/admin/tag_group/create">{{trans('default.tag_control.tag_insert') ?? '新增標籤'}}</a>
                                 </div>

@@ -75,7 +75,7 @@
                                             <td>{{trans('default.order_control.order_status_msg')[$model->status]}}</td>
                                             <td>{{ $model->created_at}}</td>
                                             <td>
-                                                @if(authPermission('advertisement-edit'))
+                                                @if(authPermission('order-edit'))
                                                     <div class="row mb-1">
                                                     <a href="/admin/order/edit?id={{$model->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
                                                     </div>

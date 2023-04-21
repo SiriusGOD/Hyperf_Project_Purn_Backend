@@ -251,7 +251,7 @@
                         <a href="/admin/image_group/index" class="nav-link {{$image_group_active ?? ''}}">
                             <i class="nav-icon fas fa-image"></i>
                             <p>
-                                {{trans('default.leftbox.image_group') ?? '公告管理'}}
+                                {{trans('default.leftbox.image_group') ?? '套圖管理'}}
                             </p>
                         </a>
                     </li>
