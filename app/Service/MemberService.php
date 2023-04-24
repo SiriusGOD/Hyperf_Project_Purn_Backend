@@ -17,6 +17,8 @@ use App\Model\MemberFollow;
 use App\Model\BuyMemberLevel;
 use App\Model\MemberLevel;
 use App\Model\MemberVerification;
+use App\Model\Order;
+use App\Model\Product;
 use App\Model\Role;
 use App\Model\User;
 use Carbon\Carbon;
@@ -364,5 +366,41 @@ class MemberService
         $model->save();
 
         return $model->code;
+    }
+
+    public function getMemberProductId(int $memberId): array
+    {
+        $model = Order::join('order_details', 'order_details.order_id', 'orders.id')
+                    ->join('products', 'products.id', 'order_details.product_id')
+                    ->select('products.id', 'products.type', 'products.correspond_id')
+                    ->where('orders.user_id', $memberId)
+                    ->where('orders.status', Order::ORDER_STATUS['finish'])
+                    ->whereIn('products.type', [Product::TYPE_LIST[0], Product::TYPE_LIST[1]])
+                    ->get();
+        if(!empty($model)){
+            $image_arr = [];
+            $video_arr = [];
+            foreach ($model as $key => $value) {
+                if($value->type == Product::TYPE_LIST[0]){
+                    array_push($image_arr, array(
+                        'product_id' => $value->id,
+                        'source_id' => $value->correspond_id
+                    ));
+                }
+                
+                if($value->type == Product::TYPE_LIST[1]){
+                    array_push($video_arr, array(
+                        'product_id' => $value->id,
+                        'source_id' => $value->correspond_id
+                    ));
+                }
+            }
+            $data['image'] = $image_arr;
+            $data['video'] = $video_arr;
+        }else{
+            $data['image'] = [];
+            $data['video'] = [];
+        }  
+        return $data;
     }
 }

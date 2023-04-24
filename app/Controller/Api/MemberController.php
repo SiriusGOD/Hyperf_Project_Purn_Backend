@@ -297,4 +297,13 @@ class MemberController extends AbstractController
         $result = $service->getMemberFollowList($userId, $follow_type);
         return $this->success(['models' => $result]);
     }
+
+    #[Middleware(ApiAuthMiddleware::class)]
+    #[RequestMapping(methods: ['GET'], path: 'getMemberProductId')]
+    public function getMemberProductId(MemberService $service)
+    {
+        $id = auth('jwt')->user()->getId();
+        $result = $service -> getMemberProductId($id);
+        return $this->success(['models' => $result]);
+    }
 }
