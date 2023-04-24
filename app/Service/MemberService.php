@@ -34,6 +34,7 @@ use Hyperf\Redis\Redis;
 class MemberService extends BaseService
 {
     public const CACHE_KEY = 'member:token:';
+    public const KEY = 'member:';
 
     public const DEVICE_CACHE_KEY = 'member:device:';
 
@@ -155,7 +156,7 @@ class MemberService extends BaseService
 
         return $imageUrl;
     }
-
+    //token 存入redis
     public function saveToken(int $userId, string $token): void
     {
         $key =self::CACHE_KEY.$userId;
@@ -317,7 +318,21 @@ class MemberService extends BaseService
 
         return $this->createVerificationCode($memberId);
     }
-
+   
+    public function getMember($id)
+    {
+        $key = self::KEY.":".$id;
+        if ($this->redis->exists($key)) {
+            $res = $this->redis->get($key);
+            return json_decode($res,true);
+        }
+        $user = Member::find($id);
+      
+        $this->redis->set($key, json_encode($user->toArray() ) );
+        $this->redis->expire($key, 86400);
+        return $user->toArray();
+    }
+  
     public function getUserFromAccount(?string $account)
     {
         $user = Member::where('account', $account)->first();
