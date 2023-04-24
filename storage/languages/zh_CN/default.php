@@ -467,6 +467,9 @@ return [
     'activity_control' => [
         'activity_control' => '用戶日誌',
         'activity_last_activity' => '最後活動時間',
+        'activity_device_type' => '設備類型',
+        'activity_version' => '版本號',
+        'activity_ip' => '用戶 ip',
     ],
     // -------------------------------------------------------------------
 ];

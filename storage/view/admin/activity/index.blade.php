@@ -25,6 +25,18 @@
                                             colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.activity_control.activity_last_activity') ?? '最後活動時間'}}
                                         </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.activity_control.activity_device_type') ?? '設備類型'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.activity_control.activity_version') ?? '版本號'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.activity_control.activity_ip') ?? '用戶 ip'}}
+                                        </th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -33,6 +45,9 @@
                                             <td class="sorting_1 dtr-control">{{ $model->id }}</td>
                                             <td class="sorting_1 dtr-control">{{ $model->member->name }}</td>
                                             <td>{{ $model->last_activity }}</td>
+                                            <td>{{ $model->device_type }}</td>
+                                            <td>{{ $model->version }}</td>
+                                            <td>{{ $model->ip }}</td>
                                         </tr>
                                     @endforeach
                                     </tbody>
@@ -41,6 +56,9 @@
                                         <th rowspan="1" colspan="1">{{trans('default.id') ?? '序號'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.user_name') ?? '使用者名稱'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.activity_control.activity_last_activity') ?? '最後活動時間'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.activity_control.activity_device_type') ?? '設備類型'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.activity_control.activity_version') ?? '版本號'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.activity_control.activity_ip') ?? '用戶 ip'}}</th>
                                     </tr>
                                     </tfoot>
                                 </table>

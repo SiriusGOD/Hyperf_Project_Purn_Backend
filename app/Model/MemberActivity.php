@@ -15,8 +15,12 @@ namespace App\Model;
  * @property int $id 
  * @property int $member_id 
  * @property string $last_activity 
+ * @property string $device_type 
+ * @property string $version 
+ * @property string $ip 
  * @property \Carbon\Carbon $created_at 
  * @property \Carbon\Carbon $updated_at 
+ * @property-read Member $member 
  */
 class MemberActivity extends Model
 {

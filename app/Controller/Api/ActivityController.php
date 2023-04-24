@@ -14,6 +14,7 @@ namespace App\Controller\Api;
 use App\Controller\AbstractController;
 use App\Model\MemberActivity;
 use App\Request\ActivityRequest;
+use App\Service\BaseService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 
@@ -21,11 +22,14 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 class ActivityController extends AbstractController
 {
     #[RequestMapping(methods: ['GET'], path: 'create')]
-    public function create(ActivityRequest $request)
+    public function create(ActivityRequest $request, BaseService $service)
     {
         $model = new MemberActivity();
         $model->member_id = auth()->user()->getId();
         $model->last_activity = $request->input('last_activity');
+        $model->device_type = $request->input('device_type');
+        $model->version = $request->input('version');
+        $model->ip = $service->getIp($request->getHeaders(), $request->getServerParams());
         $model->save();
 
         return $this->success();

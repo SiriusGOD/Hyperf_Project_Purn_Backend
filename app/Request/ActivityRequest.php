@@ -20,6 +20,8 @@ class ActivityRequest extends AuthApiBaseRequest
     {
         return [
             'last_activity' => 'required|date',
+            'device_type' => 'required|string',
+            'version' => 'required|string',
         ];
     }
 }
