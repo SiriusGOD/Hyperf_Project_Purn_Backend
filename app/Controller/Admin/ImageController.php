@@ -16,7 +16,6 @@ use App\Model\Image;
 use App\Model\TagCorrespond;
 use App\Request\ImageRequest;
 use App\Service\ImageService;
-use App\Service\TagService;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -80,7 +79,7 @@ class ImageController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'store')]
-    public function store(ImageRequest $request, ResponseInterface $response, ImageService $service, TagService $tagService): PsrResponseInterface
+    public function store(ImageRequest $request, ResponseInterface $response, ImageService $service): PsrResponseInterface
     {
         $imageUrl = null;
         $thumbnail = null;

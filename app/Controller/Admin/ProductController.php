@@ -167,7 +167,7 @@ class ProductController extends AbstractController
             }
             $query = $type_class::select('*');
             $query_total = $type_class::select('*');
-            if($product_type == Product::TYPE_LIST[0] || $product_type == Product::TYPE_LIST[1]){
+            if ($product_type == Product::TYPE_LIST[0] || $product_type == Product::TYPE_LIST[1]) {
                 $query = $query->whereNull('deleted_at');
                 $query_total = $query_total->whereNull('deleted_at');
             }

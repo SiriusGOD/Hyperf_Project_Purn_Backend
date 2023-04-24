@@ -40,6 +40,7 @@ return [
         'taggroup'=>'標籤群組管理',
         'actorclassification'=>'操作日誌',
         'userstep'=>'操作日誌',
+        'customer_service' => '客服系統',
     ],
     'user_name' => '使用者名稱',
     'list' => '列表',
@@ -49,6 +50,7 @@ return [
     'edit' => '編輯',
     'delete' => '刪除',
     'expire' => '狀態',
+    'detail' => '詳情',
 
     // -------------------------------------------------------------------
     // default
@@ -216,6 +218,7 @@ return [
         'coin' => '點數管理',
         'user-step'=>'操作日誌',
         'activity' => '用戶日誌',
+        'customer_service' => '客服系統',
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -470,6 +473,27 @@ return [
         'activity_device_type' => '設備類型',
         'activity_version' => '版本號',
         'activity_ip' => '用戶 ip',
+    ],
+    // -------------------------------------------------------------------
+    // CustomerServiceController
+    'customer_service_control' => [
+        'customer_service_control' => '客服系統',
+        'customer_service_member_name' => '用戶名稱',
+        'customer_service_type' => '問題種類',
+        'customer_service_title' => '標題',
+        'customer_service_updated_at' => '更新時間',
+        'customer_service_type_array' => [
+            1 => '客服問題',
+        ],
+    ],
+    'customer_service_detail_control' => [
+        'message_record' => '對話紀錄',
+        'message_response' => '回覆訊息',
+        'created_at' => '建立時間',
+        'user_name' => '客服名稱',
+        'member_name' => '用戶名稱',
+        'message' => '訊息',
+        'image_url' => '圖片',
     ],
     // -------------------------------------------------------------------
 ];

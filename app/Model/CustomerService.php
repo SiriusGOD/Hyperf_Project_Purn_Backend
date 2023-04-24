@@ -14,27 +14,26 @@ namespace App\Model;
 /**
  * @property int $id
  * @property int $member_id
- * @property string $last_activity
- * @property string $device_type
- * @property string $version
- * @property string $ip
+ * @property int $type
+ * @property string $title
+ * @property int $is_unread
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ * @property CustomerServiceDetail[]|\Hyperf\Database\Model\Collection $details
  * @property Member $member
  */
-class MemberActivity extends Model
+class CustomerService extends Model
 {
     public const PAGE_PER = 10;
 
-    public const TYPES = [
-        1 => ImageGroup::class,
-        2 => Video::class,
+    public const TYPE = [
+        'normal' => 1,
     ];
 
     /**
      * The table associated with the model.
      */
-    protected ?string $table = 'member_activities';
+    protected ?string $table = 'customer_services';
 
     /**
      * The attributes that are mass assignable.
@@ -44,10 +43,20 @@ class MemberActivity extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'type' => 'integer', 'is_unread' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    public function details()
+    {
+        return $this->hasMany(CustomerServiceDetail::class);
+    }
 
     public function member()
     {
         return $this->belongsTo(Member::class);
+    }
+
+    public function lastUpdatedAt()
+    {
+        return $this->details()->orderByDesc('id')->first()->updated_at;
     }
 }

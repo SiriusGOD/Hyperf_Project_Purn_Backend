@@ -53,7 +53,7 @@ class MemberLevelTask
                     if (! empty($member_level)) {
                         if ($member_level->end_time <= $now) {
                             // 移除到期會員VIP
-                            $member_level -> delete();
+                            $member_level->delete();
 
                             // 變更會員狀態
                             $up_member = Member::where('id', $member->id)->first();
@@ -71,7 +71,7 @@ class MemberLevelTask
                     if (! empty($member_level)) {
                         if ($member_level->end_time <= $now) {
                             // 移除到期會員鑽石
-                            $member_level -> delete();
+                            $member_level->delete();
 
                             // 確認是否有vip會員資格
                             $vip = BuyMemberLevel::where('member_id', $member->id)
@@ -80,7 +80,7 @@ class MemberLevelTask
                                 ->first();
                             if ($vip->end_time <= $now) {
                                 // vip 也超過時間
-                                $vip -> delete();
+                                $vip->delete();
 
                                 $status = MemberLevel::NO_MEMBER_LEVEL;
                                 $vip_quota_flag = true;

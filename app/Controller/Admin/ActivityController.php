@@ -12,23 +12,15 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
-use App\Model\Image;
 use App\Model\MemberActivity;
-use App\Model\TagCorrespond;
-use App\Request\ImageRequest;
-use App\Service\ImageService;
-use App\Service\TagService;
-use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Paginator\Paginator;
 use Hyperf\Validation\Contract\ValidatorFactoryInterface;
 use Hyperf\View\RenderInterface;
-use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
 #[Controller]
 #[Middleware(middleware: 'App\\Middleware\\PermissionMiddleware')]
