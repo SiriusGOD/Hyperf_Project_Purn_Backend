@@ -35,7 +35,7 @@ class MemberApiUpdateRequest extends AuthApiBaseRequest
                 Rule::unique('members')->ignore($id),
             ],
             'password' => 'string',
-            'email' => [
+            'account' => [
                 'string',
                 Rule::unique('members')->ignore($id),
             ],
