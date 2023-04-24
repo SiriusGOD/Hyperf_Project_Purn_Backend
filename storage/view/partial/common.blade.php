@@ -276,6 +276,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('customer-service-index'))
+                    <li class="nav-item">
+                        <a href="/admin/customer_service/index" class="nav-link {{$customer_service_active ?? ''}}">
+                            <i class="nav-icon fas fa-envelope"></i>
+                            <p>
+                                {{trans('default.leftbox.customer_service') ?? '客服系統'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

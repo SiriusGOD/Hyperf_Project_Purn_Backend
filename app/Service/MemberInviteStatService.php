@@ -158,7 +158,7 @@ class MemberInviteStatService extends BaseService
      */
     public function initRow($uid, $level = self::LEVEL_1)
     {
-        //return MemberInviteLog::create([
+        // return MemberInviteLog::create([
         //    'uid' => $uid,
         //    'd_coins' => 0,
         //    'k_coins' => 0,

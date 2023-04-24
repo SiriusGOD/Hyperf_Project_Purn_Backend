@@ -70,37 +70,46 @@ class ProxyService
     //        }
     //    });
     //    return $flag;
-  
-    //分潤計算 
-    public function calculatePercentage($money) {
-      if ($money <=1000) {
-          return 0.1;
-      } elseif ($money <=2000) {
-          return 0.12;
-      } elseif ($money <= 5000) {
-          return 0.14;
-      } elseif ($money <= 10000) {
-          return 0.16;
-      } elseif ($money <= 20000) {
-          return 0.18;
-      } elseif ($money <= 40000) {
-          return 0.20;
-      } elseif ($money <= 70000) {
-          return 0.23;
-      } elseif ($money < 100000) {
-          return 0.26;
-      } else {
-          return 0.30;
-      }
+
+    // 分潤計算
+    public function calculatePercentage($money)
+    {
+        if ($money <= 1000) {
+            return 0.1;
+        }
+        if ($money <= 2000) {
+            return 0.12;
+        }
+        if ($money <= 5000) {
+            return 0.14;
+        }
+        if ($money <= 10000) {
+            return 0.16;
+        }
+        if ($money <= 20000) {
+            return 0.18;
+        }
+        if ($money <= 40000) {
+            return 0.20;
+        }
+        if ($money <= 70000) {
+            return 0.23;
+        }
+        if ($money < 100000) {
+            return 0.26;
+        }
+        return 0.30;
     }
+
     /**
-     *分潤計算 
-     * 返佣
-     */ 
-    public function returnRateMoney(float $money ,int $userLevel){
+     *分潤計算
+     * 返佣.
+     */
+    public function returnRateMoney(float $money, int $userLevel)
+    {
         $res = self::calculatePercentage($money);
         return $res * $money * ProxyCode::LEVEL[$userLevel]['rate'];
-    } 
+    }
 
     /*
      * 我的推广收入统计

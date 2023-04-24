@@ -13,28 +13,23 @@ namespace App\Model;
 
 /**
  * @property int $id
+ * @property int $customer_service_id
+ * @property int $user_id
  * @property int $member_id
- * @property string $last_activity
- * @property string $device_type
- * @property string $version
- * @property string $ip
+ * @property string $message
+ * @property string $image_url
+ * @property int $is_read
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property Member $member
  */
-class MemberActivity extends Model
+class CustomerServiceDetail extends Model
 {
     public const PAGE_PER = 10;
-
-    public const TYPES = [
-        1 => ImageGroup::class,
-        2 => Video::class,
-    ];
 
     /**
      * The table associated with the model.
      */
-    protected ?string $table = 'member_activities';
+    protected ?string $table = 'customer_service_details';
 
     /**
      * The attributes that are mass assignable.
@@ -44,7 +39,12 @@ class MemberActivity extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'customer_service_id' => 'integer', 'user_id' => 'integer', 'member_id' => 'integer', 'is_read' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function member()
     {
