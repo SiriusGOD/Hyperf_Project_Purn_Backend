@@ -53,8 +53,8 @@ class MemberInviteLogService extends BaseService
       $this->modelStore($model ,$datas);
     }
     
-    //記算每一層代理
-    public function calcProxy(array $insert , Member $member)
+    //計算每一層代理
+    public function calcProxy(Member $member)
     {
       $level = 2;
       $memberModel  = $this->member;

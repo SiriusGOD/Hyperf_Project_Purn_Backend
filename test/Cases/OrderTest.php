@@ -58,6 +58,7 @@ class OrderTest extends HttpTestCase
         $model->pay_proxy = 'test';
         $model->status = Order::ORDER_STATUS['create'];
         $model->save();
+
         $user = User::first();
         $token = auth()->login($user);
         make(MemberService::class)->saveToken($user->id, $token);

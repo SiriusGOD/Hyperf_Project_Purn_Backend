@@ -12,9 +12,11 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Constants\ProxyCode;
-use App\Model\Member;
 use App\Model\MemberInviteReceiveLog;
+use App\Model\Member;
 use App\Model\Order;
+use App\Model\Product;
+use App\Model\MemberInviteLog;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
@@ -32,18 +34,25 @@ class ProxyService
     protected $logger;
 
     protected $redeem;
-
+    protected $member;
     protected $memberInviteStatService;
-
+    protected $memberInviteLog;
     protected $memberRedeemVideoService;
+    protected $memberInviteReceiveLog;
 
     public function __construct(
         Redis $redis,
+        Member $member,
         LoggerFactory $loggerFactory,
+        MemberInviteLog $memberInviteLog,
+        MemberInviteReceiveLog $memberInviteReceiveLog,
         MemberInviteStatService $memberInviteStatService
     ) {
+        $this->memberInviteLog = $memberInviteLog;
         $this->logger = $loggerFactory->get('reply');
-        $this->redis = $redis;
+        $this->redis =  $redis;
+        $this->member = $member;
+        $this->memberInviteReceiveLog =$memberInviteReceiveLog;
         $this->memberInviteStatService = $memberInviteStatService;
     }
 
@@ -71,6 +80,51 @@ class ProxyService
     //    });
     //    return $flag;
   
+    //返傭
+    public function rebate(Member $member ,Order $order, Product $product)
+    {
+      $wg = new \Hyperf\Utils\WaitGroup();
+      $memberInviteReceiveLog = $this->memberInviteReceiveLog;
+      $memberModel = $this->member;
+      //商品類型不是現金點數
+      //怕使用者 充了數馬上提出
+      if($product->type != Product::TYPE_LIST[1]){
+        $money = $order->pay_amount;
+        //查看上層代理
+        $res = $this->memberInviteLog->where("member_id", $member->id)->get();
+        $rate = self::calculatePercentage($money);
+        foreach($res as $proxy){
+          
+          $userLevel = $proxy->level; 
+          $uRate = ProxyCode::LEVEL[$userLevel]['rate'];
+          $amount = number_format($money * $uRate *  $rate ,2);
+          //print_r(['amount'=>$amount]);
+          $return["member_id"] = $proxy->invited_by;
+          $return["invite_by"] = 0;
+          $return["order_sn"] = $order->order_number;
+          $return["amount"] = number_format($money ,2);
+          $return["reach_amount"] = number_format($money ,2);
+          $return["level"] = $userLevel;
+          $return["rate"] = $uRate;
+          $return["type"] = ($proxy->leverl == 1) ? 0 : 1 ;//0 直推 1 跨级收益
+          //返傭
+
+          $wg->add(1);
+          co(function() use ($wg, $return, $memberInviteReceiveLog, $memberModel, $amount){
+            $member = $memberModel->find((int)$return["member_id"]);
+            $member->coins = $member->coins + $amount; 
+            $member->save(); 
+
+            $memberInviteReceiveLog->create($return);
+            usleep(100);
+            $wg->done();
+          });
+        } 
+      }
+      $wg->wait(); 
+
+    }  
+
     //分潤計算 
     public function calculatePercentage($money) {
       if ($money <=1000) {
