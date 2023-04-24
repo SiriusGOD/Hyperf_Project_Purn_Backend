@@ -66,41 +66,36 @@ class ProxyService
     //    });
     //    return $flag;
     //}
-
-    public function calcRate($money) 
-    {
-      foreach(ProxyCode::COIN_RATE as $key => $data){
-          if($key>1 && $key<10)
-          {
-            if( $money >ProxyCode::COIN_RATE[$key]["money"]  && $money <=ProxyCode::COIN_RATE[$key+1]["money"] )
-            {
-                print_r([ProxyCode::COIN_RATE[$key+1]["rate"] ,"rate"]);
-                 return $money * ProxyCode::COIN_RATE[$key+1]["rate"]; 
-            }
-          }else{
-            if($key==1)
-            {
-           // print_r(['kkr2'=>$key]);
-              if($money <= ProxyCode::COIN_RATE[$key]["money"] ){
-                 return $money * ProxyCode::COIN_RATE[$key]["rate"]; 
-              }
-            }
-            if($key==10)
-            {
-              if($money >= ProxyCode::COIN_RATE[$key]["money"] )
-              {
-                 return $money * ProxyCode::COIN_RATE[$key]["rate"]; 
-              }
-            }
-        }
-      } 
+  
+    //分潤計算 
+    public function calculatePercentage($money) {
+      if ($money <=1000) {
+          return 0.1;
+      } elseif ($money <=2000) {
+          return 0.12;
+      } elseif ($money <= 5000) {
+          return 0.14;
+      } elseif ($money <= 10000) {
+          return 0.16;
+      } elseif ($money <= 20000) {
+          return 0.18;
+      } elseif ($money <= 40000) {
+          return 0.20;
+      } elseif ($money <= 70000) {
+          return 0.23;
+      } elseif ($money < 100000) {
+          return 0.26;
+      } else {
+          return 0.30;
+      }
     }
     /**
+     *分潤計算 
      * 返佣
      */ 
     public function returnRateMoney(float $money ,int $userLevel){
-        $res = self::calcRate($money);
-        return $res *ProxyCode::LEVEL[$userLevel]['rate'];
+        $res = self::calculatePercentage($money);
+        return $res * $money * ProxyCode::LEVEL[$userLevel]['rate'];
     } 
 
     /**

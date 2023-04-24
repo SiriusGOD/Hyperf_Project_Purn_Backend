@@ -10,9 +10,10 @@ ENV TIMEZONE=${timezone:-"America/Los_Angeles"} \
     SCAN_CACHEABLE=(true)
 
 
+
 RUN set -ex \
     && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
-    && docker-php-ext-install pdo_mysql pcntl                   \
+    && docker-php-ext-install pdo_mysql pcntl bcmath \
     && mkdir -p /usr/src/php/ext/redis \
     && cd /usr/src/php/ext \
     && curl https://github.com/phpredis/phpredis/archive/refs/tags/5.3.4.tar.gz -O -L \
