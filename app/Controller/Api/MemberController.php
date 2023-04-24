@@ -299,4 +299,31 @@ class MemberController extends AbstractController
         $result = $service->getMemberFollowList($userId, $follow_type);
         return $this->success(['models' => $result]);
     }
+
+    #[Middleware(ApiAuthMiddleware::class)]
+    #[RequestMapping(methods: ['GET'], path: 'getMemberProductId')]
+    public function getMemberProductId(RequestInterface $request, MemberService $service)
+    {
+        $id = auth('jwt')->user()->getId();
+        $type = $request->input('type', 'all');
+        $offset = $request->input('offset', 0);
+        $limit = $request->input('limit', 0);
+        $result = $service -> getMemberProductId($id, $type, $offset, $limit);
+        return $this->success(['models' => $result]);
+    }
+
+    /**
+     * 獲取推薦列表
+     */
+    // #[RequestMapping(methods: ['GET'], path: 'getPersonalList')]
+    // public function getPersonalList(RequestInterface $request, MemberService $service)
+    // {
+    //     $user_id = auth('jwt')->user()->getId();
+    //     $method = $request->input('method', 'recommend');
+    //     $offset = $request->input('offset', 0);
+    //     $limit = $request->input('limit', 0);
+    //     $result = $service->getPersonalList($user_id, $method, $offset, $limit);
+        
+    //     return $this->success(['models' => $result]);
+    // }
 }
