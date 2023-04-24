@@ -75,7 +75,18 @@ class ProductSeed implements BaseInterface
         $model->currency = '美金';
         $model->selling_price = 100;
         $model->save();
-
+        //測試用
+        $model = new \App\Model\Product();
+        $model->user_id = 1;
+        $model->type = 'points';
+        $model->correspond_id = 1;
+        $model->name = '測試用點數';
+        $model->expire = 0;
+        $model->start_time = '2023-03-25 00:00:00';
+        $model->end_time = '2027-03-25 00:00:00';
+        $model->currency = 'CNY';
+        $model->selling_price = 20;
+        $model->save();
     }
 
     public function down(): void

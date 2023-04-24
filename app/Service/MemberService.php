@@ -31,6 +31,7 @@ class MemberService extends BaseService
     public const DEVICE_CACHE_KEY = 'member:device:';
 
     public const EXPIRE_VERIFICATION_MINUTE = 10;
+    public const DAY = 86400;
 
     protected Redis $redis;
     protected $memberInviteLogService;
@@ -114,7 +115,7 @@ class MemberService extends BaseService
             $insert['level']  = 1;
             $insert['invited_code']  = $data["invited_code"];
             $this->memberInviteLogService->initRow($insert);
-            $this->memberInviteLogService->calcProxy($insert ,$model);
+            $this->memberInviteLogService->calcProxy($model);
           }
         }
         $model->aff = md5((string)$model->id);
@@ -149,7 +150,9 @@ class MemberService extends BaseService
 
     public function saveToken(int $userId, string $token): void
     {
-        $this->redis->set(self::CACHE_KEY . $userId, $token);
+        $key =self::CACHE_KEY.$userId;
+        $this->redis->set($key, $token);
+        $this->redis->expire($key, self::DAY);
     }
 
     public function checkAndSaveDevice(int $userId, string $uuid): bool
