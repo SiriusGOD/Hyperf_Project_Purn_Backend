@@ -89,4 +89,23 @@ class BaseService
         }
         return '';
     }
+
+    //共用儲存 
+    public function modelStore($model ,array $datas) : bool
+    {
+      if(isset($datas["id"]) && !empty($datas["id"])){
+        $model = $model->where('id',$datas['id'])->first(); 
+      }else{
+        $model = new $model(); 
+      }
+      foreach($datas as $key => $val)
+      {
+        $model->$key = $val;
+      }
+      if($model->save()){
+        return true;
+      }else{
+        return false;
+      }
+    }
 }

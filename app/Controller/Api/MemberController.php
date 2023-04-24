@@ -69,6 +69,8 @@ class MemberController extends AbstractController
                 'age' => $request->input('age', 18),
                 'email' => $request->input('email', ''),
                 'phone' => $request->input('phone', ''),
+                'name' => $request->input('name', ''),
+                'invited_code' => $request->input('invited_code', ''),
             ]);
 
             if (empty($user)) {

@@ -19,11 +19,12 @@ use App\Model\MemberLevel;
 use App\Model\MemberVerification;
 use App\Model\Role;
 use App\Model\User;
+use App\Service\MemberInviteLogService;
 use Carbon\Carbon;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
-class MemberService
+class MemberService extends BaseService
 {
     public const CACHE_KEY = 'member:token:';
 
@@ -32,12 +33,16 @@ class MemberService
     public const EXPIRE_VERIFICATION_MINUTE = 10;
 
     protected Redis $redis;
-
+    protected $memberInviteLogService;
     protected \Psr\Log\LoggerInterface $logger;
 
-    public function __construct(Redis $redis, LoggerFactory $loggerFactory)
+  public function __construct(Redis $redis, 
+                MemberInviteLogService $memberInviteLogService,
+                LoggerFactory $loggerFactory 
+                )
     {
         $this->redis = $redis;
+        $this->memberInviteLogService = $memberInviteLogService;
         $this->logger = $loggerFactory->get('reply');
     }
 
@@ -91,8 +96,41 @@ class MemberService
         $model->device = $data['device'];
         $model->register_ip = $data['register_ip'];
         $model->save();
-
+        self::afterRegister($model , $data);
         return $model;
+    }
+    
+    //代理Log  
+    public function afterRegister(Member $model ,array $data)
+    {
+        if(!empty($data["invited_code"]))
+        {
+          $member = self::getMmemberByAff($data["invited_code"]);
+          if($member)
+          {
+            $model->invited_by    = $member->id;
+            $insert['invited_by'] = $member->id;
+            $insert['member_id']  = $model->id;
+            $insert['level']  = 1;
+            $insert['invited_code']  = $data["invited_code"];
+            $this->memberInviteLogService->initRow($insert);
+            $this->memberInviteLogService->calcProxy($insert ,$model);
+          }
+        }
+        $model->aff = md5((string)$model->id);
+        $model->save();
+    }
+
+    //推廣碼找代理  
+    public function getMmemberByAff(string $aff) : Member
+    {
+        return Member::where('aff',$aff)->first(); 
+    }
+
+    //找一個代理  
+    public function getProxy() : Member 
+    {
+        return Member::where('aff',"!=","")->orderBy("id","desc")->first(); 
     }
 
     public function moveUserAvatar($file): string
