@@ -430,8 +430,11 @@ class MemberService extends BaseService
         return $model->code;
     }
 
-    public function getMemberProductId($memberId, $type, $offset, $limit): array
+    public function getMemberProductId($memberId, $type, $page): array
     {
+        // 顯示幾筆
+        $step = Order::FRONTED_PAGE_PER;
+
         $query = Order::join('order_details', 'order_details.order_id', 'orders.id')
                     ->join('products', 'products.id', 'order_details.product_id')
                     ->select('products.id', 'products.type', 'products.correspond_id', 'products.name', 'products.expire')
@@ -451,12 +454,14 @@ class MemberService extends BaseService
                 $query = $query -> whereIn('products.type', [Product::TYPE_LIST[0], Product::TYPE_LIST[1]]);
                 break;
         }
-
+        
         if(!empty($offset)){
-            $query = $query -> offset($offset);
+            // $query = $query -> offset($offset);
+            $query = $query -> offset(($page - 1) * $step);
         }
         if(!empty($limit)){
-            $query = $query -> limit($limit);
+            // $query = $query -> limit($limit);
+            $query = $query -> limit($step);
         }
         $model = $query -> get();
         if(!empty($model)){
@@ -465,13 +470,18 @@ class MemberService extends BaseService
             // ActorClassification::findOrFail($id);
             foreach ($model as $key => $value) {
                 if($value->type == Product::TYPE_LIST[0]){
-                    $image = ImageGroup::findOrFail($value->correspond_id);
+                    // $image = ImageGroup::findOrFail($value->correspond_id);
+                    $image = ImageGroup::leftJoin('images', 'image_groups.id', 'images.group_id')
+                            ->selectRaw('thumbnail, count(*) as count')
+                            ->groupBy('image_groups.id');
+
                     array_push($image_arr, array(
                         'product_id' => $value->id,
                         'source_id' => $value->correspond_id, 
                         'name' => $value->name, 
                         'thumbnail' => env('IMG_DOMAIN') . $image->thumbnail ?? '',
                         'expire' =>  $value->expire,
+                        'num' =>  $image->count ?? 0,
                     ));
                 }
                 
@@ -483,6 +493,7 @@ class MemberService extends BaseService
                         'name' => $value->name, 
                         'thumbnail' => env('IMG_DOMAIN') . $video->cover_thumb ?? '', 
                         'expire' =>  $value->expire,
+                        'duration' =>  $value->duration ?? 0,
                     ));
                 }
             }
