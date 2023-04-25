@@ -30,7 +30,7 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rule_arr = [
             'id' => 'numeric',
             'product_type' => 'required|max:255',
             'product_id' => 'numeric',
@@ -46,7 +46,12 @@ class ProductRequest extends FormRequest
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_date',
             'product_currency' => 'required|max:255',
-            'product_price' => 'required|numeric',
+            'product_price' => 'required|numeric'
         ];
+        if($this->input('product_type') == Product::TYPE_LIST[2] || $this->input('product_type') == Product::TYPE_LIST[3]){
+            $rule_arr['pay_groups'] = 'required|array';
+        }
+
+        return $rule_arr;
     }
 }

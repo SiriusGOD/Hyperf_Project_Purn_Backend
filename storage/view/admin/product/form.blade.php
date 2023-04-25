@@ -65,6 +65,9 @@
                                         </option>
                                     </select>
                                 </div>
+                                @if($product_type == 'member' || $product_type == 'points')
+                                    @include('partial.paySelect')
+                                @endif
                                 <button type="submit" class="btn btn-primary">{{trans('default.submit') ?? '送出'}}</button>
                             </form>
                         </div>

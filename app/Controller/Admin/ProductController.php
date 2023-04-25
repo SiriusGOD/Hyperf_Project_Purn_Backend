@@ -17,6 +17,7 @@ use App\Model\ImageGroup;
 use App\Model\MemberLevel;
 use App\Model\Product;
 use App\Model\Video;
+use App\Model\PayCorrespond;
 use App\Request\ProductMultipleStoreRequest;
 use App\Request\ProductRequest;
 use App\Service\ProductService;
@@ -133,6 +134,7 @@ class ProductController extends AbstractController
         $model->id = '';
         $data['navbar'] = trans('default.product_control.product_create');
         $data['product_active'] = 'active';
+        $data['pay_ids'] = '';
         $data['model'] = $model;
         $data['product_type'] = $product_type;
         return $this->render->render('admin.product.form', $data);
@@ -233,6 +235,7 @@ class ProductController extends AbstractController
         $data['end_time'] = $request->input('end_time');
         $data['currency'] = $request->input('product_currency');
         $data['selling_price'] = $request->input('product_price');
+        $data['pay_groups'] = $request->input('pay_groups');
         $service->store($data);
         return $response->redirect('/admin/product/index');
     }
@@ -271,6 +274,7 @@ class ProductController extends AbstractController
         }
         $data['model'] = $model;
         $data['product_type'] = $product_type;
+        $data['pay_ids'] = PayCorrespond::where('product_id', $id)->get()->pluck('pay_id');
         $data['navbar'] = trans('default.product_control.product_edit');
         $data['product_active'] = 'active';
         return $this->render->render('admin.product.form', $data);
