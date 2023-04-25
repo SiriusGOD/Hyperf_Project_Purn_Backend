@@ -50,7 +50,7 @@ class ProxyMemberTest extends HttpTestCase
     {
         $member = $this->memberService->getProxy();
         $insertArray = self::memberExp();
-        $q = "second_".rand(112221,333331);
+        $q = "s_".date("YmdHis")."_".rand(11,99);
         $insertArray["name"] = $q;
         $insertArray["email"] =$q."@example.com";
         $insertArray["invited_code"] = $member->aff;
