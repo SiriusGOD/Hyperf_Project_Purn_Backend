@@ -35,4 +35,11 @@ class MemberInviteReceiveLog extends Model
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'invite_by' => 'integer', 'level' => 'integer', 'type' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    /**
+     * Get the member that the log belongs to.
+     */
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'member_id');
+    }
 }

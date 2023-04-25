@@ -22,8 +22,8 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 class ProxyController extends AbstractController
 {
     // 分享/邀請碼
-    #[RequestMapping(methods: ['GET'], path: 'share')]
-    public function share(RequestInterface $request, MemberService $memberService)
+    #[RequestMapping(methods: ['POST'], path: 'share')]
+    public function share(MemberService $memberService)
     {
         $memberId = auth('jwt')->user()->getId();
         $result = $memberService->getMember($memberId);
@@ -31,7 +31,7 @@ class ProxyController extends AbstractController
     }
 
     // 我的收益
-    #[RequestMapping(methods: ['GET'], path: 'myIncome')]
+    #[RequestMapping(methods: ['POST'], path: 'myIncome')]
     public function myIncome(RequestInterface $request, ProxyService $proxyService)
     {
         $memberId = auth('jwt')->user()->getId();
@@ -41,12 +41,12 @@ class ProxyController extends AbstractController
     }
 
     // 我的代理成員/下線
-    #[RequestMapping(methods: ['GET'], path: 'downline')]
+    #[RequestMapping(methods: ['POST'], path: 'downline')]
     public function downline(RequestInterface $request, ProxyService $proxyService)
     {
         $memberId = auth('jwt')->user()->getId();
         $page = $request->input('page',1);
-        $result = $proxyService->myIncome($memberId ,$page);
+        $result = $proxyService->downline($memberId ,$page);
         return $this->success(['models' => $result ]);
     }
 }

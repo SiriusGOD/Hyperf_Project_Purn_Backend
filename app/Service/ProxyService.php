@@ -23,7 +23,7 @@ use Hyperf\Redis\Redis;
 /**
  * Class ProxyService.
  */
-class ProxyService
+class ProxyService extends BaseService
 {
     public const CACHE_KEY = 'redeem';
 
@@ -83,27 +83,24 @@ class ProxyService
     public function downline(int $memberId ,int $page )
     {
       $limit = 10;
-      if($page==1){
-        $page = $$page-1;
-      }
-      return $this->memberInviteLog 
-                          ->where('member_id',$memberId)
-                          ->offset($page * $limit)
-                          ->limit($limit)
-                          ->get();
+      $where["invited_by"] = $memberId; 
+      $model = $this->memberInviteLog->with(["inviter" =>function($query){
+        $query->select("id","name");
+      }])->with(["member" =>function($query){
+        $query->select("id","name");
+      }]);
+      return $this->list($model, $where, $page, $limit);
     }
+
     //我的收益
     public function myIncome(int $memberId ,int $page )
     {
       $limit = 10;
-      if($page==1){
-        $page = $$page-1;
-      }
-      return $this->memberInviteReceiveLog
-                          ->where('member_id',$memberId)
-                          ->offset($page * $limit)
-                          ->limit($limit)
-                          ->get();
+      $where["member_id"] = $memberId; 
+      $model = $this->memberInviteReceiveLog->with(["member" =>function($query){
+        $query->select("id","name");
+      }]);
+      return $this->list($model, $where, $page, $limit);
     }
     //返傭
     public function rebate(Member $member ,Order $order, Product $product)

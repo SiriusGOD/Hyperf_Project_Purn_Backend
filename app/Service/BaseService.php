@@ -106,4 +106,16 @@ class BaseService
         }
         return false;
     }
+    //共用清單
+    public function list($model, array $where, int $page, int $limit){
+
+      foreach($where as $key =>$val){
+         $model = $model->where($key,$val) ;
+      }
+      if($page==1){
+        $page=0;
+      }
+      return $model->offset($page * $limit)->limit($limit)->get();
+
+    }
 }

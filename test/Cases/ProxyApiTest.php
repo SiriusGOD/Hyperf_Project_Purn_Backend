@@ -40,7 +40,7 @@ class ProxyApiTest extends HttpTestCase
         $member = $this->memberService->getProxy();
         $token = auth()->login($member);
         make(MemberService::class)->saveToken($member->id, $token);
-        $data = $this->client->get('/api/proxy/share', [], [
+        $data = $this->client->post('/api/proxy/share', [], [
             'Authorization' => 'Bearer ' . $token,
         ]);
         $this->assertSame(200, (int)$data['code']);
@@ -52,9 +52,23 @@ class ProxyApiTest extends HttpTestCase
         $member = Member::where('id' ,50)->first();
         $token = auth()->login($member);
         make(MemberService::class)->saveToken($member->id, $token);
-        $data = $this->client->get('/api/proxy/myIncome', [], [
+        $data = $this->client->post('/api/proxy/myIncome', [], [
             'Authorization' => 'Bearer ' . $token,
         ]);
+        print_r($data);
+        $this->assertSame(200, (int)$data['code']);
+    }
+
+    //我的收益
+    public function testDownline()
+    {
+        $member = Member::where('id' ,50)->first();
+        $token = auth()->login($member);
+        make(MemberService::class)->saveToken($member->id, $token);
+        $data = $this->client->post('/api/proxy/downline', [], [
+            'Authorization' => 'Bearer ' . $token,
+        ]);
+        //print_r($data);
         $this->assertSame(200, (int)$data['code']);
     }
 }
