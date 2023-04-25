@@ -182,7 +182,7 @@ class MemberController extends AbstractController
         $code = $service->getVerificationCode($member->id);
         $driver = $factory->get('default');
         $content = trans('email.verification.content', ['code' => $code]);
-        $driver->push(new EmailVerificationJob($request->input('email'), $content));
+        $driver->push(new EmailVerificationJob($request->input('email'),  trans('email.verification.subject'), $content));
 
         return $this->success();
     }

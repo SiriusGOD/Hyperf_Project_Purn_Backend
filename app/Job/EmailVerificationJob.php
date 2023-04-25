@@ -21,15 +21,18 @@ class EmailVerificationJob extends Job
 
     public string $content;
 
+    public string $subject;
+
     /**
      * 任務執行失敗後的重試次數，即最大執行次數為 $maxAttempts+1 次
      */
     protected int $maxAttempts = 2;
 
-    public function __construct(string $address, string $content)
+    public function __construct(string $address, string $subject, string $content)
     {
         // 這裡最好是普通資料，不要使用攜帶 IO 的物件，比如 PDO 物件
         $this->address = $address;
+        $this->subject = $subject;
         $this->content = $content;
     }
 
@@ -38,7 +41,7 @@ class EmailVerificationJob extends Job
         $logger = make(LoggerFactory::class)->get('job', 'job');
         $service = make(MailService::class);
         $logger->info('寄送 mail 至 ' . $this->address);
-        $result = $service->send($this->address, $this->content);
+        $result = $service->send($this->address, $this->subject, $this->content);
         $msg = '寄送 mail 至 ' . $this->address . ' 失敗';
         if ($result) {
             $msg = '寄送 mail 至 ' . $this->address . ' 成功';

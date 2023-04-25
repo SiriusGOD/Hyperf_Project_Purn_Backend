@@ -64,6 +64,24 @@ return [
             ],
         ],
     ],
+    'email' => [
+        'handler' => [
+            'class' => Monolog\Handler\RotatingFileHandler::class,
+            'constructor' => [
+                'filename' => BASE_PATH . '/runtime/logs/email.log',
+                'level' => Monolog\Logger::DEBUG,
+                'maxFiles' => 5,
+            ],
+        ],
+        'formatter' => [
+            'class' => Monolog\Formatter\LineFormatter::class,
+            'constructor' => [
+                'format' => null,
+                'dateFormat' => 'Y-m-d H:i:s',
+                'allowInlineLineBreaks' => true,
+            ],
+        ],
+    ],
     'sql' => [
         'handler' => [
             'class' => Monolog\Handler\RotatingFileHandler::class,

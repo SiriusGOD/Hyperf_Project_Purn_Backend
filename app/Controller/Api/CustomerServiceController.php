@@ -23,6 +23,7 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\Paginator\Paginator;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Qbhy\HyperfAuth\AuthMiddleware;
 
@@ -61,6 +62,8 @@ class CustomerServiceController extends AbstractController
         $path = '/api/customer_service/detail';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        $paginator = new Paginator($models,  $data['step'], $page);
+        $data['paginator'] = $paginator->toArray();
         return $this->success($data);
     }
 
