@@ -71,7 +71,7 @@ class ImageGroupService
             $query = $query->whereNotIn('id', $withoutIds);
         }
 
-        return $query->get();
+        return $query->orderByDesc('id')->get();
     }
 
     public function getImageGroupsByKeyword(string $keyword, int $page, int $limit = Image::PAGE_PER): Collection

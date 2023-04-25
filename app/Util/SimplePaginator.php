@@ -25,8 +25,11 @@ class SimplePaginator
         ];
 
         if (! empty($this->path)) {
-            $result['next'] = $this->path . '?page=' . ($this->page + 1);
-            $result['prev'] = $this->path . '?page=' . (($this->page == 0 ? 1 : $this->page) - 1);
+            if (str_contains('?', $this->path)) {
+                $this->path .= '?';
+            }
+            $result['next'] = $this->path . 'page=' . ($this->page + 1);
+            $result['prev'] = $this->path . 'page=' . (($this->page == 0 ? 1 : $this->page) - 1);
         }
 
         return $result;

@@ -76,7 +76,7 @@ class VideoService
     public function getVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER, array $withoutIds = []): Collection
     {
         $query = self::baseVideos($tagIds, $page, $status, $limit, $withoutIds);
-        return $query->get();
+        return $query->orderByDesc('id')->get();
     }
 
     // 影片
