@@ -28,10 +28,20 @@ use App\Service\VideoService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Log\LoggerInterface;
+use Hyperf\Logger\LoggerFactory;
 
 #[Controller]
 class VideoController extends AbstractController
 {
+    protected LoggerInterface $logger;
+
+    public function __construct(LoggerFactory $loggerFactory)
+    {
+        // 第一個引數對應日誌的 name, 第二個引數對應 config/autoload/logger.php 內的 key
+        $this->logger = $loggerFactory->get('log', 'default');
+    }
+  
     #[RequestMapping(methods: ['GET'], path: 'list')]
     public function list(RequestInterface $request, VideoService $service)
     {
@@ -81,6 +91,9 @@ class VideoController extends AbstractController
     public function data(RequestInterface $request, VideoService $VideoService, TagService $tagService, ActorService $actorService)
     {
         $data = $request->all();
+        if(env("APP_ENV")=="develop"){ 
+          $this->logger->info(json_encode($data));
+        } 
         $video = $VideoService->storeVideo($data);
         $tagService->videoCorrespondTag($data, $video->id);
         $actorService->videoCorrespondActor($data, $video->id);

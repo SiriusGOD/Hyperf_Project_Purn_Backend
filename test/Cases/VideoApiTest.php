@@ -27,7 +27,7 @@ class VideoApiTest extends HttpTestCase
      * @var Client
      */
     protected $client;
-  
+    protected $videoService;
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
@@ -123,6 +123,7 @@ class VideoApiTest extends HttpTestCase
         ], [
             'Authorization' => 'Bearer ' . $token,
         ]);
+        
         $this->assertNotSame($data1['data']["models"][0]["id"], $data2['data']["models"][0]["id"]  );
     }
 
@@ -151,6 +152,7 @@ class VideoApiTest extends HttpTestCase
         $res1 = $this->client->get('/api/video/find',[ 'id' => (int)$row[0]->id ]);
         $this->assertSame((int)$row[0]->id , $res1['data']["models"]['id'] );
     }
+  
     //vidoe list api 有tag測試
     public function testApiListHasTags()
     {
