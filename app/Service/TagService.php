@@ -11,10 +11,12 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\ImageGroup;
 use App\Model\MemberTag;
 use App\Model\Tag;
 use App\Model\TagCorrespond;
 use App\Model\TagHasGroup;
+use App\Model\Video;
 use Hyperf\Database\Model\Collection;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
@@ -183,5 +185,17 @@ class TagService
         }
 
         return array_merge($result, $popularTag);
+    }
+
+    public function getTagsByModelType(?string $type, ?int $id) : array
+    {
+        if (empty($type) or empty($id)) {
+            return [];
+        }
+
+        return match ($type) {
+            ImageGroup::class => ImageGroup::find($id)->tags()->pluck('tags.id')->toArray(),
+            default => Video::find($id)->tags()->pluck('tags.id')->toArray(),
+        };
     }
 }

@@ -29,7 +29,9 @@ class ImageApiListRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tags.*' => 'required|numeric',
+            'tags.*' => 'numeric',
+            'type' => 'string',
+            'id' => 'numeric',
         ];
     }
 }

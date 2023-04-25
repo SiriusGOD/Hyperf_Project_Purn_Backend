@@ -11,17 +11,18 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\Advertisement;
 use App\Model\ImageGroup;
 use App\Model\Video;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
 class SearchService
 {
-    public const IMAGE_GROUP_PAGE_PER = 60;
+    public const IMAGE_GROUP_PAGE_PER = 0.6;
 
-    public const VIDEO_PAGE_PER = 30;
+    public const VIDEO_PAGE_PER = 0.3;
 
-    public const ADVERTISEMENT_PAGE_PER = 10;
+    public const ADVERTISEMENT_PAGE_PER = 0.1;
 
     public const POPULAR_CACHE_KEY = 'search:popular:';
 
@@ -48,11 +49,11 @@ class SearchService
         $this->baseUrl = $this->getBaseUrl();
     }
 
-    public function search(?array $tagIds, int $page): array
+    public function search(?array $tagIds, int $page, int $limit): array
     {
-        $imageGroups = $this->imageGroupService->getImageGroups($tagIds, $page, self::IMAGE_GROUP_PAGE_PER)->toArray();
-        $videos = $this->videoService->getVideos($tagIds, $page, 9, self::VIDEO_PAGE_PER)->toArray();
-        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, self::ADVERTISEMENT_PAGE_PER);
+        $imageGroups = $this->imageGroupService->getImageGroups($tagIds, $page, $this->getPerLimit(ImageGroup::class, $limit))->toArray();
+        $videos = $this->videoService->getVideos($tagIds, $page, 9, $this->getPerLimit(Video::class, $limit))->toArray();
+        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, $this->getPerLimit(Advertisement::class, $limit));
 
         $result = [];
 
@@ -61,11 +62,11 @@ class SearchService
         return $this->generateAdvertisements($result, $advertisements);
     }
 
-    public function suggest(array $suggest, int $page): array
+    public function suggest(array $suggest, int $page, int $limit = 10): array
     {
-        $imageGroups = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, self::IMAGE_GROUP_PAGE_PER);
-        $videos = $this->videoService->getVideosBySuggest($suggest, $page, self::VIDEO_PAGE_PER);
-        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, self::ADVERTISEMENT_PAGE_PER);
+        $imageGroups = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $this->getPerLimit(ImageGroup::class, $limit));
+        $videos = $this->videoService->getVideosBySuggest($suggest, $page, $this->getPerLimit(Video::class, $limit));
+        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, $this->getPerLimit(Advertisement::class, $limit));
 
         $result = [];
 
@@ -74,11 +75,11 @@ class SearchService
         return $this->generateAdvertisements($result, $advertisements);
     }
 
-    public function keyword(string $keyword, int $page): array
+    public function keyword(string $keyword, int $page, int $limit = 10): array
     {
-        $imageGroups = $this->imageGroupService->getImageGroupsByKeyword($keyword, $page, self::IMAGE_GROUP_PAGE_PER)->toArray();
-        $videos = $this->videoService->searchVideo($keyword, 0, 0, self::VIDEO_PAGE_PER)->toArray();
-        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, self::ADVERTISEMENT_PAGE_PER);
+        $imageGroups = $this->imageGroupService->getImageGroupsByKeyword($keyword, $page, $this->getPerLimit(ImageGroup::class, $limit))->toArray();
+        $videos = $this->videoService->searchVideo($keyword, 0, 0, $this->getPerLimit(Video::class, $limit))->toArray();
+        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, $this->getPerLimit(Advertisement::class, $limit));
 
         $result = [];
 
@@ -88,11 +89,11 @@ class SearchService
     }
 
     // TODO 可以做快取去優化，但是需要增加非同步 task 去處理
-    public function popular(int $page): array
+    public function popular(int $page, int $limit =10): array
     {
-        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, self::ADVERTISEMENT_PAGE_PER);
-        $imageGroups = $this->popularImageGroups($page);
-        $videos = $this->popularVideos($page);
+        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, $this->getPerLimit(Advertisement::class, $limit));
+        $imageGroups = $this->popularImageGroups($page, $this->getPerLimit(ImageGroup::class, $limit));
+        $videos = $this->popularVideos($page, $this->getPerLimit(Video::class, $limit));
 
         $result = [];
 
@@ -152,16 +153,16 @@ class SearchService
         return $result;
     }
 
-    protected function popularImageGroups(int $page): array
+    protected function popularImageGroups(int $page, int $limit = 10): array
     {
         $hotImages = ImageGroup::where('hot_order', '>=', 1)
             ->with(['tags', 'imagesLimit'])
             ->orderBy('hot_order')
-            ->offset($page * self::IMAGE_GROUP_PAGE_PER)
-            ->limit(self::IMAGE_GROUP_PAGE_PER)
+            ->offset($page * $limit)
+            ->limit($limit)
             ->get();
 
-        $remain = self::IMAGE_GROUP_PAGE_PER - $hotImages->count();
+        $remain = $limit - $hotImages->count();
         if ($remain == 0) {
             return $hotImages->toArray();
         }
@@ -203,16 +204,16 @@ class SearchService
         return \Hyperf\Collection\collect($result)->sortByDesc('total')->toArray();
     }
 
-    protected function popularVideos(int $page): array
+    protected function popularVideos(int $page, int $limit = 10): array
     {
         $hotVideos = Video::with('tags')
             ->where('hot_order', '>=', 1)
             ->orderBy('hot_order')
-            ->offset($page * self::IMAGE_GROUP_PAGE_PER)
-            ->limit(self::IMAGE_GROUP_PAGE_PER)
+            ->offset($page * $limit)
+            ->limit($limit)
             ->get();
 
-        $remain = self::VIDEO_PAGE_PER - $hotVideos->count();
+        $remain = $limit - $hotVideos->count();
         if ($remain == 0) {
             return $hotVideos->toArray();
         }
@@ -248,5 +249,14 @@ class SearchService
         }
 
         return $result;
+    }
+
+    protected function getPerLimit(string $type, int $limit) : int
+    {
+        return (int) match ($type) {
+            Video::class => floor($limit * self::VIDEO_PAGE_PER),
+            ImageGroup::class => floor($limit * self::IMAGE_GROUP_PAGE_PER),
+            Advertisement::class => floor($limit * self::ADVERTISEMENT_PAGE_PER),
+        };
     }
 }
