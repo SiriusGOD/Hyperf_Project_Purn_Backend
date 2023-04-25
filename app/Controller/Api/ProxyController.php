@@ -30,4 +30,23 @@ class ProxyController extends AbstractController
         return $this->success(['code' => $result['aff'] ]);
     }
 
+    // 我的收益
+    #[RequestMapping(methods: ['GET'], path: 'myIncome')]
+    public function myIncome(RequestInterface $request, ProxyService $proxyService)
+    {
+        $memberId = auth('jwt')->user()->getId();
+        $page = $request->input('page',1);
+        $result = $proxyService->myIncome($memberId ,$page);
+        return $this->success(['models' => $result ]);
+    }
+
+    // 我的代理成員/下線
+    #[RequestMapping(methods: ['GET'], path: 'downline')]
+    public function downline(RequestInterface $request, ProxyService $proxyService)
+    {
+        $memberId = auth('jwt')->user()->getId();
+        $page = $request->input('page',1);
+        $result = $proxyService->myIncome($memberId ,$page);
+        return $this->success(['models' => $result ]);
+    }
 }

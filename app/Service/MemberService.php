@@ -320,7 +320,7 @@ class MemberService extends BaseService
 
         return $this->createVerificationCode($memberId);
     }
-   
+    //用id找用戶 
     public function getMember($id)
     {
         $key = self::KEY.":".$id;

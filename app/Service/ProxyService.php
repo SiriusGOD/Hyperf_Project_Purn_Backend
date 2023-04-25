@@ -13,10 +13,10 @@ namespace App\Service;
 
 use App\Constants\ProxyCode;
 use App\Model\MemberInviteReceiveLog;
+use App\Model\MemberInviteLog;
 use App\Model\Member;
 use App\Model\Order;
 use App\Model\Product;
-use App\Model\MemberInviteLog;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
@@ -48,10 +48,10 @@ class ProxyService
         MemberInviteReceiveLog $memberInviteReceiveLog,
         MemberInviteStatService $memberInviteStatService
     ) {
-        $this->memberInviteLog = $memberInviteLog;
         $this->logger = $loggerFactory->get('reply');
         $this->redis =  $redis;
         $this->member = $member;
+        $this->memberInviteLog = $memberInviteLog;
         $this->memberInviteReceiveLog =$memberInviteReceiveLog;
         $this->memberInviteStatService = $memberInviteStatService;
     }
@@ -63,7 +63,6 @@ class ProxyService
     // public function tuiProxyDetail(Order $order, Member $fromMember)
     // {
     //    $flag = $this->memberInviteStatService->calcProxyZhi($order, $fromMember);
-
     //    co(function () use ($fromMember) {
     //        // 异步执行，错误了不影响整体
     //        // invite by 代理缓存
@@ -80,6 +79,32 @@ class ProxyService
     //    });
     //    return $flag;
   
+    //我的下線
+    public function downline(int $memberId ,int $page )
+    {
+      $limit = 10;
+      if($page==1){
+        $page = $$page-1;
+      }
+      return $this->memberInviteLog 
+                          ->where('member_id',$memberId)
+                          ->offset($page * $limit)
+                          ->limit($limit)
+                          ->get();
+    }
+    //我的收益
+    public function myIncome(int $memberId ,int $page )
+    {
+      $limit = 10;
+      if($page==1){
+        $page = $$page-1;
+      }
+      return $this->memberInviteReceiveLog
+                          ->where('member_id',$memberId)
+                          ->offset($page * $limit)
+                          ->limit($limit)
+                          ->get();
+    }
     //返傭
     public function rebate(Member $member ,Order $order, Product $product)
     {
@@ -107,16 +132,15 @@ class ProxyService
           $return["level"] = $userLevel;
           $return["rate"] = $uRate;
           $return["type"] = ($proxy->leverl == 1) ? 0 : 1 ;//0 直推 1 跨级收益
-          //返傭
 
           $wg->add(1);
+          //返傭
           co(function() use ($wg, $return, $memberInviteReceiveLog, $memberModel, $amount){
             $member = $memberModel->find((int)$return["member_id"]);
             $member->coins = $member->coins + $amount; 
             $member->save(); 
-
             $memberInviteReceiveLog->create($return);
-            usleep(100);
+            //usleep(100);
             $wg->done();
           });
         } 

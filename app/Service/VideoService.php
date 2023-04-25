@@ -127,6 +127,7 @@ class VideoService
     public function storeVideo($data)
     {
         try {
+            unset($data['_id']);
             if (! empty($data['id']) and Video::where('id', $data['id'])->exists()) {
                 $model = Video::find($data['id']);
                 // del tvideo'tag
