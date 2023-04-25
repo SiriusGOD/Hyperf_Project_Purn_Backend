@@ -127,16 +127,10 @@ class VideoService
     public function storeVideo($data)
     {
         try {
-            unset($data['_id']);
-            unset($data['mod']);
             unset($data['user_id']);
             unset($data['uuid']);
             unset($data['release_at']);
             unset($data['refreshed_at']);
-            unset($data['category_id']);
-            unset($data['source']);
-            unset($data['cover_full']);
-            unset($data['sign']);
             if (! empty($data['id']) and Video::where('id', $data['id'])->exists()) {
                 $model = Video::find($data['id']);
                 // del tvideo'tag
