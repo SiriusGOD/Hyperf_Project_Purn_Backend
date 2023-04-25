@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace HyperfTest\Cases;
 use App\Service\MemberService;
+use App\Model\Member;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
 
@@ -33,7 +34,7 @@ class ProxyApiTest extends HttpTestCase
         $this->memberService = make(MemberService::class);
     }
   
-    //註冊2級代理
+    //分享碼
     public function testMemberShare()
     {
         $member = $this->memberService->getProxy();
@@ -42,8 +43,18 @@ class ProxyApiTest extends HttpTestCase
         $data = $this->client->get('/api/proxy/share', [], [
             'Authorization' => 'Bearer ' . $token,
         ]);
-        print_r($data);
         $this->assertSame(200, (int)$data['code']);
     }
 
+    //我的收益
+    public function testMyIncome()
+    {
+        $member = Member::where('id' ,50)->first();
+        $token = auth()->login($member);
+        make(MemberService::class)->saveToken($member->id, $token);
+        $data = $this->client->get('/api/proxy/myIncome', [], [
+            'Authorization' => 'Bearer ' . $token,
+        ]);
+        $this->assertSame(200, (int)$data['code']);
+    }
 }
