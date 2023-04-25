@@ -430,10 +430,10 @@ class MemberService extends BaseService
         return $model->code;
     }
 
-    public function getMemberProductId($memberId, $type, $page): array
+    public function getMemberProductId($memberId, $type, $page, $pageSize=0): array
     {
         // 顯示幾筆
-        $step = Order::FRONTED_PAGE_PER;
+        $step = $pageSize ?? Order::FRONTED_PAGE_PER;
 
         $query = Order::join('order_details', 'order_details.order_id', 'orders.id')
                     ->join('products', 'products.id', 'order_details.product_id')
@@ -454,7 +454,7 @@ class MemberService extends BaseService
                 $query = $query -> whereIn('products.type', [Product::TYPE_LIST[0], Product::TYPE_LIST[1]]);
                 break;
         }
-        
+
         if(!empty($offset)){
             // $query = $query -> offset($offset);
             $query = $query -> offset(($page - 1) * $step);
@@ -472,8 +472,9 @@ class MemberService extends BaseService
                 if($value->type == Product::TYPE_LIST[0]){
                     // $image = ImageGroup::findOrFail($value->correspond_id);
                     $image = ImageGroup::leftJoin('images', 'image_groups.id', 'images.group_id')
-                            ->selectRaw('thumbnail, count(*) as count')
-                            ->groupBy('image_groups.id');
+                            ->selectRaw('image_groups.thumbnail, count(*) as count')
+                            ->groupBy('image_groups.id')
+                            ->first();
 
                     array_push($image_arr, array(
                         'product_id' => $value->id,

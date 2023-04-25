@@ -286,6 +286,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('pay-index'))
+                    <li class="nav-item">
+                        <a href="/admin/pay/index" class="nav-link {{$pay_active ?? ''}}">
+                            <i class="nav-icon fas fa-credit-card"></i>
+                            <p>
+                                {{trans('default.leftbox.pay') ?? '支付管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->
