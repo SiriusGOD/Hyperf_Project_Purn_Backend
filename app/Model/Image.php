@@ -11,22 +11,21 @@ declare(strict_types=1);
  */
 namespace App\Model;
 
-use Carbon\Carbon;
 use Hyperf\Database\Model\SoftDeletes;
 
 /**
  * @property int $id
  * @property int $user_id
  * @property string $title
- * @property string $title_thumbnail
  * @property string $thumbnail
  * @property string $url
- * @property int $like
- * @property int $group_id
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property Carbon $deleted_at
  * @property string $description
+ * @property int $group_id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property string $deleted_at
+ * @property int $sync_id
+ * @property User $user
  */
 class Image extends Model
 {
@@ -49,10 +48,28 @@ class Image extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'likes' => 'integer', 'group_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'group_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'sync_id' => 'integer'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getAdminBaseUrl()
+    {
+        if ($this->sync_id > 0) {
+            return env('IMAGE_GROUP_DECRYPT_URL');
+        }
+
+        return '';
+    }
+
+    public function getApiBaseUrl()
+    {
+        if ($this->sync_id > 0) {
+            return env('IMAGE_GROUP_ENCRYPT_URL');
+        }
+
+        return '';
     }
 }

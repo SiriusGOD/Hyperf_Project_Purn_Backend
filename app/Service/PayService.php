@@ -21,7 +21,7 @@ use Carbon\Carbon;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
-use App\Service\ProxyService;
+
 class PayService
 {
     public const CACHE_KEY = 'Pay';
@@ -31,9 +31,10 @@ class PayService
     protected Redis $redis;
 
     protected $proxyService;
+
     protected \Psr\Log\LoggerInterface $logger;
 
-    public function __construct(Redis $redis, LoggerFactory $loggerFactory,ProxyService $proxyService)
+    public function __construct(Redis $redis, LoggerFactory $loggerFactory, ProxyService $proxyService)
     {
         $this->redis = $redis;
         $this->logger = $loggerFactory->get('Pay');
@@ -143,8 +144,8 @@ class PayService
             unset($signdata['sign']);
             $sign = $this->make_sign_callback($signdata, env('PAY_SIGNKEY'));
             if ($sign != $data['sign']) {
-                //$this->logger->error('簽名驗證失敗', $data);
-                //return '簽名驗證失敗';
+                // $this->logger->error('簽名驗證失敗', $data);
+                // return '簽名驗證失敗';
             }
 
             // 查詢對應訂單
@@ -277,10 +278,10 @@ class PayService
                     } else {
                         // 儲值點數 現金點數
                         $coin = Coin::where('id', $product->correspond_id)->first();
-                        if($coin -> type == Coin::TYPE_LIST[0]){
+                        if ($coin->type == Coin::TYPE_LIST[0]) {
                             $member->coins = (float) $member->coins + $coin->points;
                         }
-                        if($coin -> type == Coin::TYPE_LIST[1]){
+                        if ($coin->type == Coin::TYPE_LIST[1]) {
                             $member->diamond_coins = (float) $member->diamond_coins + $coin->points;
                         }
                         $member->save();
@@ -289,11 +290,10 @@ class PayService
                 }
 
                 Db::commit();
-                //查看代理等級給返傭 
-                if($order->status == Order::ORDER_STATUS['finish']){  
-                  //返傭
-                  $this->proxyService->rebate($member ,$order, $product);
-                    
+                // 查看代理等級給返傭
+                if ($order->status == Order::ORDER_STATUS['finish']) {
+                    // 返傭
+                    $this->proxyService->rebate($member, $order, $product);
                 }
                 $this->logger->info('執行結束', $data);
             } catch (\Throwable $th) {

@@ -173,6 +173,18 @@ class TagService
         }
     }
 
+    public function getTagsByModelType(?string $type, ?int $id): array
+    {
+        if (empty($type) or empty($id)) {
+            return [];
+        }
+
+        return match ($type) {
+            ImageGroup::class => ImageGroup::find($id)->tags()->pluck('tags.id')->toArray(),
+            default => Video::find($id)->tags()->pluck('tags.id')->toArray(),
+        };
+    }
+
     protected function generatePopularTags(array $tags, array $popularTag)
     {
         $result = [];
@@ -185,17 +197,5 @@ class TagService
         }
 
         return array_merge($result, $popularTag);
-    }
-
-    public function getTagsByModelType(?string $type, ?int $id) : array
-    {
-        if (empty($type) or empty($id)) {
-            return [];
-        }
-
-        return match ($type) {
-            ImageGroup::class => ImageGroup::find($id)->tags()->pluck('tags.id')->toArray(),
-            default => Video::find($id)->tags()->pluck('tags.id')->toArray(),
-        };
     }
 }

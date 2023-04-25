@@ -23,11 +23,12 @@ namespace App\Model;
  * @property string $deleted_at
  * @property int $pay_type
  * @property int $hot_order
+ * @property int $sync_id
  * @property \Hyperf\Database\Model\Collection|Image[] $images
  * @property \Hyperf\Database\Model\Collection|Tag[] $tags
  * @property User $user
- * @property mixed $model_type
  * @property \Hyperf\Database\Model\Collection|Image[] $imagesLimit
+ * @property mixed $model_type
  */
 class ImageGroup extends Model
 {
@@ -56,7 +57,7 @@ class ImageGroup extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'pay_type' => 'integer', 'hot_order' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'pay_type' => 'integer', 'hot_order' => 'integer', 'sync_id' => 'integer'];
 
     protected array $appends = ['model_type'];
 
@@ -78,6 +79,24 @@ class ImageGroup extends Model
     public function imagesLimit()
     {
         return $this->hasMany(Image::class, 'group_id')->limit(self::DEFAULT_FREE_LIMIT);
+    }
+
+    public function getAdminBaseUrl()
+    {
+        if ($this->sync_id > 0) {
+            return env('IMAGE_GROUP_DECRYPT_URL');
+        }
+
+        return '';
+    }
+
+    public function getApiBaseUrl()
+    {
+        if ($this->sync_id > 0) {
+            return env('IMAGE_GROUP_ENCRYPT_URL');
+        }
+
+        return '';
     }
 
     protected function getModelTypeAttribute()

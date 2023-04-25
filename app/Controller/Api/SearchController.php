@@ -29,7 +29,7 @@ class SearchController extends AbstractController
     #[RequestMapping(methods: ['GET'], path: 'list')]
     public function list(ImageApiListRequest $request, SearchService $service, TagService $tagService)
     {
-        $tagIds = $request->input('tags',[]);
+        $tagIds = $request->input('tags', []);
         $page = (int) $request->input('page', 0);
         $limit = (int) $request->input('limit', 10);
         $modelTags = $tagService->getTagsByModelType($request->input('type'), (int) $request->input('id'));

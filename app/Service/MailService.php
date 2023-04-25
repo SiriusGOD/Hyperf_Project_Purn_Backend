@@ -22,6 +22,7 @@ class MailService
     {
         $this->log = $factory->get('email', 'email');
     }
+
     // TODO finish email
     public function send(string $address, string $subject, string $content): bool
     {

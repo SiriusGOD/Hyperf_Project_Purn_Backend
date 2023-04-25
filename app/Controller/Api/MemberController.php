@@ -182,7 +182,7 @@ class MemberController extends AbstractController
         $code = $service->getVerificationCode($member->id);
         $driver = $factory->get('default');
         $content = trans('email.verification.content', ['code' => $code]);
-        $driver->push(new EmailVerificationJob($request->input('email'),  trans('email.verification.subject'), $content));
+        $driver->push(new EmailVerificationJob($request->input('email'), trans('email.verification.subject'), $content));
 
         return $this->success();
     }
@@ -308,11 +308,11 @@ class MemberController extends AbstractController
         $type = $request->input('type', 'all');
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 0);
-        $result = $service -> getMemberProductId($id, $type, $offset, $limit);
+        $result = $service->getMemberProductId($id, $type, $offset, $limit);
         return $this->success(['models' => $result]);
     }
 
-    /**
+    /*
      * 獲取推薦列表
      */
     // #[RequestMapping(methods: ['GET'], path: 'getPersonalList')]
@@ -323,7 +323,7 @@ class MemberController extends AbstractController
     //     $offset = $request->input('offset', 0);
     //     $limit = $request->input('limit', 0);
     //     $result = $service->getPersonalList($user_id, $method, $offset, $limit);
-        
+
     //     return $this->success(['models' => $result]);
     // }
 }

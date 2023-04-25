@@ -89,7 +89,7 @@ class SearchService
     }
 
     // TODO 可以做快取去優化，但是需要增加非同步 task 去處理
-    public function popular(int $page, int $limit =10): array
+    public function popular(int $page, int $limit = 10): array
     {
         $advertisements = $this->advertisementService->getAdvertisementBySearch($page, $this->getPerLimit(Advertisement::class, $limit));
         $imageGroups = $this->popularImageGroups($page, $this->getPerLimit(ImageGroup::class, $limit));
@@ -127,11 +127,12 @@ class SearchService
     protected function generateImageGroups(array $result, array $imageGroups): array
     {
         foreach ($imageGroups as $imageGroup) {
-            $imageGroup['thumbnail'] = $this->baseUrl . $imageGroup['thumbnail'];
-            $imageGroup['url'] = $this->baseUrl . $imageGroup['url'];
+            $url = $this->getUrl($imageGroup);
+            $imageGroup['thumbnail'] = $url . $imageGroup['thumbnail'];
+            $imageGroup['url'] = $url . $imageGroup['url'];
             foreach ($imageGroup['images_limit'] as $key => $image) {
-                $imageGroup['images_limit'][$key]['thumbnail'] = $this->baseUrl . $imageGroup['images_limit'][$key]['thumbnail'];
-                $imageGroup['images_limit'][$key]['url'] = $this->baseUrl . $imageGroup['images_limit'][$key]['url'];
+                $imageGroup['images_limit'][$key]['thumbnail'] = $url . $imageGroup['images_limit'][$key]['thumbnail'];
+                $imageGroup['images_limit'][$key]['url'] = $url . $imageGroup['images_limit'][$key]['url'];
             }
 
             $result[] = $imageGroup;
@@ -251,12 +252,21 @@ class SearchService
         return $result;
     }
 
-    protected function getPerLimit(string $type, int $limit) : int
+    protected function getPerLimit(string $type, int $limit): int
     {
         return (int) match ($type) {
             Video::class => floor($limit * self::VIDEO_PAGE_PER),
             ImageGroup::class => floor($limit * self::IMAGE_GROUP_PAGE_PER),
             Advertisement::class => floor($limit * self::ADVERTISEMENT_PAGE_PER),
         };
+    }
+
+    protected function getUrl(array $model): string
+    {
+        if ($model['sync_id'] > 0) {
+            return env('IMAGE_GROUP_ENCRYPT_URL');
+        }
+
+        return $this->baseUrl;
     }
 }

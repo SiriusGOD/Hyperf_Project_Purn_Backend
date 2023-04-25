@@ -11,14 +11,12 @@ declare(strict_types=1);
  */
 namespace App\Model;
 
-use Carbon\Carbon;
-
 /**
  * @property int $id
  * @property string $description
  * @property string $param
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  */
 class SystemParam extends Model
 {
@@ -32,7 +30,7 @@ class SystemParam extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = [];
+    protected array $fillable = ['description', 'param'];
 
     /**
      * The attributes that should be cast to native types.

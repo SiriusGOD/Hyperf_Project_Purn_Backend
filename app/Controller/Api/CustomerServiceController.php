@@ -62,7 +62,7 @@ class CustomerServiceController extends AbstractController
         $path = '/api/customer_service/detail';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
-        $paginator = new Paginator($models,  $data['step'], $page);
+        $paginator = new Paginator($models, $data['step'], $page);
         $data['paginator'] = $paginator->toArray();
         return $this->success($data);
     }

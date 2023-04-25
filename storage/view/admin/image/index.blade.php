@@ -66,10 +66,10 @@
                                             <td>{{ $model->user->name }}</td>
                                             <td>{{ $model->title }}</td>
                                             <td>
-                                                <img src="{{ $model->thumbnail }}" alt="">
+                                                <img src="{{$model->getAdminBaseUrl() . $model->thumbnail }}" alt="">
                                             </td>
                                             <td>
-                                                <a href="{{ env('APP_HOST', '') . $model->url }}" target="_blank">link</a>
+                                                <a href="{{ $model->getAdminBaseUrl() . $model->url }}" target="_blank">link</a>
                                             </td>
                                             <td>{{ $model->like_count ?? 0 }}</td>
                                             <td>{{ $model->click_count ?? 0 }}</td>
