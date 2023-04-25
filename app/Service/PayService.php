@@ -277,7 +277,12 @@ class PayService
                     } else {
                         // 儲值點數 現金點數
                         $coin = Coin::where('id', $product->correspond_id)->first();
-                        $member->coins = (float) $member->coins + $coin->points;
+                        if($coin -> type == Coin::TYPE_LIST[0]){
+                            $member->coins = (float) $member->coins + $coin->points;
+                        }
+                        if($coin -> type == Coin::TYPE_LIST[1]){
+                            $member->diamond_coins = (float) $member->diamond_coins + $coin->points;
+                        }
                         $member->save();
                         var_dump('儲值現金點數成功');
                     }

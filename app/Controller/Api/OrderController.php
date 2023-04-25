@@ -83,7 +83,7 @@ class OrderController extends AbstractController
             case 'cash':
                 // 現金
                 // 確認商品是否為現金
-                if ($product['currency'] != Product::CURRENCY[0]) {
+                if ($product['currency'] == Product::CURRENCY[2]) {
                     return $this->error('該商品不能使用現金購買', ErrorCode::BAD_REQUEST);
                 }
                 // 生成支付鏈接(測試) -> 現金相關才需生成
