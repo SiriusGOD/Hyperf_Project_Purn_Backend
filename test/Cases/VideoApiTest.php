@@ -94,6 +94,8 @@ class VideoApiTest extends HttpTestCase
         $data['actors'] = $rand->getRandTagActor(8,"ACTOR");
         $data['title'] = $rand->getRandTitle();
         $vcount1 = $this->videoService->videoCount(); 
+        $str= '{"title":"\u8105\u8feb\u96c6\u56e3\u75f4\u6f22\u5e2b\u30ec\u25cb\u30d7 \u751f\u811a\u592a\u3082\u3082\u3092\u64ab\u3067\u56de\u3059\u6307\u5148\u2026\u5c3b\u306b\u64e6\u308a\u4ed8\u3051\u3089\u308c\u308b\u30c1\u25cb\u30dd\u2026\u6050\u6016\u3067\u811a\u3092\u30ac\u30af\u30ac\u30af\u3055\u305b\u62b5\u6297","_id":"15428_ymd","type":"1","mod":"1","category":"\u4e03\u5ea6","category_id":"143","p_id":"3510356","duration":"7215","source":"\/videos2\/600102281a4ba8ae332ea5603b510611\/600102281a4ba8ae332ea5603b510611.m3u8","cover_thumb":"\/upload\/xiao\/20230425\/2023042511210171330.jpg","cover_full":"\/upload\/xiao\/20230425\/2023042511210190648.jpg","actors":"","tags":"\u5de8\u4e73,\u7f8e\u817f","directors":"","coins":"0","uuid":"","release_at":"","created_at":"1682394073","sign":"f5502b83562c4e4d7856f4bf835eaec3"}';
+        $data = json_decode($str,true);
         $res = $this->client->post('/api/video/data', $data);
         $vcount2 = $this->videoService->videoCount(); 
         $this->assertSame($vcount1+1  , $vcount2);
