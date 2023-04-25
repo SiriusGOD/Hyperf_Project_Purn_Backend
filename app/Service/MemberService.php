@@ -104,8 +104,10 @@ class MemberService extends BaseService
         $model->account = $data['account'];
         $model->device = $data['device'];
         $model->register_ip = $data['register_ip'];
+        $model->aff = 0;
         $model->save();
-
+        $model->aff = md5((string)$model->id);
+        $model->save();
         self::afterRegister($model , $data);
         return $model;
     }
