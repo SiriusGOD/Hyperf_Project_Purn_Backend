@@ -310,7 +310,7 @@ class MemberController extends AbstractController
         $pageSize = $request->input('pageSize', 20);
         // $offset = $request->input('offset', 0);
         // $limit = $request->input('limit', 0);
-        $result = $service -> getMemberProductId($id, $type, $page, $pageSize);
+        $result = $service->getMemberProductId($id, $type, $page, $pageSize);
         return $this->success(['models' => $result]);
     }
 

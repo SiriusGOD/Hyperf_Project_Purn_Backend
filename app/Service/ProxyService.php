@@ -11,13 +11,13 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use Hyperf\DbConnection\Db;
 use App\Constants\ProxyCode;
-use App\Model\MemberInviteReceiveLog;
-use App\Model\MemberInviteLog;
 use App\Model\Member;
+use App\Model\MemberInviteLog;
+use App\Model\MemberInviteReceiveLog;
 use App\Model\Order;
 use App\Model\Product;
+use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
@@ -30,15 +30,22 @@ class ProxyService extends BaseService
 
     public const EXPIRE = 3600;
 
+    public const LIMIT = 10;
+
     protected $redis;
 
     protected $logger;
 
     protected $redeem;
+
     protected $member;
+
     protected $memberInviteStatService;
+
     protected $memberInviteLog;
+
     protected $memberRedeemVideoService;
+
     protected $memberInviteReceiveLog;
 
     public function __construct(
@@ -50,10 +57,10 @@ class ProxyService extends BaseService
         MemberInviteStatService $memberInviteStatService
     ) {
         $this->logger = $loggerFactory->get('reply');
-        $this->redis =  $redis;
+        $this->redis = $redis;
         $this->member = $member;
         $this->memberInviteLog = $memberInviteLog;
-        $this->memberInviteReceiveLog =$memberInviteReceiveLog;
+        $this->memberInviteReceiveLog = $memberInviteReceiveLog;
         $this->memberInviteStatService = $memberInviteStatService;
     }
 
@@ -79,116 +86,126 @@ class ProxyService extends BaseService
     //        }
     //    });
     //    return $flag;
-  
-    //我的下線
-    public function downline(int $memberId ,int $page )
+
+    // 我的下線
+    public function downline(int $memberId, int $page)
     {
-      $limit = 10;
-      $where["invited_by"] = $memberId; 
-      $model = $this->memberInviteLog->with(["inviter" =>function($query){
-        $query->select("id","name");
-      }])->with(["member" =>function($query){
-        $query->select("id","name");
-      }]);
-      return $this->list($model, $where, $page, $limit);
+        $limit = self::LIMIT;
+        $where['invited_by'] = $memberId;
+        $model = $this->memberInviteLog->with(['inviter' => function ($query) {
+            $query->select('id', 'name');
+        }])->with(['member' => function ($query) {
+            $query->select('id', 'name');
+        }]);
+        return $this->list($model, $where, $page, $limit);
     }
 
-    //我的收益
-    public function myIncome(int $memberId ,int $page )
+    // 我的收益
+    public function myIncome(int $memberId, int $page)
     {
-      $limit = 10;
-      $where["member_id"] = $memberId; 
-      $model = $this->memberInviteReceiveLog->with(["member" =>function($query){
-        $query->select("id","name");
-      }]);
-      return $this->list($model, $where, $page, $limit);
+        $limit = self::LIMIT;
+        $where['member_id'] = $memberId;
+        $model = $this->memberInviteReceiveLog->with(['member' => function ($query) {
+            $query->select('id', 'name');
+        }]);
+        return $this->list($model, $where, $page, $limit);
     }
-    //返傭
-    public function rebate(Member $member ,Order $order, Product $product)
-    {
-      Db::beginTransaction();
-      $wg = new \Hyperf\Utils\WaitGroup();
-      $memberInviteReceiveLog = $this->memberInviteReceiveLog;
-      $memberModel = $this->member;
-      //商品類型不是現金點數
-      //怕使用者 充了數馬上提出
-      try {
-          if ($product->type != Product::TYPE_LIST[1]) {
-              $money = $order->pay_amount;
-              //查看上層代理
-              $res = $this->memberInviteLog->where("member_id", $member->id)->get();
-              $rate = self::calculatePercentage($money);
-              foreach ($res as $proxy) {
-                  $userLevel = $proxy->level;
-                  $uRate = ProxyCode::LEVEL[$userLevel]['rate'];
-                  $amount = number_format($money * $uRate * $rate, 2);
-                  //print_r(['amount'=>$amount]);
-                  $return["member_id"] = $proxy->invited_by;
-                  $return["invite_by"] = 0;
-                  $return["order_sn"] = $order->order_number;
-                  $return["amount"] = $money;
-                  $return["reach_amount"] = $amount;
-                  $return["level"] = $userLevel;
-                  $return["rate"] = $uRate;
-                  $return["type"] = ($proxy->level == 1) ? 0 : 1; //0 直推 1 跨级收益
-                  $wg->add(1);
-                  //返傭
-                  co(function () use ($wg, $return, $memberInviteReceiveLog, $memberModel, $amount) {
-                      try {
-                          $member = $memberModel->find((int)$return["member_id"]);
-                          $member->coins = $member->coins + $amount;
-                          $member->save();
-                          $memberInviteReceiveLog->create($return);
-                          usleep(100);
-                          $wg->done();
-                      } catch (\Throwable $ex) {
-                          $this->logger->error($ex->getMessage());
-                          throw $ex;
-                      } finally {
-                          Db::rollBack();
-                      }
-                  });
-              }
-          }
-          $wg->wait();
-          Db::commit();
-      } catch (\Throwable $ex) {
-          $this->logger->error($ex->getMessage());
-          Db::rollBack();
-          return false;
-      }
-    }  
 
-    //分潤計算 
-    public function calculatePercentage($money) {
-      if ($money <=1000) {
-          return 0.1;
-      } elseif ($money <=2000) {
-          return 0.12;
-      } elseif ($money <= 5000) {
-          return 0.14;
-      } elseif ($money <= 10000) {
-          return 0.16;
-      } elseif ($money <= 20000) {
-          return 0.18;
-      } elseif ($money <= 40000) {
-          return 0.20;
-      } elseif ($money <= 70000) {
-          return 0.23;
-      } elseif ($money < 100000) {
-          return 0.26;
-      } else {
-          return 0.30;
-      }
+    // 返傭
+    public function rebate(Member $member, Order $order, Product $product)
+    {
+        Db::beginTransaction();
+        $wg = new \Hyperf\Utils\WaitGroup();
+        $memberInviteReceiveLog = $this->memberInviteReceiveLog;
+        $memberModel = $this->member;
+        // 商品類型不是現金點數
+        // 怕使用者 充了數馬上提出
+        try {
+            if ($product->type != Product::TYPE_LIST[1]) {
+                $money = $order->pay_amount;
+                // 查看上層代理
+                $res = $this->memberInviteLog->where('member_id', $member->id)->get();
+                $rate = self::calculatePercentage($money);
+                foreach ($res as $proxy) {
+                    $userLevel = $proxy->level;
+                    $uRate = ProxyCode::LEVEL[$userLevel]['rate'];
+                    $amount = number_format($money * $uRate * $rate, 2);
+                    // print_r(['amount'=>$amount]);
+                    $return['member_id'] = $proxy->invited_by;
+                    $return['invite_by'] = 0;
+                    $return['order_sn'] = $order->order_number;
+                    $return['amount'] = $money;
+                    $return['reach_amount'] = $amount;
+                    $return['level'] = $userLevel;
+                    $return['rate'] = $uRate;
+                    $return['type'] = ($proxy->level == 1) ? 0 : 1; // 0 直推 1 跨级收益
+                    $wg->add(1);
+                    // 返傭
+                    co(function () use ($wg, $return, $memberInviteReceiveLog, $memberModel, $amount) {
+                        try {
+                            $member = $memberModel->find((int) $return['member_id']);
+                            $member->coins = $member->coins + $amount;
+                            $member->save();
+                            $memberInviteReceiveLog->create($return);
+                            usleep(100);
+                            $wg->done();
+                        } catch (\Throwable $ex) {
+                            $this->logger->error($ex->getMessage());
+                            throw $ex;
+                        } finally {
+                            Db::rollBack();
+                        }
+                    });
+                }
+            }
+            $wg->wait();
+            Db::commit();
+        } catch (\Throwable $ex) {
+            $this->logger->error($ex->getMessage());
+            Db::rollBack();
+            return false;
+        }
     }
+
+    // 分潤計算
+    public function calculatePercentage($money)
+    {
+        if ($money <= 1000) {
+            return 0.1;
+        }
+        if ($money <= 2000) {
+            return 0.12;
+        }
+        if ($money <= 5000) {
+            return 0.14;
+        }
+        if ($money <= 10000) {
+            return 0.16;
+        }
+        if ($money <= 20000) {
+            return 0.18;
+        }
+        if ($money <= 40000) {
+            return 0.20;
+        }
+        if ($money <= 70000) {
+            return 0.23;
+        }
+        if ($money < 100000) {
+            return 0.26;
+        }
+        return 0.30;
+    }
+
     /**
-     *分潤計算 
-     * 返佣
-     */ 
-    public function returnRateMoney(float $money ,int $userLevel){
+     *分潤計算
+     * 返佣.
+     */
+    public function returnRateMoney(float $money, int $userLevel)
+    {
         $res = self::calculatePercentage($money);
         return $res * $money * ProxyCode::LEVEL[$userLevel]['rate'];
-    } 
+    }
 
     /*
      * 我的推广收入统计

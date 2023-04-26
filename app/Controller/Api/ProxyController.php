@@ -11,9 +11,11 @@ declare(strict_types=1);
  */
 namespace App\Controller\Api;
 
+use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Service\MemberService;
 use App\Service\ProxyService;
+use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -37,7 +39,12 @@ class ProxyController extends AbstractController
         $memberId = auth('jwt')->user()->getId();
         $page = $request->input('page', 1);
         $result = $proxyService->myIncome($memberId, $page);
-        return $this->success(['models' => $result]);
+        $data = [];
+        $data['models'] = $result;
+        $path = '/api/proxy/myIncome';
+        $simplePaginator = new SimplePaginator($page, ProxyService::LIMIT, $path);
+        $data = array_merge($data, $simplePaginator->render());
+        return $this->success($data);
     }
 
     // 我的代理成員/下線
@@ -47,6 +54,11 @@ class ProxyController extends AbstractController
         $memberId = auth('jwt')->user()->getId();
         $page = $request->input('page', 1);
         $result = $proxyService->downline($memberId, $page);
-        return $this->success(['models' => $result]);
+        $data = [];
+        $data['models'] = $result;
+        $path = '/api/proxy/downline';
+        $simplePaginator = new SimplePaginator($page, ProxyService::LIMIT, $path);
+        $data = array_merge($data, $simplePaginator->render());
+        return $this->success($data);
     }
 }

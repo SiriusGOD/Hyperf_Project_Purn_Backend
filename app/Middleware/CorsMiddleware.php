@@ -12,14 +12,14 @@ declare(strict_types=1);
 namespace App\Middleware;
 
 use Hyperf\Context\Context;
+use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Logger\LoggerFactory;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Rps;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\HttpServer\Contract\ResponseInterface;
 
 class CorsMiddleware implements MiddlewareInterface
 {
@@ -29,7 +29,9 @@ class CorsMiddleware implements MiddlewareInterface
      * @var LoggerFactory
      */
     protected $loggerFactory;
+
     protected $request;
+
     protected $response;
 
     public function __construct(RequestInterface $request, ContainerInterface $container, LoggerFactory $loggerFactory, ResponseInterface $response)
