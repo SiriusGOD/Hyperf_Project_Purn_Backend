@@ -16,6 +16,7 @@ use App\Request\ProductApiRequest;
 use App\Service\ProductService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
+use App\Util\SimplePaginator;
 
 #[Controller]
 class ProductController extends AbstractController
@@ -23,20 +24,20 @@ class ProductController extends AbstractController
     /**
      * 獲取上架中的商品列表.
      */
-    #[RequestMapping(methods: ['GET'], path: 'list')]
+    #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(ProductApiRequest $request, ProductService $service)
     {
-        $keyword = $request->input('keyword', '');
-        $offset = $request->input('offset', 0);
-        $limit = $request->input('limit', 0);
-        $result = $service->getListByKeyword($keyword, $offset, $limit);
+        // member coin diamond
+        $type = $request->input('type', 'member');
+        $result = $service->getListByType($type);
+
         return $this->success($result);
     }
 
     /**
      * 獲取上架中的商品數.
      */
-    #[RequestMapping(methods: ['GET'], path: 'count')]
+    #[RequestMapping(methods: ['POST'], path: 'count')]
     public function count(ProductApiRequest $request, ProductService $service)
     {
         $keyword = $request->input('keyword', '');

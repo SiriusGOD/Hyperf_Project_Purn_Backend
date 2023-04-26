@@ -13,9 +13,10 @@ namespace App\Service;
 
 use App\Model\Image;
 use App\Model\Pay;
+use App\Model\MemberLevel;
+use App\Model\Coin;
 use App\Model\Product;
 use App\Model\Tag;
-use App\Model\Video;
 use App\Model\PayCorrespond;
 use Carbon\Carbon;
 use Hyperf\Redis\Redis;
@@ -110,10 +111,10 @@ class ProductService
         }
     }
 
-    // 獲取商品列表
-    public function getListByKeyword($keyword, $offset, $limit)
+    // 獲取商品列表 (會員卡 點數 鑽石)
+    public function getListByType($type)
     {
-        $checkRedisKey = self::CACHE_KEY . ':' . $offset . ':' . $limit . ':' . $keyword;
+        $checkRedisKey = self::CACHE_KEY . ':' . $type;
 
         if ($this->redis->exists($checkRedisKey)) {
             $jsonResult = $this->redis->get($checkRedisKey);
@@ -121,73 +122,44 @@ class ProductService
         }
 
         $now = Carbon::now()->toDateTimeString();
-        if (! empty($keyword)) {
-            $tagIds = Tag::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
-        }
-        // image
-        $img_query = Product::join('images', 'products.correspond_id', 'images.id')
-            ->select('products.id', 'products.name', 'products.start_time', 'products.end_time', 'products.currency', 'products.selling_price', 'images.thumbnail', 'images.like', 'images.description')
-            ->where('products.type', '=', Image::class)
-            ->where('products.start_time', '<=', $now)
-            ->where('products.end_time', '>=', $now)
-            ->where('products.expire', Product::EXPIRE['no']);
 
-        if (! empty($tagIds)) {
-            $img_query = $img_query->leftjoin('tag_corresponds', 'images.id', 'tag_corresponds.correspond_id')
-                ->where('tag_corresponds.correspond_type', '=', Image::class)
-                ->whereIn('tag_corresponds.tag_id', $tagIds)
-                ->orwhere('products.name', 'like', '%' . $keyword . '%');
-        } elseif (! empty($keyword)) {
-            $img_query = $img_query->where('products.name', 'like', '%' . $keyword . '%');
-        }
-        if ($offset != 0) {
-            $img_query = $img_query->offset($offset);
-        }
-        if ($limit != 0) {
-            $img_query = $img_query->limit($limit);
-        }
-        $img_data = $img_query->get()->toArray();
-        foreach ($img_data as $key => $value) {
-            $img_data[$key]['selling_price'] = (float) $value['selling_price'];
-        }
-
-        // video
-        $video_query = Product::join('videos', 'products.correspond_id', 'videos.id')
-            ->select('products.id', 'products.name', 'products.start_time', 'products.end_time', 'products.currency', 'products.selling_price', 'videos.m3u8', 'videos.full_m3u8', 'videos.duration', 'videos.cover_thumb', 'videos.likes', 'videos.category')
-            ->where('products.type', '=', Video::class)
-            ->where('products.start_time', '<=', $now)
-            ->where('products.end_time', '>=', $now)
-            ->where('products.expire', Product::EXPIRE['no']);
-
-        if (! empty($tagIds)) {
-            $video_query = $video_query->leftjoin('tag_corresponds', 'videos.id', 'tag_corresponds.correspond_id')
-                ->where('tag_corresponds.correspond_type', '=', Video::class)
-                ->whereIn('tag_corresponds.tag_id', $tagIds)
-                ->orWhere('products.name', 'like', '%' . $keyword . '%');
-        } elseif (! empty($keyword)) {
-            $video_query = $video_query->where('products.name', 'like', '%' . $keyword . '%');
-        }
-        if ($offset != 0) {
-            $video_query = $video_query->offset($offset);
-        }
-        if ($limit != 0) {
-            $video_query = $video_query->limit($limit);
-        }
-        $video_data = $video_query->get()->toArray();
-
-        foreach ($video_data as $key => $value) {
-            $video_data[$key]['selling_price'] = (float) $value['selling_price'];
+        switch ($type) {
+            case 'member':
+                $query = MemberLevel::join('products', function ($join) {
+                            $join->on('member_levels.id', '=', 'products.correspond_id')
+                                ->where('products.type', Product::TYPE_LIST[2])
+                                ->where('expire', Product::EXPIRE['no']);
+                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, products.diamond_price, member_levels.type')->get()->toArray();
+                break;
+            case 'coin':
+                $query = Coin::join('products', function ($join) {
+                            $join->on('coins.id', '=', 'products.correspond_id')
+                                ->where('products.type', Product::TYPE_LIST[3])
+                                ->where('expire', Product::EXPIRE['no']);
+                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, products.diamond_price, coins.type')->where('coins.type', Coin::TYPE_LIST[0])->get()->toArray();
+                break;
+            case 'diamond':
+                $query = Coin::join('products', function ($join) {
+                            $join->on('coins.id', '=', 'products.correspond_id')
+                                ->where('products.type', Product::TYPE_LIST[3])
+                                ->where('expire', Product::EXPIRE['no']);
+                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, products.diamond_price, coins.type')->where('coins.type', Coin::TYPE_LIST[1])->get()->toArray();
+                break;
+            default:
+                $query = MemberLevel::join('products', function ($join) {
+                            $join->on('member_levels.id', '=', 'products.correspond_id')
+                                ->where('products.type', Product::TYPE_LIST[2])
+                                ->where('expire', Product::EXPIRE['no']);
+                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, products.diamond_price, member_levels.type')->get()->toArray();
+                break;
         }
 
-        $data = [
-            'image' => $img_data,
-            'video' => $video_data,
-        ];
-
-        $this->redis->set($checkRedisKey, json_encode($data));
-        $this->redis->expire($checkRedisKey, self::TTL_30_Min);
-
-        return $data;
+        // 撈取個商品的支付方式
+        foreach ($query as $key => $value) {
+            $pay_query = PayCorrespond::join('pays', 'pays.id', 'pay_corresponds.pay_id')->where('pays.expire', Pay::EXPIRE['no'])->where('pay_corresponds.product_id', $value['id'])->select('pays.id', 'pays.name', 'pays.pronoun')->get()->toArray();
+            $query[$key]['pay_method'] = $pay_query;
+        }
+        return $query;
     }
 
     // 獲取商品總數 (上架中的)
