@@ -14,11 +14,13 @@ namespace App\Middleware;
 use Hyperf\Context\Context;
 use Hyperf\Logger\LoggerFactory;
 use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ResponseInterface as Rps;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\HttpServer\Contract\ResponseInterface;
+
 class CorsMiddleware implements MiddlewareInterface
 {
     protected ContainerInterface $container;
@@ -38,7 +40,7 @@ class CorsMiddleware implements MiddlewareInterface
         $this->response = $response;
     }
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): Rps
     {
         // 寫入跨域請求日誌
         $this->logRequest($request);
