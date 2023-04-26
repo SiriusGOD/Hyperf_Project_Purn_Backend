@@ -17,6 +17,7 @@ use App\Model\SystemParam;
 use App\Model\Tag;
 use App\Service\ImageGroupService;
 use App\Service\TagService;
+use Hyperf\Crontab\Annotation\Crontab;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
