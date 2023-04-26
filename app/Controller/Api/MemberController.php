@@ -200,6 +200,7 @@ class MemberController extends AbstractController
 
         if (! empty($model)) {
             $member->status = Member::STATUS['VERIFIED'];
+            $member->email = $request->input('email') ?? $member->email;
             $member->save();
             $model->delete();
             return $this->success();

@@ -20,6 +20,7 @@ class RegisterVerificationRequest extends AuthApiBaseRequest
     {
         return [
             'code' => 'required|string',
+            'email' => 'email',
         ];
     }
 }
