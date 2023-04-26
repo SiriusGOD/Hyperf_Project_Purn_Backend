@@ -55,7 +55,7 @@ class ProxyOrderTest extends HttpTestCase
         $token = auth()->login($member);
         $order = Order::orderBy("id","desc")->first();
         make(MemberService::class)->saveToken($member->id, $token);
-        $string = '{"order_id":"'.$order->pay_order_id.'","third_id":"test_order_id_xgkxn3is","pay_money":"20","pay_time":"'.time().'","success" : "200","sign":""}';
+        $string = '{"order_id":"'.$order->pay_order_id.'","third_id":"test_order_id_xgkxn3is","pay_money":"'.$order->total_price.'","pay_time":"'.time().'","success":"200","sign":""}';
         $json = json_decode($string, true);
         print_r($json);
         $data = $this->client->post('/api/pay/notifyPayAction', $json ,

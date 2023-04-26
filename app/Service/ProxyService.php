@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use Hyperf\DbConnection\Db;
 use App\Constants\ProxyCode;
 use App\Model\MemberInviteReceiveLog;
 use App\Model\MemberInviteLog;
@@ -105,45 +106,57 @@ class ProxyService extends BaseService
     //返傭
     public function rebate(Member $member ,Order $order, Product $product)
     {
+      Db::beginTransaction();
       $wg = new \Hyperf\Utils\WaitGroup();
       $memberInviteReceiveLog = $this->memberInviteReceiveLog;
       $memberModel = $this->member;
       //商品類型不是現金點數
       //怕使用者 充了數馬上提出
-      if($product->type != Product::TYPE_LIST[1]){
-        $money = $order->pay_amount;
-        //查看上層代理
-        $res = $this->memberInviteLog->where("member_id", $member->id)->get();
-        $rate = self::calculatePercentage($money);
-        foreach($res as $proxy){
-          
-          $userLevel = $proxy->level; 
-          $uRate = ProxyCode::LEVEL[$userLevel]['rate'];
-          $amount = number_format($money * $uRate *  $rate ,2);
-          //print_r(['amount'=>$amount]);
-          $return["member_id"] = $proxy->invited_by;
-          $return["invite_by"] = 0;
-          $return["order_sn"] = $order->order_number;
-          $return["amount"] = number_format($money ,2);
-          $return["reach_amount"] = number_format($money ,2);
-          $return["level"] = $userLevel;
-          $return["rate"] = $uRate;
-          $return["type"] = ($proxy->leverl == 1) ? 0 : 1 ;//0 直推 1 跨级收益
-
-          $wg->add(1);
-          //返傭
-          co(function() use ($wg, $return, $memberInviteReceiveLog, $memberModel, $amount){
-            $member = $memberModel->find((int)$return["member_id"]);
-            $member->coins = $member->coins + $amount; 
-            $member->save(); 
-            $memberInviteReceiveLog->create($return);
-            //usleep(100);
-            $wg->done();
-          });
-        } 
+      try {
+          if ($product->type != Product::TYPE_LIST[1]) {
+              $money = $order->pay_amount;
+              //查看上層代理
+              $res = $this->memberInviteLog->where("member_id", $member->id)->get();
+              $rate = self::calculatePercentage($money);
+              foreach ($res as $proxy) {
+                  $userLevel = $proxy->level;
+                  $uRate = ProxyCode::LEVEL[$userLevel]['rate'];
+                  $amount = number_format($money * $uRate * $rate, 2);
+                  //print_r(['amount'=>$amount]);
+                  $return["member_id"] = $proxy->invited_by;
+                  $return["invite_by"] = 0;
+                  $return["order_sn"] = $order->order_number;
+                  $return["amount"] = $money;
+                  $return["reach_amount"] = $amount;
+                  $return["level"] = $userLevel;
+                  $return["rate"] = $uRate;
+                  $return["type"] = ($proxy->level == 1) ? 0 : 1; //0 直推 1 跨级收益
+                  $wg->add(1);
+                  //返傭
+                  co(function () use ($wg, $return, $memberInviteReceiveLog, $memberModel, $amount) {
+                      try {
+                          $member = $memberModel->find((int)$return["member_id"]);
+                          $member->coins = $member->coins + $amount;
+                          $member->save();
+                          $memberInviteReceiveLog->create($return);
+                          usleep(100);
+                          $wg->done();
+                      } catch (\Throwable $ex) {
+                          $this->logger->error($ex->getMessage());
+                          throw $ex;
+                      } finally {
+                          Db::rollBack();
+                      }
+                  });
+              }
+          }
+          $wg->wait();
+          Db::commit();
+      } catch (\Throwable $ex) {
+          $this->logger->error($ex->getMessage());
+          Db::rollBack();
+          return false;
       }
-      $wg->wait(); 
-
     }  
 
     //分潤計算 
