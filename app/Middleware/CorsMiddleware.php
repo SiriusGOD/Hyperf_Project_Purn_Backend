@@ -18,7 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-
+use Hyperf\HttpServer\Contract\RequestInterface;
 class CorsMiddleware implements MiddlewareInterface
 {
     protected ContainerInterface $container;
@@ -27,11 +27,15 @@ class CorsMiddleware implements MiddlewareInterface
      * @var LoggerFactory
      */
     protected $loggerFactory;
+    protected $request;
+    protected $response;
 
-    public function __construct(ContainerInterface $container, LoggerFactory $loggerFactory)
+    public function __construct(RequestInterface $request, ContainerInterface $container, LoggerFactory $loggerFactory, ResponseInterface $response)
     {
         $this->container = $container;
         $this->loggerFactory = $loggerFactory;
+        $this->request = $request;
+        $this->response = $response;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -55,6 +59,21 @@ class CorsMiddleware implements MiddlewareInterface
         }
 
         return $handler->handle($request);
+    }
+
+    public function handle($request, \Closure $next)
+    {
+        $dispatched = $request->getAttribute(Dispatched::class);
+        if ($dispatched->handler->callback === 'Hyperf\HttpServer\StaticServer::send') {
+            $headers = [
+                'Access-Control-Allow-Origin' => '*',
+                'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers' => 'Content-Type, Authorization, X-Requested-With',
+            ];
+            $this->response = $this->response->withHeaders($headers);
+        }
+        Context::set(ResponseInterface::class, $this->response);
+        return $next($request);
     }
 
     protected function logRequest(ServerRequestInterface $request)
