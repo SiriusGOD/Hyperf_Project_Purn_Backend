@@ -61,6 +61,8 @@ class SearchService
         $videoLimit = $limit - $imageGroupLimit;
 
         $imageGroups = $this->navigationSuggestImageGroups($suggest, $page, $limit);
+
+        return [];
     }
 
     protected function navigationSuggestImageGroups(array $suggest, int $page, int $limit) : array
