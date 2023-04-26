@@ -40,8 +40,6 @@ class SearchService
 
     public string $url;
 
-    public string $baseUrl;
-
     public function __construct(
         ImageGroupService $imageGroupService,
         VideoService $videoService,
@@ -52,7 +50,6 @@ class SearchService
         $this->videoService = $videoService;
         $this->advertisementService = $advertisementService;
         $this->url = $request->url();
-        $this->baseUrl = $this->getBaseUrl();
     }
 
     public function navigationSuggest(array $suggest, int $page, int $limit) : array
@@ -163,7 +160,7 @@ class SearchService
     protected function generateAdvertisements(array $result, array $advertisements): array
     {
         foreach ($advertisements as $advertisement) {
-            $advertisement['image_url'] = $this->baseUrl . $advertisement['image_url'];
+            $advertisement['image_url'] = $this->getBaseUrl() . $advertisement['image_url'];
             $result[] = $advertisement;
         }
 
@@ -339,7 +336,7 @@ class SearchService
             return env('IMAGE_GROUP_ENCRYPT_URL');
         }
 
-        return $this->baseUrl;
+        return $this->getBaseUrl();
     }
 
     protected function getAdvertisementsLimit(int $page, int $limit) : int
