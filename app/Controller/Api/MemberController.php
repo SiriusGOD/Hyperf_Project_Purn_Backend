@@ -170,13 +170,13 @@ class MemberController extends AbstractController
     }
 
     #[Middleware(TryLimitMiddleware::class)]
-    #[RequestMapping(methods: ['GET'], path: 'verification')]
+    #[RequestMapping(methods: ['POST'], path: 'verification')]
     public function sendVerification(SendVerificationRequest $request, MemberService $service, DriverFactory $factory)
     {
         if (auth()->check()) {
             $member = auth()->user();
         } else {
-            $member = $service->getUserFromAccount($request->input('uuid'));
+            $member = $service->getUserFromAccount($request->input('device_id'));
         }
 
         $code = $service->getVerificationCode($member->id);
@@ -211,7 +211,7 @@ class MemberController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'verification/reset_password_check')]
     public function checkResetPasswordVerificationCode(ResetPasswordVerificationRequest $request, MemberService $service)
     {
-        $member = $service->getUserFromAccount($request->input('uuid'));
+        $member = $service->getUserFromAccount($request->input('device_id'));
 
         if (empty($member)) {
             return $this->error(trans('validation.exists', ['attribute' => 'uuid']), 400);

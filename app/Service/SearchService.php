@@ -18,11 +18,17 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 
 class SearchService
 {
-    public const IMAGE_GROUP_PAGE_PER = 0.6;
+    public const NORMAL_IMAGE_GROUP_PERCENT = 0.35;
 
-    public const VIDEO_PAGE_PER = 0.3;
+    public const NORMAL_VIDEO_PERCENT = 0.35;
 
-    public const ADVERTISEMENT_PAGE_PER = 0.1;
+    public const HOT_ORDER_IMAGE_GROUP_PERCENT = 0.1;
+
+    public const HOT_ORDER_VIDEO_PERCENT = 0.1;
+
+    public const ADVERTISEMENT_PAGE_PER = 20;
+
+    public const OTHER_LIMIT = 1;
 
     public const POPULAR_CACHE_KEY = 'search:popular:';
 
@@ -47,6 +53,56 @@ class SearchService
         $this->advertisementService = $advertisementService;
         $this->url = $request->url();
         $this->baseUrl = $this->getBaseUrl();
+    }
+
+    public function navigationSuggest(array $suggest, int $page, int $limit) : array
+    {
+        $imageGroupLimit = floor($limit / 2);
+        $videoLimit = $limit - $imageGroupLimit;
+
+        $imageGroups = $this->navigationSuggestImageGroups($suggest, $page, $limit);
+    }
+
+    protected function navigationSuggestImageGroups(array $suggest, int $page, int $limit) : array
+    {
+        $hotOrderLimit = $this->getHotOrderPerLimit(ImageGroup::class, $limit);
+        $hotOrderModels = $this->imageGroupService->getImageGroupsByHotOrder($page, $hotOrderLimit);
+        $otherLimit = self::OTHER_LIMIT;
+        $suggestLimit = $limit - $hotOrderLimit - $otherLimit;
+        if($suggestLimit <= 0) {
+            return $hotOrderModels;
+        }
+        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit);
+        $remain = $suggestLimit - count($suggestModels);
+        if($remain >= 1) {
+            $otherLimit += $remain;
+        }
+
+        $models = $this->imageGroupService->getImageGroups(null, $page, $otherLimit)->toArray();
+
+        return array_merge($hotOrderModels, $suggestModels, $models);
+    }
+
+    protected function navigationSuggestVideos(array $suggest, int $page, int $limit) : array
+    {
+        $hotOrderLimit = $this->getHotOrderPerLimit(Video::class, $limit);
+        $hotOrderModels = $this->videoService->getVideosByHotOrder($page, $hotOrderLimit);
+        $otherLimit = self::OTHER_LIMIT;
+        $suggestLimit = $limit - $hotOrderLimit - $otherLimit;
+        if($suggestLimit <= 0) {
+            return $hotOrderModels;
+        }
+
+        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $limit);
+
+        $remain = $suggestLimit - count($suggestModels);
+        if($remain >= 1) {
+            $otherLimit += $remain;
+        }
+
+        $models = $this->videoService->getVideos(null, $page, $otherLimit)->toArray();
+
+        return array_merge($hotOrderModels, $suggestModels, $models);
     }
 
     public function search(?array $tagIds, int $page, int $limit): array
@@ -144,9 +200,10 @@ class SearchService
     protected function generateVideos(array $result, array $videos): array
     {
         foreach ($videos as $video) {
-            $video['cover_thumb'] = $this->baseUrl . $video['cover_thumb'];
-            $video['full_m3u8'] = $this->baseUrl . $video['full_m3u8'];
-            $video['m3u8'] = $this->baseUrl . $video['m3u8'];
+            $video['cover_thumb'] = 'https://new.cnzuqiu.mobi' . $video['cover_thumb'];
+            $video['full_m3u8'] = 'https://video.iwanna.tv' . $video['full_m3u8'];
+            $video['m3u8'] = 'https://video.iwanna.tv' . $video['m3u8'];
+            $video['source'] = 'https://video.iwanna.tv' . $video['source'];
 
             $result[] = $video;
         }
@@ -255,9 +312,17 @@ class SearchService
     protected function getPerLimit(string $type, int $limit): int
     {
         return (int) match ($type) {
-            Video::class => floor($limit * self::VIDEO_PAGE_PER),
-            ImageGroup::class => floor($limit * self::IMAGE_GROUP_PAGE_PER),
+            Video::class => floor($limit * self::NORMAL_VIDEO_PERCENT),
+            ImageGroup::class => floor($limit * self::NORMAL_IMAGE_GROUP_PERCENT),
             Advertisement::class => floor($limit * self::ADVERTISEMENT_PAGE_PER),
+        };
+    }
+
+    protected function getHotOrderPerLimit(string $type, int $limit): int
+    {
+        return (int) match ($type) {
+            Video::class => floor($limit * self::HOT_ORDER_VIDEO_PERCENT),
+            ImageGroup::class => floor($limit * self::HOT_ORDER_IMAGE_GROUP_PERCENT),
         };
     }
 
@@ -268,5 +333,17 @@ class SearchService
         }
 
         return $this->baseUrl;
+    }
+
+    protected function getAdvertisementsLimit(int $page, int $limit) : int
+    {
+        $last =  floor($limit * ($page - 1) / self::ADVERTISEMENT_PAGE_PER);
+        $now = floor($limit * $page / self::ADVERTISEMENT_PAGE_PER);
+
+        if ($now - $last > 0) {
+            return (int) ($now - $last);
+        }
+
+        return 0;
     }
 }

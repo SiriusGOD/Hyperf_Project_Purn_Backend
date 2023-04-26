@@ -27,7 +27,7 @@ class SendVerificationRequest extends FormRequest
     {
         return [
             'email' => 'required|string',
-            'uuid' => 'string',
+            'device_id' => 'string',
         ];
     }
 }

@@ -28,7 +28,6 @@ class ImageGroupService
 {
     public function storeImageGroup(array $data): ImageGroup
     {
-        $refresh = false;
         $model = ImageGroup::findOrNew($data['id']);
         $model->user_id = $data['user_id'];
         $model->title = $data['title'];
@@ -38,9 +37,6 @@ class ImageGroupService
         }
         $model->description = $data['description'];
         $model->pay_type = $data['pay_type'];
-        if ($model->hot_order != $data['hot_order']) {
-            $refresh = true;
-        }
         $model->hot_order = $data['hot_order'];
         $model->save();
 
@@ -198,5 +194,18 @@ class ImageGroupService
             ->where('products.correspond_id', $id)
             ->where('orders.status', Order::ORDER_STATUS['finish'])
             ->exists();
+    }
+
+    public function getImageGroupsByHotOrder(int $page, int $limit) : array
+    {
+        return ImageGroup::with([
+            'tags', 'imagesLimit',
+        ])
+        ->where('hot_order', '>=', 1)
+        ->offset($limit * $page)
+        ->limit($limit)
+        ->orderByDesc('hot_order')
+        ->get()
+        ->toArray();
     }
 }
