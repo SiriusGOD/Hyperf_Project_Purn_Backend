@@ -185,6 +185,15 @@ return [
         'end_time' => '結束時間',
         'start_time' => '開始時間',
     ],
+    // proxy
+    'proxy' => [
+        'title' => '代理',
+        'name' => '演員名',
+        'proxy1' => '1級代理',
+        'proxy2' => '2級代理',
+        'proxy3' => '3級代理',
+        'proxy4' => '4級代理',
+    ],
     // actor
     'actor' => [
         'insert' => '新增',
@@ -220,6 +229,7 @@ return [
         'activity' => '用戶日誌',
         'customer_service' => '客服系統',
         'pay' => '支付管理',
+        'proxy' => '代理管理',
     ],
     // -------------------------------------------------------------------
     // UserController

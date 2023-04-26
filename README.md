@@ -48,3 +48,9 @@ ex. php bin/hyperf.php swagger:gen -f json
 ### 前端套件
 
 https://adminlte.io/docs/3.2/dependencies.html
+
+### 前端套件
+
+資源中心 過來的m3u8 影片加上 
+
+https://video.iwanna.tv/
