@@ -179,7 +179,12 @@ class SearchService
             $port = 443;
         }
 
-        return env('TEST_IMG_URL', $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $port);
+        $result = $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $port;
+        if(empty(env("TEST_IMG_URL"))) {
+            return env("TEST_IMG_URL");
+        }
+
+        return $result;
     }
 
     protected function generateImageGroups(array $result, array $imageGroups): array
