@@ -58,16 +58,14 @@ class CustomerServiceController extends AbstractController
         $id = $request->input('id');
         $models = CustomerServiceDetail::where('customer_service_id', $id)
             ->with('user', 'member')
+            ->offset($page * CustomerServiceDetail::PAGE_PER)
+            ->limit(CustomerServiceDetail::PAGE_PER)
             ->get();
         $data = [];
         $data['models'] = $models;
-        $data['page'] = $page;
-        $data['step'] = CustomerServiceDetail::PAGE_PER;
         $path = '/api/customer_service/detail';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
-        $paginator = new Paginator($models, $data['step'], $page);
-        $data['paginator'] = $paginator->toArray();
+        $simplePaginator = new SimplePaginator($page, CustomerServiceDetail::PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 
