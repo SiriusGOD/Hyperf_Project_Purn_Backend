@@ -512,17 +512,6 @@ class MemberService extends BaseService
         return $data;
     }
 
-      protected function createVerificationCode(int $memberId): string
-      {
-          $model = new MemberVerification();
-          $model->member_id = $memberId;
-          $model->code = str_random();
-          $model->expired_at = Carbon::now()->addMinutes(self::EXPIRE_VERIFICATION_MINUTE)->toDateTimeString();
-          $model->save();
-
-          return $model->code;
-      }
-
       // 獲取個人推薦商品 (上架中的) (暫時遮掉)
       // public function getPersonalList($user_id, $method, $offset, $limit)
       // {
