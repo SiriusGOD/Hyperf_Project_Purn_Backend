@@ -18,6 +18,7 @@ use App\Model\Coin;
 use App\Model\Product;
 use App\Model\Tag;
 use App\Model\Video;
+use App\Model\Pay;
 use Carbon\Carbon;
 use Hyperf\Redis\Redis;
 
@@ -158,6 +159,8 @@ class ProductService
         foreach ($query as $key => $value) {
             $pay_query = PayCorrespond::join('pays', 'pays.id', 'pay_corresponds.pay_id')->where('pays.expire', Pay::EXPIRE['no'])->where('pay_corresponds.product_id', $value['id'])->select('pays.id', 'pays.name', 'pays.pronoun')->get()->toArray();
             $query[$key]['pay_method'] = $pay_query;
+            $query[$key]['selling_price'] = (double)$value['selling_price'];
+            $query[$key]['diamond_price'] = (int)$value['diamond_price'];
         }
         return $query;
     }
