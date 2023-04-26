@@ -33,6 +33,8 @@ class Order extends Model
 {
     public const PAGE_PER = 10;
 
+    public const FRONTED_PAGE_PER = 20;
+
     public const ORDER_STATUS = ['create' => 1, 'delete' => 11, 'finish' => 21];
 
     public const PAY_WAY_MAP_NEW = [0 => 'local', 1 => 'wechat', 2 => 'bankcard', 3 => 'alipay', 4 => 'ecny', 5 => 'visa', 6 => 'agent'];

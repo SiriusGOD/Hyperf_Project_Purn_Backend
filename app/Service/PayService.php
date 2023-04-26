@@ -17,6 +17,7 @@ use App\Model\Member;
 use App\Model\MemberLevel;
 use App\Model\Order;
 use App\Model\Product;
+use App\Model\Pay;
 use Carbon\Carbon;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
@@ -316,5 +317,18 @@ class PayService
         $string = http_build_query($array) . $signKey;
         $string = str_replace('amp;', '', $string);
         return md5($string);
+    }
+
+    public function store(array $params): void
+    {
+        $model = Pay::where('id', $params['id'])->first();
+        if (empty($model)) {
+            $model = new Pay();
+        }
+        $model->user_id = $params['user_id'];
+        $model->pronoun = $params['pronoun'];
+        $model->name = $params['name'];
+        $model->expire = $params['expire'];
+        $model->save();
     }
 }

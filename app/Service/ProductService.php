@@ -12,9 +12,11 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Image;
+use App\Model\Pay;
 use App\Model\Product;
 use App\Model\Tag;
 use App\Model\Video;
+use App\Model\PayCorrespond;
 use Carbon\Carbon;
 use Hyperf\Redis\Redis;
 
@@ -63,6 +65,39 @@ class ProductService
         $model->currency = $data['currency'];
         $model->selling_price = $data['selling_price'];
         $model->save();
+
+        if(!empty($data['pay_groups'])){
+            // 新增或更新支付方式
+            if(! PayCorrespond::where('product_id', $model->id)->whereNull('deleted_at')->exists()){
+                // 新增
+                foreach ($data['pay_groups'] as $key => $value) {
+                    $payment = new PayCorrespond();
+                    $payment->product_id = $model->id;
+                    $payment->pay_id = $value;
+                    $payment->save();
+                }
+            }else{
+                // 更新
+                // 撈出目前有設定的支付
+                $pays = PayCorrespond::where('product_id', $model->id)->whereNull('deleted_at')->get()->pluck('pay_id')->toArray();
+
+                // 比對要刪除的支付
+                $deletes = array_diff($pays, $data['pay_groups']);
+                foreach ($deletes as $key => $value) {
+                    $payment = PayCorrespond::where('product_id',  $model->id)->where('pay_id', $value)->first();
+                    $payment->delete();
+                }
+
+                // 比對要新增的支付
+                $adds = array_diff($data['pay_groups'], $pays);
+                foreach ($adds as $key => $value) {
+                    $payment = new PayCorrespond();
+                    $payment->product_id = $model->id;
+                    $payment->pay_id = $value;
+                    $payment->save();
+                }
+            }
+        }
     }
 
     // 新增radis大批匯入的商品ID

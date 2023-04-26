@@ -424,70 +424,93 @@ class MemberService extends BaseService
           }
       }
 
-      public function getMemberProductId($memberId, $type, $offset, $limit): array
-      {
-          $query = Order::join('order_details', 'order_details.order_id', 'orders.id')
-              ->join('products', 'products.id', 'order_details.product_id')
-              ->select('products.id', 'products.type', 'products.correspond_id', 'products.name', 'products.expire')
-              ->where('orders.user_id', $memberId)
-              ->where('orders.status', Order::ORDER_STATUS['finish']);
-          switch ($type) {
-              case 'all':
-                  $query = $query->whereIn('products.type', [Product::TYPE_LIST[0], Product::TYPE_LIST[1]]);
-                  break;
-              case 'image':
-                  $query = $query->where('products.type', Product::TYPE_LIST[0]);
-                  break;
-              case 'video':
-                  $query = $query->where('products.type', Product::TYPE_LIST[1]);
-                  break;
-              default:
-                  $query = $query->whereIn('products.type', [Product::TYPE_LIST[0], Product::TYPE_LIST[1]]);
-                  break;
-          }
+    protected function createVerificationCode(int $memberId): string
+    {
+        $model = new MemberVerification();
+        $model->member_id = $memberId;
+        $model->code = str_random();
+        $model->expired_at = Carbon::now()->addMinutes(self::EXPIRE_VERIFICATION_MINUTE)->toDateTimeString();
+        $model->save();
 
-          if (! empty($offset)) {
-              $query = $query->offset($offset);
-          }
-          if (! empty($limit)) {
-              $query = $query->limit($limit);
-          }
-          $model = $query->get();
-          if (! empty($model)) {
-              $image_arr = [];
-              $video_arr = [];
-              // ActorClassification::findOrFail($id);
-              foreach ($model as $key => $value) {
-                  if ($value->type == Product::TYPE_LIST[0]) {
-                      $image = ImageGroup::findOrFail($value->correspond_id);
-                      array_push($image_arr, [
-                          'product_id' => $value->id,
-                          'source_id' => $value->correspond_id,
-                          'name' => $value->name,
-                          'thumbnail' => env('IMG_DOMAIN') . $image->thumbnail ?? '',
-                          'expire' => $value->expire,
-                      ]);
-                  }
+        return $model->code;
+    }
 
-                  if ($value->type == Product::TYPE_LIST[1]) {
-                      $video = Video::findOrFail($value->correspond_id);
-                      array_push($video_arr, [
-                          'product_id' => $value->id,
-                          'source_id' => $value->correspond_id,
-                          'name' => $value->name,
-                          'thumbnail' => env('IMG_DOMAIN') . $video->cover_thumb ?? '',
-                          'expire' => $value->expire,
-                      ]);
-                  }
-              }
-              $data['image'] = $image_arr;
-              $data['video'] = $video_arr;
-          } else {
-              $data['image'] = [];
-              $data['video'] = [];
-          }
-          return $data;
-      }
+    public function getMemberProductId($memberId, $type, $page, $pageSize=0): array
+    {
+        // 顯示幾筆
+        $step = $pageSize ?? Order::FRONTED_PAGE_PER;
+
+        $query = Order::join('order_details', 'order_details.order_id', 'orders.id')
+                    ->join('products', 'products.id', 'order_details.product_id')
+                    ->select('products.id', 'products.type', 'products.correspond_id', 'products.name', 'products.expire')
+                    ->where('orders.user_id', $memberId)
+                    ->where('orders.status', Order::ORDER_STATUS['finish']);
+        switch ($type) {
+            case 'all':
+                $query = $query -> whereIn('products.type', [Product::TYPE_LIST[0], Product::TYPE_LIST[1]]);
+                break;
+            case 'image':
+                $query = $query -> where('products.type', Product::TYPE_LIST[0]);
+                break;
+            case 'video':
+                $query = $query -> where('products.type', Product::TYPE_LIST[1]);
+                break;
+            default:
+                $query = $query -> whereIn('products.type', [Product::TYPE_LIST[0], Product::TYPE_LIST[1]]);
+                break;
+        }
+
+        if(!empty($offset)){
+            // $query = $query -> offset($offset);
+            $query = $query -> offset(($page - 1) * $step);
+        }
+        if(!empty($limit)){
+            // $query = $query -> limit($limit);
+            $query = $query -> limit($step);
+        }
+        $model = $query -> get();
+        if(!empty($model)){
+            $image_arr = [];
+            $video_arr = [];
+            // ActorClassification::findOrFail($id);
+            foreach ($model as $key => $value) {
+                if($value->type == Product::TYPE_LIST[0]){
+                    // $image = ImageGroup::findOrFail($value->correspond_id);
+                    $image = ImageGroup::leftJoin('images', 'image_groups.id', 'images.group_id')
+                            ->selectRaw('image_groups.thumbnail, count(*) as count')
+                            ->groupBy('image_groups.id')
+                            ->first();
+
+                    array_push($image_arr, array(
+                        'product_id' => $value->id,
+                        'source_id' => $value->correspond_id, 
+                        'name' => $value->name, 
+                        'thumbnail' => env('IMG_DOMAIN') . $image->thumbnail ?? '',
+                        'expire' =>  $value->expire,
+                        'num' =>  $image->count ?? 0,
+                    ));
+                }
+                
+                if($value->type == Product::TYPE_LIST[1]){
+                    $video = Video::findOrFail($value->correspond_id);
+                    array_push($video_arr, array(
+                        'product_id' => $value->id,
+                        'source_id' => $value->correspond_id,
+                        'name' => $value->name, 
+                        'thumbnail' => env('IMG_DOMAIN') . $video->cover_thumb ?? '', 
+                        'expire' =>  $value->expire,
+                        'duration' =>  $value->duration ?? 0,
+                    ));
+                }
+            }
+            $data['image'] = $image_arr;
+            $data['video'] = $video_arr;
+        }else{
+            $data['image'] = [];
+            $data['video'] = [];
+        }  
+        return $data;
+    }
 
       protected function createVerificationCode(int $memberId): string
       {

@@ -306,9 +306,11 @@ class MemberController extends AbstractController
     {
         $id = auth('jwt')->user()->getId();
         $type = $request->input('type', 'all');
-        $offset = $request->input('offset', 0);
-        $limit = $request->input('limit', 0);
-        $result = $service->getMemberProductId($id, $type, $offset, $limit);
+        $page = $request->input('page', 0);
+        $pageSize = $request->input('pageSize', 20);
+        // $offset = $request->input('offset', 0);
+        // $limit = $request->input('limit', 0);
+        $result = $service -> getMemberProductId($id, $type, $page, $pageSize);
         return $this->success(['models' => $result]);
     }
 
