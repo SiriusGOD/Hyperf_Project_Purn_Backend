@@ -32,7 +32,7 @@ class ValidationException extends ValidationExceptionHandler
         $errors = $throwable->validator->errors()->all();
         $url = request()->getUri()->getPath();
         if (str_contains($url, 'api')) {
-            return $this->response->json(['code' => ApiCode::BAD_REQUEST, 'msg' => $errors]);
+            return $this->response->json(['code' => ApiCode::BAD_REQUEST, 'msg' => $errors[0] ?? '']);
         }
         return $this->render->render('error', ['errors' => $errors]);
     }
