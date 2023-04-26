@@ -177,7 +177,7 @@ class SearchService
         }
 
         $result = $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $port;
-        if(empty(env("TEST_IMG_URL"))) {
+        if(!empty(env("TEST_IMG_URL"))) {
             return env("TEST_IMG_URL");
         }
 
