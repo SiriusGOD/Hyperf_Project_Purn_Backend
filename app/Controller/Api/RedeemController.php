@@ -13,9 +13,12 @@ namespace App\Controller\Api;
 
 use App\Constants\ErrorCode;
 use App\Controller\AbstractController;
+use App\Model\MemberRedeem;
+use App\Model\MemberRedeemVideo;
 use App\Service\MemberRedeemService;
 use App\Service\MemberRedeemVideoService;
 use App\Service\RedeemService;
+use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -43,7 +46,12 @@ class RedeemController extends AbstractController
         $memberId = auth('jwt')->user()->getId();
         $page = $request->input('page', 0);
         $result = $memberRedeemService->getRedeemList($memberId, $page);
-        return $this->success(['models' => $result]);
+        $data = [];
+        $data['models'] = $result;
+        $path = '/api/redeem/videoRedeemList';
+        $simplePaginator = new SimplePaginator($page, MemberRedeem::PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
+        return $this->success($data);
     }
 
     // 使用者己兌換列表
@@ -53,6 +61,11 @@ class RedeemController extends AbstractController
         $memberId = auth('jwt')->user()->getId();
         $page = $request->input('page', 0);
         $result = $memberRedeemServiceVideo->usedRedeemList($memberId, $page);
-        return $this->success(['models' => $result]);
+        $data = [];
+        $data['models'] = $result;
+        $path = '/api/redeem/usedVideoRedeemList';
+        $simplePaginator = new SimplePaginator($page, MemberRedeemVideo::PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
+        return $this->success($data);
     }
 }

@@ -34,6 +34,7 @@ class AdvertisementController extends AbstractController
             $item['image_url'] = $host . $item['image_url'];
             $result[] = $item;
         }
+
         return $this->success($result);
     }
 }

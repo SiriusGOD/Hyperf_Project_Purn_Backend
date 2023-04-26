@@ -21,6 +21,7 @@ use App\Service\ClickService;
 use App\Service\ImageService;
 use App\Service\LikeService;
 use App\Service\SuggestService;
+use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 
@@ -35,11 +36,9 @@ class ImageController extends AbstractController
         $models = $service->getImages($tagIds, $page);
         $data = [];
         $data['models'] = $models;
-        $data['page'] = $page;
-        $data['step'] = Image::PAGE_PER;
-        $path = '/api/image/list';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        $path = '/api/customer_service/list';
+        $simplePaginator = new SimplePaginator($page, Image::PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 
@@ -51,11 +50,9 @@ class ImageController extends AbstractController
         $models = $service->getImagesByKeyword($keyword, $page);
         $data = [];
         $data['models'] = $models;
-        $data['page'] = $page;
-        $data['step'] = Image::PAGE_PER;
         $path = '/api/image/search';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        $simplePaginator = new SimplePaginator($page, Image::PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 
@@ -68,11 +65,9 @@ class ImageController extends AbstractController
         $models = $service->getImagesBySuggest($suggest, $page);
         $data = [];
         $data['models'] = $models;
-        $data['page'] = $page;
-        $data['step'] = Image::PAGE_PER;
         $path = '/api/image/suggest';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        $simplePaginator = new SimplePaginator($page, Image::PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 

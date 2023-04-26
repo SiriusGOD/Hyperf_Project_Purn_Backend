@@ -14,6 +14,7 @@ namespace App\Controller\Api;
 use App\Controller\AbstractController;
 use App\Request\ProductApiRequest;
 use App\Service\ProductService;
+use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 
@@ -30,7 +31,12 @@ class ProductController extends AbstractController
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 0);
         $result = $service->getListByKeyword($keyword, $offset, $limit);
-        return $this->success($result);
+        $data = [];
+        $data['models'] = $result;
+        $path = '/api/product/list';
+        $simplePaginator = new SimplePaginator($offset, $limit, $path);
+        $data = array_merge($data, $simplePaginator->render());
+        return $this->success($data);
     }
 
     /**

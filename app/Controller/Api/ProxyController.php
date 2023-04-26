@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
-use App\Service\ProxyService;
 use App\Service\MemberService;
+use App\Service\ProxyService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -27,7 +27,7 @@ class ProxyController extends AbstractController
     {
         $memberId = auth('jwt')->user()->getId();
         $result = $memberService->getMember($memberId);
-        return $this->success(['code' => $result['aff'] ]);
+        return $this->success(['code' => $result['aff']]);
     }
 
     // 我的收益
@@ -35,9 +35,9 @@ class ProxyController extends AbstractController
     public function myIncome(RequestInterface $request, ProxyService $proxyService)
     {
         $memberId = auth('jwt')->user()->getId();
-        $page = $request->input('page',1);
-        $result = $proxyService->myIncome($memberId ,$page);
-        return $this->success(['models' => $result ]);
+        $page = $request->input('page', 1);
+        $result = $proxyService->myIncome($memberId, $page);
+        return $this->success(['models' => $result]);
     }
 
     // 我的代理成員/下線
@@ -45,8 +45,8 @@ class ProxyController extends AbstractController
     public function downline(RequestInterface $request, ProxyService $proxyService)
     {
         $memberId = auth('jwt')->user()->getId();
-        $page = $request->input('page',1);
-        $result = $proxyService->downline($memberId ,$page);
-        return $this->success(['models' => $result ]);
+        $page = $request->input('page', 1);
+        $result = $proxyService->downline($memberId, $page);
+        return $this->success(['models' => $result]);
     }
 }

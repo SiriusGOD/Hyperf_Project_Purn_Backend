@@ -127,10 +127,8 @@ class VideoService
     public function storeVideo($data)
     {
         try {
-            unset($data['user_id']);
-            unset($data['uuid']);
-            unset($data['release_at']);
-            unset($data['refreshed_at']);
+            unset($data['user_id'], $data['uuid'], $data['release_at'], $data['refreshed_at']);
+
             if (! empty($data['id']) and Video::where('id', $data['id'])->exists()) {
                 $model = Video::find($data['id']);
                 // del tvideo'tag
@@ -143,9 +141,9 @@ class VideoService
             foreach ($data as $key => $val) {
                 $model->{$key} = "{$val}";
             }
-            $model->description ="";
-            $model->refreshed_at =date("Y-m-d H:i:s");
-            $model->user_id =1;
+            $model->description = '';
+            $model->refreshed_at = date('Y-m-d H:i:s');
+            $model->user_id = 1;
             $model->save();
             return $model;
         } catch (\Exception $e) {

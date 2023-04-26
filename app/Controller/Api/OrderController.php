@@ -23,6 +23,7 @@ use App\Model\Video;
 use App\Request\OrderRequest;
 use App\Service\OrderService;
 use App\Service\PayService;
+use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 
@@ -40,7 +41,12 @@ class OrderController extends AbstractController
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 0);
         $result = $service->searchUserOrder($user_id, $order_status, $offset, $limit);
-        return $this->success(['models' => $result]);
+        $data = [];
+        $data['models'] = $result;
+        $path = '/api/order/list';
+        $simplePaginator = new SimplePaginator($offset, $limit, $path);
+        $data = array_merge($data, $simplePaginator->render());
+        return $this->success($data);
     }
 
     /**

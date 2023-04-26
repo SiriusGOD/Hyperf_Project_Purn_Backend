@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
-use App\Model\Image;
+use App\Model\CustomerService;
 use App\Model\ImageGroup;
 use App\Request\ClickRequest;
 use App\Request\GetPayImageRequest;
@@ -24,6 +24,7 @@ use App\Service\ImageGroupService;
 use App\Service\ImageService;
 use App\Service\LikeService;
 use App\Service\SuggestService;
+use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 
@@ -38,11 +39,9 @@ class ImageGroupController extends AbstractController
         $models = $service->getImageGroups($tagIds, $page);
         $data = [];
         $data['models'] = $models;
-        $data['page'] = $page;
-        $data['step'] = ImageGroup::PAGE_PER;
         $path = '/api/image_group/list';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        $simplePaginator = new SimplePaginator($page, CustomerService::PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 
@@ -54,11 +53,9 @@ class ImageGroupController extends AbstractController
         $models = $service->getImageGroupsByKeyword($keyword, $page);
         $data = [];
         $data['models'] = $models;
-        $data['page'] = $page;
-        $data['step'] = Image::PAGE_PER;
         $path = '/api/image_group/search';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        $simplePaginator = new SimplePaginator($page, CustomerService::PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 
@@ -71,11 +68,9 @@ class ImageGroupController extends AbstractController
         $models = $service->getImageGroupsBySuggest($suggest, $page);
         $data = [];
         $data['models'] = $models;
-        $data['page'] = $page;
-        $data['step'] = Image::PAGE_PER;
         $path = '/api/image_group/suggest';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        $simplePaginator = new SimplePaginator($page, CustomerService::PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 

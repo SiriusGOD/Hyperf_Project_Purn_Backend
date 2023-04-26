@@ -16,6 +16,7 @@ use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Request\StageVideoRequest;
 use App\Service\StageVideoService;
+use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -108,15 +109,9 @@ class StageVideoController extends AbstractController
         $page = (int) $request->input('page', 0);
         $data = [];
         $data['models'] = $stageVideoService->myStageCateList($userId, $page);
-        $data['page'] = $page;
-        $data['step'] = Constants::DEFAULT_PAGE_PER;
-        $path = '/api/stage_video/stageCateList';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        if ($page == 1) {
-            $data['prev'] = '';
-        } else {
-            $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
-        }
+        $path = '/api/stage_video/keyword';
+        $simplePaginator = new SimplePaginator($page, Constants::DEFAULT_PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 }

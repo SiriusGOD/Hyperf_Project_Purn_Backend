@@ -19,6 +19,7 @@ use App\Request\CustomerServiceCreateRequest;
 use App\Request\CustomerServiceDetailRequest;
 use App\Service\CustomerServiceService;
 use App\Service\ImageService;
+use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
@@ -36,14 +37,17 @@ class CustomerServiceController extends AbstractController
     {
         $page = (int) $request->input('page', 0);
         $memberId = auth()->user()->getId();
-        $models = CustomerService::where('member_id', $memberId)->orderByDesc('id')->get()->toArray();
+        $models = CustomerService::where('member_id', $memberId)
+            ->offset($page * CustomerService::PAGE_PER)
+            ->limit(CustomerService::PAGE_PER)
+            ->orderByDesc('id')
+            ->get()
+            ->toArray();
         $data = [];
         $data['models'] = $models;
-        $data['page'] = $page;
-        $data['step'] = CustomerService::PAGE_PER;
         $path = '/api/customer_service/list';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        $simplePaginator = new SimplePaginator($page, CustomerService::PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 

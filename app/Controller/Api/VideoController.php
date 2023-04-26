@@ -25,11 +25,12 @@ use App\Service\RedeemService;
 use App\Service\SuggestService;
 use App\Service\TagService;
 use App\Service\VideoService;
+use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use Psr\Log\LoggerInterface;
 use Hyperf\Logger\LoggerFactory;
+use Psr\Log\LoggerInterface;
 
 #[Controller]
 class VideoController extends AbstractController
@@ -41,7 +42,7 @@ class VideoController extends AbstractController
         // 第一個引數對應日誌的 name, 第二個引數對應 config/autoload/logger.php 內的 key
         $this->logger = $loggerFactory->get('log', 'default');
     }
-  
+
     #[RequestMapping(methods: ['GET'], path: 'list')]
     public function list(RequestInterface $request, VideoService $service)
     {
@@ -49,15 +50,9 @@ class VideoController extends AbstractController
         $page = (int) $request->input('page', 0);
         $data = [];
         $data['models'] = $service->getVideos($tagIds, $page);
-        $data['page'] = $page;
-        $data['step'] = Constants::DEFAULT_PAGE_PER;
-        $path = '/api/image/list';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        if ($page == 1) {
-            $data['prev'] = '';
-        } else {
-            $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
-        }
+        $path = '/api/video/list';
+        $simplePaginator = new SimplePaginator($page, Video::PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 
@@ -91,9 +86,9 @@ class VideoController extends AbstractController
     public function data(RequestInterface $request, VideoService $VideoService, TagService $tagService, ActorService $actorService)
     {
         $data = $request->all();
-        if(env("APP_ENV")=="develop"){ 
-          $this->logger->info(json_encode($data));
-        } 
+        if (env('APP_ENV') == 'develop') {
+            $this->logger->info(json_encode($data));
+        }
         $video = $VideoService->storeVideo($data);
         $tagService->videoCorrespondTag($data, $video->id);
         $actorService->videoCorrespondActor($data, $video->id);
@@ -119,12 +114,11 @@ class VideoController extends AbstractController
             $result = ['message' => 'title 不得為空'];
             return $this->success($result);
         }
+        $data = [];
         $data['models'] = $service->searchVideo($title, $compare, $length, $page);
-        $data['page'] = $page;
-        $data['step'] = Constants::DEFAULT_PAGE_PER;
         $path = '/api/video/search';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        $simplePaginator = new SimplePaginator($page, Video::PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 
@@ -137,11 +131,9 @@ class VideoController extends AbstractController
         $models = $service->getVideosBySuggest($suggest, $page);
         $data = [];
         $data['models'] = $models;
-        $data['page'] = $page;
-        $data['step'] = Constants::DEFAULT_PAGE_PER;
         $path = '/api/video/suggest';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        $simplePaginator = new SimplePaginator($page, Constants::DEFAULT_PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 

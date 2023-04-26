@@ -15,6 +15,7 @@ use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Service\ActorClassificationService;
 use App\Service\ActorService;
+use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -26,12 +27,11 @@ class ActorController extends AbstractController
     public function list(RequestInterface $request, ActorService $service)
     {
         $page = (int) $request->input('page', 0);
+        $data = [];
         $data['models'] = $service->getActors($page);
-        $data['page'] = $page;
-        $data['step'] = Constants::DEFAULT_PAGE_PER;
         $path = '/api/actor/list';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . (($page == 0 ? 1 : $page) - 1);
+        $simplePaginator = new SimplePaginator($page, Constants::DEFAULT_PAGE_PER, $path);
+        $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
 
