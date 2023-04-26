@@ -12,8 +12,7 @@ class AdvertisementTest extends HttpTestCase
 {
     public function testList()
     {
-        $data = $this->client->get('/api/advertisement/list');
-
+        $data = $this->client->post('/api/advertisement/list');
         $this->assertSame(200, (int)$data['code']);
     }
 }

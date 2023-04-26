@@ -20,7 +20,7 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 #[Controller]
 class AdvertisementController extends AbstractController
 {
-    #[RequestMapping(methods: ['GET'], path: 'list')]
+    #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, AdvertisementService $service)
     {
         $data = $service->getAdvertisements();
@@ -29,7 +29,11 @@ class AdvertisementController extends AbstractController
         $url = $request->url();
         $urlArr = parse_url($url);
         $port = $urlArr['port'] ?? '80';
-        $host = $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $port;
+        if(!empty(env("TEST_IMG_URL"))){
+            $host = env("TEST_IMG_URL");
+        }else{
+            $host = $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $port;
+        }
         foreach ($data as $item) {
             $item['image_url'] = $host . $item['image_url'];
             $result[] = $item;
