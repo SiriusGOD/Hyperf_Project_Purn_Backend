@@ -161,6 +161,9 @@ class ProductService
             $query[$key]['pay_method'] = $pay_query;
             $query[$key]['selling_price'] = (double)$value['selling_price'];
         }
+        $this->redis->set($checkRedisKey, json_encode($query));
+        $this->redis->expire($checkRedisKey, self::TTL_30_Min);
+
         return $query;
     }
 

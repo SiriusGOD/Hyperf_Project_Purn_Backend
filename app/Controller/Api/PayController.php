@@ -31,4 +31,11 @@ class PayController extends AbstractController
         $result = $service->notifyPayAction($data);
         return $this->success(['models' => $result]);
     }
+
+    #[RequestMapping(methods: ['POST'], path: 'list')]
+    public function list(RequestInterface $request, PayService $service)
+    {
+        $result = $service->getPayList();
+        return $this->success(['models' => $result]);
+    }
 }
