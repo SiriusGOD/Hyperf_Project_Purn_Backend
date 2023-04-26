@@ -33,17 +33,17 @@ class OrderController extends AbstractController
     /**
      * 獲取使用者訂單.
      */
-    #[RequestMapping(methods: ['GET'], path: 'list')]
+    #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(OrderRequest $request, OrderService $service)
     {
         $user_id = auth('jwt')->user()->getId();
         $order_status = $request->input('order_status');
-        $offset = $request->input('offset', 0);
+        $offset = $request->input('page', 0);
         $limit = $request->input('limit', 0);
         $result = $service->searchUserOrder($user_id, $order_status, $offset, $limit);
         $data = [];
         $data['models'] = $result;
-        $path = '/api/order/list';
+        $path = '/api/order/list?';
         $simplePaginator = new SimplePaginator($offset, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
@@ -307,7 +307,7 @@ class OrderController extends AbstractController
     /**
      * 查詢訂單資訊.
      */
-    #[RequestMapping(methods: ['GET'], path: 'search')]
+    #[RequestMapping(methods: ['POST'], path: 'search')]
     public function search(OrderRequest $request, OrderService $service)
     {
         $order_num = $request->input('order_num');

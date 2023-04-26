@@ -130,28 +130,28 @@ class ProductService
                             $join->on('member_levels.id', '=', 'products.correspond_id')
                                 ->where('products.type', Product::TYPE_LIST[2])
                                 ->where('expire', Product::EXPIRE['no']);
-                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, products.diamond_price, member_levels.type')->get()->toArray();
+                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, member_levels.type')->get()->toArray();
                 break;
             case 'coin':
                 $query = Coin::join('products', function ($join) {
                             $join->on('coins.id', '=', 'products.correspond_id')
                                 ->where('products.type', Product::TYPE_LIST[3])
                                 ->where('expire', Product::EXPIRE['no']);
-                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, products.diamond_price, coins.type')->where('coins.type', Coin::TYPE_LIST[0])->get()->toArray();
+                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, coins.type')->where('coins.type', Coin::TYPE_LIST[0])->get()->toArray();
                 break;
             case 'diamond':
                 $query = Coin::join('products', function ($join) {
                             $join->on('coins.id', '=', 'products.correspond_id')
                                 ->where('products.type', Product::TYPE_LIST[3])
                                 ->where('expire', Product::EXPIRE['no']);
-                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, products.diamond_price, coins.type')->where('coins.type', Coin::TYPE_LIST[1])->get()->toArray();
+                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, coins.type')->where('coins.type', Coin::TYPE_LIST[1])->get()->toArray();
                 break;
             default:
                 $query = MemberLevel::join('products', function ($join) {
                             $join->on('member_levels.id', '=', 'products.correspond_id')
                                 ->where('products.type', Product::TYPE_LIST[2])
                                 ->where('expire', Product::EXPIRE['no']);
-                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, products.diamond_price, member_levels.type')->get()->toArray();
+                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, member_levels.type')->get()->toArray();
                 break;
         }
 
@@ -160,7 +160,6 @@ class ProductService
             $pay_query = PayCorrespond::join('pays', 'pays.id', 'pay_corresponds.pay_id')->where('pays.expire', Pay::EXPIRE['no'])->where('pay_corresponds.product_id', $value['id'])->select('pays.id', 'pays.name', 'pays.pronoun')->get()->toArray();
             $query[$key]['pay_method'] = $pay_query;
             $query[$key]['selling_price'] = (double)$value['selling_price'];
-            $query[$key]['diamond_price'] = (int)$value['diamond_price'];
         }
         return $query;
     }

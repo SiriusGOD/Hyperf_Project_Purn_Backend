@@ -17,7 +17,6 @@ use App\Service\ProductService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
-use App\Util\SimplePaginator;
 
 #[Controller]
 class ProductController extends AbstractController
