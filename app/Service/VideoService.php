@@ -132,8 +132,8 @@ class VideoService
         try {
             unset($data['user_id'], $data['uuid'], $data['release_at'], $data['refreshed_at']);
 
-            if (! empty($data['id']) and Video::where('id', $data['id'])->exists()) {
-                $model = Video::find($data['id']);
+            if (! empty($data['_id']) and Video::where('_id', $data['_id'])->exists()) {
+                $model = Video::where('_id',$data['_id'])->first();
                 // del tvideo'tag
                 self::delVideoCorrespond($model->id, 'tags');
                 // del video'actor
