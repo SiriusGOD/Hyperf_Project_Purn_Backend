@@ -24,7 +24,6 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\Paginator\Paginator;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Qbhy\HyperfAuth\AuthMiddleware;
 

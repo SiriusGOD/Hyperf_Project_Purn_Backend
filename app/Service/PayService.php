@@ -332,7 +332,6 @@ class PayService
         $model->save();
     }
 
-    //
     public function getPayList()
     {
         return Pay::select('id', 'name', 'pronoun')->where('expire', Pay::EXPIRE['no'])->get();

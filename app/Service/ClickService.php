@@ -77,6 +77,20 @@ class ClickService
         return $models->toArray();
     }
 
+    public function calculatePopularClickByTypeIds(string $type, array $typeIds): array
+    {
+        $endDate = Carbon::now();
+        $startDate = $endDate->copy()->subDays(self::POPULAR_DAY);
+        $models = Click::where('type', $type)
+            ->whereBetween('statistical_date', [$startDate->toDateString(), $endDate->toDateString()])
+            ->groupBy(['type_id'])
+            ->select(DB::raw('type_id as id'), Db::raw('sum(count) as total'))
+            ->whereIn('type_id', $typeIds)
+            ->get();
+
+        return $models->toArray();
+    }
+
     public function getPopularClick(string $type)
     {
         if ($this->redis->exists(self::POPULAR_CLICK_CACHE_KEY . $type)) {

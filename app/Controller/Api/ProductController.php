@@ -14,7 +14,6 @@ namespace App\Controller\Api;
 use App\Controller\AbstractController;
 use App\Request\ProductApiRequest;
 use App\Service\ProductService;
-use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 

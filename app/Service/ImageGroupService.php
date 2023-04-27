@@ -185,6 +185,19 @@ class ImageGroupService
         return $this->orderCheck($id, $memberId);
     }
 
+    public function getImageGroupsByHotOrder(int $page, int $limit): array
+    {
+        return ImageGroup::with([
+            'tags', 'imagesLimit',
+        ])
+            ->where('hot_order', '>=', 1)
+            ->offset($limit * $page)
+            ->limit($limit)
+            ->orderByDesc('hot_order')
+            ->get()
+            ->toArray();
+    }
+
     protected function orderCheck(int $id, int $memberId): bool
     {
         return Order::where('orders.user_id', $memberId)
@@ -194,18 +207,5 @@ class ImageGroupService
             ->where('products.correspond_id', $id)
             ->where('orders.status', Order::ORDER_STATUS['finish'])
             ->exists();
-    }
-
-    public function getImageGroupsByHotOrder(int $page, int $limit) : array
-    {
-        return ImageGroup::with([
-            'tags', 'imagesLimit',
-        ])
-        ->where('hot_order', '>=', 1)
-        ->offset($limit * $page)
-        ->limit($limit)
-        ->orderByDesc('hot_order')
-        ->get()
-        ->toArray();
     }
 }

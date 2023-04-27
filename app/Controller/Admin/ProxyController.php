@@ -13,8 +13,6 @@ namespace App\Controller\Admin;
 
 use App\Constants\Constants;
 use App\Controller\AbstractController;
-use App\Model\Redeem;
-use App\Model\User;
 use App\Service\MemberService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -55,5 +53,4 @@ class ProxyController extends AbstractController
         $data['proxy_active'] = 'active';
         return $this->render->render('admin.proxy.index', $data);
     }
-
 }
