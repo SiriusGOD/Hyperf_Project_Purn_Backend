@@ -125,7 +125,7 @@ class OrderController extends AbstractController
                     // 如果是購買鑽石點數，則會員鑽石點數需要更新
                     if ($product['type'] == Product::TYPE_LIST[3]) {
                         $coin = Coin::where('id', $product['correspond_id'])->first();
-                        $member->diamond_coins = (float) $member->diamond_coins + $coin->points;
+                        $member->diamond_coins = (float) $member->diamond_coins + $coin->points + $coin->bonus;
                     }
                     // 如果是會員卡(則要做會員升等)
                     if($product['type'] == Product::TYPE_LIST[2]){

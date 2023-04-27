@@ -314,7 +314,7 @@ class PayService
                         }
                         // 儲值點數 鑽石點數
                         if ($coin->type == Coin::TYPE_LIST[1]) {
-                            $member->diamond_coins = (float) $member->diamond_coins + $coin->points;
+                            $member->diamond_coins = (float) $member->diamond_coins + $coin->points + $coin->bonus;
                         }
                         $member->save();
                         var_dump('儲值現金點數成功');
