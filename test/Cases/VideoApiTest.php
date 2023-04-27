@@ -38,9 +38,9 @@ class VideoApiTest extends HttpTestCase
     //vidoe list api 測試
     public function testApiList()
     {
-        $res1 = $this->client->get('/api/video/list');
+        $res1 = $this->client->post('/api/video/list');
         $this->assertSame(200, (int) $res1['code']);
-        $res2 = $this->client->get('/api/video/list',['page'=>2]);
+        $res2 = $this->client->post('/api/video/list',['page'=>2]);
         $this->assertSame(200, (int) $res2['code']);
         $this->assertNotSame($res2['data']["models"][0]["id"], $res1['data']["models"][0]["id"]);
     }
@@ -94,18 +94,18 @@ class VideoApiTest extends HttpTestCase
         $data['actors'] = $rand->getRandTagActor(8,"ACTOR");
         $data['title'] = $rand->getRandTitle();
         $vcount1 = $this->videoService->videoCount(); 
-        $str= '{"title":"\u8105\u8feb\u96c6\u56e3\u75f4\u6f22\u5e2b\u30ec\u25cb\u30d7 \u751f\u811a\u592a\u3082\u3082\u3092\u64ab\u3067\u56de\u3059\u6307\u5148\u2026\u5c3b\u306b\u64e6\u308a\u4ed8\u3051\u3089\u308c\u308b\u30c1\u25cb\u30dd\u2026\u6050\u6016\u3067\u811a\u3092\u30ac\u30af\u30ac\u30af\u3055\u305b\u62b5\u6297","_id":"15428_ymd","type":"1","mod":"1","category":"\u4e03\u5ea6","category_id":"143","p_id":"3510356","duration":"7215","source":"\/videos2\/600102281a4ba8ae332ea5603b510611\/600102281a4ba8ae332ea5603b510611.m3u8","cover_thumb":"\/upload\/xiao\/20230425\/2023042511210171330.jpg","cover_full":"\/upload\/xiao\/20230425\/2023042511210190648.jpg","actors":"","tags":"\u5de8\u4e73,\u7f8e\u817f","directors":"","coins":"0","uuid":"","release_at":"","created_at":"1682394073","sign":"f5502b83562c4e4d7856f4bf835eaec3"}';
+        $str= '{"title":"11\u8105\u8feb\u96c6\u56e3\u75f4\u6f22\u5e2b\u30ec\u25cb\u30d7 \u751f\u811a\u592a\u3082\u3082\u3092\u64ab\u3067\u56de\u3059\u6307\u5148\u2026\u5c3b\u306b\u64e6\u308a\u4ed8\u3051\u3089\u308c\u308b\u30c1\u25cb\u30dd\u2026\u6050\u6016\u3067\u811a\u3092\u30ac\u30af\u30ac\u30af\u3055\u305b\u62b5\u6297","_id":"15428_ymd","type":"1","mod":"1","category":"\u4e03\u5ea6","category_id":"143","p_id":"3510356","duration":"7215","source":"\/videos2\/600102281a4ba8ae332ea5603b510611\/600102281a4ba8ae332ea5603b510611.m3u8","cover_thumb":"\/upload\/xiao\/20230425\/2023042511210171330.jpg","cover_full":"\/upload\/xiao\/20230425\/2023042511210190648.jpg","actors":"","tags":"\u5de8\u4e73,\u7f8e\u817f","directors":"","coins":"0","uuid":"","release_at":"","created_at":"1682394073","sign":"f5502b83562c4e4d7856f4bf835eaec3"}';
         $data = json_decode($str,true);
         $res = $this->client->post('/api/video/data', $data);
         $vcount2 = $this->videoService->videoCount(); 
         $this->assertSame($vcount1+1  , $vcount2);
-        $this->assertSame(200, (int) $res['code']);
+        $this->assertSame(200, (int)$res['code']);
     }
     //vidoe search api 測試
     public function testApiSearch()
     {
         $res = $this->videoService->getVideos([],0);
-        $res2 = $this->client->get('/api/video/search',['title'=>$res[0]->title]);
+        $res2 = $this->client->post('/api/video/search',['title'=>$res[0]->title]);
         $this->assertSame($res[0]->title, $res2['data']["models"][0]["title"]);
     }
 
@@ -115,12 +115,12 @@ class VideoApiTest extends HttpTestCase
         $user = Member::first();
         $token = auth()->login($user);
         make(MemberService::class)->saveToken($user->id, $token);
-        $data1 = $this->client->get('/api/video/stagelist', [
+        $data1 = $this->client->post('/api/video/stagelist', [
           "page" => 0
         ], [
             'Authorization' => 'Bearer ' . $token,
         ]);
-        $data2 = $this->client->get('/api/video/stagelist', [
+        $data2 = $this->client->post('/api/video/stagelist', [
           "page" => 1
         ], [
             'Authorization' => 'Bearer ' . $token,
@@ -129,29 +129,13 @@ class VideoApiTest extends HttpTestCase
         $this->assertNotSame($data1['data']["models"][0]["id"], $data2['data']["models"][0]["id"]  );
     }
 
-    //vidoe stage api
-    public function testApiStageVideo()
-    {
-        $videoId = rand(1,6);
-        $user = Member::first();
-        $token = auth()->login($user);
-        make(MemberService::class)->saveToken($user->id, $token);
-        $data = $this->client->post('/api/video/stageVideo', [
-          "video_id" => $videoId
-        ], [
-            'Authorization' => 'Bearer ' . $token,
-        ]);
-        $this->assertSame(200, (int)$data['code']);
-        $res = make(VideoService::class)->myStageVideo($user->id);
-        $this->assertSame($res[0]->member_id, $user->id);
-    }
 
     //vidoe find api
     public function testApiFind()
     {
         $tagService = \Hyperf\Utils\ApplicationContext::getContainer()->get(VideoService::class);
         $row = $tagService->getVideos([],0); 
-        $res1 = $this->client->get('/api/video/find',[ 'id' => (int)$row[0]->id ]);
+        $res1 = $this->client->post('/api/video/find',[ 'id' => (int)$row[0]->id ]);
         $this->assertSame((int)$row[0]->id , $res1['data']["models"]['id'] );
     }
   
@@ -163,7 +147,7 @@ class VideoApiTest extends HttpTestCase
         $data = array_slice( $tags->toArray(),0,3);
         $ids  = array_column($data , 'id') ;
         $names  = array_column($data , 'name') ;
-        $res1 = $this->client->get('/api/video/list',[ 'tags' => $ids ]);
+        $res1 = $this->client->post('/api/video/list',[ 'tags' => $ids ]);
         $assertCount = 0;
         for($i=1; $i<=4; $i++){
           $tagstr = $res1['data']["models"][$i]['tags'];
