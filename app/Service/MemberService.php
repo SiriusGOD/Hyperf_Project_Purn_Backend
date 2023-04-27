@@ -241,7 +241,7 @@ class MemberService extends BaseService
       public function getList($page, $pagePer)
       {
           // 撈取 遊客 註冊未驗證 註冊已驗證 會員
-          return Member::select("*")->where('status', '<=', 2)->offset(($page - 1) * $pagePer)->limit($pagePer)->orderBy("id","desc")->get();
+          return Member::select('*')->where('status', '<=', 2)->offset(($page - 1) * $pagePer)->limit($pagePer)->orderBy('id', 'desc')->get();
       }
 
       // 使用者列表

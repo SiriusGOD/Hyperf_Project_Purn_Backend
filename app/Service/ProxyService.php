@@ -33,12 +33,19 @@ class ProxyService extends BaseService
     public const LIMIT = 10;
 
     protected $redis;
+
     protected $logger;
+
     protected $redeem;
+
     protected $member;
+
     protected $memberInviteReceiveLog;
+
     protected $memberInviteStatService;
+
     protected $memberInviteLog;
+
     protected $memberRedeemVideoService;
 
     public function __construct(
@@ -79,41 +86,38 @@ class ProxyService extends BaseService
     //        }
     //    });
     //    return $flag;
-    //計算層級代理有多少收益
+    // 計算層級代理有多少收益
     public function calcLevelInCome(int $memberId, int $invited_by, int $level)
-    { 
-        $page =1;
+    {
+        $page = 1;
         $limit = self::LIMIT;
-        $where['member_id'] =  $memberId;
-        $where['invite_by'] = $invited_by; 
-        $where['level'] = $level; 
+        $where['member_id'] = $memberId;
+        $where['invite_by'] = $invited_by;
+        $where['level'] = $level;
         $model = $this->memberInviteReceiveLog;
         $res = $this->list($model, $where, $page, $limit);
         $sumAry = $res->toArray();
-        if($res->count()>0){
-          $sum = array_reduce($sumAry, function($carry, $item) {
-              return $carry + $item['reach_amount'];
-          }, 0);
-          return $sum;
-        }else{ 
-          return false;
+        if ($res->count() > 0) {
+            return array_reduce($sumAry, function ($carry, $item) {
+                return $carry + $item['reach_amount'];
+            }, 0);
         }
+        return false;
     }
 
     // 我的下線by level
     public function calcLevel(int $memberId, int $level)
     {
-        $page =1;
+        $page = 1;
         $limit = self::LIMIT;
         $where['member_id'] = $memberId;
         $where['level'] = $level;
         $model = $this->memberInviteLog;
         $res = $this->list($model, $where, $page, $limit);
-        if($res->count()>0){
-            return self::calcLevelInCome($res[0]->invited_by,$res[0]->member_id ,$level);
-        }else{
-            return false;
+        if ($res->count() > 0) {
+            return self::calcLevelInCome($res[0]->invited_by, $res[0]->member_id, $level);
         }
+        return false;
     }
 
     // 我的下線
@@ -150,43 +154,43 @@ class ProxyService extends BaseService
         // 商品類型不是現金點數
         // 怕使用者 充了數馬上提出
         try {
-            //if ($product->type != Product::TYPE_LIST[1]) {
-                $money = $order->pay_amount;
-                // 查看上層代理
-                $res = $this->memberInviteLog->where('member_id', $member->id)->get();
-                $rate = self::calculatePercentage($money);
-                foreach ($res as $proxy) {
-                    $userLevel = $proxy->level;
-                    $uRate = ProxyCode::LEVEL[$userLevel]['rate'];
-                    $amount = number_format($money * $uRate * $rate, 2);
-                    // print_r(['amount'=>$amount]);
-                    $return['member_id'] = $proxy->invited_by;
-                    $return['invite_by'] = $proxy->member_id;
-                    $return['order_sn'] = $order->order_number;
-                    $return['amount'] = $money;
-                    $return['reach_amount'] = $amount;
-                    $return['level'] = $userLevel;
-                    $return['rate'] = $uRate;
-                    $return['type'] = ($proxy->level == 1) ? 0 : 1; // 0 直推 1 跨级收益
-                    $wg->add(1);
-                    // 返傭
-                    co(function () use ($wg, $return, $memberInviteReceiveLog, $memberModel, $amount) {
-                        try {
-                            $member = $memberModel->find((int) $return['member_id']);
-                            $member->coins = $member->coins + $amount;
-                            $member->save();
-                            $memberInviteReceiveLog->create($return);
-                            usleep(100);
-                            $wg->done();
-                        } catch (\Throwable $ex) {
-                            $this->logger->error($ex->getMessage());
-                            throw $ex;
-                        } finally {
-                            Db::rollBack();
-                        }
-                    });
-                }
-            //}
+            // if ($product->type != Product::TYPE_LIST[1]) {
+            $money = $order->pay_amount;
+            // 查看上層代理
+            $res = $this->memberInviteLog->where('member_id', $member->id)->get();
+            $rate = self::calculatePercentage($money);
+            foreach ($res as $proxy) {
+                $userLevel = $proxy->level;
+                $uRate = ProxyCode::LEVEL[$userLevel]['rate'];
+                $amount = number_format($money * $uRate * $rate, 2);
+                // print_r(['amount'=>$amount]);
+                $return['member_id'] = $proxy->invited_by;
+                $return['invite_by'] = $proxy->member_id;
+                $return['order_sn'] = $order->order_number;
+                $return['amount'] = $money;
+                $return['reach_amount'] = $amount;
+                $return['level'] = $userLevel;
+                $return['rate'] = $uRate;
+                $return['type'] = ($proxy->level == 1) ? 0 : 1; // 0 直推 1 跨级收益
+                $wg->add(1);
+                // 返傭
+                co(function () use ($wg, $return, $memberInviteReceiveLog, $memberModel, $amount) {
+                    try {
+                        $member = $memberModel->find((int) $return['member_id']);
+                        $member->coins = $member->coins + $amount;
+                        $member->save();
+                        $memberInviteReceiveLog->create($return);
+                        usleep(100);
+                        $wg->done();
+                    } catch (\Throwable $ex) {
+                        $this->logger->error($ex->getMessage());
+                        throw $ex;
+                    } finally {
+                        Db::rollBack();
+                    }
+                });
+            }
+            // }
             $wg->wait();
             Db::commit();
         } catch (\Throwable $ex) {

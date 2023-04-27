@@ -11,17 +11,17 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\BuyMemberLevel;
 use App\Model\Member;
 use App\Model\MemberLevel;
-use App\Model\BuyMemberLevel;
-use App\Model\Pay;
 use App\Model\Order;
 use App\Model\OrderDetail;
+use App\Model\Pay;
 use App\Model\Product;
+use Carbon\Carbon;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
-use Carbon\Carbon;
 
 class OrderService
 {
@@ -112,10 +112,10 @@ class OrderService
         // $product = Product::find($prod_id)->toArray();
         $product = $arr['product'];
         // 撈取支付方式
-        if($arr['payment_type'] == 0){
+        if ($arr['payment_type'] == 0) {
             $pay_way['pronoun'] = Order::PAY_WAY_MAP_NEW[$arr['payment_type']];
-        }else{
-            $pay_way = Pay::select('pronoun')->where('id',$arr['payment_type'])->first()->toArray();
+        } else {
+            $pay_way = Pay::select('pronoun')->where('id', $arr['payment_type'])->first()->toArray();
         }
         $data['order'] = [
             'user_id' => $user['id'],
@@ -290,7 +290,7 @@ class OrderService
                         $member->diamond_quota = MemberLevel::LIMIT_QUOTA;
                         break;
                 }
-            }else{
+            } else {
                 switch ($level) {
                     case 'vip':
                         $member->vip_quota = null;
@@ -327,7 +327,7 @@ class OrderService
                     // 當是購買鑽石或vip會員1天卡 則會限制當天觀看數為50部
                     if ($duration == 1) {
                         $member->diamond_quota = MemberLevel::LIMIT_QUOTA;
-                    }else{
+                    } else {
                         $member->diamond_quota = null;
                     }
                     $member->member_level_status = MemberLevel::TYPE_VALUE[$level];
@@ -337,7 +337,7 @@ class OrderService
                 if ($duration == 1 && $level == 'vip') {
                     $member->vip_quota = MemberLevel::LIMIT_QUOTA;
                     $member->save();
-                }else if($duration != 1 && $level == 'vip'){
+                } elseif ($duration != 1 && $level == 'vip') {
                     $member->vip_quota = null;
                     $member->save();
                 }
@@ -348,13 +348,13 @@ class OrderService
                 $buy_member_level->save();
 
                 // 不是一天的會員卡 次數要改成null
-                if($duration > 1){
+                if ($duration > 1) {
                     switch ($level) {
                         case 'vip':
-                            $member -> vip_quota = null;
+                            $member->vip_quota = null;
                             break;
                         case 'diamond':
-                            $member -> diamond_quota = null;
+                            $member->diamond_quota = null;
                             break;
                     }
                     $member->save();
@@ -376,10 +376,10 @@ class OrderService
             case MemberLevel::TYPE_VALUE['diamond']:
                 // 確認是否有vip會員資格
                 $vip = BuyMemberLevel::where('member_id', $user_id)
-                ->where('member_level_type', MemberLevel::TYPE_LIST[0])
-                ->whereNull('deleted_at')
-                ->first();
-                if(!empty($vip)){
+                    ->where('member_level_type', MemberLevel::TYPE_LIST[0])
+                    ->whereNull('deleted_at')
+                    ->first();
+                if (! empty($vip)) {
                     if ($vip->end_time <= $now) {
                         // vip 也超過時間
                         $vip->delete();
@@ -393,7 +393,7 @@ class OrderService
                         $vip_quota_flag = false;
                         $diamond_quota_flag = true;
                     }
-                }else{
+                } else {
                     $status = MemberLevel::NO_MEMBER_LEVEL;
                     $vip_quota_flag = true;
                     $diamond_quota_flag = true;
@@ -412,7 +412,6 @@ class OrderService
                 }
                 $up_member->save();
                 break;
-            
             case MemberLevel::TYPE_VALUE['vip']:
                 // 變更會員狀態
                 $up_member = Member::where('id', $user_id)->first();

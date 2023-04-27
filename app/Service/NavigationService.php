@@ -18,10 +18,6 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 
 class NavigationService
 {
-    public const NORMAL_IMAGE_GROUP_PERCENT = 0.35;
-
-    public const NORMAL_VIDEO_PERCENT = 0.35;
-
     public const HOT_ORDER_IMAGE_GROUP_PERCENT = 0.1;
 
     public const HOT_ORDER_VIDEO_PERCENT = 0.1;
@@ -32,11 +28,20 @@ class NavigationService
 
     public const POPULAR_CACHE_KEY = 'search:popular:';
 
+    public const DETAIL_PERCENTS = [
+        0 => [0.1, 0.9],
+        1 => [0.2, 0.8],
+        2 => [0.2, 0.8],
+        3 => [0.1, 0.9],
+    ];
+
     public VideoService $videoService;
 
     public ImageGroupService $imageGroupService;
 
     public AdvertisementService $advertisementService;
+
+    public TagService $tagService;
 
     public string $url;
 
@@ -44,12 +49,40 @@ class NavigationService
         ImageGroupService $imageGroupService,
         VideoService $videoService,
         AdvertisementService $advertisementService,
+        TagService $tagService,
         RequestInterface $request
     ) {
         $this->imageGroupService = $imageGroupService;
         $this->videoService = $videoService;
         $this->advertisementService = $advertisementService;
+        $this->tagService = $tagService;
         $this->url = $request->url();
+    }
+
+    public function navigationDetail(array $suggest, int $navId, string $type, int $id, int $page, int $limit): array
+    {
+        $imageLimit = (int) floor($limit / 2);
+        $tagIds = $this->tagService->getTagsByModelType($type, $id);
+        $imageGroups = $this->navigationDetailImageGroups($suggest, $navId, $tagIds, $page, $imageLimit);
+        $videoLimit = $limit - $imageLimit;
+        $videos = $this->navigationDetailVideos($suggest, $navId, $tagIds, $page, $videoLimit);
+
+        switch ($navId) {
+            case 1:
+                $ids = $this->getIds($videos);
+                $clicks = $this->calculateNavigationPopularClick(Video::class, $ids);
+                $videos = $this->sortClickAndModels($clicks, $videos);
+                $ids = $this->getIds($imageGroups);
+                $clicks = $this->calculateNavigationPopularClick(ImageGroup::class, $ids);
+                $imageGroups = $this->sortClickAndModels($clicks, $videos);
+                return array_merge($imageGroups, $videos);
+            default:
+                $result = array_merge($imageGroups, $videos);
+                $collect = \Hyperf\Collection\collect($result);
+                $collect = $collect->sortByDesc('created_at');
+
+                return $collect->toArray();
+        }
     }
 
     public function navigationSuggest(array $suggest, int $page, int $limit): array
@@ -99,6 +132,64 @@ class NavigationService
         $collect = $collect->sortByDesc('created_at');
 
         return $collect->toArray();
+    }
+
+    protected function navigationDetailImageGroups(array $suggest, int $navId, array $tagIds, int $page, int $limit): array
+    {
+        $otherLimit = 0;
+        $percent = self::DETAIL_PERCENTS[$navId];
+        $typeLimit = (int) floor($percent[1] * $limit);
+
+        $imageGroupIds = $this->tagService->getTypeIdsByTagIds($tagIds, ImageGroup::class, $page, $typeLimit);
+        $imageGroups = ImageGroup::with([
+            'tags', 'imagesLimit',
+        ])
+            ->whereIn('id', $imageGroupIds)
+            ->offset($limit * $page)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        $userLimit = $limit - count($imageGroups);
+
+        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $userLimit);
+        $remain = $userLimit - count($suggestModels);
+        if ($remain >= 1) {
+            $otherLimit += $remain;
+        }
+
+        $models = $this->imageGroupService->getImageGroups(null, $page, $otherLimit)->toArray();
+
+        return array_merge($models, $suggestModels, $imageGroups);
+    }
+
+    protected function navigationDetailVideos(array $suggest, int $navId, array $tagIds, int $page, int $limit): array
+    {
+        $otherLimit = 0;
+        $percent = self::DETAIL_PERCENTS[$navId];
+        $typeLimit = (int) floor($percent[1] * $limit);
+
+        $ids = $this->tagService->getTypeIdsByTagIds($tagIds, Video::class, $page, $typeLimit);
+        $videos = Video::with([
+            'tags',
+        ])
+            ->whereIn('id', $ids)
+            ->offset($limit * $page)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        $userLimit = $limit - count($videos);
+
+        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $userLimit);
+        $remain = $userLimit - count($suggestModels);
+        if ($remain >= 1) {
+            $otherLimit += $remain;
+        }
+
+        $models = $this->videoService->getVideos(null, $page, 9, $otherLimit)->toArray();
+
+        return array_merge($models, $suggestModels, $videos);
     }
 
     protected function navigationPopularImageGroups(array $suggest, int $page, int $limit): array
@@ -258,7 +349,7 @@ class NavigationService
         }
 
         foreach ($models as $model) {
-            if (!empty($ids[$model['id']])) {
+            if (! empty($ids[$model['id']])) {
                 continue;
             }
 

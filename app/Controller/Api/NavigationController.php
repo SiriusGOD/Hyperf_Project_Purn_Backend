@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
+use App\Request\NavigationDetailRequest;
 use App\Service\NavigationService;
 use App\Service\SuggestService;
 use App\Service\VideoService;
@@ -62,6 +63,25 @@ class NavigationController extends AbstractController
             3 => $service->navigationSuggestSortById($suggest, $page, $limit),
         };
         $path = '/api/navigation/search?id=' . $id . '&';
+        $simplePaginator = new SimplePaginator($page, $limit, $path);
+        $data = array_merge($data, $simplePaginator->render());
+
+        return $this->success($data);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'detail')]
+    public function detail(NavigationDetailRequest $request, NavigationService $service, SuggestService $suggestService)
+    {
+        $data = [];
+        $page = $request->input('page', 0);
+        $limit = $request->input('limit', 10);
+        $navId = $request->input('nav_id', 0);
+        $type = $request->input('type');
+        $id = $request->input('type_id');
+        $userId = (int) auth()->user()->getId();
+        $suggest = $suggestService->getTagProportionByUser($userId);
+        $data['model'] = $service->navigationDetail($suggest, $navId, $type, $id, $page, $limit);
+        $path = '/api/navigation/detail?id=' . $id . '&';
         $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
 

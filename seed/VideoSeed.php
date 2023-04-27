@@ -72,7 +72,7 @@ class VideoSeed implements BaseInterface
                 $exps = explode(",",$insertData['tags']);
                 foreach($exps as $str){
                     $tag = make(TagService::class)->createTagByName($str, 1);
-                    make(TagService::class)->createTagRelationship("video",$video->id ,$tag->id );
+                    make(TagService::class)->createTagRelationship(\App\Model\Video::class,$video->id ,$tag->id );
                 } 
             }
             if($insertData['actors']){
