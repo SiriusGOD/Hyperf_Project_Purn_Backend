@@ -137,21 +137,21 @@ class ProductService
                             $join->on('coins.id', '=', 'products.correspond_id')
                                 ->where('products.type', Product::TYPE_LIST[3])
                                 ->where('expire', Product::EXPIRE['no']);
-                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, coins.type')->where('coins.type', Coin::TYPE_LIST[0])->orderBy('coins.points')->get()->toArray();
+                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, coins.type, coins.bonus')->where('coins.type', Coin::TYPE_LIST[0])->orderBy('coins.points')->get()->toArray();
                 break;
             case 'diamond':
                 $query = Coin::join('products', function ($join) {
                             $join->on('coins.id', '=', 'products.correspond_id')
                                 ->where('products.type', Product::TYPE_LIST[3])
                                 ->where('expire', Product::EXPIRE['no']);
-                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, coins.type')->where('coins.type', Coin::TYPE_LIST[1])->orderBy('coins.points')->get()->toArray();
+                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, coins.type, coins.bonus')->where('coins.type', Coin::TYPE_LIST[1])->orderBy('coins.points')->get()->toArray();
                 break;
             default:
                 $query = MemberLevel::join('products', function ($join) {
                             $join->on('member_levels.id', '=', 'products.correspond_id')
                                 ->where('products.type', Product::TYPE_LIST[2])
                                 ->where('expire', Product::EXPIRE['no']);
-                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, member_levels.type')->get()->toArray();
+                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, member_levels.type, member_levels.duration')->orderBy('member_levels.type')->orderBy('member_levels.duration')->get()->toArray();
                 break;
         }
 
@@ -161,6 +161,11 @@ class ProductService
             $query[$key]['pay_method'] = $pay_query;
             $query[$key]['selling_price'] = (string)$value['selling_price'];
             if(empty($query[$key]['duration']))$query[$key]['duration'] = null;
+            if(is_null($query[$key]['bonus'])){
+                $query[$key]['bonus'] = null;
+            }else{
+                $query[$key]['bonus'] = (string)$query[$key]['bonus'];
+            }
         }
         $this->redis->set($checkRedisKey, json_encode($query));
         $this->redis->expire($checkRedisKey, self::TTL_30_Min);
