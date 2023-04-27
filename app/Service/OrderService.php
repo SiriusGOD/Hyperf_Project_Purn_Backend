@@ -12,12 +12,16 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Member;
+use App\Model\MemberLevel;
+use App\Model\BuyMemberLevel;
+use App\Model\Pay;
 use App\Model\Order;
 use App\Model\OrderDetail;
 use App\Model\Product;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
+use Carbon\Carbon;
 
 class OrderService
 {
@@ -82,7 +86,7 @@ class OrderService
             $query = $query->where('orders.status', '=', $order_status);
         }
         if (! empty($offset)) {
-            $query = $query->offset($offset);
+            $query = $query->offset($offset * $limit);
         }
         if (! empty($limit)) {
             $query = $query->limit($limit);
@@ -107,7 +111,12 @@ class OrderService
         // 撈取商品資料
         // $product = Product::find($prod_id)->toArray();
         $product = $arr['product'];
-
+        // 撈取支付方式
+        if($arr['payment_type'] == 0){
+            $pay_way['pronoun'] = Order::PAY_WAY_MAP_NEW[$arr['payment_type']];
+        }else{
+            $pay_way = Pay::select('pronoun')->where('id',$arr['payment_type'])->first()->toArray();
+        }
         $data['order'] = [
             'user_id' => $user['id'],
             'email' => $user['email'],
@@ -115,15 +124,19 @@ class OrderService
             'payment_type' => $arr['payment_type'],
             // 'currency' => $product['currency'],
             // 'total_price' => $product['selling_price'] ?? 0,
-            'pay_way' => Order::PAY_WAY_MAP_NEW[$arr['payment_type']],
+            // 'pay_way' => Order::PAY_WAY_MAP_NEW[$arr['payment_type']],
+            'pay_way' => $pay_way['pronoun'],
             'pay_url' => $arr['pay_url'] ?? '',
             'pay_proxy' => $arr['pay_proxy'],
             'pay_order_id' => $arr['pay_order_id'] ?? '',
         ];
         switch ($arr['pay_method']) {
             case 'cash':
+                $data['order']['currency'] = Order::PAY_CURRENCY['cny'];
+                $data['order']['total_price'] = $product['selling_price'] ?? 0;
+                break;
             case 'coin':
-                $data['order']['currency'] = $product['currency'];
+                $data['order']['currency'] = Order::PAY_CURRENCY['coin'];
                 $data['order']['total_price'] = $product['selling_price'] ?? 0;
                 break;
             case 'diamond_coin':
@@ -241,5 +254,172 @@ class OrderService
         $orderSn = 'PO' . date('Ymd', $_SERVER['REQUEST_TIME']) . str_pad((string) ($lastNum + 1), 5, '0', STR_PAD_LEFT);
 
         return $orderSn;
+    }
+
+    // 會員升等
+    public function memberLevelUp($data)
+    {
+        $product = Product::where('id', $data['prod_id'])->first();
+        $member = Member::where('id', $data['user_id'])->where('status', '<', Member::STATUS['DISABLE'])->first();
+        // 獲取會員卡天數
+        $member_level = MemberLevel::where('id', $product->correspond_id)->first();
+        $duration = $member_level->duration;
+        $level = $member_level->type;
+        // 確認該會員是否已有會員資格
+        // 沒有會員資格
+        if ($member->member_level_status != MemberLevel::TYPE_VALUE['vip'] && $member->member_level_status != MemberLevel::TYPE_VALUE['diamond']) {
+            // 新增會員的會員等級持續時間
+            $now = Carbon::now();
+            $buy_member_level = new BuyMemberLevel();
+            $buy_member_level->member_id = $member->id;
+            $buy_member_level->member_level_type = $level;
+            $buy_member_level->member_level_id = $member_level->id;
+            $buy_member_level->order_number = $data['order_number'];
+            $buy_member_level->start_time = $now->toDateTimeString();
+            $buy_member_level->end_time = $now->addDays($duration)->toDateTimeString();
+            $buy_member_level->save();
+
+            // 更新會員的會員等級
+            // 當是購買鑽石或vip會員1天卡 則會限制當天觀看數為50部
+            if ($duration == 1) {
+                switch ($level) {
+                    case 'vip':
+                        $member->vip_quota = MemberLevel::LIMIT_QUOTA;
+                        break;
+                    case 'diamond':
+                        $member->diamond_quota = MemberLevel::LIMIT_QUOTA;
+                        break;
+                }
+            }else{
+                switch ($level) {
+                    case 'vip':
+                        $member->vip_quota = null;
+                        break;
+                    case 'diamond':
+                        $member->diamond_quota = null;
+                        break;
+                }
+            }
+            $member->member_level_status = MemberLevel::TYPE_VALUE[$level];
+            $member->save();
+
+            var_dump('新增');
+        } else {
+            // 有會員資格
+            $buy_member_level = BuyMemberLevel::where('member_id', $member->id)
+                ->where('member_level_type', $level)
+                ->whereNull('deleted_at')
+                ->first();
+            if (empty($buy_member_level)) {
+                // 新增會員的會員等級持續時間
+                $now = Carbon::now();
+                $buy_member_level = new BuyMemberLevel();
+                $buy_member_level->member_id = $member->id;
+                $buy_member_level->member_level_type = $level;
+                $buy_member_level->member_level_id = $member_level->id;
+                $buy_member_level->order_number = $data['order_number'];
+                $buy_member_level->start_time = $now->toDateTimeString();
+                $buy_member_level->end_time = $now->addDays($duration)->toDateTimeString();
+                $buy_member_level->save();
+
+                if ($level == 'diamond' && $member->member_level_status != MemberLevel::TYPE_VALUE[$level]) {
+                    // 更新會員的會員等級
+                    // 當是購買鑽石或vip會員1天卡 則會限制當天觀看數為50部
+                    if ($duration == 1) {
+                        $member->diamond_quota = MemberLevel::LIMIT_QUOTA;
+                    }else{
+                        $member->diamond_quota = null;
+                    }
+                    $member->member_level_status = MemberLevel::TYPE_VALUE[$level];
+                    $member->save();
+                }
+
+                if ($duration == 1 && $level == 'vip') {
+                    $member->vip_quota = MemberLevel::LIMIT_QUOTA;
+                    $member->save();
+                }else if($duration != 1 && $level == 'vip'){
+                    $member->vip_quota = null;
+                    $member->save();
+                }
+                var_dump('更新 -> 新增一筆');
+            } else {
+                $end_time = $buy_member_level->end_time;
+                $buy_member_level->end_time = Carbon::parse($end_time)->addDays($duration)->toDateTimeString();
+                $buy_member_level->save();
+
+                // 不是一天的會員卡 次數要改成null
+                if($duration > 1){
+                    switch ($level) {
+                        case 'vip':
+                            $member -> vip_quota = null;
+                            break;
+                        case 'diamond':
+                            $member -> diamond_quota = null;
+                            break;
+                    }
+                    $member->save();
+                }
+                var_dump('更新 -> 延長');
+            }
+        }
+    }
+
+    // 會員降等
+    public function memberLevelDown($user_id)
+    {
+        $now = Carbon::now()->toDateTimeString();
+        // 查詢會員等級
+        $member = Member::select('member_level_status')->where('id', $user_id)->first()->toArray();
+        $member_level = $member['member_level_status'];
+
+        switch ($member_level) {
+            case MemberLevel::TYPE_VALUE['diamond']:
+                // 確認是否有vip會員資格
+                $vip = BuyMemberLevel::where('member_id', $user_id)
+                ->where('member_level_type', MemberLevel::TYPE_LIST[0])
+                ->whereNull('deleted_at')
+                ->first();
+                if(!empty($vip)){
+                    if ($vip->end_time <= $now) {
+                        // vip 也超過時間
+                        $vip->delete();
+
+                        $status = MemberLevel::NO_MEMBER_LEVEL;
+                        $vip_quota_flag = true;
+                        $diamond_quota_flag = false;
+                    } else {
+                        // vip 沒超過時間
+                        $status = MemberLevel::TYPE_VALUE['vip'];
+                        $vip_quota_flag = false;
+                        $diamond_quota_flag = true;
+                    }
+                }else{
+                    $status = MemberLevel::NO_MEMBER_LEVEL;
+                    $vip_quota_flag = true;
+                    $diamond_quota_flag = true;
+                }
+
+                // 變更會員狀態
+                $up_member = Member::where('id', $user_id)->first();
+                $up_member->member_level_status = $status;
+                if ($diamond_quota_flag) {
+                    // 鑽石次數歸0
+                    $up_member->diamond_quota = 0;
+                }
+                if ($vip_quota_flag) {
+                    // vip次數歸0
+                    $up_member->vip_quota = 0;
+                }
+                $up_member->save();
+                break;
+            
+            case MemberLevel::TYPE_VALUE['vip']:
+                // 變更會員狀態
+                $up_member = Member::where('id', $user_id)->first();
+                $up_member->member_level_status = MemberLevel::NO_MEMBER_LEVEL;
+                $up_member->vip_quota = 0;
+                $up_member->save();
+                break;
+        }
     }
 }

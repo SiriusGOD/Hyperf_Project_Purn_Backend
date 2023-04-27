@@ -85,12 +85,14 @@ class CoinController extends AbstractController
         $type = $request->input('type');
         $name = $request->input('name');
         $points = $request->input('points');
+        $bonus = $request->input('bonus', 0);
         $service->store([
             'id' => $id,
             'user_id' => $userId,
             'type' => $type,
             'name' => $name,
             'points' => $points,
+            'bonus' => $bonus
         ]);
         return $response->redirect('/admin/coin/index');
     }

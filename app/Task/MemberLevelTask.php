@@ -78,17 +78,26 @@ class MemberLevelTask
                                 ->where('member_level_type', MemberLevel::TYPE_LIST[0])
                                 ->whereNull('deleted_at')
                                 ->first();
-                            if ($vip->end_time <= $now) {
-                                // vip 也超過時間
-                                $vip->delete();
-
+                            if(!empty($vip)){
+                                if ($vip->end_time <= $now) {
+                                    // vip 也超過時間
+                                    $vip->delete();
+    
+                                    $status = MemberLevel::NO_MEMBER_LEVEL;
+                                    $vip_quota_flag = true;
+                                    $diamond_quota_flag = false;
+                                } else {
+                                    // vip 沒超過時間
+                                    $status = MemberLevel::TYPE_VALUE['vip'];
+                                    $vip_quota_flag = false;
+                                    $diamond_quota_flag = true;
+                                }
+                            }else{
                                 $status = MemberLevel::NO_MEMBER_LEVEL;
                                 $vip_quota_flag = true;
-                            } else {
-                                // vip 沒超過時間
-                                $status = MemberLevel::TYPE_VALUE['vip'];
                                 $diamond_quota_flag = true;
                             }
+                            
                             // 變更會員狀態
                             $up_member = Member::where('id', $member->id)->first();
                             $up_member->member_level_status = $status;

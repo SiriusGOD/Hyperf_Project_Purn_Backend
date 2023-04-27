@@ -75,7 +75,8 @@ class Member extends Model implements Authenticatable
 
     protected array $hidden = ['password'];
 
-    protected array $appends = ['is_selected_tag', 'is_vip_experience', 'is_diamond_experience'];
+    // protected array $appends = ['is_selected_tag', 'is_vip_experience', 'is_diamond_experience'];
+    protected array $appends = ['is_selected_tag'];
 
     public function getJwtIdentifier()
     {
@@ -113,22 +114,22 @@ class Member extends Model implements Authenticatable
     }
 
     // 確認是否為VIP體驗會員
-    protected function getIsVipExperienceAttribute()
-    {
-        $date = BuyMemberLevel::select(Db::raw('DATEDIFF(end_time, start_time) as date'))->where('member_id', $this->id)->where('member_level_type', 'vip')->whereNull('deleted_at')->first();
-        if (empty($date)) {
-            return 0;
-        }
-        return 1;
-    }
+    // protected function getIsVipExperienceAttribute()
+    // {
+    //     $date = BuyMemberLevel::select(Db::raw('DATEDIFF(end_time, start_time) as date'))->where('member_id', $this->id)->where('member_level_type', 'vip')->whereNull('deleted_at')->first();
+    //     if (empty($date)) {
+    //         return 0;
+    //     }
+    //     return 1;
+    // }
 
     // 確認是否為鑽石體驗會員
-    protected function getIsDiamondExperienceAttribute()
-    {
-        $date = BuyMemberLevel::select(Db::raw('DATEDIFF(end_time, start_time) as date'))->where('member_id', $this->id)->where('member_level_type', 'diamond')->whereNull('deleted_at')->first();
-        if (empty($date)) {
-            return 0;
-        }
-        return 1;
-    }
+    // protected function getIsDiamondExperienceAttribute()
+    // {
+    //     $date = BuyMemberLevel::select(Db::raw('DATEDIFF(end_time, start_time) as date'))->where('member_id', $this->id)->where('member_level_type', 'diamond')->whereNull('deleted_at')->first();
+    //     if (empty($date)) {
+    //         return 0;
+    //     }
+    //     return 1;
+    // }
 }
