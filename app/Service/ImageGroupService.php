@@ -119,6 +119,7 @@ class ImageGroupService
             ])
                 ->whereIn('id', $imageIds)
                 ->offset($limit * $page)
+                ->orderByDesc('id')
                 ->limit($limit)
                 ->get()
                 ->toArray();

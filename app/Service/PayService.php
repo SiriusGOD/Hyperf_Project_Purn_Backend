@@ -66,10 +66,10 @@ class PayService
             $sign = $this->make_sign_pay($data, env('PAY_SIGNKEY'));
             $data['ip'] = $arr['ip'];
             // 撈取支付方式
-            if($arr['payment_type'] == 0){
+            if ($arr['payment_type'] == 0) {
                 $pay_way['pronoun'] = Order::PAY_WAY_MAP_NEW[$arr['payment_type']];
-            }else{
-                $pay_way = Pay::select('pronoun')->where('id',$arr['payment_type'])->first()->toArray();
+            } else {
+                $pay_way = Pay::select('pronoun')->where('id', $arr['payment_type'])->first()->toArray();
             }
             $data['pay_type'] = $pay_way['pronoun'];
             $data['type'] = isset($arr['pay_proxy']) ? $arr['pay_proxy'] : 'online';
@@ -234,7 +234,7 @@ class PayService
                                         $member->diamond_quota = MemberLevel::LIMIT_QUOTA;
                                         break;
                                 }
-                            }else{
+                            } else {
                                 switch ($level) {
                                     case 'vip':
                                         $member->vip_quota = null;
@@ -271,7 +271,7 @@ class PayService
                                     // 當是購買鑽石或vip會員1天卡 則會限制當天觀看數為50部
                                     if ($duration == 1) {
                                         $member->diamond_quota = MemberLevel::LIMIT_QUOTA;
-                                    }else{
+                                    } else {
                                         $member->diamond_quota = null;
                                     }
                                     $member->member_level_status = MemberLevel::TYPE_VALUE[$level];
@@ -281,7 +281,7 @@ class PayService
                                 if ($duration == 1 && $level == 'vip') {
                                     $member->vip_quota = MemberLevel::LIMIT_QUOTA;
                                     $member->save();
-                                }else if($duration != 1 && $level == 'vip'){
+                                } elseif ($duration != 1 && $level == 'vip') {
                                     $member->vip_quota = null;
                                     $member->save();
                                 }
@@ -292,13 +292,13 @@ class PayService
                                 $buy_member_level->save();
 
                                 // 不是一天的會員卡 次數要改成null
-                                if($duration > 1){
+                                if ($duration > 1) {
                                     switch ($level) {
                                         case 'vip':
-                                            $member -> vip_quota = null;
+                                            $member->vip_quota = null;
                                             break;
                                         case 'diamond':
-                                            $member -> diamond_quota = null;
+                                            $member->diamond_quota = null;
                                             break;
                                     }
                                     $member->save();

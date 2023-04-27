@@ -35,7 +35,7 @@ class CoinService
         $model->type = $params['type'];
         $model->name = $params['name'];
         $model->points = $params['points'];
-        if($params['type'] == Coin::TYPE_LIST[1]){
+        if ($params['type'] == Coin::TYPE_LIST[1]) {
             $model->bonus = $params['bonus'];
         }
         $model->save();

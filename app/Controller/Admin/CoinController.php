@@ -92,7 +92,7 @@ class CoinController extends AbstractController
             'type' => $type,
             'name' => $name,
             'points' => $points,
-            'bonus' => $bonus
+            'bonus' => $bonus,
         ]);
         return $response->redirect('/admin/coin/index');
     }

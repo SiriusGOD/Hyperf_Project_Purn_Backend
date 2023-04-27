@@ -128,7 +128,7 @@ class OrderController extends AbstractController
                         $member->diamond_coins = (float) $member->diamond_coins + $coin->points + $coin->bonus;
                     }
                     // 如果是會員卡(則要做會員升等)
-                    if($product['type'] == Product::TYPE_LIST[2]){
+                    if ($product['type'] == Product::TYPE_LIST[2]) {
                         $data['order_number'] = $result;
                         $service->memberLevelUp($data);
                     }
@@ -187,8 +187,8 @@ class OrderController extends AbstractController
                     $pay_amount = Product::QUOTA;
 
                     // 鑽石次數歸0時，判斷是否要降等!!!!
-                    if($user['diamond_quota'] - Product::QUOTA == 0){
-                        $service -> memberLevelDown($data['user_id']);
+                    if ($user['diamond_quota'] - Product::QUOTA == 0) {
+                        $service->memberLevelDown($data['user_id']);
                     }
                 }
 
@@ -233,8 +233,8 @@ class OrderController extends AbstractController
                     $pay_amount = Product::QUOTA;
 
                     // Vip次數歸0時，判斷是否要降等!!!!
-                    if($user['vip_quota'] - Product::QUOTA == 0){
-                        $service -> memberLevelDown($data['user_id']);
+                    if ($user['vip_quota'] - Product::QUOTA == 0) {
+                        $service->memberLevelDown($data['user_id']);
                     }
                 }
 
@@ -285,9 +285,8 @@ class OrderController extends AbstractController
             $order->status = Order::ORDER_STATUS['finish'];
             $order->save();
             return $this->success($pay_res['data'], '購買商品成功');
-        }else{
-            $this->error('購買商品失敗', ErrorCode::BAD_REQUEST);
         }
+        $this->error('購買商品失敗', ErrorCode::BAD_REQUEST);
 
         // 生成支付鏈接(測試) -> 現金相關才需生成
         // $pay_res = $pay_service->getPayUrl($user_id, $prod_id, $payment_type, $oauth_type, $pay_proxy, $ip);

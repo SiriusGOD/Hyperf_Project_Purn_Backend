@@ -185,6 +185,17 @@ class TagService
         };
     }
 
+    public function getTypeIdsByTagIds(array $tagIds, string $type, int $page, int $limit): array
+    {
+        return TagCorrespond::where('correspond_type', $type)
+            ->whereIn('tag_id', $tagIds)
+            ->offset($page * $limit)
+            ->limit($limit)
+            ->get()
+            ->pluck('correspond_id')
+            ->toArray();
+    }
+
     protected function generatePopularTags(array $tags, array $popularTag)
     {
         $result = [];

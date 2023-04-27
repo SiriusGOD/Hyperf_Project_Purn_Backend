@@ -58,10 +58,10 @@ class ProxyController extends AbstractController
     #[RequestMapping(methods: ['GET'], path: 'detail')]
     public function detail(RequestInterface $request, ProxyService $proxyService, MemberService $memberService)
     {
-        $memberId = $request->input('member_id') ;
-        $member = $memberService->getMember((int)$memberId);
+        $memberId = $request->input('member_id');
+        $member = $memberService->getMember((int) $memberId);
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $users = $proxyService->myIncome((int)$memberId, $page);
+        $users = $proxyService->myIncome((int) $memberId, $page);
         $total = $memberService->allCount();
         $data['last_page'] = ceil($total / Constants::DEFAULT_PAGE_PER);
         if ($total == 0) {
@@ -72,11 +72,10 @@ class ProxyController extends AbstractController
         $data['page'] = $page;
         $data['step'] = 10;
         $path = '/admin/proxy/detail';
-        $data['next'] = $path . '?page=' . ($page + 1)."&member_id=".$memberId;
-        $data['prev'] = $path . '?page=' . ($page - 1)."&member_id=".$memberId;
-        $data['navbar'] = $member["name"]."__".trans('default.proxy.title');
+        $data['next'] = $path . '?page=' . ($page + 1) . '&member_id=' . $memberId;
+        $data['prev'] = $path . '?page=' . ($page - 1) . '&member_id=' . $memberId;
+        $data['navbar'] = $member['name'] . '__' . trans('default.proxy.title');
         $data['proxy_active'] = 'active';
         return $this->render->render('admin.proxy.detail', $data);
     }
-
 }

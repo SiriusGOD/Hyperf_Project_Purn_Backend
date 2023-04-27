@@ -496,14 +496,14 @@ if (! function_exists('JAddSlashes')) {
     }
 }
 /*
- * 計算代理 
+ * 計算代理
  * @param $memberId int
  * @param $level int
  */
 if (! function_exists('calcPxory')) {
-    function calcPxory(int $memberId ,int $level)
+    function calcPxory(int $memberId, int $level)
     {
         $service = di(\App\Service\ProxyService::class);
-        return $service->calcLevel($memberId , $level);
+        return $service->calcLevel($memberId, $level);
     }
 }
