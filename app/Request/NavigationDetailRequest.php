@@ -22,7 +22,7 @@ class NavigationDetailRequest extends AuthApiBaseRequest
             'type' => 'required|string',
             'page' => 'numeric',
             'limit' => 'numeric',
-            'id' => 'required|numeric',
+            'type_id' => 'required|numeric',
             'nav_id' => 'required|numeric|between:0,3',
         ];
     }
