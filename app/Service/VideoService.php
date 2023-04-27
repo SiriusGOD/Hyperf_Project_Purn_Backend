@@ -155,7 +155,7 @@ class VideoService
               $data['user_id'] = 1;
               $data['expire'] = 0;
               $data['start_time'] =date('Y-m-d H:i:s');
-              $data['end_time'] =  date('Y-m-d H:i:s');
+              $data['end_time'] = date('Y-m-d H:i:s', strtotime('+10 years'));
               $data['currency'] = 'COIN';
               $data['diamond_price'] = 1;
               $data['selling_price'] = empty($model->coin) ? 0: $model->coin ;
