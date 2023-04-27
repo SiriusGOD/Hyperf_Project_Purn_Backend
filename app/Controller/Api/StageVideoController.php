@@ -99,7 +99,7 @@ class StageVideoController extends AbstractController
     }
 
     // 儲存影片清單
-    #[RequestMapping(methods: ['GET'], path: 'stageCateList')]
+    #[RequestMapping(methods: ['POST'], path: 'stageCateList')]
     public function stageCateList(RequestInterface $request, StageVideoService $stageVideoService)
     {
         $userId = auth('jwt')->user()->getId();

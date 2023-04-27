@@ -51,7 +51,7 @@ class CustomerServiceController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'detail')]
+    #[RequestMapping(methods: ['POST'], path: 'detail')]
     public function detail(CustomerServiceDetailRequest $request)
     {
         $page = (int) $request->input('page', 0);
