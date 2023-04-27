@@ -33,20 +33,13 @@ class ProxyService extends BaseService
     public const LIMIT = 10;
 
     protected $redis;
-
     protected $logger;
-
     protected $redeem;
-
     protected $member;
-
-    protected $memberInviteStatService;
-
-    protected $memberInviteLog;
-
-    protected $memberRedeemVideoService;
-
     protected $memberInviteReceiveLog;
+    protected $memberInviteStatService;
+    protected $memberInviteLog;
+    protected $memberRedeemVideoService;
 
     public function __construct(
         Redis $redis,
@@ -86,7 +79,42 @@ class ProxyService extends BaseService
     //        }
     //    });
     //    return $flag;
+    //計算層級代理有多少收益
+    public function calcLevelInCome(int $memberId, int $invited_by, int $level)
+    { 
+        $page =1;
+        $limit = self::LIMIT;
+        $where['member_id'] =  $memberId;
+        $where['invite_by'] = $invited_by; 
+        $where['level'] = $level; 
+        $model = $this->memberInviteReceiveLog;
+        $res = $this->list($model, $where, $page, $limit);
+        $sumAry = $res->toArray();
+        if($res->count()>0){
+          $sum = array_reduce($sumAry, function($carry, $item) {
+              return $carry + $item['reach_amount'];
+          }, 0);
+          return $sum;
+        }else{ 
+          return false;
+        }
+    }
 
+    // 我的下線by level
+    public function calcLevel(int $memberId, int $level)
+    {
+        $page =1;
+        $limit = self::LIMIT;
+        $where['member_id'] = $memberId;
+        $where['level'] = $level;
+        $model = $this->memberInviteLog;
+        $res = $this->list($model, $where, $page, $limit);
+        if($res->count()>0){
+            return self::calcLevelInCome($res[0]->invited_by,$res[0]->member_id ,$level);
+        }else{
+            return false;
+        }
+    }
     // 我的下線
     public function downline(int $memberId, int $page)
     {
@@ -121,7 +149,7 @@ class ProxyService extends BaseService
         // 商品類型不是現金點數
         // 怕使用者 充了數馬上提出
         try {
-            if ($product->type != Product::TYPE_LIST[1]) {
+            //if ($product->type != Product::TYPE_LIST[1]) {
                 $money = $order->pay_amount;
                 // 查看上層代理
                 $res = $this->memberInviteLog->where('member_id', $member->id)->get();
@@ -132,7 +160,7 @@ class ProxyService extends BaseService
                     $amount = number_format($money * $uRate * $rate, 2);
                     // print_r(['amount'=>$amount]);
                     $return['member_id'] = $proxy->invited_by;
-                    $return['invite_by'] = 0;
+                    $return['invite_by'] = $proxy->member_id;
                     $return['order_sn'] = $order->order_number;
                     $return['amount'] = $money;
                     $return['reach_amount'] = $amount;
@@ -157,7 +185,7 @@ class ProxyService extends BaseService
                         }
                     });
                 }
-            }
+            //}
             $wg->wait();
             Db::commit();
         } catch (\Throwable $ex) {
