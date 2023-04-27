@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
-use App\Service\SearchService;
+use App\Service\NavigationService;
 use App\Service\SuggestService;
 use App\Service\VideoService;
 use App\Util\SimplePaginator;
@@ -48,7 +48,7 @@ class NavigationController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'search')]
-    public function getSearchList(RequestInterface $request, SearchService $service, SuggestService $suggestService)
+    public function getSearchList(RequestInterface $request, NavigationService $service, SuggestService $suggestService)
     {
         $data = [];
         $page = $request->input('page', 0);
@@ -57,9 +57,9 @@ class NavigationController extends AbstractController
         $userId = (int) auth()->user()->getId();
         $suggest = $suggestService->getTagProportionByUser($userId);
         $data['model'] = match ($id) {
-            default => $service->popular($page, $limit),
-            2 => $service->suggest($suggest, $page, $limit),
-            3 => $service->search(null, $page, $limit),
+            default => $service->navigationPopular($suggest, $page, $limit),
+            2 => $service->navigationSuggest($suggest, $page, $limit),
+            3 => $service->navigationSuggestSortById($suggest, $page, $limit),
         };
         $path = '/api/navigation/search?id=' . $id . '&';
         $simplePaginator = new SimplePaginator($page, $limit, $path);

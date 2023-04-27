@@ -342,12 +342,11 @@ class MemberService extends BaseService
       {
           $user = [];
 
-          if (!empty($account)) {
+          if (! empty($account)) {
               $user = Member::where('account', $account)->first();
           }
 
-
-          if (empty($user) and !empty($email)) {
+          if (empty($user) and ! empty($email)) {
               $user = Member::where('email', $email)->first();
           }
 

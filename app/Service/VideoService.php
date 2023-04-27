@@ -341,6 +341,17 @@ class VideoService
         return Video::find($id);
     }
 
+    public function getVideosByHotOrder(int $page, int $limit): array
+    {
+        return Video::with('tags')
+            ->where('hot_order', '>=', 1)
+            ->orderBy('hot_order')
+            ->offset($page * $limit)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+    }
+
     protected function orderCheck(int $id, int $memberId): bool
     {
         return Order::where('orders.user_id', $memberId)
@@ -350,16 +361,5 @@ class VideoService
             ->where('products.correspond_id', $id)
             ->where('orders.status', Order::ORDER_STATUS['finish'])
             ->exists();
-    }
-
-    public function getVideosByHotOrder(int $page, int $limit) : array
-    {
-        return Video::with('tags')
-            ->where('hot_order', '>=', 1)
-            ->orderBy('hot_order')
-            ->offset($page * $limit)
-            ->limit($limit)
-            ->get()
-            ->toArray();
     }
 }

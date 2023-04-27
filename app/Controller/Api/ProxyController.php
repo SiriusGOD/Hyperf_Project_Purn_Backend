@@ -11,7 +11,6 @@ declare(strict_types=1);
  */
 namespace App\Controller\Api;
 
-use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Service\MemberService;
 use App\Service\ProxyService;

@@ -67,7 +67,6 @@ class ImageGroupSyncTask
                 $this->tagService->createTagRelationshipArr(ImageGroup::class, $id, $tagsIds);
             }
             $this->createImages($result['data']['resources'], $id);
-            $forever = false;
         }
 
         return '';

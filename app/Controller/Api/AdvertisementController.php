@@ -29,9 +29,9 @@ class AdvertisementController extends AbstractController
         $url = $request->url();
         $urlArr = parse_url($url);
         $port = $urlArr['port'] ?? '80';
-        if(!empty(env("TEST_IMG_URL"))){
-            $host = env("TEST_IMG_URL");
-        }else{
+        if (! empty(env('TEST_IMG_URL'))) {
+            $host = env('TEST_IMG_URL');
+        } else {
             $host = $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $port;
         }
         foreach ($data as $item) {

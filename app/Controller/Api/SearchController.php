@@ -37,7 +37,7 @@ class SearchController extends AbstractController
         $models = $service->search($tagIds, $page, $limit);
         $data = [];
         $data['models'] = $models;
-        $data['test'] = env("TEST_IMG_URL");
+        $data['test'] = env('TEST_IMG_URL');
         $path = '/api/search/list';
         $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
