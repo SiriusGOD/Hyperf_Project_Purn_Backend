@@ -151,7 +151,7 @@ class VideoService
               $data['id'] = null;
               $data['type'] = Product::TYPE_LIST[1];
               $data['correspond_id'] = $model->id;
-              $data['name'] = $model->id;
+              $data['name'] = $model->title;
               $data['user_id'] = 1;
               $data['expire'] = 0;
               $data['start_time'] =date('Y-m-d H:i:s');
