@@ -85,12 +85,18 @@ class MemberLevelController extends AbstractController
         $type = $request->input('type');
         $name = $request->input('name');
         $duration = $request->input('duration');
+        $title = $request->input('title', '');
+        $description = $request->input('description', '');
+        $remark = $request->input('remark', '');
         $service->store([
             'id' => $id,
             'user_id' => $userId,
             'type' => $type,
             'name' => $name,
             'duration' => $duration,
+            'title' => $title,
+            'description' => $description,
+            'remark' => $remark,
         ]);
         return $response->redirect('/admin/member_level/index');
     }

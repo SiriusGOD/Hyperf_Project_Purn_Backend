@@ -43,6 +43,10 @@ class MemberLevel extends Model
 
     public const ZERO_QUOTA = 0;
 
+    // 永久
+    public const FOREVER_DURATION = 3650;
+    public const FOREVER = '永久';
+
     /**
      * The table associated with the model.
      *

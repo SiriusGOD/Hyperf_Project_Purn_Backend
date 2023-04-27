@@ -25,6 +25,18 @@
                                     <input type="text" class="form-control" name="name" id="name" placeholder="" value="{{$model->name ?? ''}}">
                                 </div>
                                 <div class="form-group">
+                                    <label for="exampleInputEmail1">{{ trans('default.member_level_control.member_level_title') ?? '會員卡資訊'}}</label>
+                                    <textarea id="title" name="title" class="form-control" value="{{$model->title ?? ''}}"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{ trans('default.member_level_control.member_level_description') ?? '會員卡描述'}}</label>
+                                    <input type="text" class="form-control" name="description" id="description" placeholder="" value="{{$model->description ?? ''}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{ trans('default.member_level_control.member_level_remark') ?? '會員卡備註'}}</label>
+                                    <input type="text" class="form-control" name="remark" id="remark" placeholder="" value="{{$model->remark ?? ''}}">
+                                </div>
+                                <div class="form-group">
                                     <label for="exampleInputEmail1">{{ trans('default.member_level_control.member_level_duration') ?? '持續天數'}}</label>
                                     <input type="text" class="form-control" name="duration" id="duration" placeholder="" value="{{$model->duration ?? ''}}">
                                 </div>

@@ -34,6 +34,9 @@ class MemberLevelService
         $model->user_id = $params['user_id'];
         $model->type = $params['type'];
         $model->name = $params['name'];
+        $model->title = $params['title'];
+        $model->description = $params['description'];
+        $model->remark = $params['remark'];
         $model->duration = $params['duration'];
         $model->save();
     }

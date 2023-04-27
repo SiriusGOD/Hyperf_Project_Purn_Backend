@@ -463,6 +463,9 @@ return [
         'member_level_insert' => '新增會員等級',
         'member_level_edit' => '編輯會員等級',
         'member_level_duration' => '持續天數',
+        'member_level_title' => '會員卡資訊',
+        'member_level_description' => '會員卡描述',
+        'member_level_remark' => '會員卡備註',
         'member_level_type' => [
             'vip' => \App\Model\MemberLevel::TYPE_NAME['vip'],
             'diamond' => \App\Model\MemberLevel::TYPE_NAME['diamond'],
