@@ -13,42 +13,29 @@
                                     <thead>
                                     <tr>
                                         <th>{{trans('default.id') ?? '序號'}}</th>
-                                        <th>{{trans('default.proxy.title') ?? '1級代理'}}</th>
-                                        <th>{{trans('default.proxy.proxy1') ?? '1級代理'}}</th>
-                                        <th>{{trans('default.proxy.proxy2') ?? '2級代理'}}</th>
-                                        <th>{{trans('default.proxy.proxy3') ?? '3級代理'}}</th>
-                                        <th>{{trans('default.proxy.proxy4') ?? '4級代理'}}</th>
-                                        <th>{{trans('default.action') ?? ''}}</th>
+                                        <th>{{trans('default.proxy.name') ?? '代理人名'}}</th>
+                                        <th>{{trans('default.proxy.order_amount') ?? '訂單金額'}}</th>
+                                        <th>{{trans('default.proxy.reach_amount') ?? '返傭金額'}}</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach($datas as $row)
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $row->id }}</td>
-                                            <td>{{ $row->name }}</td>
-                                            <td>{{  calcPxory($row->id, 1)}}</td>
-                                            <td>{{  calcPxory($row->id, 2)}}</td>
-                                            <td>{{  calcPxory($row->id, 3)}}</td>
-                                            <td>{{  calcPxory($row->id, 4)}}</td>
-                                            <td>
-                                                @if(authPermission('proxy.detail'))
-                                                    <a href="/admin/proxy/detail?member_id={{$row->id}}" class="btn btn-primary">{{trans('default.detail') ?? '編輯'}}</a>
-                                                @endif
-                                            </td>
+                                            <td>{{ $row->member->name }}</td>
+                                            <td>{{  $row->amount}}</td>
+                                            <td>{{  $row->reach_amount}}</td>
                                         </tr>
                                     @endforeach
                                     </tbody>
                                     <tfoot>
                                     <tr>
                                         <th>{{trans('default.id') ?? '序號'}}</th>
-                                        <th>{{trans('default.proxy.title') ?? '1級代理'}}</th>
-                                        <th>{{trans('default.proxy.proxy1') ?? '1級代理'}}</th>
-                                        <th>{{trans('default.proxy.proxy2') ?? '2級代理'}}</th>
-                                        <th>{{trans('default.proxy.proxy3') ?? '3級代理'}}</th>
-                                        <th>{{trans('default.proxy.proxy4') ?? '4級代理'}}</th>
-                                        <th>{{trans('default.action') ?? ''}}</th>
+                                        <th>{{trans('default.proxy.name') ?? '代理人名'}}</th>
+                                        <th>{{trans('default.proxy.order_amount') ?? '訂單金額'}}</th>
+                                        <th>{{trans('default.proxy.reach_amount') ?? '返傭金額'}}</th>
                                     </tr>
-                                    </tfoot>
+                                   </tfoot>
                                 </table>
                             </div>
                         </div>

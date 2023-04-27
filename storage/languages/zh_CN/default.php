@@ -48,6 +48,7 @@ return [
     'store' => '儲存',
     'create' => '新增',
     'edit' => '編輯',
+    'detail' => '詳細資料',
     'delete' => '刪除',
     'expire' => '狀態',
     'detail' => '詳情',
@@ -193,6 +194,9 @@ return [
         'proxy2' => '2級代理',
         'proxy3' => '3級代理',
         'proxy4' => '4級代理',
+        'name' => '代理人名',
+        'order_amount' => '訂單金額',
+        'reach_amount' => '返傭金額',
     ],
     // actor
     'actor' => [

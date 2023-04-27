@@ -115,6 +115,7 @@ class ProxyService extends BaseService
             return false;
         }
     }
+
     // 我的下線
     public function downline(int $memberId, int $page)
     {
@@ -132,7 +133,7 @@ class ProxyService extends BaseService
     public function myIncome(int $memberId, int $page)
     {
         $limit = self::LIMIT;
-        $where['member_id'] = $memberId;
+        $where['invite_by'] = $memberId;
         $model = $this->memberInviteReceiveLog->with(['member' => function ($query) {
             $query->select('id', 'name');
         }]);
