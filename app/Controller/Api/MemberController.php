@@ -176,7 +176,11 @@ class MemberController extends AbstractController
         if (auth()->check()) {
             $member = auth()->user();
         } else {
-            $member = $service->getUserFromAccount($request->input('device_id'));
+            $member = $service->getUserFromAccountOrEmail($request->input('device_id'));
+        }
+
+        if (empty($member)) {
+            return $this->error(trans('validation.exists', ['attribute' => 'email or device_id']), 400);
         }
 
         $code = $service->getVerificationCode($member->id);
@@ -194,12 +198,16 @@ class MemberController extends AbstractController
         if (auth()->check()) {
             $member = auth()->user();
         } else {
-            $member = $service->getUserFromAccount($request->input('device_id'));
+            $member = $service->getUserFromAccountOrEmail($request->input('device_id'), $request->input('email'));
+        }
+
+        if (empty($member)) {
+            return $this->error(trans('validation.exists', ['attribute' => 'email or device_id']), 400);
         }
 
         $code = $service->getVerificationCode($member->id);
         $driver = $factory->get('default');
-        $content = trans('email.reset_verification.content', ['code' => $code]);
+        $content = trans('email.reset_verification.content', ['code' => $code, 'account' => $member->account]);
         $driver->push(new EmailVerificationJob($request->input('email'), trans('email.reset_verification.subject'), $content));
 
         return $this->success();
@@ -234,7 +242,7 @@ class MemberController extends AbstractController
         if (empty($account)) {
             $account = $request->input('device_id');
         }
-        $member = $service->getUserFromAccount($account);
+        $member = $service->getUserFromAccountOrEmail($account);
 
         if (empty($member)) {
             return $this->error(trans('validation.exists', ['attribute' => 'device_id']), 400);

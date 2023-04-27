@@ -60,7 +60,7 @@ class MemberService extends BaseService
 
       public function apiGetUser(array $userInfo)
       {
-          $user = $this->getUserFromAccount($userInfo['account']);
+          $user = $this->getUserFromAccountOrEmail($userInfo['account']);
 
           if (! $user) {
               return false;
@@ -338,9 +338,18 @@ class MemberService extends BaseService
           return $user->toArray();
       }
 
-      public function getUserFromAccount(?string $account)
+      public function getUserFromAccountOrEmail(?string $account, ?string $email = null)
       {
-          $user = Member::where('account', $account)->first();
+          $user = [];
+
+          if (!empty($account)) {
+              $user = Member::where('account', $account)->first();
+          }
+
+
+          if (empty($user) and !empty($email)) {
+              $user = Member::where('email', $email)->first();
+          }
 
           if (empty($user)) {
               return false;
