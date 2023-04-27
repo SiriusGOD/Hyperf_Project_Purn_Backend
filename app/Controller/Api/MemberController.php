@@ -187,6 +187,24 @@ class MemberController extends AbstractController
         return $this->success();
     }
 
+    #[Middleware(TryLimitMiddleware::class)]
+    #[RequestMapping(methods: ['POST'], path: 'reset_verification')]
+    public function sendResetVerification(SendVerificationRequest $request, MemberService $service, DriverFactory $factory)
+    {
+        if (auth()->check()) {
+            $member = auth()->user();
+        } else {
+            $member = $service->getUserFromAccount($request->input('device_id'));
+        }
+
+        $code = $service->getVerificationCode($member->id);
+        $driver = $factory->get('default');
+        $content = trans('email.reset_verification.content', ['code' => $code]);
+        $driver->push(new EmailVerificationJob($request->input('email'), trans('email.reset_verification.subject'), $content));
+
+        return $this->success();
+    }
+
     #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'verification/register_check')]
     public function checkRegisterVerificationCode(RegisterVerificationRequest $request)
@@ -212,7 +230,11 @@ class MemberController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'verification/reset_password_check')]
     public function checkResetPasswordVerificationCode(ResetPasswordVerificationRequest $request, MemberService $service)
     {
-        $member = $service->getUserFromAccount($request->input('device_id'));
+        $account = $request->input('account');
+        if (empty($account)) {
+            $account = $request->input('device_id');
+        }
+        $member = $service->getUserFromAccount($account);
 
         if (empty($member)) {
             return $this->error(trans('validation.exists', ['attribute' => 'device_id']), 400);

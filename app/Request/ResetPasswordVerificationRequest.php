@@ -27,7 +27,7 @@ class ResetPasswordVerificationRequest extends FormRequest
     {
         return [
             'code' => 'required|string',
-            'email' => 'string|required_without:uuid',
+            'account' => 'string|required_without:device_id',
             'device_id' => 'string',
             'password' => 'required|string',
         ];
