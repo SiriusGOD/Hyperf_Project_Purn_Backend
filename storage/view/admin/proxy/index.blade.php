@@ -26,10 +26,10 @@
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $row->id }}</td>
                                             <td>{{ $row->name }}</td>
-                                            <td>{{ $row->title }}</td>
-                                            <td>{{ isset($category[$row->category_id]) ? $category[$row->category_id]: "" }}</td>
-                                            <td>{{ $row->count }}</td>
-                                            <td>{{ $row->counted }}</td>
+                                            <td>{{  calcPxory($row->id, 1)}}</td>
+                                            <td>{{  calcPxory($row->id, 2)}}</td>
+                                            <td>{{  calcPxory($row->id, 3)}}</td>
+                                            <td>{{  calcPxory($row->id, 4)}}</td>
                                             <td>
                                                 @if(authPermission('proxy.edit'))
                                                     <a href="/admin/proxy.edit?id={{$row->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>

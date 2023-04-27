@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace HyperfTest\Cases;
 use App\Service\ProxyService;
 use App\Service\MemberService;
+use App\Model\Product;
+use App\Model\Member;
 use App\Model\Order;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
@@ -37,10 +39,11 @@ class ProxyOrderTest extends HttpTestCase
   
     public function testGenOrder()
     {
-        $member = $this->memberService->getProxy();
+        $p  = Product::orderBy("id",'desc')->first();
+        $member = Member::select("id")->find(32);
         $token = auth()->login($member);
         make(MemberService::class)->saveToken($member->id, $token);
-        $string = '{"product_id":6,"payment_type":1,"oauth_type":"android","pay_proxy":"online","pay_method":"cash"}';
+        $string = '{"product_id":'.$p->id.',"payment_type":1,"oauth_type":"android","pay_proxy":"online","pay_method":"cash"}';
         $json = json_decode($string,true);
         $data = $this->client->post('/api/order/create', $json ,
           [
@@ -51,7 +54,7 @@ class ProxyOrderTest extends HttpTestCase
 
     public function testPayOrder()
     {
-        $member = $this->memberService->getProxy();
+        $member = Member::select("id")->find(32);
         $token = auth()->login($member);
         $order = Order::orderBy("id","desc")->first();
         make(MemberService::class)->saveToken($member->id, $token);
