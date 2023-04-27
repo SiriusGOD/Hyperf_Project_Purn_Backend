@@ -20,12 +20,18 @@ class MemberLevelSeed implements BaseInterface
         $model->type = 'vip';
         $model->name = 'VIP卡1天';
         $model->duration = 1;
+        $model->title = '春節限時發送\r\n永久無限觀看所有視頻(含付費視頻)';
+        $model->description = '春節限時發送，永久無限觀看所有視頻（含付費視頻）';
+        $model->remark = '限制觀看50片';
         $model->save();
 
         $model = new \App\Model\MemberLevel();
         $model->user_id = 1;
         $model->type = 'vip';
         $model->name = 'VIP卡30天';
+        $model->title = '春節限時發送\r\n永久無限觀看所有視頻(含付費視頻)';
+        $model->description = '春節限時發送，永久無限觀看所有視頻（含付費視頻）';
+        $model->remark = '';
         $model->duration = 30;
         $model->save();
 
@@ -33,6 +39,9 @@ class MemberLevelSeed implements BaseInterface
         $model->user_id = 1;
         $model->type = 'vip';
         $model->name = 'VIP卡90天';
+        $model->title = '春節限時發送\r\n永久無限觀看所有視頻(含付費視頻)';
+        $model->description = '春節限時發送，永久無限觀看所有視頻（含付費視頻）';
+        $model->remark = '';
         $model->duration = 90;
         $model->save();
 
@@ -40,6 +49,9 @@ class MemberLevelSeed implements BaseInterface
         $model->user_id = 1;
         $model->type = 'vip';
         $model->name = 'VIP卡永久';
+        $model->title = '春節限時發送\r\n永久無限觀看所有視頻(含付費視頻)';
+        $model->description = '春節限時發送，永久無限觀看所有視頻（含付費視頻）';
+        $model->remark = '';
         $model->duration = 3650;
         $model->save();
 
@@ -48,6 +60,9 @@ class MemberLevelSeed implements BaseInterface
         $model->user_id = 1;
         $model->type = 'diamond';
         $model->name = '鑽石卡1天';
+        $model->title = '春節限時發送\r\n永久無限觀看所有視頻(含付費視頻)';
+        $model->description = '春節限時發送，永久無限觀看所有視頻（含付費視頻）';
+        $model->remark = '限制觀看50片';
         $model->duration = 1;
         $model->save();
 
@@ -55,6 +70,9 @@ class MemberLevelSeed implements BaseInterface
         $model->user_id = 1;
         $model->type = 'diamond';
         $model->name = '鑽石卡30天';
+        $model->title = '春節限時發送\r\n永久無限觀看所有視頻(含付費視頻)';
+        $model->description = '春節限時發送，永久無限觀看所有視頻（含付費視頻）';
+        $model->remark = '';
         $model->duration = 30;
         $model->save();
     }
