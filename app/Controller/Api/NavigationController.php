@@ -58,8 +58,8 @@ class NavigationController extends AbstractController
         $suggest = $suggestService->getTagProportionByUser($userId);
         $data['model'] = match ($id) {
             default => $service->popular($page, $limit),
-            2 => $service->suggest($suggest, $page, $limit),
-            3 => $service->search(null, $page, $limit),
+            2 => $service->navigationSuggest($suggest, $page, $limit),
+            3 => $service->navigationSuggestSortById($suggest, $page, $limit),
         };
         $path = '/api/navigation/search?id=' . $id . '&';
         $simplePaginator = new SimplePaginator($page, $limit, $path);

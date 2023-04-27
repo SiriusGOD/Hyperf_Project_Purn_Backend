@@ -54,12 +54,31 @@ class SearchService
 
     public function navigationSuggest(array $suggest, int $page, int $limit) : array
     {
-        $imageGroupLimit = floor($limit / 2);
+        $advertisementLimit = $this->getAdvertisementsLimit($page, $limit);
+        if ($advertisementLimit > 0) {
+            $limit--;
+        }
+        $imageGroupLimit = (int) floor($limit / 2);
         $videoLimit = $limit - $imageGroupLimit;
 
-        $imageGroups = $this->navigationSuggestImageGroups($suggest, $page, $limit);
+        $imageGroups = $this->navigationSuggestImageGroups($suggest, $page, $imageGroupLimit);
+        $videos = $this->navigationSuggestVideos($suggest, $page, $videoLimit);
+        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, $advertisementLimit);
 
-        return [];
+        $result = [];
+
+        $result = $this->generateImageGroups($result, $imageGroups);
+        $result = $this->generateVideos($result, $videos);
+        return $this->generateAdvertisements($result, $advertisements);
+    }
+
+    public function navigationSuggestSortById(array $suggest, int $page, int $limit) : array
+    {
+        $result = $this->navigationSuggest($suggest, $page, $limit);
+        $collect = \Hyperf\Collection\collect($result);
+        $collect = $collect->sortByDesc('created_at');
+
+        return $collect->toArray();
     }
 
     protected function navigationSuggestImageGroups(array $suggest, int $page, int $limit) : array
