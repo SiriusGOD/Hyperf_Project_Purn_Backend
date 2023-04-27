@@ -21,7 +21,7 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 #[Controller]
 class ActivityController extends AbstractController
 {
-    #[RequestMapping(methods: ['GET'], path: 'create')]
+    #[RequestMapping(methods: ['POST'], path: 'create')]
     public function create(ActivityRequest $request, BaseService $service)
     {
         $model = new MemberActivity();

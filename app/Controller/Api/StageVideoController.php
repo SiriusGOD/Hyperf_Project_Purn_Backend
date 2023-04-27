@@ -43,7 +43,7 @@ class StageVideoController extends AbstractController
     }
 
     // 刪除Stage影片分類
-    #[RequestMapping(methods: ['PUT'], path: 'deleteStageCate')]
+    #[RequestMapping(methods: ['POST'], path: 'deleteStageCate')]
     public function deleteStageCate(RequestInterface $request, StageVideoService $stageVideoService)
     {
         $userId = auth('jwt')->user()->getId();

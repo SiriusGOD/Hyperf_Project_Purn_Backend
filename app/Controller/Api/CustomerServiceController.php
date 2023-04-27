@@ -32,7 +32,7 @@ use Qbhy\HyperfAuth\AuthMiddleware;
 #[Middleware(AuthMiddleware::class)]
 class CustomerServiceController extends AbstractController
 {
-    #[RequestMapping(methods: ['GET'], path: 'list')]
+    #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request)
     {
         $page = (int) $request->input('page', 0);

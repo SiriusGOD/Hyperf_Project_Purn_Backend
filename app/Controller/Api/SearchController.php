@@ -26,7 +26,7 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 #[Controller]
 class SearchController extends AbstractController
 {
-    #[RequestMapping(methods: ['GET'], path: 'list')]
+    #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(ImageApiListRequest $request, SearchService $service, TagService $tagService)
     {
         $tagIds = $request->input('tags', []);
@@ -44,7 +44,7 @@ class SearchController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'keyword')]
+    #[RequestMapping(methods: ['POST'], path: 'keyword')]
     public function keyword(ImageApiSearchRequest $request, SearchService $service)
     {
         $keyword = $request->input('keyword');
@@ -59,7 +59,7 @@ class SearchController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'suggest')]
+    #[RequestMapping(methods: ['POST'], path: 'suggest')]
     public function suggest(VideoApiSuggestRequest $request, SearchService $service, SuggestService $suggestService)
     {
         $page = (int) $request->input('page', 0);
@@ -75,7 +75,7 @@ class SearchController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'popular')]
+    #[RequestMapping(methods: ['POST'], path: 'popular')]
     public function popular(RequestInterface $request, SearchService $service)
     {
         $page = (int) $request->input('page', 0);

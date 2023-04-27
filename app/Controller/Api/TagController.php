@@ -21,28 +21,28 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 #[Controller]
 class TagController extends AbstractController
 {
-    #[RequestMapping(methods: ['GET'], path: 'list')]
+    #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, TagService $service)
     {
         $data = $service->getTags();
         return $this->success($data->toArray());
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'popular')]
+    #[RequestMapping(methods: ['POST'], path: 'popular')]
     public function popular(RequestInterface $request, TagService $service)
     {
         $data = $service->getPopularTag();
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'groupList')]
+    #[RequestMapping(methods: ['POST'], path: 'groupList')]
     public function groupList(RequestInterface $request, TagGroupService $service)
     {
         $data = $service->getTags();
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'searchGroupTags')]
+    #[RequestMapping(methods: ['POST'], path: 'searchGroupTags')]
     public function searchGroupTags(RequestInterface $request, TagGroupService $service)
     {
         $group_id = $request->input('group_id');

@@ -20,7 +20,7 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 #[Controller]
 class AnnouncementController extends AbstractController
 {
-    #[RequestMapping(methods: ['GET'], path: 'list')]
+    #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, AnnouncementService $service)
     {
         $data = $service->getAnnouncements();

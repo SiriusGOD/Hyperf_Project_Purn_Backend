@@ -100,7 +100,7 @@ class MemberController extends AbstractController
         ]);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'logout')]
+    #[RequestMapping(methods: ['POST'], path: 'logout')]
     public function logout()
     {
         auth()->logout();
@@ -160,7 +160,7 @@ class MemberController extends AbstractController
     }
 
     #[Middleware(ApiAuthMiddleware::class)]
-    #[RequestMapping(methods: ['GET'], path: 'detail')]
+    #[RequestMapping(methods: ['POST'], path: 'detail')]
     public function detail(MemberDetailRequest $request)
     {
         // $id = $request->input('id');
@@ -322,7 +322,7 @@ class MemberController extends AbstractController
         return $this->error('查無該會員追蹤資料', ErrorCode::BAD_REQUEST);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'getFollowList')]
+    #[RequestMapping(methods: ['POST'], path: 'getFollowList')]
     public function getMemberFollowList(RequestInterface $request, MemberService $service)
     {
         $userId = auth('jwt')->user()->getId();
@@ -332,7 +332,7 @@ class MemberController extends AbstractController
     }
 
     #[Middleware(ApiAuthMiddleware::class)]
-    #[RequestMapping(methods: ['GET'], path: 'getMemberProductId')]
+    #[RequestMapping(methods: ['POST'], path: 'getMemberProductId')]
     public function getMemberProductId(RequestInterface $request, MemberService $service)
     {
         $id = auth('jwt')->user()->getId();
@@ -348,7 +348,7 @@ class MemberController extends AbstractController
     /*
      * 獲取推薦列表
      */
-    // #[RequestMapping(methods: ['GET'], path: 'getPersonalList')]
+    // #[RequestMapping(methods: ['POST'], path: 'getPersonalList')]
     // public function getPersonalList(RequestInterface $request, MemberService $service)
     // {
     //     $user_id = auth('jwt')->user()->getId();

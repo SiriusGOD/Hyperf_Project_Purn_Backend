@@ -24,7 +24,7 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 #[Controller]
 class NavigationController extends AbstractController
 {
-    #[RequestMapping(methods: ['GET'], path: 'list')]
+    #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, VideoService $service)
     {
         $data = [
@@ -47,7 +47,7 @@ class NavigationController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'search')]
+    #[RequestMapping(methods: ['POST'], path: 'search')]
     public function getSearchList(RequestInterface $request, SearchService $service, SuggestService $suggestService)
     {
         $data = [];

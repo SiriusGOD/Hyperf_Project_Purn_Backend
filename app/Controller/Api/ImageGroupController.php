@@ -31,7 +31,7 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 #[Controller]
 class ImageGroupController extends AbstractController
 {
-    #[RequestMapping(methods: ['GET'], path: 'list')]
+    #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(ImageApiListRequest $request, ImageGroupService $service)
     {
         $tagIds = $request->input('tags');
@@ -45,7 +45,7 @@ class ImageGroupController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'search')]
+    #[RequestMapping(methods: ['POST'], path: 'search')]
     public function search(ImageApiSearchRequest $request, ImageGroupService $service)
     {
         $keyword = $request->input('keyword');
@@ -59,7 +59,7 @@ class ImageGroupController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'suggest')]
+    #[RequestMapping(methods: ['POST'], path: 'suggest')]
     public function suggest(ImageApiSuggestRequest $request, SuggestService $suggestService, ImageGroupService $service)
     {
         $page = (int) $request->input('page', 0);
@@ -82,7 +82,7 @@ class ImageGroupController extends AbstractController
         return $this->success([]);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'click/popular')]
+    #[RequestMapping(methods: ['POST'], path: 'click/popular')]
     public function getClickPopular(ClickService $service)
     {
         $result = $service->getPopularClick(ImageGroup::class);
@@ -98,7 +98,7 @@ class ImageGroupController extends AbstractController
         return $this->success([]);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'pay_image')]
+    #[RequestMapping(methods: ['POST'], path: 'pay_image')]
     public function getPayImage(GetPayImageRequest $request, ImageGroupService $service, ImageService $imageService)
     {
         $id = (int) $request->input('id');

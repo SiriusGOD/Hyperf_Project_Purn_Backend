@@ -40,7 +40,7 @@ class RedeemController extends AbstractController
     }
 
     // 使用者的兌換卷列表
-    #[RequestMapping(methods: ['GET'], path: 'videoRedeemList')]
+    #[RequestMapping(methods: ['POST'], path: 'videoRedeemList')]
     public function videoRedeemList(RequestInterface $request, MemberRedeemService $memberRedeemService)
     {
         $memberId = auth('jwt')->user()->getId();
@@ -55,7 +55,7 @@ class RedeemController extends AbstractController
     }
 
     // 使用者己兌換列表
-    #[RequestMapping(methods: ['GET'], path: 'usedVideoRedeemList')]
+    #[RequestMapping(methods: ['POST'], path: 'usedVideoRedeemList')]
     public function usedVideoRedeemList(RequestInterface $request, MemberRedeemVideoService $memberRedeemServiceVideo)
     {
         $memberId = auth('jwt')->user()->getId();

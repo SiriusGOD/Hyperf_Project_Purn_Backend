@@ -43,7 +43,7 @@ class VideoController extends AbstractController
         $this->logger = $loggerFactory->get('log', 'default');
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'list')]
+    #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, VideoService $service)
     {
         $tagIds = $request->input('tags', []);
@@ -70,7 +70,7 @@ class VideoController extends AbstractController
         return $this->success([]);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'count')]
+    #[RequestMapping(methods: ['POST'], path: 'count')]
     public function count(VideoService $service)
     {
         $result = $service->getVideoCount();
@@ -95,7 +95,7 @@ class VideoController extends AbstractController
         return $this->success([$video]);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'find')]
+    #[RequestMapping(methods: ['POST'], path: 'find')]
     public function find(RequestInterface $request, VideoService $service)
     {
         $id = $request->input('id', 0);
@@ -103,7 +103,7 @@ class VideoController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'search')]
+    #[RequestMapping(methods: ['POST'], path: 'search')]
     public function search(RequestInterface $request, VideoService $service)
     {
         $title = $request->input('title');
@@ -122,7 +122,7 @@ class VideoController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'suggest')]
+    #[RequestMapping(methods: ['POST'], path: 'suggest')]
     public function suggest(VideoApiSuggestRequest $request, VideoService $service, SuggestService $suggestService)
     {
         $page = (int) $request->input('page', 0);
@@ -145,7 +145,7 @@ class VideoController extends AbstractController
         return $this->success([]);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'click/popular')]
+    #[RequestMapping(methods: ['POST'], path: 'click/popular')]
     public function getClickPopular(ClickService $service)
     {
         $result = $service->getPopularClick(Video::class);
@@ -161,7 +161,7 @@ class VideoController extends AbstractController
         return $this->success([]);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'pay_video')]
+    #[RequestMapping(methods: ['POST'], path: 'pay_video')]
     public function getPayVideo(GetPayImageRequest $request, VideoService $service)
     {
         $id = (int) $request->input('id');

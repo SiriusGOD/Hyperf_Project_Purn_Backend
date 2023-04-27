@@ -23,7 +23,7 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 #[Controller]
 class ActorController extends AbstractController
 {
-    #[RequestMapping(methods: ['GET'], path: 'list')]
+    #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, ActorService $service)
     {
         $page = (int) $request->input('page', 0);
@@ -35,21 +35,21 @@ class ActorController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'count')]
+    #[RequestMapping(methods: ['POST'], path: 'count')]
     public function count(ActorService $service)
     {
         $result = $service->getActorCount();
         return $this->success(['count' => $result]);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'getClassification')]
+    #[RequestMapping(methods: ['POST'], path: 'getClassification')]
     public function getClassification(ActorClassificationService $service)
     {
         $result = $service->getClassification();
         return $this->success(['models' => $result]);
     }
 
-    #[RequestMapping(methods: ['GET'], path: 'getListByClassification')]
+    #[RequestMapping(methods: ['POST'], path: 'getListByClassification')]
     public function getListByClassification(RequestInterface $request, ActorClassificationService $service)
     {
         $type_id = (int) $request->input('type_id', 0);
