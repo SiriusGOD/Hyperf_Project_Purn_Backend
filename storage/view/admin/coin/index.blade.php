@@ -39,6 +39,10 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.coin_control.bonus') ?? '贈與點數'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
                                             aria-label="CSS grade: activate to sort column ascending">{{trans('default.action') ?? '動作'}}
                                         </th>
                                         
@@ -51,6 +55,7 @@
                                             <td class="sorting_1 dtr-control">{{ trans('default.coin_control.coin_type')[$model->type] }}</td>
                                             <td>{{ $model->name }}</td>
                                             <td>{{ $model->points }}</td>
+                                            <td>{{ $model->bonus }}</td>
                                             <td>
                                             @if(authPermission('coin-edit'))
                                                 <div class="row mb-1">
@@ -67,6 +72,7 @@
                                         <th rowspan="1" colspan="1">{{trans('default.type') ?? '類型'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.name') ?? '名稱'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.coin_control.points') ?? '點數'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.coin_control.bonus') ?? '贈與點數'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>
                                     </tfoot>

@@ -25,9 +25,22 @@
                                     <input type="text" class="form-control" name="name" id="name" placeholder="" value="{{$model->name ?? ''}}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.coin_control.points') ?? '點數'}}</label>
-                                    <input type="text" class="form-control" name="points" id="points" placeholder="" value="{{$model->points ?? ''}}">
+                                    <label for="exampleInputEmail1">{{trans('default.coin_control.points_msg') ?? '點數'}}</label>
+                                    <input type="text" class="form-control" name="points" id="points" placeholder="" value="{{$model->points ?? 0}}">
                                 </div>
+                                @if(empty($model->type))
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.coin_control.bonus_msg') ?? '贈與點數'}}</label>
+                                    <input type="text" class="form-control" name="bonus" id="bonus" placeholder="" value="{{$model->bonus ?? 0}}">
+                                </div>
+                                @elseif(!empty($model->type))
+                                @if($model->type == \App\Model\Coin::TYPE_LIST[1])
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.coin_control.bonus_msg') ?? '贈與點數'}}</label>
+                                    <input type="text" class="form-control" name="bonus" id="bonus" placeholder="" value="{{$model->bonus ?? 0}}">
+                                </div>
+                                @endif
+                                @endif
                                 <button type="submit" class="btn btn-primary">{{ trans('default.submit') ?? '送出'}}</button>
                             </form>
                         </div>

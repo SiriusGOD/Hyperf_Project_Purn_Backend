@@ -471,6 +471,9 @@ return [
         'coin_insert' => '新增點數類別',
         'coin_edit' => '編輯點數類別',
         'points' => '點數',
+        'points_msg' => '點數  (請勿隨意變更點數！！！！)',
+        'bonus' => '贈與鑽石',
+        'bonus_msg' => '贈與鑽石  (請勿隨意變更贈與鑽石!!!)',
         'coin_type' => [
             'cash' => \App\Model\Coin::TYPE_NAME['cash'],
             'diamond' => \App\Model\Coin::TYPE_NAME['diamond'],
