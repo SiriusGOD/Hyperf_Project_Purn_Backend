@@ -108,7 +108,7 @@ class OrderController extends AbstractController
             case 'coin':
                 // 現金點數
                 // 確認商品是否為現金點數
-                if ($product['currency'] != Product::CURRENCY[1]) {
+                if ($product['currency'] == Product::CURRENCY[2]) {
                     return $this->error('該商品不能使用現金點數購買', ErrorCode::BAD_REQUEST);
                 }
                 // 確認點數是否足夠
@@ -127,6 +127,12 @@ class OrderController extends AbstractController
                         $coin = Coin::where('id', $product['correspond_id'])->first();
                         $member->diamond_coins = (float) $member->diamond_coins + $coin->points;
                     }
+                    // 如果是會員卡(則要做會員升等)
+                    if($product['type'] == Product::TYPE_LIST[2]){
+                        $data['order_number'] = $result;
+                        $service->memberLevelUp($data);
+                    }
+
                     $re = $member->save();
                     $pay_amount = $product['selling_price'];
                 } else {
@@ -179,6 +185,11 @@ class OrderController extends AbstractController
                     $member->diamond_quota = $user['diamond_quota'] - Product::QUOTA;
                     $re = $member->save();
                     $pay_amount = Product::QUOTA;
+
+                    // 鑽石次數歸0時，判斷是否要降等!!!!
+                    if($user['diamond_quota'] - Product::QUOTA == 0){
+                        $service -> memberLevelDown($data['user_id']);
+                    }
                 }
 
                 break;
@@ -197,14 +208,15 @@ class OrderController extends AbstractController
                     return $this->error('該商品不可使用VIP觀看次數購買', ErrorCode::BAD_REQUEST);
                 }
                 // 如果是圖片，確認圖片是否是vip或免費影片
-                if ($product['type'] != Product::TYPE_LIST[0]) {
+                if ($product['type'] == Product::TYPE_LIST[0]) {
                     $img = ImageGroup::where('id', $product['correspond_id'])->first()->toArray();
                     if ($img['pay_type'] == ImageGroup::IMAGE_GROUP_PAY_TYPE['diamond']) {
                         return $this->error('該商品不可使用VIP觀看次數購買', ErrorCode::BAD_REQUEST);
                     }
                 }
+
                 // 如果是影片，確認影片是否是vip或免費影片
-                if ($product['type'] != Product::TYPE_LIST[1]) {
+                if ($product['type'] == Product::TYPE_LIST[1]) {
                     $video = Video::where('id', $product['correspond_id'])->first()->toArray();
                     if ($video['is_free'] == Video::VIDEO_TYPE['diamond']) {
                         return $this->error('該商品不可使用VIP觀看次數購買', ErrorCode::BAD_REQUEST);
@@ -219,6 +231,11 @@ class OrderController extends AbstractController
                     $member->vip_quota = $user['vip_quota'] - Product::QUOTA;
                     $re = $member->save();
                     $pay_amount = Product::QUOTA;
+
+                    // Vip次數歸0時，判斷是否要降等!!!!
+                    if($user['vip_quota'] - Product::QUOTA == 0){
+                        $service -> memberLevelDown($data['user_id']);
+                    }
                 }
 
                 break;
@@ -258,9 +275,6 @@ class OrderController extends AbstractController
                 }
 
                 break;
-            default:
-                # code...
-                break;
         }
 
         // 變更訂單狀態為已完成 (除了現金購買外)
@@ -271,6 +285,8 @@ class OrderController extends AbstractController
             $order->status = Order::ORDER_STATUS['finish'];
             $order->save();
             return $this->success($pay_res['data'], '購買商品成功');
+        }else{
+            $this->error('購買商品失敗', ErrorCode::BAD_REQUEST);
         }
 
         // 生成支付鏈接(測試) -> 現金相關才需生成
