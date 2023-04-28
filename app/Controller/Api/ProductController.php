@@ -27,9 +27,8 @@ class ProductController extends AbstractController
     public function list(ProductApiRequest $request, ProductService $service)
     {
         // member coin diamond
-        $type = $request->input('type', 'member');
+        $type = $request->input('type', 'coin');
         $result = $service->getListByType($type);
-
         return $this->success($result);
     }
 
@@ -45,5 +44,17 @@ class ProductController extends AbstractController
             'count' => $result,
         ];
         return $this->success($data);
+    }
+
+    /**
+     * 獲取上架中的商品列表.
+     */
+    #[RequestMapping(methods: ['POST'], path: 'getMemberList')]
+    public function getMemberList(ProductApiRequest $request, ProductService $service)
+    {
+        // member
+        $result = $service->getListByMember();
+
+        return $this->success($result);
     }
 }

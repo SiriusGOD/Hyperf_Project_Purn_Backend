@@ -110,7 +110,7 @@ class ProductService
         }
     }
 
-    // 獲取商品列表 (會員卡 點數 鑽石)
+    // 獲取商品列表 (點數 鑽石)
     public function getListByType($type)
     {
         $checkRedisKey = self::CACHE_KEY . ':' . $type;
@@ -123,13 +123,6 @@ class ProductService
         $now = Carbon::now()->toDateTimeString();
 
         switch ($type) {
-            case 'member':
-                $query = MemberLevel::join('products', function ($join) {
-                    $join->on('member_levels.id', '=', 'products.correspond_id')
-                        ->where('products.type', Product::TYPE_LIST[2])
-                        ->where('expire', Product::EXPIRE['no']);
-                })->selectRaw('products.id, products.name, products.currency, products.selling_price, member_levels.type, member_levels.duration')->orderBy('member_levels.type')->orderBy('member_levels.duration')->get()->toArray();
-                break;
             case 'coin':
                 $query = Coin::join('products', function ($join) {
                     $join->on('coins.id', '=', 'products.correspond_id')
@@ -145,11 +138,11 @@ class ProductService
                 })->selectRaw('products.id, products.name, products.currency, products.selling_price, coins.type, coins.bonus')->where('coins.type', Coin::TYPE_LIST[1])->orderBy('coins.points')->get()->toArray();
                 break;
             default:
-                $query = MemberLevel::join('products', function ($join) {
-                    $join->on('member_levels.id', '=', 'products.correspond_id')
-                        ->where('products.type', Product::TYPE_LIST[2])
-                        ->where('expire', Product::EXPIRE['no']);
-                })->selectRaw('products.id, products.name, products.currency, products.selling_price, member_levels.type, member_levels.duration')->orderBy('member_levels.type')->orderBy('member_levels.duration')->get()->toArray();
+                $query = Coin::join('products', function ($join) {
+                            $join->on('coins.id', '=', 'products.correspond_id')
+                                ->where('products.type', Product::TYPE_LIST[3])
+                                ->where('expire', Product::EXPIRE['no']);
+                        })->selectRaw('products.id, products.name, products.currency, products.selling_price, coins.type, coins.bonus')->where('coins.type', Coin::TYPE_LIST[0])->orderBy('coins.points')->get()->toArray();
                 break;
         }
 
@@ -157,11 +150,8 @@ class ProductService
         foreach ($query as $key => $value) {
             $pay_query = PayCorrespond::join('pays', 'pays.id', 'pay_corresponds.pay_id')->where('pays.expire', Pay::EXPIRE['no'])->where('pay_corresponds.product_id', $value['id'])->select('pays.id', 'pays.name', 'pays.pronoun')->get()->toArray();
             $query[$key]['pay_method'] = $pay_query;
-            $query[$key]['selling_price'] = (string) $value['selling_price'];
-            if (empty($query[$key]['duration'])) {
-                $query[$key]['duration'] = null;
-            }
-            if (is_null($query[$key]['bonus'])) {
+            $query[$key]['selling_price'] = (string)$value['selling_price'];
+            if(is_null($query[$key]['bonus'])){
                 $query[$key]['bonus'] = null;
             } else {
                 $query[$key]['bonus'] = (string) $query[$key]['bonus'];
@@ -193,5 +183,63 @@ class ProductService
             $query = $query->where('products.name', 'like', '%' . $keyword . '%');
         }
         return $query->count();
+    }
+
+    // 獲取商品列表 (會員卡)
+    public function getListByMember()
+    {   
+        $checkRedisKey = self::CACHE_KEY . ':member';
+
+        if ($this->redis->exists($checkRedisKey)) {
+            $jsonResult = $this->redis->get($checkRedisKey);
+            return json_decode($jsonResult, true);
+        }
+
+        $now = Carbon::now()->toDateTimeString();
+
+        $products = MemberLevel::join('products', function ($join) {
+                    $join->on('member_levels.id', '=', 'products.correspond_id')
+                        ->where('products.type', Product::TYPE_LIST[2])
+                        ->where('expire', Product::EXPIRE['no']);
+                })->selectRaw('products.id, products.name, products.currency, products.selling_price, member_levels.type, member_levels.duration, member_levels.title, member_levels.description, member_levels.remark')->orderBy('member_levels.type')->orderBy('member_levels.duration')->get()->toArray();
+        
+        $vip_arr = [];
+        $diamond_arr = [];
+        foreach ($products as $key => $value) {
+            // 撈取個商品的支付方式   
+            $pay_query = PayCorrespond::join('pays', 'pays.id', 'pay_corresponds.pay_id')->where('pays.expire', Pay::EXPIRE['no'])->where('pay_corresponds.product_id', $value['id'])->select('pays.id', 'pays.name', 'pays.pronoun')->get()->toArray();
+
+            if($value['type'] == MemberLevel::TYPE_LIST['0']){
+                array_push($vip_arr, array(
+                    'id' => $value['id'],
+                    'name' => $value['name'],
+                    'currency' => $value['currency'],
+                    'selling_price' => (string)$value['selling_price'],
+                    'title' => str_replace('\r', "", $value['title']),
+                    'description' => $value['description'],
+                    'remark' => $value['remark'],
+                    'pay_method' => $pay_query
+                ));
+            }else{
+                array_push($diamond_arr, array(
+                    'id' => $value['id'],
+                    'name' => $value['name'],
+                    'currency' => $value['currency'],
+                    'selling_price' => (string)$value['selling_price'],
+                    'title' => str_replace('\r', "", $value['title']),
+                    'description' => $value['description'],
+                    'remark' => $value['remark'],
+                    'pay_method' => $pay_query
+                ));
+            }
+        }
+
+        $data['vip'] = $vip_arr;
+        $data['diamond'] = $diamond_arr;
+
+        $this->redis->set($checkRedisKey, json_encode($data));
+        $this->redis->expire($checkRedisKey, self::TTL_30_Min);
+
+        return $data;
     }
 }
