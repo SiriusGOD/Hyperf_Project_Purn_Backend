@@ -84,17 +84,12 @@ class ImageGroupSyncTask
 
     protected function getCount(): int
     {
-        if ($this->redis->exists(self::SYNC_KEY)) {
-            return (int) $this->redis->get(self::SYNC_KEY);
-        }
-
         $model = SystemParam::firstOrCreate([
             'description' => self::SYNC_KEY,
             'param' => 1,
         ]);
 
         $count = $model->param;
-        $this->redis->set(self::SYNC_KEY, $count);
 
         return $count;
     }
