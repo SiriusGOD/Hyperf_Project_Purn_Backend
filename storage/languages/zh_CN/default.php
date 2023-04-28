@@ -367,6 +367,7 @@ return [
         'image_group_clicks' => '套圖觀看次數',
         'image_group_likes' => '套圖按讚數',
         'image_group_pay_type' => '套圖付費方式',
+        'image_group_sync' => '套圖同步',
         'image_group_pay_type_types' => [
             0 => '免費',
             1 => 'vip',

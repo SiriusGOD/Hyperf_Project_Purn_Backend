@@ -9,8 +9,9 @@
                         <div class="row">
 
                             @if(authPermission('image-group-create'))
-                                <div class="col-sm-12 col-md-12 mb-1">
+                                <div class="col-sm-6 col-md-6 mb-1">
                                     <a class="btn badge-info" href="/admin/image_group/create">{{trans('default.image_group_control.image_group_insert') ?? '新增套圖'}}</a>
+                                    <button class="btn btn-primary" id="image_sync">{{trans('default.image_group_control.image_group_sync') ?? '套圖同步'}}</button>
                                 </div>
                             @endif
                         </div>
@@ -172,5 +173,16 @@
         </div>
         <!-- /.col -->
     </div>
+
+    <script>
+        $('#image_sync').click(function (){
+            $.get({
+                'url' : '/admin/image_group/sync',
+                'success' : function (data) {
+                    alert('start sync')
+                }
+            })
+        })
+    </script>
 
 @endsection

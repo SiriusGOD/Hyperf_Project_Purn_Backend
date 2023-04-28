@@ -55,7 +55,13 @@ class ImageGroupSyncTask
         while ($forever) {
             $this->logger->info('取得套圖同步資料，筆數 : ' . $count);
             $url = $this->syncUrl . '&_n=' . $count;
-            $res = $client->get($url);
+            try {
+                $res = $client->get($url);
+            } catch (\Exception $exception) {
+                $this->logger->info('套圖錯誤 id : ' . $count);
+                $count++;
+                continue;
+            }
             $result = json_decode($res->getBody()->getContents(), true);
             if (empty($result['data'])) {
                 $this->logger->info('無資料');

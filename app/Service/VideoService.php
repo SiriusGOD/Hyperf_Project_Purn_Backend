@@ -11,13 +11,13 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use App\Model\Product;
 use App\Model\ActorCorrespond;
 use App\Model\BuyMemberLevel;
 use App\Model\Member;
 use App\Model\MemberHasVideo;
 use App\Model\MemberLevel;
 use App\Model\Order;
+use App\Model\Product;
 use App\Model\Tag;
 use App\Model\TagCorrespond;
 use App\Model\Video;
@@ -27,7 +27,7 @@ use Hyperf\Database\Model\Collection;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
-use App\Service\ProductService;
+
 class VideoService
 {
     public const CACHE_KEY = 'video';
@@ -43,10 +43,12 @@ class VideoService
     protected $logger;
 
     protected $memberHasVideo;
+
     protected $productService;
+
     protected $model;
 
-    public function __construct(ProductService $productService,Video $video, Redis $redis, LoggerFactory $loggerFactory, MemberHasVideo $memberHasVideo)
+    public function __construct(ProductService $productService, Video $video, Redis $redis, LoggerFactory $loggerFactory, MemberHasVideo $memberHasVideo)
     {
         $this->redis = $redis;
         $this->logger = $loggerFactory->get('reply');
@@ -54,7 +56,6 @@ class VideoService
         $this->memberHasVideo = $memberHasVideo;
         $this->productService = $productService;
     }
-
 
     // 取得影片
     public function find(int $id)
@@ -147,21 +148,21 @@ class VideoService
             $model->description = '';
             $model->refreshed_at = date('Y-m-d H:i:s');
             $model->user_id = 1;
-            if($model->save()){ 
-              $data['id'] = null;
-              $data['type'] = Product::TYPE_LIST[1];
-              $data['correspond_id'] = $model->id;
-              $data['name'] = $model->title;
-              $data['user_id'] = 1;
-              $data['expire'] = 0;
-              $data['start_time'] =date('Y-m-d H:i:s');
-              $data['end_time'] = date('Y-m-d H:i:s', strtotime('+10 years'));
-              $data['currency'] = 'COIN';
-              $data['diamond_price'] = 1;
-              $data['selling_price'] = empty($model->coin) ? 0: $model->coin ;
-              $this->productService->store($data);
+            if ($model->save()) {
+                $data['id'] = null;
+                $data['type'] = Product::TYPE_LIST[1];
+                $data['correspond_id'] = $model->id;
+                $data['name'] = $model->title;
+                $data['user_id'] = 1;
+                $data['expire'] = 0;
+                $data['start_time'] = date('Y-m-d H:i:s');
+                $data['end_time'] = date('Y-m-d H:i:s', strtotime('+10 years'));
+                $data['currency'] = 'COIN';
+                $data['diamond_price'] = 1;
+                $data['selling_price'] = empty($model->coin) ? 0 : $model->coin;
+                $this->productService->store($data);
             }
-          return $model;
+            return $model;
         } catch (\Exception $e) {
             $this->logger->info($e->getMessage());
             echo $e->getMessage();

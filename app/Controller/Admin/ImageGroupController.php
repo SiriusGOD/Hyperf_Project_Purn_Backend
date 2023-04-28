@@ -12,12 +12,14 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
+use App\Job\ManualImageGroupSyncJob;
 use App\Model\ImageGroup;
 use App\Model\TagCorrespond;
 use App\Request\ImageRequest;
 use App\Service\ImageGroupService;
 use App\Service\ImageService;
 use App\Service\TagService;
+use Hyperf\AsyncQueue\Driver\DriverFactory;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -134,5 +136,14 @@ class ImageGroupController extends AbstractController
     {
         ImageGroup::where('id', $request->input('id'))->delete();
         return $response->redirect('/admin/image_group/index');
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'sync')]
+    public function sync(RequestInterface $request, ResponseInterface $response, DriverFactory $factory): PsrResponseInterface
+    {
+        $driver = $factory->get('default');
+        $driver->push(new ManualImageGroupSyncJob());
+
+        return $response->json([]);
     }
 }

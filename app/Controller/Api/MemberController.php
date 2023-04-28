@@ -245,7 +245,7 @@ class MemberController extends AbstractController
         $member = $service->getUserFromAccountOrEmail($account);
 
         if (empty($member)) {
-            return $this->error(trans('validation.exists', ['attribute' => 'device_id']), 400);
+            return $this->error(trans('validation.exists', ['attribute' => 'device_id or account']), 400);
         }
 
         $now = Carbon::now()->toDateTimeString();

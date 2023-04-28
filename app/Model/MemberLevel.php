@@ -45,6 +45,7 @@ class MemberLevel extends Model
 
     // 永久
     public const FOREVER_DURATION = 3650;
+
     public const FOREVER = '永久';
 
     /**
