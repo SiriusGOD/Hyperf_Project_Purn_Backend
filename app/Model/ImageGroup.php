@@ -38,8 +38,7 @@ class ImageGroup extends Model
 
     public const IMAGE_GROUP_PAY_TYPE = [
         'free' => 0,
-        'vip' => 1,
-        'diamond' => 2,
+        'vip' => 1
     ];
 
     public string $modelType = self::class;
