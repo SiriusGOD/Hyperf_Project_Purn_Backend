@@ -26,6 +26,18 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 #[Controller]
 class RedeemController extends AbstractController
 {
+    // 檢查兌換碼
+    #[RequestMapping(methods: ['POST'], path: 'checkRedeem')]
+    public function checkRedeem(RequestInterface $request, RedeemService $redeemService)
+    {
+        $code = $request->input('code');
+        $result = $redeemService-> checkRedeemByCode($code);
+        if($result){
+          return $this->success(['msg' => "可兌換"]);
+        }
+        return $this->success(['msg' => "己過期或找不到優惠卷"]);
+    }
+
     // 兌換影片
     #[RequestMapping(methods: ['POST'], path: 'videoRedeem')]
     public function videoRedeem(RequestInterface $request, RedeemService $redeemService)
@@ -38,7 +50,22 @@ class RedeemController extends AbstractController
         $result = $redeemService->redeemVideo($memberId, $videoId);
         return $this->success(['models' => $result]);
     }
-
+  
+    // 兌換影片
+    #[RequestMapping(methods: ['POST'], path: 'redeemCode')]
+    public function redeemCode(RequestInterface $request, RedeemService $redeemService)
+    {
+        $memberId = auth('jwt')->user()->getId();
+        $code = $request->input('code');
+        if (empty($code)) {
+            return $this->error('code 字段是必须的', ErrorCode::BAD_REQUEST);
+        }
+        $result = $redeemService->executeRedeemCode($code, $memberId);
+        if($result){
+          return $this->success(['msg' => "己兌換"]);
+        }
+        return $this->success(['msg' => "己過期或找不到優惠卷"]);
+    }
     // 使用者的兌換卷列表
     #[RequestMapping(methods: ['POST'], path: 'videoRedeemList')]
     public function videoRedeemList(RequestInterface $request, MemberRedeemService $memberRedeemService)

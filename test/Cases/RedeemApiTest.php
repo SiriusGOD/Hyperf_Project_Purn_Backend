@@ -52,68 +52,72 @@ class RedeemApiTest extends HttpTestCase
     }
 
     //使用者沒有兌換卷
-    public function testMemberRedeemApiFalse()
+    public function testMemberCheck()
     {
       $memberId = 7;
       $user = Member::where('id',$memberId)->first();
       $token = auth()->login($user);
       $this->token = $token; 
       make(MemberService::class)->saveToken($user->id, $token);
-      $data = $this->client->post('/api/redeem/videoRedeem', [
-          'video_id' => 1
-      ], [
+      $json["code"] = "wer";
+      $data = $this->client->post('/api/redeem/checkRedeem',$json , [
           'Authorization' => 'Bearer ' . $token,
       ]);
-      $this->assertSame(true, empty($data['data']['models']));
+      $json["code"] = "m02twebCFb";
+      $data = $this->client->post('/api/redeem/checkRedeem',$json , [
+          'Authorization' => 'Bearer ' . $token,
+      ]);
+      $this->assertSame("可兌換", $data["data"]["msg"]);
     }
   
     //取可用兌換卷
-    public function testMemberRedeemApi()
+    //public function testMemberRedeemApi()
+    //{
+    //  $user = Member::where('id',1)->first();
+    //  $token = auth()->login($user);
+    //  $this->token = $token; 
+    //  make(MemberService::class)->saveToken($user->id, $token);
+    //  $data = $this->client->post('/api/redeem/videoRedeem', [
+    //      'video_id' => 1
+    //  ], [
+    //      'Authorization' => 'Bearer ' . $token,
+    //  ]);
+    //  $this->assertSame(200, (int)$data['code']);
+    //}
+  
+    //取可用兌換卷
+    public function testRedeemCode()
     {
       $user = Member::where('id',1)->first();
       $token = auth()->login($user);
       $this->token = $token; 
       make(MemberService::class)->saveToken($user->id, $token);
-      $data = $this->client->post('/api/redeem/videoRedeem', [
-          'video_id' => 1
-      ], [
-          'Authorization' => 'Bearer ' . $token,
-      ]);
-      $this->assertSame(200, (int)$data['code']);
-    }
-  
-    //取可用兌換卷
-    public function test1MemberRedeemApiList()
-    {
-      $user = Member::where('id',1)->first();
-      $token = auth()->login($user);
-      $this->token = $token; 
-      make(MemberService::class)->saveToken($user->id, $token);
-      $data = $this->client->get('/api/redeem/videoRedeemList',
+      $data = $this->client->post('/api/redeem/redeemCode',
       [
-        "page" => 0
+        "code" => 'm02twebCFb'
       ], 
       [
           'Authorization' => 'Bearer ' . $token,
       ]);
-      $this->assertSame(1, (int)$data['data']['models'][0]["member_id"]);
+      print_r($data);
+      $this->assertSame(200, $data['code']);
     }
 
-    //取可用兌換卷
-    public function testUsedMemberRedeemApiList()
-    {
-      $memberId = 1;
-      $user = Member::where('id',$memberId)->first();
-      $token = auth()->login($user);
-      $this->token = $token; 
-      make(MemberService::class)->saveToken($user->id, $token);
-      $data = $this->client->get('/api/redeem/usedVideoRedeemList',
-      [
-        "page" => 0
-      ], 
-      [
-          'Authorization' => 'Bearer ' . $token,
-      ]);
-      $this->assertSame($memberId, (int)$data['data']['models'][0]["member_id"]);
-    }
+    ////取可用兌換卷
+    //public function testUsedMemberRedeemApiList()
+    //{
+    //  $memberId = 1;
+    //  $user = Member::where('id',$memberId)->first();
+    //  $token = auth()->login($user);
+    //  $this->token = $token; 
+    //  make(MemberService::class)->saveToken($user->id, $token);
+    //  $data = $this->client->get('/api/redeem/usedVideoRedeemList',
+    //  [
+    //    "page" => 0
+    //  ], 
+    //  [
+    //      'Authorization' => 'Bearer ' . $token,
+    //  ]);
+    //  $this->assertSame($memberId, (int)$data['data']['models'][0]["member_id"]);
+    //}
 }

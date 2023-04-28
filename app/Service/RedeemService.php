@@ -95,6 +95,13 @@ class RedeemService extends BaseService
       }
 
       // 使用者兌換卷 by code
+      public function checkRedeemByCode(string $code)
+      {
+          $model = $this->redeem->where('status', 0)
+                                      ->where('code', $code)->exists();
+          return $model;
+      }
+      // 使用者兌換卷 by code
       public function getMemberRedeemByCode(string $code, int $page)
       {
           $model = $this->memberRedeem->where('redeem_code', $code)
