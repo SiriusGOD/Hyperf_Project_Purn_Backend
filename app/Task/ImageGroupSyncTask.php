@@ -71,9 +71,15 @@ class ImageGroupSyncTask
                 $forever = false;
             }
 
-            if ((int) $systemParam->param - $count >= 100) {
+            if ($count - ((int) $systemParam->param) >= 100) {
                 $this->logger->info('筆數過多 下次繼續同步 ： ' . $count);
                 $forever = false;
+            }
+
+            if (ImageGroup::where('sync_id', $result['data']['id'])->exists()) {
+                $count++;
+                sleep(1);
+                continue;
             }
             $id = $this->createImageGroup($result['data']);
             $tagsIds = $this->getTags($result['data']['tags']);
@@ -103,11 +109,6 @@ class ImageGroupSyncTask
 
     protected function createImageGroup(array $params): int
     {
-        $model = ImageGroup::where('sync_id', $params['id'])->first();
-        if (! empty($model)) {
-            return $model->id;
-        }
-
         $url = env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live');
         $imageInfo = getimagesize($url . $params['thumb']);
         $model = new ImageGroup();
