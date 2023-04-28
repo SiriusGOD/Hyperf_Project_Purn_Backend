@@ -115,6 +115,6 @@ class Video extends Model
 
     protected function getModelTypeAttribute()
     {
-        return self::class;
+        return 'video';
     }
 }

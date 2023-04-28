@@ -103,6 +103,6 @@ class ImageGroup extends Model
 
     protected function getModelTypeAttribute()
     {
-        return self::class;
+        return 'image_group';
     }
 }
