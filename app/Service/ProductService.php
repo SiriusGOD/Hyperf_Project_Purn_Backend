@@ -51,6 +51,8 @@ class ProductService
     // 新增或更新
     public function store(array $data)
     {
+        var_dump($data);
+        die();
         $model = Product::findOrNew($data['id']);
         $model->user_id = $data['user_id'];
         $model->type = $data['type'];
@@ -204,7 +206,11 @@ class ProductService
                 })->selectRaw('products.id, products.name, products.currency, products.selling_price, member_levels.type, member_levels.duration, member_levels.title, member_levels.description, member_levels.remark')->orderBy('member_levels.type')->orderBy('member_levels.duration')->get()->toArray();
         
         $vip_arr = [];
+        $vip_key = 0;
+        $vip_index = 0;
         $diamond_arr = [];
+        $diamond_key = 0;
+        $diamond_index = 0;
         foreach ($products as $key => $value) {
             // 撈取個商品的支付方式   
             $pay_query = PayCorrespond::join('pays', 'pays.id', 'pay_corresponds.pay_id')->where('pays.expire', Pay::EXPIRE['no'])->where('pay_corresponds.product_id', $value['id'])->select('pays.id', 'pays.name', 'pays.pronoun')->get()->toArray();
@@ -220,6 +226,10 @@ class ProductService
                     'remark' => $value['remark'],
                     'pay_method' => $pay_query
                 ));
+                if($value['duration'] == 30){
+                    $vip_index = $vip_key;
+                }
+                $vip_key++;
             }else{
                 array_push($diamond_arr, array(
                     'id' => $value['id'],
@@ -231,11 +241,17 @@ class ProductService
                     'remark' => $value['remark'],
                     'pay_method' => $pay_query
                 ));
+                if($value['duration'] == 30){
+                    $diamond_index = $diamond_key;
+                }
+                $diamond_key++;
             }
         }
 
         $data['vip'] = $vip_arr;
+        $data['vip_index'] = $vip_index;
         $data['diamond'] = $diamond_arr;
+        $data['diamond_index'] = $diamond_index;
 
         $this->redis->set($checkRedisKey, json_encode($data));
         $this->redis->expire($checkRedisKey, self::TTL_30_Min);
