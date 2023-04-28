@@ -51,7 +51,8 @@ class ImageGroupSyncTask
 
     public function execute()
     {
-        $count = $this->getCount();
+        $systemParam = $this->getCount();
+        $count = (int) $systemParam->param;
         $forever = true;
         $client = new \GuzzleHttp\Client();
         while ($forever) {
@@ -69,6 +70,11 @@ class ImageGroupSyncTask
                 $this->logger->info('無資料');
                 $forever = false;
             }
+
+            if ((int) $systemParam->param - $count >= 100) {
+                $this->logger->info('筆數過多 下次繼續同步 ： ' . $count);
+                $forever = false;
+            }
             $id = $this->createImageGroup($result['data']);
             $tagsIds = $this->getTags($result['data']['tags']);
             if (! empty($tagsIds)) {
@@ -79,19 +85,20 @@ class ImageGroupSyncTask
             sleep(1);
         }
 
+        $systemParam->param = $count;
+        $systemParam->save();
+
         return '';
     }
 
-    protected function getCount(): int
+    protected function getCount(): SystemParam
     {
-        $model = SystemParam::firstOrCreate([
+        return SystemParam::firstOrCreate([
             'description' => self::SYNC_KEY,
-            'param' => 1,
+        ], [
+            'description' => self::SYNC_KEY,
+            'param' => 1
         ]);
-
-        $count = $model->param;
-
-        return $count;
     }
 
     protected function createImageGroup(array $params): int
