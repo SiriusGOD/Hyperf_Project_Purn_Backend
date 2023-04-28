@@ -124,15 +124,21 @@ class SearchService
         return $result;
     }
 
-    protected function generateImageGroups(array $result, array $imageGroups): array
+    public function generateImageGroups(array $result, array $imageGroups): array
     {
         foreach ($imageGroups as $imageGroup) {
             $url = $this->getUrl($imageGroup);
             $imageGroup['thumbnail'] = $url . $imageGroup['thumbnail'];
             $imageGroup['url'] = $url . $imageGroup['url'];
+            $count = 0;
             foreach ($imageGroup['images_limit'] as $key => $image) {
+                if ($count >= ImageGroup::DEFAULT_FREE_LIMIT) {
+                    unset($imageGroup['images_limit'][$key]);
+                    continue;
+                }
                 $imageGroup['images_limit'][$key]['thumbnail'] = $url . $imageGroup['images_limit'][$key]['thumbnail'];
                 $imageGroup['images_limit'][$key]['url'] = $url . $imageGroup['images_limit'][$key]['url'];
+                $count++;
             }
 
             $result[] = $imageGroup;

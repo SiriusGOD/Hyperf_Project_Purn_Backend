@@ -80,7 +80,7 @@ class ImageGroup extends Model
 
     public function imagesLimit()
     {
-        return $this->hasMany(Image::class, 'group_id')->limit(self::DEFAULT_FREE_LIMIT);
+        return $this->hasMany(Image::class, 'group_id');
     }
 
     public function getAdminBaseUrl()

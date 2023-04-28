@@ -23,6 +23,7 @@ use App\Service\ClickService;
 use App\Service\ImageGroupService;
 use App\Service\ImageService;
 use App\Service\LikeService;
+use App\Service\SearchService;
 use App\Service\SuggestService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -32,13 +33,14 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 class ImageGroupController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'list')]
-    public function list(ImageApiListRequest $request, ImageGroupService $service)
+    public function list(ImageApiListRequest $request, ImageGroupService $service, SearchService $searchService)
     {
         $tagIds = $request->input('tags');
         $page = (int) $request->input('page', 0);
-        $models = $service->getImageGroups($tagIds, $page);
+        $models = $service->getImageGroups($tagIds, $page)->toArray();
+        $result = $searchService->generateImageGroups([], $models);
         $data = [];
-        $data['models'] = $models;
+        $data['models'] = $result;
         $path = '/api/image_group/list';
         $simplePaginator = new SimplePaginator($page, CustomerService::PAGE_PER, $path);
         $data = array_merge($data, $simplePaginator->render());
@@ -46,13 +48,14 @@ class ImageGroupController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'search')]
-    public function search(ImageApiSearchRequest $request, ImageGroupService $service)
+    public function search(ImageApiSearchRequest $request, ImageGroupService $service, SearchService $searchService)
     {
         $keyword = $request->input('keyword');
         $page = (int) $request->input('page', 0);
-        $models = $service->getImageGroupsByKeyword($keyword, $page);
+        $models = $service->getImageGroupsByKeyword($keyword, $page)->toArray();
+        $result = $searchService->generateImageGroups([], $models);
         $data = [];
-        $data['models'] = $models;
+        $data['models'] = $result;
         $path = '/api/image_group/search';
         $simplePaginator = new SimplePaginator($page, CustomerService::PAGE_PER, $path);
         $data = array_merge($data, $simplePaginator->render());
@@ -60,14 +63,15 @@ class ImageGroupController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'suggest')]
-    public function suggest(ImageApiSuggestRequest $request, SuggestService $suggestService, ImageGroupService $service)
+    public function suggest(ImageApiSuggestRequest $request, SuggestService $suggestService, ImageGroupService $service, SearchService $searchService)
     {
         $page = (int) $request->input('page', 0);
         $userId = (int) auth()->user()->getId();
         $suggest = $suggestService->getTagProportionByUser($userId);
         $models = $service->getImageGroupsBySuggest($suggest, $page);
+        $result = $searchService->generateImageGroups([], $models);
         $data = [];
-        $data['models'] = $models;
+        $data['models'] = $result;
         $path = '/api/image_group/suggest';
         $simplePaginator = new SimplePaginator($page, CustomerService::PAGE_PER, $path);
         $data = array_merge($data, $simplePaginator->render());
