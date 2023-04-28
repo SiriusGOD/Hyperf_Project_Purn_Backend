@@ -30,6 +30,7 @@
         "hyperf/crontab": "3.0.*",
         "hyperf/database": "3.0.*",
         "hyperf/db-connection": "3.0.*",
+        "hyperf/event": "^3.0",
         "hyperf/framework": "3.0.*",
         "hyperf/guzzle": "3.0.*",
         "hyperf/http-server": "3.0.*",
@@ -49,6 +50,7 @@
         "pragmarx/google2fa": "^8.0"
     },
     "require-dev": {
+        "filp/whoops": "^2.15",
         "friendsofphp/php-cs-fixer": "*",
         "hyperf/devtool": "3.0.*",
         "hyperf/ide-helper": "3.0.*",
