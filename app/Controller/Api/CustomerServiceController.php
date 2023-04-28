@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
+use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\CustomerService;
 use App\Model\CustomerServiceDetail;
 use App\Request\CustomerServiceApiReplyRequest;
@@ -19,6 +20,7 @@ use App\Request\CustomerServiceCreateRequest;
 use App\Request\CustomerServiceDetailRequest;
 use App\Service\CustomerServiceService;
 use App\Service\ImageService;
+use App\Util\General;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -28,24 +30,25 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Qbhy\HyperfAuth\AuthMiddleware;
 
 #[Controller]
-#[Middleware(AuthMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class CustomerServiceController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request)
     {
         $page = (int) $request->input('page', 0);
+        $limit = (int) $request->input('limit', CustomerService::PAGE_PER);
         $memberId = auth()->user()->getId();
         $models = CustomerService::where('member_id', $memberId)
-            ->offset($page * CustomerService::PAGE_PER)
-            ->limit(CustomerService::PAGE_PER)
+            ->offset($page * $limit)
+            ->limit($limit)
             ->orderByDesc('id')
             ->get()
             ->toArray();
         $data = [];
         $data['models'] = $models;
         $path = '/api/customer_service/list';
-        $simplePaginator = new SimplePaginator($page, CustomerService::PAGE_PER, $path);
+        $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
@@ -54,16 +57,26 @@ class CustomerServiceController extends AbstractController
     public function detail(CustomerServiceDetailRequest $request)
     {
         $page = (int) $request->input('page', 0);
+        $limit = (int) $request->input('limit', CustomerService::PAGE_PER);
         $id = $request->input('id');
         $models = CustomerServiceDetail::where('customer_service_id', $id)
             ->with('user', 'member')
-            ->offset($page * CustomerServiceDetail::PAGE_PER)
-            ->limit(CustomerServiceDetail::PAGE_PER)
-            ->get();
+            ->offset($page * $limit)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+
+        $result = [];
+        $url = General::getImageUrl($request->url());
+        foreach ($models as $model) {
+            $model['image_url'] = $url . $model['image_url'];
+            $result[] = $model;
+        }
         $data = [];
-        $data['models'] = $models;
+        $data['models'] = $result;
         $path = '/api/customer_service/detail';
-        $simplePaginator = new SimplePaginator($page, CustomerServiceDetail::PAGE_PER, $path);
+        $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }

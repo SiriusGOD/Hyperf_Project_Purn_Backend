@@ -34,6 +34,8 @@ class ImageGroupSyncTask
 
     protected Redis $redis;
 
+    protected int $count = 0;
+
     protected string $syncUrl;
 
     private \Psr\Log\LoggerInterface $logger;
@@ -82,7 +84,6 @@ class ImageGroupSyncTask
 
     protected function getCount(): int
     {
-        $count = 0;
         if ($this->redis->exists(self::SYNC_KEY)) {
             return (int) $this->redis->get(self::SYNC_KEY);
         }
@@ -105,6 +106,8 @@ class ImageGroupSyncTask
             return $model->id;
         }
 
+        $url = env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live');
+        $imageInfo = getimagesize($url . $params['thumb']);
         $model = new ImageGroup();
         $model->user_id = self::ADMIN_ID;
         $model->title = $params['title'];
@@ -112,6 +115,8 @@ class ImageGroupSyncTask
         $model->url = $params['thumb'];
         $model->description = $params['desc'];
         $model->sync_id = $params['id'];
+        $model->height = $imageInfo[1];
+        $model->weight = $imageInfo[0];
 
         $model->save();
 

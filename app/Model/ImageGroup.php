@@ -12,23 +12,25 @@ declare(strict_types=1);
 namespace App\Model;
 
 /**
- * @property int $id
- * @property int $user_id
- * @property string $title
- * @property string $thumbnail
- * @property string $url
- * @property string $description
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property string $deleted_at
- * @property int $pay_type
- * @property int $hot_order
- * @property int $sync_id
- * @property \Hyperf\Database\Model\Collection|Image[] $images
- * @property \Hyperf\Database\Model\Collection|Tag[] $tags
- * @property User $user
- * @property \Hyperf\Database\Model\Collection|Image[] $imagesLimit
- * @property mixed $model_type
+ * @property int $id 
+ * @property int $user_id 
+ * @property string $title 
+ * @property string $thumbnail 
+ * @property string $url 
+ * @property string $description 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property string $deleted_at 
+ * @property int $pay_type 
+ * @property int $hot_order 
+ * @property int $sync_id 
+ * @property int $height 
+ * @property int $weight 
+ * @property-read \Hyperf\Database\Model\Collection|Image[] $images 
+ * @property-read \Hyperf\Database\Model\Collection|Tag[] $tags 
+ * @property-read User $user 
+ * @property-read \Hyperf\Database\Model\Collection|Image[] $imagesLimit 
+ * @property-read mixed $model_type 
  */
 class ImageGroup extends Model
 {
@@ -57,7 +59,7 @@ class ImageGroup extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'pay_type' => 'integer', 'hot_order' => 'integer', 'sync_id' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'pay_type' => 'integer', 'hot_order' => 'integer', 'sync_id' => 'integer', 'height' => 'integer', 'weight' => 'integer'];
 
     protected array $appends = ['model_type'];
 
