@@ -91,7 +91,7 @@ class BaseService
     }
 
     // 共用儲存
-    public function modelStore($model, array $datas): bool
+    public function modelStore($model, array $datas)
     {
         if (isset($datas['id']) && ! empty($datas['id'])) {
             $model = $model->where('id', $datas['id'])->first();
@@ -102,7 +102,7 @@ class BaseService
             $model->{$key} = $val;
         }
         if ($model->save()) {
-            return true;
+            return $model;
         }
         return false;
     }
