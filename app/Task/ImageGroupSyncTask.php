@@ -143,12 +143,6 @@ class ImageGroupSyncTask
 
     protected function createImage(array $image, int $imageGroupId): void
     {
-        $model = Image::where('sync_id', $image['id'])->first();
-
-        if (! empty($model)) {
-            return;
-        }
-
         $model = new Image();
         $model->user_id = self::ADMIN_ID;
         $model->title = '';

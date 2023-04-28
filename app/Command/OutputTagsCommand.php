@@ -54,7 +54,7 @@ class OutputTagsCommand extends HyperfCommand
             }
 
             $result = json_decode($res->getBody()->getContents(), true);
-            if (empty($result['data'])) {
+            if (empty($result['data']) or $count == 1000) {
                 $this->info('無資料');
                 $forever = false;
             }
