@@ -27,7 +27,7 @@ use Hyperf\Database\Model\Collection;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
-
+use App\Util\Calc;
 class VideoService
 {
     public const CACHE_KEY = 'video';
@@ -142,6 +142,11 @@ class VideoService
             } else {
                 $model = new Video();
             }
+            
+            $cover = env("COVER_URL").$data['cover_full'];
+            $imgSize = Calc::imgSize($cover); 
+            $data['cover_witdh'] = isset($imgSize['width']) ?$imgSize['width'] :0;
+            $data['cover_heigh'] = isset($imgSize['heigh']) ?$imgSize['heigh'] :0;
             foreach ($data as $key => $val) {
                 $model->{$key} = "{$val}";
             }

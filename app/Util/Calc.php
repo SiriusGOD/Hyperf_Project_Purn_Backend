@@ -24,7 +24,7 @@ class Calc
         $image_size = getimagesize($temp_file);
         // 獲取圖片寬度和高度
         $data['width'] = $image_size[0];
-        $data['height'] = $image_size[1];
+        $data['heigh'] = $image_size[1];
         // 刪除臨時文件
         unlink($temp_file);
         return $data;
