@@ -49,7 +49,7 @@ class ProductController extends AbstractController
     /**
      * 獲取上架中的商品列表.
      */
-    #[RequestMapping(methods: ['POST'], path: 'getMemberList')]
+    #[RequestMapping(methods: ['POST'], path: 'getMemberProductList')]
     public function getMemberList(ProductApiRequest $request, ProductService $service)
     {
         // member
