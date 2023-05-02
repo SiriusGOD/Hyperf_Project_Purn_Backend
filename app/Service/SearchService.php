@@ -131,6 +131,10 @@ class SearchService
             $imageGroup['thumbnail'] = $url . $imageGroup['thumbnail'];
             $imageGroup['url'] = $url . $imageGroup['url'];
             $count = 0;
+            if (empty($imageGroup['images_limit'])) {
+                $result[] = $imageGroup;
+                continue;
+            }
             foreach ($imageGroup['images_limit'] as $key => $image) {
                 if ($count >= ImageGroup::DEFAULT_FREE_LIMIT) {
                     unset($imageGroup['images_limit'][$key]);
