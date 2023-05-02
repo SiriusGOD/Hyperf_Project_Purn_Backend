@@ -8,37 +8,32 @@
                     <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                         <div class="row">
                             <div class="col-sm-12 col-md-10 mb-1">
-                                <form action="/admin/product/search" method="get">
+                                <form action="/admin/product/multipleEdit" method="get">
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_choose_type') ?? '選擇商品類型'}}</label>
                                     <select  class="form-control-sm" name="product_type" >
-                                    <option value="">全部</option>
-                                    @foreach(\App\Model\Product::TYPE_LIST as $type)
+                                    <!-- @foreach(\App\Model\Product::TYPE_LIST as $type)
                                         <option value="{{$type}}" {{$product_type == $type ? 'selected' : ''}}>
                                             {{\App\Model\Product::TYPE_LIST_NAME[$type]}}
                                         </option>
-                                    @endforeach
+                                    @endforeach -->
+                                        <option value="{{\App\Model\Product::TYPE_LIST[0]}}" {{$product_type == \App\Model\Product::TYPE_LIST[0] ? 'selected' : ''}}>
+                                            {{\App\Model\Product::TYPE_LIST_NAME['image']}}
+                                        </option>
+                                        <option value="{{\App\Model\Product::TYPE_LIST[1]}}" {{$product_type == \App\Model\Product::TYPE_LIST[1] ? 'selected' : ''}}>
+                                            {{\App\Model\Product::TYPE_LIST_NAME['video']}}
+                                        </option>
                                     </select>
-                                    <label for="exampleInputEmail1">{{trans('default.product_control.product_name') ?? '名稱'}}: </label>
-                                    <input type="text" name="product_name" id="product_name" value="" placeholder="請輸入商品名稱">
+                                    <label for="exampleInputEmail1">&nbsp;&nbsp; {{trans('default.product_control.product_name') ?? '名稱'}}: </label>
+                                    <input type="text" name="product_name" id="product_name" value="" placeholder="請輸入影片或圖片名稱">
+
+                                    <label for="exampleInputEmail1">&nbsp;&nbsp;{{trans('default.product_control.product_id') ?? '商品序號'}} (多筆請用逗號隔開): </label>
+                                    <input type="text" name="product_id" id="product_id" value="" placeholder="請輸入ID">
                                     
                                     <button type="submit" class="btn btn-primary">查詢</button>
                                 </form>
                             </div>
-                            @if(authPermission('product-create'))
-                            <div class="col-md-1  ms-auto">
-                                <a class="btn badge-info" href="/admin/product/choose">{{trans('default.product_control.product_create') ?? '新增商品'}}</a>
-                            </div>
-                            @endif
-                            <!-- @if(authPermission('product-multiple-create'))
-                            <div class="col-md-1  ms-auto">
-                                <a class="btn badge-info" href="/admin/product/multipleChoice">{{trans('default.product_control.multiple_create') ?? '大批新增'}}</a>
-                            </div>
-                            @endif -->
-                            @if(authPermission('product-multiple-create'))
-                            <div class="col-md-1  ms-auto">
-                                <a class="btn badge-info" href="/admin/product/multipleEdit">{{trans('default.product_control.multiple_edit') ?? '大批修改'}}</a>
-                            </div>
-                            @endif
+                            <button type="submit" class="btn btn-primary col-md-1 mb-1" onclick="multipleUpdate()">{{trans('default.product_control.multiple_edit') ?? '大批修改'}}</button>
+                            <button type="submit" class="btn btn-danger col-md-1 mb-1" onclick="clearCache()">{{trans('default.product_control.product_clear_choose') ?? '清除選擇'}}</button>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
@@ -46,7 +41,7 @@
                                        aria-describedby="example2_info">
                                     <thead>
                                     <tr>
-                                        <th class="sorting sorting_asc" tabindex="0" aria-controls="example2"
+                                    <th class="sorting sorting_asc" tabindex="0" aria-controls="example2"
                                             rowspan="1"
                                             colspan="1" aria-sort="ascending"
                                             aria-label="Rendering engine: activate to sort column descending">{{trans('default.id') ?? '序號'}}
@@ -81,7 +76,6 @@
                                                 {{trans('default.click_num') ?? '點擊次數'}}
                                             </th>
                                         @endif
-                                        
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.product_control.product_currency') ?? '商品幣別'}}
@@ -93,7 +87,7 @@
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
                                             aria-label="Engine version: activate to sort column ascending">
-                                            {{trans('default.time') ?? '時間'}}
+                                            {{trans('default.time')?? '時間'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
@@ -102,11 +96,13 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="CSS grade: activate to sort column ascending">{{trans('default.action') ?? '動作'}}
+                                            aria-label="CSS grade: activate to sort column ascending">
+                                            <input type="checkbox" name="check_all" id="check_all" > 全選<br>
                                         </th>
                                     </tr>
                                     </thead>
                                     <tbody>
+                                    @if(!empty($datas))
                                     @foreach($datas as $model)
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $model->id}}</td>
@@ -128,7 +124,7 @@
                                                     </td>
                                                 @endif
                                                 <td>
-                                                    {{$model->count ?? 0}}次
+                                                    0次
                                                 </td>
                                             @endif
                                             <td>
@@ -142,39 +138,13 @@
                                             </td>
                                             <td>{{ $model->expire == 0 ? trans('default.take_up') : trans('default.take_down')}}</td>
                                             <td>
-                                                @if(authPermission('product-edit'))
-                                                    <div class="row mb-1">
-                                                    <a href="/admin/product/edit?id={{$model->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
-                                                    </div>
-                                                @endif
-                                                @if(authPermission('product-expire'))
                                                 <div class="row mb-1">
-                                                    <form action="/admin/product/expire" method="post">
-                                                        <input type="hidden" name="id" value="{{$model->id}}" >
-                                                        <input type="hidden" name="expire" value="{{\App\Model\product::EXPIRE['yes']}}" >
-                                                        @if(!empty($product_type))
-                                                        <input type="hidden" name="product_type" value="{{$product_type}}" >
-                                                        @endif
-                                                        <input type="submit"  class="btn btn-danger" value="{{trans('default.take_down') ?? '下架'}}">
-                                                    </form>
+                                                    <input type="checkbox" name="Interest" id="checkbox{{$model->id}}" onclick="insertCache({{$model->id}})"> 新增<br>
                                                 </div>
-
-
-                                                <div class="row mb-1">
-                                                    <form action="/admin/product/expire" method="post">
-                                                        <input type="hidden" name="id" value="{{$model->id}}" >
-                                                        <input type="hidden" name="expire" value="{{\App\Model\product::EXPIRE['no']}}" >
-                                                        @if(!empty($product_type))
-                                                        <input type="hidden" name="product_type" value="{{$product_type}}" >
-                                                        @endif
-                                                        <input type="submit"  class="btn btn-danger" value="{{trans('default.take_up') ?? '上架'}}">
-                                                    </form>
-                                                </div>
-                                                @endif
-
                                             </td>
                                         </tr>
                                     @endforeach
+                                    @endif
                                     </tbody>
                                     <tfoot>
                                     <tr>
@@ -190,7 +160,6 @@
                                             @endif
                                             <th rowspan="1" colspan="1">{{trans('default.click_num') ?? '點擊次數'}}</th>
                                         @endif
-                                        
                                         <th rowspan="1" colspan="1">{{trans('default.product_control.product_currency') ?? '商品幣別'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.product_control.product_price') ?? '商品價格'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.time') ?? '時間'}}</th>
@@ -248,4 +217,77 @@
         <!-- /.col -->
     </div>
 
+    <script>
+        $(document).ready(function() {
+            let products = JSON.parse(localStorage.getItem('multipleProducts'));
+            products.forEach(id => {
+                $("#checkbox" + id).prop('checked', true);
+            });
+        });
+        function insertCache(id){
+            let products = JSON.parse(localStorage.getItem('multipleProducts'));
+            if(products){
+                // 確認是否有重複 有的話刪除
+                check = products.indexOf(id);
+                if(check != -1){
+                    products.splice(check,1);
+                }else{
+                    products.push(id);
+                }
+                
+                localStorage.setItem('multipleProducts', JSON.stringify(products));
+            }else{
+                products = [];
+                products.push(id);
+                localStorage.setItem('multipleProducts', JSON.stringify(products));
+            }
+            console.log(localStorage.getItem('multipleProducts'));
+        }
+
+        function clearCache(){
+            let products = JSON.parse(localStorage.getItem('multipleProducts'));;
+            
+            products.forEach(id => {
+                $("#checkbox" + id).prop('checked', false);
+                $("#check_all").prop('checked', false);
+                // document.getElementById("checkbox" + id).checked = false;
+            });
+
+            // Clear items
+            localStorage.removeItem('multipleProducts');
+            // Clear all items
+            localStorage.clear();
+            console.log(localStorage.getItem('multipleProducts'));
+        }
+
+        function multipleUpdate(){
+            console.log('{{ urlencode($product_type) }}');
+            let data = localStorage.getItem('multipleProducts');
+            let type = '{{ urlencode($product_type) }}';
+            if(data){
+                clearCache();
+                window.location.href = "/admin/product/multipleUpdate?data=" + data + "&type=" + type;
+            }else{
+                alert('請勾選欲建立的商品');
+            }
+        }
+
+        $(document).ready(function() {
+            // 點擊全選 checkbox
+            $("#check_all").change(function() {
+                if (this.checked) {
+                    // 全選
+                    $('input[name="Interest"]').prop("checked", true);
+                    $('input[name="Interest"]').each(function() {
+                        var id = $(this).attr('id');
+                        insertCache(id.replace('checkbox',''));
+                    });
+                } else {
+                    // 取消全選
+                    $('input[name="Interest"]').prop("checked", false);
+                    clearCache();
+                }
+            });
+        });
+    </script>
 @endsection

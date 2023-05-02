@@ -12,11 +12,17 @@
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_choose_type') ?? '選擇商品類型'}}</label>
                                     <select  class="form-control-sm" name="product_type" >
                                         <option value="">選擇商品類型</option>
-                                        <@foreach(\App\Model\Product::TYPE_LIST as $type)
+                                        <!-- <@foreach(\App\Model\Product::TYPE_LIST as $type)
                                         <option value="{{$type}}" {{$product_type == $type ? 'selected' : ''}}>
                                             {{\App\Model\Product::TYPE_LIST_NAME[$type]}}
                                         </option>
-                                        @endforeach
+                                        @endforeach -->
+                                        <option value="{{\App\Model\Product::TYPE_LIST[2]}}" {{$product_type == \App\Model\Product::TYPE_LIST[2] ? 'selected' : ''}}>
+                                            {{\App\Model\Product::TYPE_LIST_NAME['member']}}
+                                        </option>
+                                        <option value="{{\App\Model\Product::TYPE_LIST[3]}}" {{$product_type == \App\Model\Product::TYPE_LIST[3] ? 'selected' : ''}}>
+                                            {{\App\Model\Product::TYPE_LIST_NAME['points']}}
+                                        </option>
                                     </select>
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_name_search') ?? '查詢名稱'}}: </label>
                                     <input type="text" name="product_name" id="product_name" value="" placeholder="請輸入影片或圖片名稱">
@@ -45,7 +51,7 @@
                                             colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.name') ?? '名稱'}}
                                         </th>
-                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                        <!-- <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
                                             aria-label="Engine version: activate to sort column ascending">
                                             {{trans('default.image') ?? '圖片'}}
@@ -54,7 +60,7 @@
                                             colspan="1"
                                             aria-label="Engine version: activate to sort column ascending">
                                             {{trans('default.preview') ?? '預覽'}}
-                                        </th>
+                                        </th> -->
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
                                             aria-label="CSS grade: activate to sort column ascending">{{trans('default.action') ?? '動作'}}
@@ -70,8 +76,8 @@
                                             {{trans('default.product_control.product_type_msg')[$product_type]}}
                                             </td>
                                             <td>{{ $model->title}}</td>
-                                            <td>{{ $model->img_thumb}}</td>
-                                            <td>{{ $model->m3u8}}</td>
+                                            <!-- <td>{{ $model->img_thumb}}</td>
+                                            <td>{{ $model->m3u8}}</td> -->
                                             <td>
                                                 @if(authPermission('product-create'))
                                                     <div class="row mb-1">
@@ -88,8 +94,8 @@
                                         <th rowspan="1" colspan="1">{{trans('default.id') ?? '序號'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.type') ?? '類型'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.name') ?? '名稱'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.image') ?? '圖片'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.preview') ?? '預覽'}}</th>
+                                        <!-- <th rowspan="1" colspan="1">{{trans('default.image') ?? '圖片'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.preview') ?? '預覽'}}</th> -->
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>
                                     </tfoot>

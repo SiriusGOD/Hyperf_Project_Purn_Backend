@@ -208,12 +208,12 @@ class OrderController extends AbstractController
                     return $this->error('該商品不可使用VIP觀看次數購買', ErrorCode::BAD_REQUEST);
                 }
                 // 如果是圖片，確認圖片是否是vip或免費影片
-                if ($product['type'] == Product::TYPE_LIST[0]) {
-                    $img = ImageGroup::where('id', $product['correspond_id'])->first()->toArray();
-                    if ($img['pay_type'] == ImageGroup::IMAGE_GROUP_PAY_TYPE['diamond']) {
-                        return $this->error('該商品不可使用VIP觀看次數購買', ErrorCode::BAD_REQUEST);
-                    }
-                }
+                // if ($product['type'] == Product::TYPE_LIST[0]) {
+                //     $img = ImageGroup::where('id', $product['correspond_id'])->first()->toArray();
+                //     if ($img['pay_type'] == ImageGroup::IMAGE_GROUP_PAY_TYPE['diamond']) {
+                //         return $this->error('該商品不可使用VIP觀看次數購買', ErrorCode::BAD_REQUEST);
+                //     }
+                // }
 
                 // 如果是影片，確認影片是否是vip或免費影片
                 if ($product['type'] == Product::TYPE_LIST[1]) {
