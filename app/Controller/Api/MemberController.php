@@ -265,11 +265,12 @@ class MemberController extends AbstractController
 
     // 追蹤多個標籤
     #[RequestMapping(methods: ['POST'], path: 'addMemberIdsFollow')]
-    public function addMemberIdsFollow(AddFollowerRequest $request, MemberFollowService $memberFollowService)
+    public function addMemberIdsFollow(AddFollowerRequest $request, MemberService $memberService, MemberFollowService $memberFollowService)
     {
         $follow_ids = $request->input('ids');
         $type = $request->input('type');
         $userId = auth('jwt')->user()->getId();
+        $memberService->delRedis($userId);
         $res = $memberFollowService->addTagsFlower($type, $userId, $follow_ids);
         if ($res) {
             return $this->success();

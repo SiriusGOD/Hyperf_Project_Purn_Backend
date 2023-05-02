@@ -48,6 +48,11 @@ class MemberFollowerApiTest extends HttpTestCase
       ], [
           'Authorization' => 'Bearer ' . $token,
       ]);
+      $data = $this->client->post('/api/member/detail', [
+      ], [
+          'Authorization' => 'Bearer ' . $token,
+      ]);
+      print_r([$data]);
       $this->assertSame(200, $data['code']);
     }
   

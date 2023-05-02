@@ -322,11 +322,23 @@ class MemberService extends BaseService
 
           return $this->createVerificationCode($memberId);
       }
+      //刪除member Redis
+      public function delRedis(int $memberId){
+          $key = $this->defaultKey($memberId);
+          if($this->redis->exists($key)){
+            $this->redis->delete($key);
+          }
+      }
 
+      //預設的key
+      public function defaultKey(int $id):string
+      {
+          return self::KEY . ':' . $id;
+      }
       // 用id找用戶
       public function getMember($id)
       {
-          $key = self::KEY . ':' . $id;
+          $key = $this->defaultKey($id);
           if ($this->redis->exists($key)) {
               $res = $this->redis->get($key);
               return json_decode($res, true);
