@@ -331,11 +331,19 @@ class MemberService extends BaseService
               $res = $this->redis->get($key);
               return json_decode($res, true);
           }
-          $user = Member::find($id);
-
-          $this->redis->set($key, json_encode($user->toArray()));
+          $user = Member::where("id",$id)->first();
+          $user = $user->toArray();
+          $urls = 
+          [
+            env("PURL1"),
+            env("PURL2"),
+            env("DURL1"),
+            env("DURL2"),
+          ];
+          $user["aff"] = $urls[rand(0,count($urls)-1)].$user['aff'];
+          $this->redis->set($key, json_encode($user));
           $this->redis->expire($key, 86400);
-          return $user->toArray();
+          return $user;
       }
 
       public function getUserFromAccountOrEmail(?string $account, ?string $email = null)
