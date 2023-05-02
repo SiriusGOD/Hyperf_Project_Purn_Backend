@@ -53,8 +53,9 @@ class ActorController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'getListByClassification')]
     public function getListByClassification(RequestInterface $request, ActorClassificationService $service)
     {
+        $userId = auth('jwt')->user()->getId();
         $type_id = (int) $request->input('type_id', 0);
-        $result = $service->getListByClassification($type_id);
+        $result = $service->getListByClassification($type_id, $userId);
         return $this->success(['models' => $result]);
     }
 }

@@ -13,6 +13,8 @@ namespace App\Service;
 
 use App\Model\ActorClassification;
 use App\Model\ActorCorrespond;
+use App\Model\MemberFollow;
+use App\Model\Actor;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
 
@@ -69,7 +71,7 @@ class ActorClassificationService
     }
 
     // 獲取依照分類的演員資料
-    public function getListByClassification(int $type_id)
+    public function getListByClassification(int $type_id, int $userId = 0)
     {
         $res_arr = [];
         if (empty($type_id)) {
@@ -83,13 +85,32 @@ class ActorClassificationService
                 })
                     ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
                     ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
-                    ->select('actors.id', 'actors.sex', 'actors.name', 'actors.avatar', DB::raw('sum(videos.rating) as video_click_num'))
+                    ->select('actors.id', 'actors.sex', 'actors.name', 'actors.avatar')
                     ->where('actor_has_classifications.actor_classifications_id', $classify_id)
                     ->groupBy('actor_corresponds.actor_id')
-                    ->orderBy('video_click_num', 'desc')
+                    ->orderBy('videos.rating', 'desc')
                     ->limit(self::GET_ACTOR_COUNT)
                     ->get()->toArray();
                 if (count($query) > 0) {
+                    // 查詢是否追隨與作品數
+                    foreach ($query as $key => $value) {
+                        $actor_id = $value['id'];
+                        // 查詢是否追隨
+                        if(MemberFollow::where('member_id', $userId)->where('correspond_type', Actor::class)->where('correspond_id', $actor_id)->whereNull('deleted_at')->exists()){
+                            $query[$key]['is_follow'] = 1;
+                        }else{
+                            $query[$key]['is_follow'] = 0;
+                        }
+
+                        // avatar加上網域
+                        if(!empty($value['avatar']))$query[$key]['avatar'] = env('IMG_DOMAIN').$value['avatar'];
+
+                        // 查詢作品數
+                        $numberOfWorks = ActorCorrespond::where('actor_id', $actor_id)->count();
+                        $query[$key]['numberOfWorks'] = $numberOfWorks;
+                    }
+
+
                     array_push($res_arr, [
                         'type_id' => $classify_id,
                         'type_name' => $value['name'],
@@ -111,6 +132,24 @@ class ActorClassificationService
                 ->orderBy('video_click_num', 'desc')
                 ->get()->toArray();
             if (count($query) > 0) {
+                // 查詢是否追隨與作品數
+                foreach ($query as $key => $value) {
+                    $actor_id = $value['id'];
+                    // 查詢是否追隨
+                    if(MemberFollow::where('member_id', $userId)->where('correspond_type', Actor::class)->where('correspond_id', $actor_id)->whereNull('deleted_at')->exists()){
+                        $query[$key]['is_follow'] = 1;
+                    }else{
+                        $query[$key]['is_follow'] = 0;
+                    }
+
+                    // avatar加上網域
+                    if(!empty($value['avatar']))$query[$key]['avatar'] = env('IMG_DOMAIN').$value['avatar'];
+
+                    // 查詢作品數
+                    $numberOfWorks = ActorCorrespond::where('actor_id', $actor_id)->count();
+                    $query[$key]['numberOfWorks'] = $numberOfWorks;
+                }
+                
                 array_push($res_arr, [
                     'type_id' => $type_id,
                     'type_name' => $type['name'],
