@@ -26,9 +26,10 @@ class ActorController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, ActorService $service)
     {
+        $userId = auth('jwt')->user()->getId();
         $page = (int) $request->input('page', 0);
         $data = [];
-        $data['models'] = $service->getActors($page);
+        $data['models'] = $service->getActors($page, $userId);
         $path = '/api/actor/list';
         $simplePaginator = new SimplePaginator($page, Constants::DEFAULT_PAGE_PER, $path);
         $data = array_merge($data, $simplePaginator->render());
