@@ -11,6 +11,8 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\Actor;
+use App\Model\ActorCorrespond;
 use App\Model\BuyMemberLevel;
 use App\Model\Image;
 use App\Model\ImageGroup;
@@ -78,7 +80,18 @@ class ImageGroupService
             $imageIds = TagCorrespond::where('correspond_type', ImageGroup::class)
                 ->whereIn('tag_id', $tagIds)
                 ->get()
-                ->pluck('correspond_id');
+                ->pluck('correspond_id')
+                ->toArray();
+        }
+
+        $actorIds = Actor::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
+        if (!empty($actorIds)) {
+            $result = ActorCorrespond::where('correspond_type', 'image')
+                ->whereIn('actor_id', $actorIds)
+                ->get()
+                ->pluck('correspond_id')
+                ->toArray();
+            $imageIds = array_merge($imageIds, $result);
         }
 
         $query = ImageGroup::with([

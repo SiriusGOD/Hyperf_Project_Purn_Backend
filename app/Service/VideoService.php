@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\BuyMemberLevel;
 use App\Model\Member;
@@ -223,7 +224,18 @@ class VideoService
             $ids = TagCorrespond::where('correspond_type', Video::class)
                 ->whereIn('tag_id', $tagIds)
                 ->get()
-                ->pluck('correspond_id');
+                ->pluck('correspond_id')
+                ->toArray();
+        }
+
+        $actorIds = Actor::where('name', 'like', '%' . $title . '%')->get()->pluck('id')->toArray();
+        if (!empty($actorIds)) {
+            $result = ActorCorrespond::where('correspond_type', 'video')
+                ->whereIn('actor_id', $actorIds)
+                ->get()
+                ->pluck('correspond_id')
+                ->toArray();
+            $ids = array_merge($ids, $result);
         }
         $model = Video::where('title', 'like', "%{$title}%")
             ->where('release_time', '<=', Carbon::now()->toDateTimeString());

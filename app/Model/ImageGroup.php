@@ -60,7 +60,7 @@ class ImageGroup extends Model
      */
     protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'pay_type' => 'integer', 'hot_order' => 'integer', 'sync_id' => 'integer', 'height' => 'integer', 'weight' => 'integer'];
 
-    protected array $appends = ['model_type'];
+    protected array $appends = ['model_type', 'image_count'];
 
     public function images()
     {
@@ -103,5 +103,10 @@ class ImageGroup extends Model
     protected function getModelTypeAttribute()
     {
         return 'image_group';
+    }
+
+    protected function getImageCountAttribute()
+    {
+        return $this->images()->count();
     }
 }
