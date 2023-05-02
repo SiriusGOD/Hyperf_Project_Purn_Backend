@@ -146,7 +146,7 @@ class VideoService
             $cover = env("COVER_URL").$data['cover_full'];
             $imgSize = Calc::imgSize($cover); 
             $data['cover_witdh'] = isset($imgSize['width']) ?$imgSize['width'] :0;
-            $data['cover_heigh'] = isset($imgSize['heigh']) ?$imgSize['heigh'] :0;
+            $data['cover_height'] = isset($imgSize['heigh']) ?$imgSize['heigh'] :0;
             foreach ($data as $key => $val) {
                 $model->{$key} = "{$val}";
             }
