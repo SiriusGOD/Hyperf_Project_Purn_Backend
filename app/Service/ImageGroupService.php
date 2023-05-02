@@ -95,7 +95,7 @@ class ImageGroupService
         }
 
         $query = ImageGroup::with([
-            'tags', 'images',
+            'tags', 'imagesLimit',
         ])
             ->orWhere('title', 'like', '%' . $keyword . '%')
             ->offset($limit * $page)
@@ -128,7 +128,7 @@ class ImageGroupService
             $useImageIds = array_unique(array_merge($imageIds, $useImageIds));
 
             $models = ImageGroup::with([
-                'tags', 'images',
+                'tags', 'imagesLimit',
             ])
                 ->whereIn('id', $imageIds)
                 ->offset($limit * $page)
