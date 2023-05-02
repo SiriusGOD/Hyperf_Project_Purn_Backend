@@ -37,9 +37,9 @@ class NavigationController extends AbstractController
     public function getSearchList(RequestInterface $request, NavigationService $service, SuggestService $suggestService)
     {
         $data = [];
-        $page = $request->input('page', 0);
-        $limit = $request->input('limit', 10);
-        $id = $request->input('id', 0);
+        $page = (int) $request->input('page', 0);
+        $limit = (int) $request->input('limit', 10);
+        $id = (int) $request->input('id', 0);
         $userId = (int) auth()->user()->getId();
         $suggest = $suggestService->getTagProportionByUser($userId);
         $data['model'] = match ($id) {
@@ -58,11 +58,11 @@ class NavigationController extends AbstractController
     public function detail(NavigationDetailRequest $request, NavigationService $service, SuggestService $suggestService)
     {
         $data = [];
-        $page = $request->input('page', 0);
-        $limit = $request->input('limit', 10);
-        $navId = $request->input('nav_id', 0);
+        $page = (int) $request->input('page', 0);
+        $limit = (int) $request->input('limit', 10);
+        $navId = (int) $request->input('nav_id', 0);
         $type = $request->input('type');
-        $id = $request->input('type_id');
+        $id = (int) $request->input('type_id');
         $userId = (int) auth()->user()->getId();
         $suggest = $suggestService->getTagProportionByUser($userId);
         $data['model'] = $service->navigationDetail($suggest, $navId, $type, $id, $page, $limit);

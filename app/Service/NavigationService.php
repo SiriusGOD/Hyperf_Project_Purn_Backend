@@ -88,8 +88,8 @@ class NavigationService
 
     public function navigationSuggest(array $suggest, int $page, int $limit): array
     {
-        $advertisementLimit = $this->getAdvertisementsLimit($page, $limit);
-        if ($advertisementLimit > 0) {
+        $advertisementLimitArr = $this->getAdvertisementsLimit($page, $limit);
+        if ($advertisementLimitArr['limit'] > 0) {
             --$limit;
         }
         $imageGroupLimit = (int) floor($limit / 2);
@@ -97,7 +97,7 @@ class NavigationService
 
         $imageGroups = $this->navigationSuggestImageGroups($suggest, $page, $imageGroupLimit);
         $videos = $this->navigationSuggestVideos($suggest, $page, $videoLimit);
-        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, $advertisementLimit);
+        $advertisements = $this->advertisementService->getAdvertisementBySearch($advertisementLimitArr['last_page'], $advertisementLimitArr['limit']);
 
         $result = [];
 
@@ -108,8 +108,8 @@ class NavigationService
 
     public function navigationPopular(array $suggest, int $page, int $limit): array
     {
-        $advertisementLimit = $this->getAdvertisementsLimit($page, $limit);
-        if ($advertisementLimit > 0) {
+        $advertisementLimitArr = $this->getAdvertisementsLimit($page, $limit);
+        if ($advertisementLimitArr['limit'] > 0) {
             --$limit;
         }
         $imageGroupLimit = (int) floor($limit / 2);
@@ -117,7 +117,7 @@ class NavigationService
 
         $imageGroups = $this->navigationPopularImageGroups($suggest, $page, $imageGroupLimit);
         $videos = $this->navigationPopularVideos($suggest, $page, $videoLimit);
-        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, $advertisementLimit);
+        $advertisements = $this->advertisementService->getAdvertisementBySearch($advertisementLimitArr['last_page'], $advertisementLimitArr['limit']);
 
         $result = [];
 
@@ -395,19 +395,30 @@ class NavigationService
         return $this->getBaseUrl();
     }
 
-    protected function getAdvertisementsLimit(int $page, int $limit): int
+    protected function getAdvertisementsLimit(int $page, int $limit): array
     {
         if ($page == 0) {
-            return 0;
+            return [
+                'limit' => 0,
+                'last_page' => 0,
+            ];
         }
+
+        $page++;
         $last = floor($limit * ($page - 1) / self::ADVERTISEMENT_PAGE_PER);
         $now = floor($limit * $page / self::ADVERTISEMENT_PAGE_PER);
 
         if ($now - $last > 0) {
-            return (int) ($now - $last);
+            return [
+                'limit' => (int) ($now - $last),
+                'last_page' => (int) $last,
+            ];
         }
 
-        return 0;
+        return [
+            'limit' => 0,
+            'last_page' => 0,
+        ];
     }
 
     public function createNavigation(array $params) : void
