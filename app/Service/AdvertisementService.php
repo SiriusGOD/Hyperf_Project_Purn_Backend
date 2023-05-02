@@ -79,6 +79,8 @@ class AdvertisementService
         $model->name = $data['name'];
         if (! empty($data['image_url'])) {
             $model->image_url = $data['image_url'];
+            $model->height = $data['height'];
+            $model->weight = $data['weight'];
         }
         $model->url = $data['url'];
         $model->position = $data['position'];

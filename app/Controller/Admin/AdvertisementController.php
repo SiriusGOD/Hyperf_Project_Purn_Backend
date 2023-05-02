@@ -83,6 +83,9 @@ class AdvertisementController extends AbstractController
             }
             $imageUrl = '/advertisement/' . $filename . '.' . $extension;
             $file->moveTo(BASE_PATH . '/public' . $imageUrl);
+            $imageInfo = getimagesize(BASE_PATH . '/public' . $imageUrl);
+            $data['height'] = $imageInfo[1] ?? null;
+            $data['weight'] = $imageInfo[0] ?? null;
         }
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = auth('session')->user()->id;
