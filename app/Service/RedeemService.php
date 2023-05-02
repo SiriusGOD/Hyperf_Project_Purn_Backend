@@ -31,13 +31,9 @@ class RedeemService extends BaseService
     protected $logger;
 
     protected $redeem;
-
     protected $memberRedeem;
-
     protected $memberRedeemService;
-
     protected $memberRedeemVideoService;
-
     protected $videoService;
 
     public function __construct(
@@ -95,11 +91,10 @@ class RedeemService extends BaseService
       }
 
       // 使用者兌換卷 by code
-      public function checkRedeemByCode(string $code)
+      public function checkRedeem(string $code)
       {
-          $model = $this->redeem->where('status', 0)
-                                      ->where('code', $code)->exists();
-          return $model;
+          $model = $this->redeem->where('code', $code)->first();
+          return $model ;
       }
       // 使用者兌換卷 by code
       public function getMemberRedeemByCode(string $code, int $page)
@@ -254,7 +249,9 @@ class RedeemService extends BaseService
       // 兌換代碼
       public function executeRedeemCode(string $code, int $memberId)
       {
-          if ((self::checkUserRedeemCode($code, $memberId) == false) && self::checkRedeemCode($code)) {
+          if ((self::checkUserRedeemCode($code, $memberId))){
+            return ["msg"=>"您己兌換過"];
+          }elseif( self::checkRedeemCode($code) ) {
               $redeemDetail = self::getRedeemByCode($code);
               // 兌換 次數上限
               if ((int) $redeemDetail['count'] >= (int) ($redeemDetail['counted'] + 1)) {
@@ -279,17 +276,21 @@ class RedeemService extends BaseService
                   $model->updated_at = date('Y-m-d H:i:s');
                   $model->created_at = date('Y-m-d H:i:s');
                   $model->save();
-                  return true;
+                  return ["msg"=>"兌換成功"];
               }
           } else {
-              return false;
+              return ["msg"=>"己過期"];
           }
       }
 
       // 查看code是否己被member 使用過
       public function checkUserRedeemCode(string $code, int $memberId)
       {
-          return $this->memberRedeem->where('member_id', $memberId)->where('redeem_code', $code)->exists();
+        $key="redeemIsUsed:".$code.":".$memberId;
+        $model = $this->memberRedeem;
+        $where['member_id'] = $memberId;
+        $where['redeem_code'] = $code;
+        return $this->chkRedis($key, $where, $model, $this->redis); 
       }
 
       // 兌換代碼是否存在 或 己過期

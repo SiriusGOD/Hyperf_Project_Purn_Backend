@@ -107,6 +107,23 @@ class BaseService
         return false;
     }
 
+    // 查看redis是否存在
+    public function chkRedis(string $key, array $where, $model, $redis ) : bool
+    {
+        if ($redis->exists($key)) {
+            return true;
+        }
+        foreach ($where as $key => $val) {
+            $model->where($key,$val);
+        }
+        $res = $model->exists();
+        if ($res) {
+            $redis->set($key, true);
+            $redis->expire($key, 3600);
+        }
+        return $res;
+    }
+
     // 共用清單
     public function list($model, array $where, int $page, int $limit)
     {

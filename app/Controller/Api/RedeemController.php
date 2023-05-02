@@ -31,8 +31,8 @@ class RedeemController extends AbstractController
     public function checkRedeem(RequestInterface $request, RedeemService $redeemService)
     {
         $code = $request->input('code');
-        $result = $redeemService-> checkRedeemByCode($code);
-        if($result){
+        $result = $redeemService->checkRedeem($code);
+        if($result ){
           return $this->success(['msg' => "可兌換"]);
         }
         return $this->success(['msg' => "己過期或找不到優惠卷"]);
@@ -61,10 +61,7 @@ class RedeemController extends AbstractController
             return $this->error('code 字段是必须的', ErrorCode::BAD_REQUEST);
         }
         $result = $redeemService->executeRedeemCode($code, $memberId);
-        if($result){
-          return $this->success(['msg' => "己兌換"]);
-        }
-        return $this->success(['msg' => "己過期或找不到優惠卷"]);
+        return $this->success($result);
     }
     // 使用者的兌換卷列表
     #[RequestMapping(methods: ['POST'], path: 'videoRedeemList')]

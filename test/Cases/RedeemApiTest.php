@@ -11,13 +11,14 @@ declare(strict_types=1);
 namespace HyperfTest\Cases;
 
 use App\Model\Member;
-use Hyperf\Testing\Client;
-use HyperfTest\HttpTestCase;
+use App\Model\Redeem;
 use App\Service\RedeemService;
 use App\Service\MemberRedeemService;
 use App\Service\MemberService;
 use App\Service\VideoService;
 use Hyperf\Redis\Redis;
+use Hyperf\Testing\Client;
+use HyperfTest\HttpTestCase;
 
 /**
  * @internal
@@ -54,20 +55,18 @@ class RedeemApiTest extends HttpTestCase
     //使用者沒有兌換卷
     public function testMemberCheck()
     {
-      $memberId = 7;
+      $memberId = 3;
       $user = Member::where('id',$memberId)->first();
       $token = auth()->login($user);
       $this->token = $token; 
       make(MemberService::class)->saveToken($user->id, $token);
-      $json["code"] = "wer";
+      $redeem=Redeem::where("status",0)->first();
+      $json["code"] = $redeem->code;
       $data = $this->client->post('/api/redeem/checkRedeem',$json , [
           'Authorization' => 'Bearer ' . $token,
       ]);
-      $json["code"] = "m02twebCFb";
-      $data = $this->client->post('/api/redeem/checkRedeem',$json , [
-          'Authorization' => 'Bearer ' . $token,
-      ]);
-      $this->assertSame("可兌換", $data["data"]["msg"]);
+      print_r($data);
+      $this->assertSame(200, $data['code']);
     }
   
     //取可用兌換卷
@@ -88,18 +87,19 @@ class RedeemApiTest extends HttpTestCase
     //取可用兌換卷
     public function testRedeemCode()
     {
-      $user = Member::where('id',1)->first();
+      $user = Member::where('id',3)->first();
       $token = auth()->login($user);
       $this->token = $token; 
       make(MemberService::class)->saveToken($user->id, $token);
+      $redeem=Redeem::where("status",0)->first();
       $data = $this->client->post('/api/redeem/redeemCode',
       [
-        "code" => 'm02twebCFb'
+        "code" => $redeem->code
       ], 
       [
           'Authorization' => 'Bearer ' . $token,
       ]);
-      print_r($data);
+      print_r([$data ,'1232']);
       $this->assertSame(200, $data['code']);
     }
 

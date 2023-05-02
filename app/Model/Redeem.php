@@ -12,20 +12,22 @@ declare(strict_types=1);
 namespace App\Model;
 
 /**
- * @property int $id
- * @property string $title
- * @property string $code
- * @property int $count
- * @property int $category_id
- * @property string $category_name
- * @property int $diamond_point
- * @property int $vip_days
- * @property int $free_watch
- * @property int $status
- * @property string $start
- * @property string $end
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property int $id 
+ * @property string $title 
+ * @property string $code 
+ * @property int $count 
+ * @property int $counted 
+ * @property int $category_id 
+ * @property string $category_name 
+ * @property int $diamond_point 
+ * @property int $vip_days 
+ * @property int $free_watch 
+ * @property int $status 
+ * @property string $start 
+ * @property string $end 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property string $content 
  */
 class Redeem extends Model
 {
@@ -39,10 +41,10 @@ class Redeem extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = [];
+    protected array $fillable = ['code','status'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'count' => 'integer', 'category_id' => 'integer', 'diamond_point' => 'integer', 'vip_days' => 'integer', 'free_watch' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'count' => 'integer', 'counted' => 'integer', 'category_id' => 'integer', 'diamond_point' => 'integer', 'vip_days' => 'integer', 'free_watch' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }
