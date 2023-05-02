@@ -88,9 +88,9 @@ class ActorClassificationService
                     ->select('actors.id', 'actors.sex', 'actors.name', 'actors.avatar')
                     ->where('actor_has_classifications.actor_classifications_id', $classify_id)
                     ->groupBy('actor_corresponds.actor_id')
-                    ->orderBy(DB::raw('sum(videos.rating)'), 'desc')
-                    ->limit(self::GET_ACTOR_COUNT)
-                    ->get()->toArray();
+                    ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
+                $total = $query->count();
+                $query = $query->limit(self::GET_ACTOR_COUNT)->get()->toArray();
                 if (count($query) > 0) {
                     // 查詢是否追隨與作品數
                     foreach ($query as $key => $value) {
@@ -114,6 +114,7 @@ class ActorClassificationService
                     array_push($res_arr, [
                         'type_id' => $classify_id,
                         'type_name' => $value['name'],
+                        'type_total' => $total,
                         'type_data' => $query,
                     ]);
                 }
@@ -129,8 +130,9 @@ class ActorClassificationService
                 ->select('actors.id', 'actors.sex', 'actors.name')
                 ->where('actor_has_classifications.actor_classifications_id', $type_id)
                 ->groupBy('actor_corresponds.actor_id')
-                ->orderBy(DB::raw('sum(videos.rating)'), 'desc')
-                ->get()->toArray();
+                ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
+            $total = $query->count();
+            $query = $query->get()->toArray();
             if (count($query) > 0) {
                 // 查詢是否追隨與作品數
                 foreach ($query as $key => $value) {
@@ -153,6 +155,7 @@ class ActorClassificationService
                 array_push($res_arr, [
                     'type_id' => $type_id,
                     'type_name' => $type['name'],
+                    'type_total' => $total,
                     'type_data' => $query,
                 ]);
             }
