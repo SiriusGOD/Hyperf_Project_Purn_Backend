@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
+use App\Model\Navigation;
 use App\Request\NavigationDetailRequest;
 use App\Service\NavigationService;
 use App\Service\SuggestService;
@@ -28,23 +29,7 @@ class NavigationController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, VideoService $service)
     {
-        $data = [
-            [
-                'id' => 1,
-                'name' => '大家都在看',
-                'order' => 1,
-            ],
-            [
-                'id' => 2,
-                'name' => '專屬推薦',
-                'order' => 2,
-            ],
-            [
-                'id' => 3,
-                'name' => '最新推薦',
-                'order' => 3,
-            ],
-        ];
+        $data = Navigation::orderBy('hot_order')->get()->toArray();
         return $this->success($data);
     }
 

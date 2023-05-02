@@ -234,6 +234,7 @@ return [
         'customer_service' => '客服系統',
         'pay' => '支付管理',
         'proxy' => '代理管理',
+        'navigation' => '導航管理',
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -527,6 +528,14 @@ return [
         'pay_open' => '開啟',
         'pay_close' => '關閉',
         'pay_method' => '支付方式',
+    ],
+    // -------------------------------------------------------------------
+    // PayController
+    'navigation_control' => [
+        'navigation_control' => '導航管理',
+        'navigation_edit' => '編輯導航',
+        'navigation_name' => '名稱',
+        'navigation_hot_order' => '排序',
     ],
     // -------------------------------------------------------------------
 ];

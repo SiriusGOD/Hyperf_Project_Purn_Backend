@@ -13,6 +13,7 @@ namespace App\Service;
 
 use App\Model\Image;
 use App\Model\ImageGroup;
+use App\Model\Navigation;
 use App\Model\Video;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
@@ -407,5 +408,17 @@ class NavigationService
         }
 
         return 0;
+    }
+
+    public function createNavigation(array $params) : void
+    {
+        $model = Navigation::where('id', $params['id'])->first();
+        if (empty($model)) {
+            $model = new Navigation();
+        }
+
+        $model->name = $params['name'];
+        $model->hot_order = $params['hot_order'];
+        $model->save();
     }
 }

@@ -307,6 +307,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('navigation-index'))
+                    <li class="nav-item">
+                        <a href="/admin/navigation/index" class="nav-link {{$navigation_active ?? ''}}">
+                            <i class="nav-icon fas fa-map"></i>
+                            <p>
+                                {{trans('default.leftbox.navigation') ?? '導航管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->
