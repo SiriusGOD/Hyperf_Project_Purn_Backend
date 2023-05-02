@@ -341,7 +341,7 @@ class MemberService extends BaseService
             env("DURL2"),
           ];
           $url = $urls[rand(0,count($urls)-1)];
-          $user["aff_url"] = $url.$user['aff'];
+          $user["aff_url"] = $url."?invited_code=".$user['aff'];
           $this->redis->set($key, json_encode($user));
           $this->redis->expire($key, 86400);
           return $user;
