@@ -90,6 +90,9 @@ class ActorService
             }else{
                 $query[$key]['is_follow'] = 0;
             }
+
+            // avatar加上網域
+            if(!empty($value['avatar']))$query[$key]['avatar'] = env('IMG_DOMAIN').$value['avatar'];
         }
         return $query;
     }
