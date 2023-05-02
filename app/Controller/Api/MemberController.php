@@ -161,12 +161,12 @@ class MemberController extends AbstractController
 
     #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'detail')]
-    public function detail(MemberDetailRequest $request)
+    public function detail(MemberDetailRequest $request, MemberService $service)
     {
         // $id = $request->input('id');
         $id = auth('jwt')->user()->getId();
-
-        return $this->success(Member::find($id)->toArray());
+        $member = $service->getMember($id);
+        return $this->success($member);
     }
 
     #[Middleware(TryLimitMiddleware::class)]
