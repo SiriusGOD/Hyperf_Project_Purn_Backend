@@ -29,7 +29,7 @@ class NavigationController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, VideoService $service)
     {
-        $data = Navigation::orderBy('hot_order')->get()->toArray();
+        $data = Navigation::select('id', 'name', 'hot_order as order')->orderBy('hot_order')->get()->toArray();
         return $this->success($data);
     }
 
