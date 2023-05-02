@@ -12,11 +12,13 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Coin;
+use App\Model\ImageGroup;
 use App\Model\MemberLevel;
 use App\Model\Pay;
 use App\Model\PayCorrespond;
 use App\Model\Product;
 use App\Model\Tag;
+use App\Model\Video;
 use Carbon\Carbon;
 use Hyperf\Redis\Redis;
 
@@ -51,8 +53,6 @@ class ProductService
     // 新增或更新
     public function store(array $data)
     {
-        var_dump($data);
-        die();
         $model = Product::findOrNew($data['id']);
         $model->user_id = $data['user_id'];
         $model->type = $data['type'];
@@ -257,5 +257,26 @@ class ProductService
         $this->redis->expire($checkRedisKey, self::TTL_30_Min);
 
         return $data;
+    }
+
+    public function multipleStore($data)
+    {
+        $model = Product::findOrNew($data['id']);
+        $model->user_id = $data['user_id'];
+        $model->expire = $data['expire'];
+        $model->selling_price = $data['selling_price'];
+        $model->save();
+
+        // image
+        if($data['type'] == Product::TYPE_LIST[0]){
+            $image = ImageGroup::findOrNew($model->correspond_id);
+            $image->pay_type = $data['origin_type'];
+            $image->save();
+        }else{
+            //video
+            $video = Video::findOrNew($model->correspond_id);
+            $video->is_free = $data['origin_type'];
+            $video->save();
+        }
     }
 }

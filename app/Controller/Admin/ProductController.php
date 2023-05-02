@@ -13,6 +13,7 @@ namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Model\Coin;
+use App\Model\Image;
 use App\Model\ImageGroup;
 use App\Model\MemberLevel;
 use App\Model\PayCorrespond;
@@ -423,10 +424,7 @@ class ProductController extends AbstractController
         $correspond_name = json_decode($request->input('correspond_name'), true);
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = (int) auth('session')->user()->id;
-        // $data['type'] = Product::TYPE_CORRESPOND_LIST[$request->input('product_type')];
         $data['type'] = $request->input('product_type');
-        // $data['correspond_id'] = $request->input('product_id') ? $request->input('product_id') : $request->input('correspond_id');
-        // $data['name'] = $request->input('product_name');
         $data['expire'] = (int) $request->input('expire');
         $data['start_time'] = $request->input('start_time');
         $data['end_time'] = $request->input('end_time');
@@ -448,43 +446,64 @@ class ProductController extends AbstractController
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
         $product_type = $request->input('product_type');
         $product_name = $request->input('product_name');
-        if (! empty($product_type)) {
-            // switch ($product_type) {
-            //     case 'image':
-            //         $product_type = Product::TYPE_CORRESPOND_LIST['image'];
-            //         break;
-            //     case 'video':
-            //         $product_type = Product::TYPE_CORRESPOND_LIST['video'];
-            //         break;
-            //     default:
-            //         $product_type = '';
-            //         break;
-            // }
-            $query = Product::select('*')->where('type', $product_type);
-            $query_tatal = Product::select('*')->where('type', $product_type);
+        if (! empty($product_type) ) {
+            switch ($product_type) {
+                case 'image':
+                    $query = Product::Join('image_groups', function ($join) use ($product_type) {
+                                $join->on('image_groups.id', '=', 'products.correspond_id')
+                                    ->where('products.type', $product_type);
+                            })->leftJoin('clicks', function ($join) {
+                                $join->on('clicks.type_id', '=', 'image_groups.id')
+                                    ->where('clicks.type', ImageGroup::class);
+                            })->selectRaw('products.*, image_groups.thumbnail as img_thumb, clicks.count');
+                    break;
+                case 'video':
+                    $query = Product::Join('videos', function ($join) use ($product_type) {
+                                $join->on('videos.id', '=', 'products.correspond_id')
+                                    ->where('products.type', $product_type);
+                            })->leftJoin('clicks', function ($join) {
+                                $join->on('clicks.type_id', '=', 'videos.id')
+                                    ->where('clicks.type', Video::class);
+                            })->selectRaw('products.*, videos.cover_thumb as img_thumb, videos.m3u8, clicks.count');
+                    break;
+                default:
+                    $query = Product::select('*')->where('type', $product_type);
+                    break;
+            }
+            $query_total = $query;
             if (! empty($product_name)) {
                 $query = $query->where('name', 'like', '%' . $product_name . '%');
-                $query_tatal = $query_tatal->where('name', 'like', '%' . $product_name . '%');
+                $query_total = $query_total->where('name', 'like', '%' . $product_name . '%');
             }
             $query = $query->offset(($page - 1) * $step)->limit($step);
             $products = $query->get();
-            $total = $query_tatal->count();
+            $total = $query_total->count();
             $data['last_page'] = ceil($total / $step);
         } else {
             $query = Product::select('*');
-            $query_tatal = Product::select('*');
+            $query_total = Product::select('*');
             if (! empty($product_name)) {
                 $query = $query->where('name', 'like', '%' . $product_name . '%');
-                $query_tatal = $query_tatal->where('name', 'like', '%' . $product_name . '%');
+                $query_total = $query_total->where('name', 'like', '%' . $product_name . '%');
             }
             $query = $query->offset(($page - 1) * $step)->limit($step);
             $products = $query->get();
-            $total = $query_tatal->count();
+            $total = $query_total->count();
             $data['last_page'] = ceil($total / $step);
         }
         if ($total == 0) {
             $data['last_page'] = 1;
         }
+
+        foreach ($products as $key => $value) {
+            if(! empty($value -> img_thumb)){
+                $products[$key] -> img_thumb = env('IMAGE_GROUP_DECRYPT_URL').$value -> img_thumb;
+            }
+            if(! empty($value -> m3u8)){
+                $products[$key] -> m3u8 = env('VIDEO_SOURCE_URL').$value -> m3u8;
+            }
+        }
+
         $data['product_type'] = $product_type;
         $data['navbar'] = trans('default.product_control.product_control');
         $data['product_active'] = 'active';
@@ -498,5 +517,131 @@ class ProductController extends AbstractController
         $paginator = new Paginator($products, $step, $page);
         $data['paginator'] = $paginator->toArray();
         return $this->render->render('admin.product.index', $data);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'multipleEdit')]
+    public function multipleEdit(RequestInterface $request)
+    {
+        // 顯示幾筆
+        $step = Product::PAGE_PER;
+        $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
+        $product_type = $request->input('product_type', 'video');
+        $product_name = $request->input('product_name');
+        $product_id = $request->input('product_id');
+
+        switch ($product_type) {
+            case 'image':
+                $query = Product::Join('image_groups', function ($join) use ($product_type) {
+                            $join->on('image_groups.id', '=', 'products.correspond_id')
+                                ->where('products.type', $product_type);
+                        })->selectRaw('products.*, image_groups.thumbnail as img_thumb');
+                break;
+            case 'video':
+                $query = Product::Join('videos', function ($join) use ($product_type) {
+                            $join->on('videos.id', '=', 'products.correspond_id')
+                                ->where('products.type', $product_type);
+                        })->selectRaw('products.*, videos.cover_thumb as img_thumb, videos.m3u8');
+                break;
+            default:
+                $query = Product::select('*')->where('type', $product_type);
+                break;
+        }
+
+        if (! empty($product_name)) {
+            $query = $query->where('products.name', 'like', '%' . $product_name . '%');
+        }
+        if(! empty($product_id)){
+            $product_id = explode(",", $product_id);
+            $query = $query->whereIn('products.id',$product_id);
+        }
+        $query_total = $query;
+        $query = $query->orderBy('id', 'desc')->offset(($page - 1) * $step)->limit($step);
+        $products = $query->get();
+        $total = $query_total->count();
+        $data['last_page'] = ceil($total / $step);
+        if ($total == 0) {
+            $data['last_page'] = 1;
+        }
+
+        foreach ($products as $key => $value) {
+            if(! empty($value -> img_thumb)){
+                $products[$key] -> img_thumb = env('IMAGE_GROUP_DECRYPT_URL').$value -> img_thumb;
+            }
+            if(! empty($value -> m3u8)){
+                $products[$key] -> m3u8 = env('VIDEO_SOURCE_URL').$value -> m3u8;
+            }
+        }
+
+        $data['product_type'] = $product_type;
+        $data['navbar'] = trans('default.product_control.multiple_edit');
+        $data['product_active'] = 'active';
+        $data['total'] = $total;
+        $data['datas'] = $products;
+        $data['page'] = $page;
+        $data['step'] = $step;
+        $path = '/admin/product/multipleEdit';
+        $data['next'] = $path . '?page=' . ($page + 1) . '&product_type=' . $product_type . '&product_name=' . $product_name;
+        $data['prev'] = $path . '?page=' . ($page - 1) . '&product_type=' . $product_type . '&product_name=' . $product_name;
+        $paginator = new Paginator($products, $step, $page);
+        $data['paginator'] = $paginator->toArray();
+        return $this->render->render('admin.product.multipleEdit', $data);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'multipleUpdate')]
+    public function multipleUpdate(RequestInterface $request)
+    {
+        $insert_data = json_decode($request->input('data'), true);
+        $type = urldecode($request->input('type'));
+        $data['currency'] = Product::CURRENCY[1];
+        $product_id_arr = [];
+        foreach ($insert_data as $key => $value) {
+            $model = Product::findOrFail($value);
+            array_push($product_id_arr, $value);
+            if (empty($model->title)) {
+                $model->title = $model->name;
+            }
+
+            if ($type == 'points') {
+                if ($model->type == Coin::TYPE_LIST[0]) {
+                    // 現金點數 -> 使用現金購買
+                    $data['currency'] = Product::CURRENCY[0];
+                }
+                if ($model->type == Coin::TYPE_LIST[1]) {
+                    // 鑽石點數 -> 使用現金點數購買
+                    $data['currency'] = Product::CURRENCY[1];
+                }
+            }
+        }
+        // 原始類型 影片(免費、VIP、鑽石) 套圖(免費、VIP)
+        if($type == Product::TYPE_LIST[0]){
+            $origin = ImageGroup::select('pay_type')->where('id', $model->correspond_id)->first();
+        }else{
+            $origin = Video::selectRaw('is_free as pay_type')->where('id', $model->correspond_id)->first();
+        }    
+
+        $data['model'] = $model;
+        $data['origin'] = $origin;
+        $data['product_type'] = $type;
+        $data['product_id_arr'] = json_encode($product_id_arr);
+        $data['navbar'] = trans('default.product_control.product_multiple_edit');
+        $data['product_active'] = 'active';
+        return $this->render->render('admin.product.multipleUpdateForm', $data);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'multipleUpdateStore')]
+    public function multipleUpdateStore(RequestInterface $request, ResponseInterface $response, ProductService $service)
+    {
+        $correspond_id = json_decode($request->input('correspond_id'), true);
+        $data['origin_type'] = $request->input('origin_type');
+        $data['user_id'] = (int) auth('session')->user()->id;
+        $data['type'] = $request->input('product_type');
+        $data['expire'] = (int) $request->input('expire');
+        $data['selling_price'] = $request->input('product_price');
+
+        foreach ($correspond_id as $key => $value) {
+            $data['id'] = $value;
+            $service->multipleStore($data);
+        }
+        return $response->redirect('/admin/product/index');
     }
 }

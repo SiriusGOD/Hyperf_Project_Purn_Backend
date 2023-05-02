@@ -62,6 +62,10 @@ return [
     'image_profile_dec' => '圖片(不上傳就不更新，只接受圖片檔案(png jpeg gif))',
     'start_time' => '開始時間',
     'end_time' => '結束時間',
+    'edit_time' => '編輯時間',
+    'time' => '時間',
+    'start' => '開始',
+    'end' => '結束',
     'buyer' => '購買人',
     'buyer_msg' => '請輸入廣告購買人名稱',
     'attribution_web' => '歸屬網站',
@@ -111,6 +115,7 @@ return [
     'user_id' => "建立者",
     'type' => "類型",
     'preview' => "預覽",
+    'click_num' => "點擊次數",
     // -------------------------------------------------------------------
     // video
     'video' => [
@@ -406,6 +411,7 @@ return [
         'product_create' => '新增商品',
         'product_multiple_create' => '新增大批商品',
         'multiple_create' => '大批新增',
+        'multiple_edit' => '大批修改',
         'product_currency' => '商品幣別',
         'product_price' => '商品價格',
         'product_type' => '商品類型',
@@ -433,7 +439,13 @@ return [
         'product_currency_msg' => [
             'CNY' => '人民幣',
             'COIN' => '現金點數'
-        ]
+        ],
+        'product_origin_type' => [
+            0 => '免費',
+            1 => 'VIP',
+            2 => '鑽石'
+        ],
+        'product_id' => '商品序號',
     ],
     // -------------------------------------------------------------------
     // ActorClassificationController

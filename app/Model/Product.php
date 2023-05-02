@@ -31,7 +31,7 @@ class Product extends Model
 {
     public const EXPIRE = ['no' => 0, 'yes' => 1];
 
-    public const PAGE_PER = 10;
+    public const PAGE_PER = 30;
 
     public const TYPE_LIST = ['image', 'video', 'member', 'points'];
 
