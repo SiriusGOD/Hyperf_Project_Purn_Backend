@@ -45,7 +45,7 @@ class MemberServiceTest extends HttpTestCase
       $this->assertSame($mem->id, $res["id"]);
     }
   
-    //測試會員追蹤
+    //測試會員detail
     public function testGetMemberApi()
     {
       $mem = Member::where("aff","!=","")->first();
