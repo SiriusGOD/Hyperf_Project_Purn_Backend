@@ -14,6 +14,7 @@ namespace App\Service;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\ActorHasClassification;
+use App\Model\MemberFollow;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
 
@@ -55,7 +56,7 @@ class ActorService
     }
 
     // 取得演員
-    public function getActors(int $page): array
+    public function getActors(int $page, int $userId = 0): array
     {
         $query = $this->model->offset(Actor::PAGE_PER * $page)->limit(Actor::PAGE_PER)->get()->toArray();
         foreach ($query as $key => $value) {
@@ -82,6 +83,16 @@ class ActorService
             if (empty($query[$key]['image_count'])) {
                 $query[$key]['image_count'] = 0;
             }
+
+            // 確認該演員是否有被使用者追蹤
+            if(MemberFollow::where('member_id', $userId)->where('correspond_type', Actor::class)->where('correspond_id', $actor_id)->whereNull('deleted_at')->exists()){
+                $query[$key]['is_follow'] = 1;
+            }else{
+                $query[$key]['is_follow'] = 0;
+            }
+
+            // avatar加上網域
+            if(!empty($value['avatar']))$query[$key]['avatar'] = env('IMG_DOMAIN').$value['avatar'];
         }
         return $query;
     }
