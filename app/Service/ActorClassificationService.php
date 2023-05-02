@@ -88,7 +88,7 @@ class ActorClassificationService
                     ->select('actors.id', 'actors.sex', 'actors.name', 'actors.avatar')
                     ->where('actor_has_classifications.actor_classifications_id', $classify_id)
                     ->groupBy('actor_corresponds.actor_id')
-                    ->orderBy('videos.rating', 'desc')
+                    ->orderBy(DB::raw('sum(videos.rating)'), 'desc')
                     ->limit(self::GET_ACTOR_COUNT)
                     ->get()->toArray();
                 if (count($query) > 0) {
@@ -126,10 +126,10 @@ class ActorClassificationService
             })
                 ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
                 ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
-                ->select('actors.id', 'actors.sex', 'actors.name', DB::raw('sum(videos.rating) as video_click_num'))
+                ->select('actors.id', 'actors.sex', 'actors.name')
                 ->where('actor_has_classifications.actor_classifications_id', $type_id)
                 ->groupBy('actor_corresponds.actor_id')
-                ->orderBy('video_click_num', 'desc')
+                ->orderBy(DB::raw('sum(videos.rating)'), 'desc')
                 ->get()->toArray();
             if (count($query) > 0) {
                 // 查詢是否追隨與作品數
