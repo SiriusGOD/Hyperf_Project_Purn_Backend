@@ -15,8 +15,11 @@ use App\Model\ActorClassification;
 use App\Model\ActorCorrespond;
 use App\Model\MemberFollow;
 use App\Model\Actor;
+use App\Model\Click;
+use App\Model\ImageGroup;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
+use Carbon\Carbon;
 
 class ActorClassificationService
 {
@@ -85,7 +88,7 @@ class ActorClassificationService
                 })
                     ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
                     ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
-                    ->select('actors.id', 'actors.sex', 'actors.name', 'actors.avatar')
+                    ->select('actors.id', 'actors.name', 'actors.avatar')
                     ->where('actor_has_classifications.actor_classifications_id', $classify_id)
                     ->groupBy('actor_corresponds.actor_id')
                     ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
@@ -95,6 +98,7 @@ class ActorClassificationService
                     // 查詢是否追隨與作品數
                     foreach ($query as $key => $value) {
                         $actor_id = $value['id'];
+                        $name = trim($value['name']);
                         // 查詢是否追隨
                         if(MemberFollow::where('member_id', $userId)->where('correspond_type', Actor::class)->where('correspond_id', $actor_id)->whereNull('deleted_at')->exists()){
                             $query[$key]['is_follow'] = 1;
@@ -108,6 +112,10 @@ class ActorClassificationService
                         // 查詢作品數
                         $numberOfWorks = ActorCorrespond::where('actor_id', $actor_id)->count();
                         $query[$key]['numberOfWorks'] = $numberOfWorks;
+
+                        // 擷取名稱第一個字
+                        $letter =  mb_substr($name, 0, 1, 'UTF-8');
+                        $query[$key]['letter'] = $letter;
                     }
 
 
@@ -127,7 +135,7 @@ class ActorClassificationService
             })
                 ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
                 ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
-                ->select('actors.id', 'actors.sex', 'actors.name', 'actors.avatar')
+                ->select('actors.id', 'actors.name', 'actors.avatar')
                 ->where('actor_has_classifications.actor_classifications_id', $type_id)
                 ->groupBy('actor_corresponds.actor_id')
                 ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
@@ -135,8 +143,10 @@ class ActorClassificationService
             $query = $query->get()->toArray();
             if (count($query) > 0) {
                 // 查詢是否追隨與作品數
+                $popular_arr = [];
                 foreach ($query as $key => $value) {
                     $actor_id = $value['id'];
+                    $name = trim($value['name']);
                     // 查詢是否追隨
                     if(MemberFollow::where('member_id', $userId)->where('correspond_type', Actor::class)->where('correspond_id', $actor_id)->whereNull('deleted_at')->exists()){
                         $query[$key]['is_follow'] = 1;
@@ -150,6 +160,50 @@ class ActorClassificationService
                     // 查詢作品數
                     $numberOfWorks = ActorCorrespond::where('actor_id', $actor_id)->count();
                     $query[$key]['numberOfWorks'] = $numberOfWorks;
+
+                    // 擷取名稱第一個字
+                    $letter =  mb_substr($name, 0, 1, 'UTF-8');
+                    $query[$key]['letter'] = $letter;
+
+                    // 查詢該演員的點擊數 最多取８位
+                    $actor_arr = $query[$key];
+                    $click_num = 0;
+                    $seven_days = Carbon::now()->subDays(7)->toDateString();
+                    $clicks = ActorCorrespond::where('actor_id', $actor_id)->get();
+                    foreach ($clicks as $key => $value) {
+                        switch ($value -> correspond_type) {
+                            case 'image':
+                                $count = Click::join('click_details', 'clicks.id', 'click_details.click_id')
+                                            ->where('click_details.created_at', '>=', $seven_days)
+                                            ->where('clicks.type', ImageGroup::class)
+                                            ->where('clicks.type_id', $value -> correspond_id)
+                                            ->count();
+                                break;
+                            case 'video':
+                                $count = Click::join('click_details', 'clicks.id', 'click_details.click_id')
+                                            ->where('click_details.created_at', '>=', $seven_days)
+                                            ->where('clicks.type', Video::class)
+                                            ->where('clicks.type_id', $value -> correspond_id)
+                                            ->count();
+                                break;
+                            default:
+                                $count = 0;
+                                break;
+                        }
+                        $click_num += $count;
+                    }
+                    
+                    $actor_arr['click_num'] = $click_num;
+                    array_push($popular_arr, $actor_arr);
+                }
+                // 排序
+                usort($popular_arr, function($a, $b) {
+                    return $b['click_num'] - $a['click_num'];
+                });
+                if(count($popular_arr) > 8)$popular_arr = array_slice($popular_arr, 0, 8);
+                
+                foreach ($popular_arr as $key => $value) {
+                    unset($popular_arr[$key]['click_num']);
                 }
                 
                 array_push($res_arr, [
@@ -157,6 +211,7 @@ class ActorClassificationService
                     'type_name' => $type['name'],
                     'type_total' => $total,
                     'type_data' => $query,
+                    'popular_data' => $popular_arr
                 ]);
             }
         }
