@@ -76,6 +76,13 @@ class ActorClassificationService
     // 獲取依照分類的演員資料
     public function getListByClassification(int $type_id, int $userId = 0)
     {
+        // redis
+        $checkRedisKey = self::CACHE_KEY.":".Carbon::now()->toDateString().":".$type_id;
+        if ($this->redis->exists($checkRedisKey)) {
+            $jsonResult = $this->redis->get($checkRedisKey);
+            return json_decode($jsonResult, true);
+        }
+
         $res_arr = [];
         if (empty($type_id)) {
             $type_arr = $this->getClassification();
@@ -215,6 +222,19 @@ class ActorClassificationService
                 ]);
             }
         }
+
+        $this->redis->set($checkRedisKey, json_encode($res_arr));
+        $this->redis->expire($checkRedisKey, self::TTL_ONE_DAY);
+
         return $res_arr;
+    }
+
+    //刪除Redis
+    public function delRedis(){
+        $checkRedisKey = self::CACHE_KEY.":".Carbon::now()->toDateString();
+        $keys = $this->redis->keys( $checkRedisKey.'*');
+        foreach ($keys as $key) {
+            $this->redis->del($key);
+        }
     }
 }

@@ -19,10 +19,13 @@ use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\Auth\ApiAuthMiddleware;
 
 #[Controller]
 class ActorController extends AbstractController
 {
+    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, ActorService $service)
     {
@@ -50,12 +53,23 @@ class ActorController extends AbstractController
         return $this->success(['models' => $result]);
     }
 
+    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'getListByClassification')]
     public function getListByClassification(RequestInterface $request, ActorClassificationService $service)
     {
         $userId = auth('jwt')->user()->getId();
         $type_id = (int) $request->input('type_id', 0);
         $result = $service->getListByClassification($type_id, $userId);
+        return $this->success(['models' => $result]);
+    }
+
+    #[Middleware(ApiAuthMiddleware::class)]
+    #[RequestMapping(methods: ['POST'], path: 'getActorDetail')]
+    public function getActorDetail(RequestInterface $request, ActorService $service)
+    {
+        $userId = auth('jwt')->user()->getId();
+        $actor_id = (int) $request->input('actor_id', 0);
+        $result = $service->getActorDetail($actor_id, $userId);
         return $this->success(['models' => $result]);
     }
 }

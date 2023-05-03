@@ -150,11 +150,12 @@ class ActorService
         $model = Actor::where('name', $data['name'])->first();
         $arr_classify = $data['classifications'] ?? [];
         $this->createActorClassificationRelationship($arr_classify, $model->id);
+        $this -> delFrontCache();
 
         return $model;
     }
 
-    // 新增或更新演員
+    // 
     public function findActor(string $name)
     {
         if (Actor::where('name', $name)->exists()) {
@@ -194,5 +195,42 @@ class ActorService
                 $model->save();
             }
         }
+        
+        $this -> delFrontCache();
+    }
+
+    // 獲取演員詳細資料
+    public function getActorDetail(int $actor_id, int $userId = 0)
+    {
+        $data = [];
+        // 撈取基本資料
+        $actor = Actor::select('name', 'avatar')->where('id', $actor_id)->first()->toArray();
+        $data['name'] = $actor['name'];
+        $data['avatar'] = $actor['avatar'];
+        if(!empty($actor['avatar']))$data['avatar'] = env('IMG_DOMAIN').$actor['avatar'];
+        // 撈取作品數
+        $works = ActorCorrespond::selectRaw('correspond_type, count(*) as count')->where('actor_id', $actor_id)->groupBy('correspond_type')->get();
+        foreach ($works as $key => $value) {
+            if($value -> correspond_type == 'video')$data['video_num'] = $value->count;
+            if($value -> correspond_type == 'image')$data['image_num'] = $value->count;
+        }
+        if(empty($data['video_num']))$data['video_num'] = 0;
+        if(empty($data['image_num']))$data['image_num'] = 0;
+
+        // 查詢是否追隨
+        if(MemberFollow::where('member_id', $userId)->where('correspond_type', Actor::class)->where('correspond_id', $actor_id)->whereNull('deleted_at')->exists()){
+            $data['is_follow'] = 1;
+        }else{
+            $data['is_follow'] = 0;
+        }
+
+        return $data;
+    }
+
+    // 刪除前台演員分類的快取
+    protected function delFrontCache()
+    {
+        $service = make(ActorClassificationService::class);
+        $service->delRedis();
     }
 }
