@@ -35,7 +35,7 @@ class Constants
         'user_id' => 1,
         'sex' => 0,
         'name' => '未分類',
-        'avatar' => '',
+        'avatar' => null,
         'created_at' => "2023-03-29 10:50:04",
         'updated_at' => "2023-03-29 10:50:04",
     ];
