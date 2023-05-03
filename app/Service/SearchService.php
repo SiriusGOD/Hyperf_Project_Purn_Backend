@@ -11,6 +11,9 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Constants\Constants;
+use App\Model\Actor;
+use App\Model\ActorCorrespond;
 use App\Model\Advertisement;
 use App\Model\ImageGroup;
 use App\Model\Video;
@@ -134,6 +137,7 @@ class SearchService
                 $result[] = $imageGroup;
                 continue;
             }
+            $imageGroup['actors'] = $this->getActors('image_group', $imageGroup['id']);
             foreach ($imageGroup['images_limit'] as $key => $image) {
                 if ($count >= ImageGroup::DEFAULT_FREE_LIMIT) {
                     unset($imageGroup['images_limit'][$key]);
@@ -157,6 +161,7 @@ class SearchService
             $video['full_m3u8'] = 'https://video.iwanna.tv' . $video['full_m3u8'];
             $video['m3u8'] = 'https://video.iwanna.tv' . $video['m3u8'];
             $video['source'] = 'https://video.iwanna.tv' . $video['source'];
+            $video['actors'] = $this->getActors('video', $video['id']);
 
             $result[] = $video;
         }
@@ -278,5 +283,31 @@ class SearchService
         }
 
         return $this->getBaseUrl();
+    }
+
+    public function getActors(string $type, int $id) : array
+    {
+        $actorIds = ActorCorrespond::where('correspond_type', $type)
+            ->where('correspond_id', $id)
+            ->get()
+            ->pluck('actor_id')
+            ->toArray();
+
+        if (empty($actorIds)) {
+            return [Constants::DEFAULT_ACTOR];
+        }
+
+        $actors = Actor::whereIn('id', $actorIds)->get()->toArray();
+
+        $result = [];
+        $baseUrl = $this->getBaseUrl();
+        foreach ($actors as $actor) {
+            if (! empty($actor['avatar'])) {
+                $actor['avatar'] = $baseUrl . $actor['avatar'];
+            }
+            $result[] = $actor;
+        }
+
+        return $result;
     }
 }

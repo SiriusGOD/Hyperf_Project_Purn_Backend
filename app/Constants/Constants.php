@@ -29,4 +29,14 @@ class Constants
         'click' => 1,
         'created_time' => 2
     ];
+
+    public const DEFAULT_ACTOR = [
+        'id' => 0,
+        'user_id' => 1,
+        'sex' => 0,
+        'name' => '未分類',
+        'avatar' => '',
+        'created_at' => "2023-03-29 10:50:04",
+        'updated_at' => "2023-03-29 10:50:04",
+    ];
 }
