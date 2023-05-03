@@ -13,6 +13,7 @@ namespace App\Task;
 
 use App\Model\Click;
 use App\Model\ImageGroup;
+use App\Model\MemberCategorizationDetial;
 use App\Model\Video;
 use App\Service\TagService;
 use Carbon\Carbon;
@@ -48,6 +49,12 @@ class CalculateTotalClickTask
             $video = Video::find($model->id);
             $video->total_click = $model->total;
             $video->save();
+
+            MemberCategorizationDetial::where('type', Video::class)
+                ->where('type_id', $model->id)
+                ->update([
+                    'total_click' => $model->total
+                ]);
         }
 
         $models = Click::whereBetween('statistical_date', [$last->toDateString(), $now->toDateString()])
@@ -60,6 +67,12 @@ class CalculateTotalClickTask
             $imageGroup = ImageGroup::find($model->id);
             $imageGroup->total_click = $model->total;
             $imageGroup->save();
+
+            MemberCategorizationDetial::where('type', ImageGroup::class)
+                ->where('type_id', $model->id)
+                ->update([
+                    'total_click' => $model->total
+                ]);
         }
 
         $this->logger->info('結束執行計算點擊數定時任務');
