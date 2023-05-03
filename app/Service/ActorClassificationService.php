@@ -127,7 +127,7 @@ class ActorClassificationService
             })
                 ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
                 ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
-                ->select('actors.id', 'actors.sex', 'actors.name')
+                ->select('actors.id', 'actors.sex', 'actors.name', 'actors.avatar')
                 ->where('actor_has_classifications.actor_classifications_id', $type_id)
                 ->groupBy('actor_corresponds.actor_id')
                 ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
