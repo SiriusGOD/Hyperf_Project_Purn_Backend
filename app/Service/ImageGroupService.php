@@ -107,13 +107,13 @@ class ImageGroupService
         }
 
         if (! empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
-            if ($isAsc) {
+            if ($isAsc == 1) {
                 $query = $query->orderBy('total_click');
             } else {
                 $query = $query->orderByDesc('total_click');
             }
         } elseif(! empty($sortBy) and $sortBy == Constants::SORT_BY['created_time']) {
-            if ($isAsc) {
+            if ($isAsc == 1) {
                 $query = $query->orderBy('id');
             } else {
                 $query = $query->orderByDesc('id');
