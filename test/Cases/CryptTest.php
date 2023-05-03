@@ -15,8 +15,12 @@ use HyperfTest\HttpTestCase;
 use App\Service\RedeemService;
 use App\Service\MemberRedeemService;
 use App\Service\VideoService;
+use App\Service\EncryptService;
 use App\Util\CRYPT;
 use Hyperf\Redis\Redis;
+
+use Hyperf\Utils\Codec\Json;
+
 /**
  * @internal
  * @coversNothing
@@ -46,9 +50,31 @@ class CryptTest extends HttpTestCase
 
     public function testApiList()
     {
-        $data = ["page"=>1, "t"=>time()];
-        $json = CRYPT::encrypt(json_encode($data) );
-        $res1 = $this->client->get('/api/actor/list',$data);
-        $this->assertSame(200, (int) $res1['code']);
+      // 发送端
+      $key = env("APP_KEY");
+      $signKey = env("SIGN_KEY");
+      $data = ["page" => 1,'t'=>time()];
+      // 將資料進行加密
+      $encryptedData = openssl_encrypt(json_encode($data), 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
+      // 對加密後的資料進行簽名
+      $signature = hash_hmac('sha256', $encryptedData, $signKey);
+      // 設定請求的 header 和 body
+      $headers = [
+          'Content-Type' => 'application/json',
+          'X-HMAC-Signature' => $signature, // 在 header 中加入簽名
+      ];
+      $body = [
+          'data' => base64_encode($encryptedData), // 在 body 中加入加密後的資料（需進行 base64 編碼）
+      ];
+      // 發送請求
+      $res = $this->client->post('/api/actor/list', $body, ['headers' => $headers]);
+      $this->assertSame(200, (int)$res['code']);
    }
+
+  public function testEnst()
+  {
+    $ser = new \App\Lib\Pinyin();
+    $res=$ser::getPinyin("喔您u");
+    print_r([$res]);
+  }
 }

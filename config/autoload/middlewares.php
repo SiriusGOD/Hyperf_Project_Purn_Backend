@@ -14,6 +14,5 @@ return [
         \Hyperf\Session\Middleware\SessionMiddleware::class,
         \Hyperf\Validation\Middleware\ValidationMiddleware::class,
         \Gokure\HyperfCors\CorsMiddleware::class,
-        \App\Middleware\ApiEncryptMiddleware::class
     ],
 ];
