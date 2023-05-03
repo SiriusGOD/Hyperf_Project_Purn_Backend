@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Constants\Constants;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\BuyMemberLevel;
@@ -72,7 +73,7 @@ class ImageGroupService
         return $query->orderByDesc('id')->get();
     }
 
-    public function getImageGroupsByKeyword(string $keyword, int $page, int $limit = Image::PAGE_PER): Collection
+    public function getImageGroupsByKeyword(string $keyword, int $page, int $limit, ?int $sortBy = null, ?int $isAsc = null): Collection
     {
         $tagIds = Tag::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
         $imageIds = [];
@@ -85,7 +86,7 @@ class ImageGroupService
         }
 
         $actorIds = Actor::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
-        if (!empty($actorIds)) {
+        if (! empty($actorIds)) {
             $result = ActorCorrespond::where('correspond_type', 'image')
                 ->whereIn('actor_id', $actorIds)
                 ->get()
@@ -103,6 +104,20 @@ class ImageGroupService
 
         if (! empty($imageIds)) {
             $query = $query->orWhereIn('id', $imageIds);
+        }
+
+        if (! empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
+            if ($isAsc == 1) {
+                $query = $query->orderBy('total_click');
+            } else {
+                $query = $query->orderByDesc('total_click');
+            }
+        } elseif(! empty($sortBy) and $sortBy == Constants::SORT_BY['created_time']) {
+            if ($isAsc == 1) {
+                $query = $query->orderBy('id');
+            } else {
+                $query = $query->orderByDesc('id');
+            }
         }
 
         return $query->get();

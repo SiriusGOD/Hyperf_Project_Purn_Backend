@@ -13,6 +13,7 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Model\CustomerService;
+use App\Model\Image;
 use App\Model\ImageGroup;
 use App\Request\ClickRequest;
 use App\Request\GetPayImageRequest;
@@ -52,12 +53,15 @@ class ImageGroupController extends AbstractController
     {
         $keyword = $request->input('keyword');
         $page = (int) $request->input('page', 0);
-        $models = $service->getImageGroupsByKeyword($keyword, $page)->toArray();
+        $limit = (int) $request->input('limit', Image::PAGE_PER);
+        $sortBy = (int) $request->input('sort_by');
+        $isAsc = (int) $request->input('is_asc');
+        $models = $service->getImageGroupsByKeyword($keyword, $page, $limit, $sortBy, $isAsc)->toArray();
         $result = $searchService->generateImageGroups([], $models);
         $data = [];
         $data['models'] = $result;
         $path = '/api/image_group/search';
-        $simplePaginator = new SimplePaginator($page, CustomerService::PAGE_PER, $path);
+        $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }
