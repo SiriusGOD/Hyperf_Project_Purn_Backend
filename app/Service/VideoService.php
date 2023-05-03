@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Constants\Constants;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\BuyMemberLevel;
@@ -216,7 +217,7 @@ class VideoService
      * @param mixed $limit
      * @param mixed $page
      */
-    public function searchVideo(string $title, $compare, int $length, $page, int $limit = Video::PAGE_PER)
+    public function searchVideo(string $title, $compare, int $length, $page, int $limit, ?int $sortBy = null, ?int $isAsc = null)
     {
         $tagIds = Tag::where('name', 'like', '%' . $title . '%')->get()->pluck('id')->toArray();
         $ids = [];
@@ -250,7 +251,20 @@ class VideoService
         if (! empty($ids)) {
             $model->whereIn('id', $ids);
         }
-        // $this->redis->set(self::COUNT_KEY, $model, self::COUNT_EXPIRE);
+        if (! empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
+            if ($isAsc == 1) {
+                $model = $model->orderBy('total_click');
+            } else {
+                $model = $model->orderByDesc('total_click');
+            }
+        } elseif(! empty($sortBy) and $sortBy == Constants::SORT_BY['created_time']) {
+            if ($isAsc == 1) {
+                $model = $model->orderBy('id');
+            } else {
+                $model = $model->orderByDesc('id');
+            }
+        }
+
         return $model->offset($limit * $page)->limit($limit)->get();
     }
 

@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Constants\Constants;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\BuyMemberLevel;
@@ -28,10 +29,6 @@ use Hyperf\DbConnection\Db;
 
 class ImageGroupService
 {
-    public const SORT_BY = [
-        'click' => 1,
-        'created_time' => 2
-    ];
     public function storeImageGroup(array $data): ImageGroup
     {
         $model = ImageGroup::findOrNew($data['id']);
@@ -107,6 +104,20 @@ class ImageGroupService
 
         if (! empty($imageIds)) {
             $query = $query->orWhereIn('id', $imageIds);
+        }
+
+        if (! empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
+            if ($isAsc) {
+                $query = $query->orderBy('total_click');
+            } else {
+                $query = $query->orderByDesc('total_click');
+            }
+        } elseif(! empty($sortBy) and $sortBy == Constants::SORT_BY['created_time']) {
+            if ($isAsc) {
+                $query = $query->orderBy('id');
+            } else {
+                $query = $query->orderByDesc('id');
+            }
         }
 
         return $query->get();

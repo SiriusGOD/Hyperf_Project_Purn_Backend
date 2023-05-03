@@ -54,7 +54,9 @@ class ImageGroupController extends AbstractController
         $keyword = $request->input('keyword');
         $page = (int) $request->input('page', 0);
         $limit = (int) $request->input('limit', Image::PAGE_PER);
-        $models = $service->getImageGroupsByKeyword($keyword, $page, $limit)->toArray();
+        $sortBy = (int) $request->input('sort_by');
+        $isAsc = (int) $request->input('is_asc');
+        $models = $service->getImageGroupsByKeyword($keyword, $page, $limit, $sortBy, $isAsc)->toArray();
         $result = $searchService->generateImageGroups([], $models);
         $data = [];
         $data['models'] = $result;

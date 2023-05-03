@@ -110,14 +110,17 @@ class VideoController extends AbstractController
         $length = $request->input('length', 0);
         $compare = $request->input('compare', 0);
         $page = (int) $request->input('page', 0);
+        $limit = (int) $request->input('page', Video::PAGE_PER);
+        $sortBy = (int) $request->input('sort_by');
+        $isAsc = (int) $request->input('is_asc');
         if (empty($title) || strlen($title) == 0) {
             $result = ['message' => 'title 不得為空'];
             return $this->success($result);
         }
         $data = [];
-        $data['models'] = $service->searchVideo($title, $compare, $length, $page);
+        $data['models'] = $service->searchVideo($title, $compare, $length, $page, $limit, $sortBy, $isAsc);
         $path = '/api/video/search';
-        $simplePaginator = new SimplePaginator($page, Video::PAGE_PER, $path);
+        $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }

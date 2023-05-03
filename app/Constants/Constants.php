@@ -24,4 +24,9 @@ class Constants
 
     // Default Page
     public const DEFAULT_PAGE_PER = 10;
+
+    public const SORT_BY = [
+        'click' => 1,
+        'created_time' => 2
+    ];
 }

@@ -50,7 +50,9 @@ class SearchController extends AbstractController
         $keyword = $request->input('keyword');
         $page = (int) $request->input('page', 0);
         $limit = (int) $request->input('limit', 10);
-        $models = $service->keyword($keyword, $page, $limit);
+        $sortBy = (int) $request->input('sort_by');
+        $isAsc = (int) $request->input('is_asc');
+        $models = $service->keyword($keyword, $page, $limit, $sortBy, $isAsc);
         $data = [];
         $data['models'] = $models;
         $path = '/api/search/keyword';

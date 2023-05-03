@@ -18,9 +18,9 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 
 class SearchService
 {
-    public const NORMAL_IMAGE_GROUP_PERCENT = 0.35;
+    public const NORMAL_IMAGE_GROUP_PERCENT = 0.5;
 
-    public const NORMAL_VIDEO_PERCENT = 0.35;
+    public const NORMAL_VIDEO_PERCENT = 0.5;
 
     public const ADVERTISEMENT_PAGE_PER = 20;
 
@@ -70,17 +70,16 @@ class SearchService
         return $this->generateAdvertisements($result, $advertisements);
     }
 
-    public function keyword(string $keyword, int $page, int $limit, int $sortBy, string $order): array
+    public function keyword(string $keyword, int $page, int $limit, ?int $sortBy, ?int $isAsc): array
     {
-        $imageGroups = $this->imageGroupService->getImageGroupsByKeyword($keyword, $page, $this->getPerLimit(ImageGroup::class, $limit))->toArray();
-        $videos = $this->videoService->searchVideo($keyword, 0, 0, $this->getPerLimit(Video::class, $limit))->toArray();
-        $advertisements = $this->advertisementService->getAdvertisementBySearch($page, $this->getPerLimit(Advertisement::class, $limit));
+        $imageGroupLimit = $this->getPerLimit(ImageGroup::class, $limit);
+        $imageGroups = $this->imageGroupService->getImageGroupsByKeyword($keyword, $page, $imageGroupLimit, $sortBy, $isAsc)->toArray();
+        $videos = $this->videoService->searchVideo($keyword, 0, 0, $page, $limit - $imageGroupLimit, $sortBy, $isAsc)->toArray();
 
         $result = [];
 
         $result = $this->generateImageGroups($result, $imageGroups);
-        $result = $this->generateVideos($result, $videos);
-        return $this->generateAdvertisements($result, $advertisements);
+        return $this->generateVideos($result, $videos);
     }
 
     // TODO 可以做快取去優化，但是需要增加非同步 task 去處理
