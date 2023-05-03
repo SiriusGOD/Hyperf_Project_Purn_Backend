@@ -27,48 +27,48 @@ class CRYPT
     //}
 
     // 加密函数
-    //public static function encrypt($plaintext)
-    //{
-    //    $ENCRYPTION_KEY = env('ENCRYPT_KEY');
-    //    $cipher = 'AES-256-CBC';
-    //    // 加密算法
-    //    $ivlen = openssl_cipher_iv_length($cipher);
-    //    // 获取初始化向量长度
-    //    $iv = openssl_random_pseudo_bytes($ivlen);
-    //    // 生成随机初始化向量
-    //    $ciphertext_raw = openssl_encrypt($plaintext, $cipher, $ENCRYPTION_KEY, OPENSSL_RAW_DATA, $iv);
-    //    $hmac = hash_hmac('sha256', $ciphertext_raw, $ENCRYPTION_KEY, true);
-    //    // 计算 HMAC
-    //    return base64_encode($iv . $hmac . $ciphertext_raw);
-    //    // 对 HMAC 和密文进行编码
-    //}
+    public static function encrypt($plaintext)
+    {
+        $ENCRYPTION_KEY = env('ENCRYPT_KEY');
+        $cipher = 'AES-256-CBC';
+        // 加密算法
+        $ivlen = openssl_cipher_iv_length($cipher);
+        // 获取初始化向量长度
+        $iv = openssl_random_pseudo_bytes($ivlen);
+        // 生成随机初始化向量
+        $ciphertext_raw = openssl_encrypt($plaintext, $cipher, $ENCRYPTION_KEY, OPENSSL_RAW_DATA, $iv);
+        $hmac = hash_hmac('sha256', $ciphertext_raw, $ENCRYPTION_KEY, true);
+        // 计算 HMAC
+        return base64_encode($iv . $hmac . $ciphertext_raw);
+        // 对 HMAC 和密文进行编码
+    }
 
     //// 解密
-    //public static function decrypt($ciphertext)
-    //{
-    //    $ENCRYPTION_KEY = env('ENCRYPT_KEY');
-    //    $cipher = 'AES-256-CBC';
-    //    // 加密算法
-    //    $c = base64_decode($ciphertext);
-    //    // 解码密文
-    //    $ivlen = openssl_cipher_iv_length($cipher);
-    //    // 获取初始化向量长度
-    //    $iv = substr($c, 0, $ivlen);
-    //    // 从密文中提取初始化向量
-    //    $hmac = substr($c, $ivlen, $sha2len = 32);
-    //    // 从密文中提取 HMAC
-    //    $ciphertext_raw = substr($c, $ivlen + $sha2len);
-    //    // 从密文中提取加密后的原始数据
-    //    $original_plaintext = openssl_decrypt($ciphertext_raw, $cipher, $ENCRYPTION_KEY, OPENSSL_RAW_DATA, $iv);
-    //    // 使用加密密钥和初始化向量解密密文
-    //    $calcmac = hash_hmac('sha256', $ciphertext_raw, $ENCRYPTION_KEY, true);
-    //    // 计算 HMAC
-    //    if (hash_equals($hmac, $calcmac)) {
-    //        // 比较 HMAC 是否一致
-    //        return $original_plaintext;
-    //    }
-    //    return null;
-    //}
+    public static function decrypt($ciphertext)
+    {
+        $ENCRYPTION_KEY = env('ENCRYPT_KEY');
+        $cipher = 'AES-256-CBC';
+        // 加密算法
+        $c = base64_decode($ciphertext);
+        // 解码密文
+        $ivlen = openssl_cipher_iv_length($cipher);
+        // 获取初始化向量长度
+        $iv = substr($c, 0, $ivlen);
+        // 从密文中提取初始化向量
+        $hmac = substr($c, $ivlen, $sha2len = 32);
+        // 从密文中提取 HMAC
+        $ciphertext_raw = substr($c, $ivlen + $sha2len);
+        // 从密文中提取加密后的原始数据
+        $original_plaintext = openssl_decrypt($ciphertext_raw, $cipher, $ENCRYPTION_KEY, OPENSSL_RAW_DATA, $iv);
+        // 使用加密密钥和初始化向量解密密文
+        $calcmac = hash_hmac('sha256', $ciphertext_raw, $ENCRYPTION_KEY, true);
+        // 计算 HMAC
+        if (hash_equals($hmac, $calcmac)) {
+            // 比较 HMAC 是否一致
+            return $original_plaintext;
+        }
+        return null;
+    }
 
     public function __construct($appId = '',$debug =false)
     {
@@ -124,28 +124,28 @@ class CRYPT
     }
     #@todo AES加解密
     #加密
-    public static function encrypt($input, $cryptKey)
-    {
-        //$ENCRYPTION_KEY = env('ENCRYPT_KEY');
-        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cfb'));
-        $key_iv = self::EVPBytesToKey($cryptKey);
-        $data = openssl_encrypt($input, 'aes-256-cfb', $key_iv[0], OPENSSL_RAW_DATA, $iv);
-        $data = $iv . $data;
-        $data = strtoupper(bin2hex($data));
-        return $data;
-    }
+    //public static function encrypt($input, $cryptKey)
+    //{
+    //    //$ENCRYPTION_KEY = env('ENCRYPT_KEY');
+    //    $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cfb'));
+    //    $key_iv = self::EVPBytesToKey($cryptKey);
+    //    $data = openssl_encrypt($input, 'aes-256-cfb', $key_iv[0], OPENSSL_RAW_DATA, $iv);
+    //    $data = $iv . $data;
+    //    $data = strtoupper(bin2hex($data));
+    //    return $data;
+    //}
 
     //解密
-    public static function decrypt($input, $cryptKey)
-    {
-        $input = hex2bin($input);
-        $iv_len = openssl_cipher_iv_length('aes-256-cfb');
-        $iv = substr($input, 0, $iv_len);
-        $input = substr($input, $iv_len);
-        $key_iv = self::EVPBytesToKey($cryptKey);
-        $decrypted = openssl_decrypt($input, 'aes-256-cfb', $key_iv[0], OPENSSL_RAW_DATA, $iv);
-        return $decrypted;
-    }
+    //public static function decrypt($input, $cryptKey)
+    //{
+    //    $input = hex2bin($input);
+    //    $iv_len = openssl_cipher_iv_length('aes-256-cfb');
+    //    $iv = substr($input, 0, $iv_len);
+    //    $input = substr($input, $iv_len);
+    //    $key_iv = self::EVPBytesToKey($cryptKey);
+    //    $decrypted = openssl_decrypt($input, 'aes-256-cfb', $key_iv[0], OPENSSL_RAW_DATA, $iv);
+    //    return $decrypted;
+    //}
 
     #@todo AES加解密
     #加密

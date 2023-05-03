@@ -46,8 +46,8 @@ class CryptTest extends HttpTestCase
 
     public function testApiList()
     {
-        $data = ["page"=>1];
-        $data = ["page"=>CRYPT::encrypt(json_encode($data) )];
+        $data = ["page"=>1, "t"=>time()];
+        $json = CRYPT::encrypt(json_encode($data) );
         $res1 = $this->client->get('/api/actor/list',$data);
         $this->assertSame(200, (int) $res1['code']);
    }
