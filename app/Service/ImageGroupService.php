@@ -28,6 +28,10 @@ use Hyperf\DbConnection\Db;
 
 class ImageGroupService
 {
+    public const SORT_BY = [
+        'click' => 1,
+        'created_time' => 2
+    ];
     public function storeImageGroup(array $data): ImageGroup
     {
         $model = ImageGroup::findOrNew($data['id']);
@@ -72,7 +76,7 @@ class ImageGroupService
         return $query->orderByDesc('id')->get();
     }
 
-    public function getImageGroupsByKeyword(string $keyword, int $page, int $limit = Image::PAGE_PER): Collection
+    public function getImageGroupsByKeyword(string $keyword, int $page, int $limit, ?int $sortBy = null, ?int $isAsc = null): Collection
     {
         $tagIds = Tag::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
         $imageIds = [];
@@ -85,7 +89,7 @@ class ImageGroupService
         }
 
         $actorIds = Actor::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
-        if (!empty($actorIds)) {
+        if (! empty($actorIds)) {
             $result = ActorCorrespond::where('correspond_type', 'image')
                 ->whereIn('actor_id', $actorIds)
                 ->get()

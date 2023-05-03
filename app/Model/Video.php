@@ -67,7 +67,8 @@ use Hyperf\Database\Model\SoftDeletes;
  * @property string $source 
  * @property string $cover_full 
  * @property int $cover_witdh 
- * @property int $cover_heigh 
+ * @property int $cover_height 
+ * @property int $total_click 
  * @property-read User $user 
  * @property-read \Hyperf\Database\Model\Collection|Tag[] $tags 
  * @property-read mixed $model_type 
@@ -101,7 +102,7 @@ class Video extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'type' => 'integer', 'p_id' => 'integer', 'music_id' => 'integer', 'coins' => 'integer', 'thumb_width' => 'integer', 'thumb_height' => 'integer', 'gif_width' => 'integer', 'gif_height' => 'integer', 'onshelf_tm' => 'integer', 'rating' => 'integer', 'refresh_at' => 'integer', 'is_free' => 'integer', 'comment' => 'integer', 'status' => 'integer', 'thumb_start_time' => 'integer', 'thumb_duration' => 'integer', 'is_hide' => 'integer', 'is_recommend' => 'integer', 'is_feature' => 'integer', 'is_top' => 'integer', 'count_pay' => 'integer', 'club_id' => 'integer', 'topic_id' => 'integer', 'duration' => 'integer', 'likes' => 'integer', 'pay_type' => 'integer', 'hot_order' => 'integer', 'mod' => 'integer', 'category_id' => 'integer', 'cover_witdh' => 'integer', 'cover_heigh' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'type' => 'integer', 'p_id' => 'integer', 'music_id' => 'integer', 'coins' => 'integer', 'thumb_width' => 'integer', 'thumb_height' => 'integer', 'gif_width' => 'integer', 'gif_height' => 'integer', 'onshelf_tm' => 'integer', 'rating' => 'integer', 'refresh_at' => 'integer', 'is_free' => 'integer', 'comment' => 'integer', 'status' => 'integer', 'thumb_start_time' => 'integer', 'thumb_duration' => 'integer', 'is_hide' => 'integer', 'is_recommend' => 'integer', 'is_feature' => 'integer', 'is_top' => 'integer', 'count_pay' => 'integer', 'club_id' => 'integer', 'topic_id' => 'integer', 'duration' => 'integer', 'likes' => 'integer', 'pay_type' => 'integer', 'hot_order' => 'integer', 'mod' => 'integer', 'category_id' => 'integer', 'cover_witdh' => 'integer', 'cover_height' => 'integer', 'total_click' => 'integer'];
 
     public function user()
     {

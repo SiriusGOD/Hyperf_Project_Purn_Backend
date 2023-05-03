@@ -251,7 +251,7 @@ class VideoService
             $model->whereIn('id', $ids);
         }
         // $this->redis->set(self::COUNT_KEY, $model, self::COUNT_EXPIRE);
-        return $model->offset(Video::PAGE_PER * $page)->limit(Video::PAGE_PER)->get();
+        return $model->offset($limit * $page)->limit($limit)->get();
     }
 
     // 共用自取

@@ -70,7 +70,7 @@ class SearchService
         return $this->generateAdvertisements($result, $advertisements);
     }
 
-    public function keyword(string $keyword, int $page, int $limit = 10): array
+    public function keyword(string $keyword, int $page, int $limit, int $sortBy, string $order): array
     {
         $imageGroups = $this->imageGroupService->getImageGroupsByKeyword($keyword, $page, $this->getPerLimit(ImageGroup::class, $limit))->toArray();
         $videos = $this->videoService->searchVideo($keyword, 0, 0, $this->getPerLimit(Video::class, $limit))->toArray();
