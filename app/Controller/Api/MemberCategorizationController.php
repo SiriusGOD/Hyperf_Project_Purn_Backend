@@ -14,7 +14,6 @@ namespace App\Controller\Api;
 use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Middleware\Auth\ApiAuthMiddleware;
-use App\Model\CustomerService;
 use App\Model\MemberCategorization;
 use App\Model\MemberCategorizationDetail;
 use App\Request\MemberCategorizationCreateRequest;
@@ -57,7 +56,7 @@ class MemberCategorizationController extends AbstractController
     {
         $memberId = auth()->user()->getId();
         $id = $service->createOrUpdateMemberCategorization([
-            'id' => $request->input('id',0),
+            'id' => $request->input('id', 0),
             'name' => $request->input('name'),
             'member_id' => $memberId,
             'hot_order' => $request->input('hot_order'),
@@ -106,7 +105,7 @@ class MemberCategorizationController extends AbstractController
             ->toArray();
 
         $data = [
-            'models' => $models
+            'models' => $models,
         ];
 
         $path = '/api/member_categorization/list';
@@ -138,7 +137,7 @@ class MemberCategorizationController extends AbstractController
         ]);
 
         $data = [
-            'models' => $models
+            'models' => $models,
         ];
 
         $path = '/api/member_categorization/detail';
