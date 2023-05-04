@@ -223,8 +223,8 @@ class ActorClassificationService
             }
         }
 
-        // $this->redis->set($checkRedisKey, json_encode($res_arr));
-        // $this->redis->expire($checkRedisKey, self::TTL_ONE_DAY);
+        $this->redis->set($checkRedisKey, json_encode($res_arr));
+        $this->redis->expire($checkRedisKey, self::TTL_ONE_DAY);
 
         return $res_arr;
     }
