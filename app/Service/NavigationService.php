@@ -134,8 +134,13 @@ class NavigationService
         $result = $this->navigationSuggest($suggest, $page, $limit);
         $collect = \Hyperf\Collection\collect($result);
         $collect = $collect->sortByDesc('created_at');
+        $result = [];
 
-        return $collect->toArray();
+        foreach ($collect->toArray() as $row) {
+            $result[] = $row;
+        }
+
+        return $result;
     }
 
     protected function navigationDetailImageGroups(array $suggest, int $navId, array $tagIds, int $page, int $limit): array
