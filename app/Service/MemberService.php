@@ -26,6 +26,7 @@ use App\Model\Product;
 use App\Model\Role;
 use App\Model\User;
 use App\Model\Video;
+use App\Model\ActorCorrespond;
 use Carbon\Carbon;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
@@ -411,7 +412,7 @@ class MemberService extends BaseService
                       $query = $class_name::join('member_follows', function ($join) use ($class_name) {
                           $join->on('member_follows.correspond_id', '=', 'actors.id')
                               ->where('member_follows.correspond_type', '=', $class_name);
-                      })->select('actors.id', 'actors.sex', 'actors.name');
+                      })->select('actors.id', 'actors.name', 'actors.avatar');
                       break;
                   case 'tag':
                       $query = $class_name::join('member_follows', function ($join) use ($class_name) {
@@ -423,7 +424,19 @@ class MemberService extends BaseService
                       # code...
                       break;
               }
-              $result[$value] = $query->where('member_follows.member_id', '=', $user_id)->whereNull('member_follows.deleted_at')->get()->toArray();
+              $query = $query->where('member_follows.member_id', '=', $user_id)->whereNull('member_follows.deleted_at')->get()->toArray();
+              
+              if($value == 'actor'){
+                foreach ($query as $key2 => $value2) {
+                    // avatar加上網域
+                    if(!empty($value2['avatar']))$query[$key2]['avatar'] = env('IMG_DOMAIN').$value2['avatar'];
+
+                    // 查詢作品數
+                    $numberOfWorks = ActorCorrespond::where('actor_id', $value2['id'])->count();
+                    $query[$key2]['numberOfWorks'] = $numberOfWorks;
+                }
+              }
+              $result[$value] = $query;
           }
 
           return $result;
@@ -582,7 +595,7 @@ class MemberService extends BaseService
             if($order -> currency == Product::CURRENCY[0]){
                 $data[$key]['price'] = $order -> total_price . " 元";
             }else if($order -> currency == Product::CURRENCY[1]){
-                $data[$key]['price'] = $order -> total_price . " 點";
+                $data[$key]['price'] = $order -> total_price . " 点";
             }
             $data[$key]['pay_method'] =  $order -> pay_name;
         }

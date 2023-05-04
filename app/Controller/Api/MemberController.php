@@ -328,6 +328,7 @@ class MemberController extends AbstractController
         return $this->error('查無該會員追蹤資料', ErrorCode::BAD_REQUEST);
     }
 
+    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'getFollowList')]
     public function getMemberFollowList(RequestInterface $request, MemberService $service)
     {
