@@ -133,7 +133,7 @@ class MemberCategorizationService extends GenerateService
             }
         }
 
-        $videos = Video::whereIn('id', $ids)->get()->toArray();
+        $videos = Video::with('tags')->whereIn('id', $ids)->get()->toArray();
 
         $result = [];
         foreach ($videos as $video) {
@@ -157,7 +157,7 @@ class MemberCategorizationService extends GenerateService
             }
         }
 
-        $imageGroups = ImageGroup::with('images')->whereIn('id', $ids)->get()->toArray();
+        $imageGroups = ImageGroup::with(['images', 'tags'])->whereIn('id', $ids)->get()->toArray();
 
         $result = [];
         foreach ($imageGroups as $imageGroup) {
