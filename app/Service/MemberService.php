@@ -235,6 +235,8 @@ class MemberService extends BaseService
               $model->last_ip = $data['last_ip'];
           }
           $model->save();
+
+          $this -> delRedis($id);
       }
 
       // 使用者列表

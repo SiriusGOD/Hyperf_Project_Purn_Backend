@@ -297,7 +297,7 @@ class MemberController extends AbstractController
             $model->save();
             return $this->success();
 
-            // 更新快取
+            // 刪除快取
             $service->delFrontCache();
         }
 
@@ -305,7 +305,7 @@ class MemberController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'deleteFollow')]
-    public function deleteMemberFollow(AddMemberFollowRequest $request)
+    public function deleteMemberFollow(AddMemberFollowRequest $request, MemberService $service)
     {
         $userId = auth('jwt')->user()->getId();
         $follow_type = $request->input('type');
@@ -321,6 +321,9 @@ class MemberController extends AbstractController
             $model->save();
             return $this->success();
         }
+
+        // 刪除快取
+        $service->delFrontCache();
 
         return $this->error('查無該會員追蹤資料', ErrorCode::BAD_REQUEST);
     }
