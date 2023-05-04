@@ -114,7 +114,7 @@ class MemberCategorizationService extends GenerateService
     public function setDefault(int $memberId, int $id): void
     {
         MemberCategorization::where('member_id', $memberId)->update([
-            'iis_default' => 0,
+            'is_default' => 0,
         ]);
 
         MemberCategorization::where('member_id', $memberId)

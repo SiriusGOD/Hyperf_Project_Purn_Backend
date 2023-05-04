@@ -194,4 +194,24 @@ class MemberCategorizationController extends AbstractController
 
         return $this->success();
     }
+
+    #[RequestMapping(methods: ['POST'], path: 'detail/exist')]
+    public function isExist(RequestInterface $request, MemberCategorizationService $service)
+    {
+        $memberId = auth()->user()->getId();
+        $type = MemberCategorizationDetail::TYPES[$request->input('type')];
+        $ids = MemberCategorization::where('member_id', $memberId)->get()->pluck('id')->toArray();
+        $count = MemberCategorizationDetail::whereIn('member_categorization_id', $ids)
+            ->where('type', $type)
+            ->where('type_id', $request->input('type_id'))
+            ->count();
+        $exist = 0;
+        if ($count > 0) {
+            $exist = 1;
+        }
+
+        return $this->success([
+            'is_exist' => $exist,
+        ]);
+    }
 }
