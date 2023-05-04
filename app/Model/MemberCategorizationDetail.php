@@ -18,8 +18,8 @@ namespace App\Model;
 class MemberCategorizationDetail extends Model
 {
     public const TYPES = [
-        1 => Video::class,
-        2 => ImageGroup::class,
+        'video' => Video::class,
+        'image_group' => ImageGroup::class,
     ];
     /**
      * The table associated with the model.

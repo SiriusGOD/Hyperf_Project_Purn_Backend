@@ -23,7 +23,7 @@ class MemberCategorizationDetailCreateRequest extends AuthApiBaseRequest
     {
         return [
             'member_categorization_id' => 'required|numeric',
-            'type' => 'required|numeric|in:1,2',
+            'type' => 'required|string',
             'type_id' => 'required|numeric',
         ];
     }
