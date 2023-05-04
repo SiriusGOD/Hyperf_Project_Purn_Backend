@@ -25,11 +25,11 @@ use App\Request\AddFollowerRequest;
 use App\Request\AddMemberFollowRequest;
 use App\Request\AddMemberTagRequest;
 use App\Request\MemberApiUpdateRequest;
-use App\Request\MemberDetailRequest;
 use App\Request\MemberLoginRequest;
 use App\Request\RegisterVerificationRequest;
 use App\Request\ResetPasswordVerificationRequest;
 use App\Request\SendVerificationRequest;
+use App\Service\MemberCategorizationService;
 use App\Service\MemberFollowService;
 use App\Service\MemberService;
 use Carbon\Carbon;
@@ -44,7 +44,7 @@ class MemberController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'login')]
     #[Middleware(LoginLimitMiddleware::class)]
-    public function login(MemberLoginRequest $request, MemberService $service)
+    public function login(MemberLoginRequest $request, MemberService $service, MemberCategorizationService $memberCategorizationService)
     {
         $user = $service->apiGetUser([
             'email' => $request->input('email'),
@@ -76,6 +76,13 @@ class MemberController extends AbstractController
             if (empty($user)) {
                 return $this->error(trans('validation.authorize'), 401);
             }
+
+            $memberCategorizationService->createOrUpdateMemberCategorization([
+                'member_id' => $user->id,
+                'name' => trans('default.default_categorization_name'),
+                'hot_order' => 0,
+                'is_default' => 1,
+            ]);
         }
 
         if (! $service->checkAndSaveDevice($user->id, $request->input('device_id'))) {
@@ -161,7 +168,7 @@ class MemberController extends AbstractController
 
     #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'detail')]
-    public function detail( MemberService $service)
+    public function detail(MemberService $service)
     {
         $id = auth('jwt')->user()->getId();
         $member = $service->getMember($id);

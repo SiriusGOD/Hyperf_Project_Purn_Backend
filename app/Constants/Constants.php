@@ -27,7 +27,7 @@ class Constants
 
     public const SORT_BY = [
         'click' => 1,
-        'created_time' => 2
+        'created_time' => 2,
     ];
 
     public const DEFAULT_ACTOR = [
