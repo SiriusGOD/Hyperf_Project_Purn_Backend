@@ -12,8 +12,8 @@ class MemberCategorizationService
         $model = new MemberCategorization();
         $model->member_id = $params['member_id'];
         $model->name = $params['name'];
-        $model->hot_order = $params['hot_order'];
-        $model->is_default = $params['is_default'];
+        $model->hot_order = $params['hot_order'] ?? 0;
+        $model->is_default = $params['is_default'] ?? 0;
         $model->save();
     }
 

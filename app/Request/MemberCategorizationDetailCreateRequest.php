@@ -14,7 +14,7 @@ namespace App\Request;
 use App\Model\User;
 use Hyperf\Validation\Request\FormRequest;
 
-class MemberCategorizationCreateRequest extends AuthApiBaseRequest
+class MemberCategorizationDetailCreateRequest extends AuthApiBaseRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -22,9 +22,9 @@ class MemberCategorizationCreateRequest extends AuthApiBaseRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'hot_order' => 'numeric',
-            'is_default' => 'numeric',
+            'id' => 'required|numeric|exists:member_categorizations',
+            'type' => 'required|numeric|in:1,2',
+            'type_id' => 'required|numeric',
         ];
     }
 }
