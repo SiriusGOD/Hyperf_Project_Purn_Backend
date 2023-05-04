@@ -183,6 +183,8 @@ class OrderService
             $model->pay_proxy = $data['order']['pay_proxy'];
             $model->save();
 
+            $this -> delMemberListCache($data['order']['user_id']);
+
             // get order id
             $res = Order::select('id')->where('order_number', $order_number)->get()->toArray();
             $id = $res[0]['id'];
@@ -221,6 +223,10 @@ class OrderService
 
         $record->status = $order_status;
         $record->save();
+
+        $this -> delMemberListCache($record-> user_id);
+
+
         return true;
     }
 
@@ -420,5 +426,12 @@ class OrderService
                 $up_member->save();
                 break;
         }
+    }
+
+    // 刪除會員購買紀錄的快取
+    public function delMemberListCache($user_id)
+    {
+        $service = make(MemberService::class);
+        $service->delMemberListRedis($user_id);
     }
 }

@@ -279,7 +279,7 @@ class MemberController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'addFollow')]
-    public function addMemberFollow(AddMemberFollowRequest $request)
+    public function addMemberFollow(AddMemberFollowRequest $request, MemberService $service)
     {
         $follow_id = $request->input('id');
         $follow_type = $request->input('type');
@@ -296,6 +296,9 @@ class MemberController extends AbstractController
             $model->correspond_id = $follow_id;
             $model->save();
             return $this->success();
+
+            // 更新快取
+            $service->delFrontCache();
         }
 
         return $this->error('該會員已追蹤', ErrorCode::BAD_REQUEST);
@@ -338,10 +341,22 @@ class MemberController extends AbstractController
         $id = auth('jwt')->user()->getId();
         $type = $request->input('type', 'all');
         $page = $request->input('page', 0);
-        $pageSize = $request->input('pageSize', 20);
-        // $offset = $request->input('offset', 0);
-        // $limit = $request->input('limit', 0);
+        $pageSize = $request->input('limit', 20);
         $result = $service->getMemberProductId($id, $type, $page, $pageSize);
+        return $this->success(['models' => $result]);
+    }
+
+    /**
+     * 獲取該使用者的購買清單
+     */
+    #[Middleware(ApiAuthMiddleware::class)]
+    #[RequestMapping(methods: ['POST'], path: 'getMemberList')]
+    public function getMemberList(RequestInterface $request, MemberService $service)
+    {
+        $user_id = auth('jwt')->user()->getId();
+        $page = $request->input('page', 0);
+        $limit = $request->input('limit');
+        $result = $service->getMemberList($user_id, $page, $limit);
         return $this->success(['models' => $result]);
     }
 
