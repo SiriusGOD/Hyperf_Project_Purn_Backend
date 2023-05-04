@@ -35,8 +35,7 @@ class AdvertisementService
         }
 
         $now = Carbon::now()->toDateTimeString();
-        $result = Advertisement::select('id', 'name', 'image_url', 'url', 'position', 'start_time', 'end_time', 'buyer', 'expire', 'created_at', 'updated_at')
-            ->where('start_time', '<=', $now)
+        $result = Advertisement::where('start_time', '<=', $now)
             ->where('end_time', '>=', $now)
             ->get()
             ->toArray();
@@ -49,8 +48,7 @@ class AdvertisementService
     public function getAdvertisementBySearch(int $page, int $limit = 1): array
     {
         $now = Carbon::now()->toDateTimeString();
-        return Advertisement::select('id', 'name', 'image_url', 'url', 'position', 'start_time', 'end_time', 'buyer', 'expire', 'created_at', 'updated_at')
-            ->where('start_time', '<=', $now)
+        return Advertisement::where('start_time', '<=', $now)
             ->where('end_time', '>=', $now)
             ->offset($page * $limit)
             ->limit($limit)
