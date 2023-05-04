@@ -11,15 +11,12 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use App\Constants\Constants;
-use App\Model\Actor;
-use App\Model\ActorCorrespond;
 use App\Model\Advertisement;
 use App\Model\ImageGroup;
 use App\Model\Video;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
-class SearchService
+class SearchService extends GenerateService
 {
     public const NORMAL_IMAGE_GROUP_PERCENT = 0.5;
 
@@ -97,76 +94,6 @@ class SearchService
         $result = $this->generateImageGroups($result, $imageGroups);
         $result = $this->generateVideos($result, $videos);
         return $this->generateAdvertisements($result, $advertisements);
-    }
-
-    protected function generateAdvertisements(array $result, array $advertisements): array
-    {
-        foreach ($advertisements as $advertisement) {
-            $advertisement['image_url'] = $this->getBaseUrl() . $advertisement['image_url'];
-            $result[] = $advertisement;
-        }
-
-        return $result;
-    }
-
-    protected function getBaseUrl()
-    {
-        $urlArr = parse_url($this->url);
-        $port = $urlArr['port'] ?? '80';
-
-        if ($urlArr['scheme'] == 'https' and empty($urlArr['port'])) {
-            $port = 443;
-        }
-
-        $result = $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $port;
-        if (! empty(env('TEST_IMG_URL'))) {
-            return env('TEST_IMG_URL');
-        }
-
-        return $result;
-    }
-
-    public function generateImageGroups(array $result, array $imageGroups): array
-    {
-        foreach ($imageGroups as $imageGroup) {
-            $url = $this->getUrl($imageGroup);
-            $imageGroup['thumbnail'] = $url . $imageGroup['thumbnail'];
-            $imageGroup['url'] = $url . $imageGroup['url'];
-            $count = 0;
-            if (empty($imageGroup['images_limit'])) {
-                $result[] = $imageGroup;
-                continue;
-            }
-            $imageGroup['actors'] = $this->getActors('image_group', $imageGroup['id']);
-            foreach ($imageGroup['images_limit'] as $key => $image) {
-                if ($count >= ImageGroup::DEFAULT_FREE_LIMIT) {
-                    unset($imageGroup['images_limit'][$key]);
-                    continue;
-                }
-                $imageGroup['images_limit'][$key]['thumbnail'] = $url . $imageGroup['images_limit'][$key]['thumbnail'];
-                $imageGroup['images_limit'][$key]['url'] = $url . $imageGroup['images_limit'][$key]['url'];
-                $count++;
-            }
-
-            $result[] = $imageGroup;
-        }
-
-        return $result;
-    }
-
-    protected function generateVideos(array $result, array $videos): array
-    {
-        foreach ($videos as $video) {
-            $video['cover_thumb'] = 'https://new.cnzuqiu.mobi' . $video['cover_thumb'];
-            $video['full_m3u8'] = 'https://video.iwanna.tv' . $video['full_m3u8'];
-            $video['m3u8'] = 'https://video.iwanna.tv' . $video['m3u8'];
-            $video['source'] = 'https://video.iwanna.tv' . $video['source'];
-            $video['actors'] = $this->getActors('video', $video['id']);
-
-            $result[] = $video;
-        }
-
-        return $result;
     }
 
     protected function popularImageGroups(int $page, int $limit = 10): array
@@ -256,17 +183,6 @@ class SearchService
         return array_merge($videos, $result);
     }
 
-    protected function getIds(array $models): array
-    {
-        $result = [];
-
-        foreach ($models as $model) {
-            $result[] = $model['id'];
-        }
-
-        return $result;
-    }
-
     protected function getPerLimit(string $type, int $limit): int
     {
         return (int) match ($type) {
@@ -274,40 +190,5 @@ class SearchService
             ImageGroup::class => floor($limit * self::NORMAL_IMAGE_GROUP_PERCENT),
             Advertisement::class => floor($limit * self::ADVERTISEMENT_PAGE_PER),
         };
-    }
-
-    protected function getUrl(array $model): string
-    {
-        if ($model['sync_id'] > 0) {
-            return env('IMAGE_GROUP_ENCRYPT_URL');
-        }
-
-        return $this->getBaseUrl();
-    }
-
-    public function getActors(string $type, int $id) : array
-    {
-        $actorIds = ActorCorrespond::where('correspond_type', $type)
-            ->where('correspond_id', $id)
-            ->get()
-            ->pluck('actor_id')
-            ->toArray();
-
-        if (empty($actorIds)) {
-            return [Constants::DEFAULT_ACTOR];
-        }
-
-        $actors = Actor::whereIn('id', $actorIds)->get()->toArray();
-
-        $result = [];
-        $baseUrl = $this->getBaseUrl();
-        foreach ($actors as $actor) {
-            if (! empty($actor['avatar'])) {
-                $actor['avatar'] = $baseUrl . $actor['avatar'];
-            }
-            $result[] = $actor;
-        }
-
-        return $result;
     }
 }

@@ -13,7 +13,7 @@ namespace App\Task;
 
 use App\Model\Click;
 use App\Model\ImageGroup;
-use App\Model\MemberCategorizationDetial;
+use App\Model\MemberCategorizationDetail;
 use App\Model\Video;
 use App\Service\TagService;
 use Carbon\Carbon;
@@ -50,7 +50,7 @@ class CalculateTotalClickTask
             $video->total_click = $model->total;
             $video->save();
 
-            MemberCategorizationDetial::where('type', Video::class)
+            MemberCategorizationDetail::where('type', Video::class)
                 ->where('type_id', $model->id)
                 ->update([
                     'total_click' => $model->total
@@ -68,7 +68,7 @@ class CalculateTotalClickTask
             $imageGroup->total_click = $model->total;
             $imageGroup->save();
 
-            MemberCategorizationDetial::where('type', ImageGroup::class)
+            MemberCategorizationDetail::where('type', ImageGroup::class)
                 ->where('type_id', $model->id)
                 ->update([
                     'total_click' => $model->total
