@@ -403,8 +403,15 @@ return [
         'order_status_msg' => [
             \App\Model\Order::ORDER_STATUS['create'] => '訂單成立',
             \App\Model\Order::ORDER_STATUS['delete'] => '訂單取消',
-            \App\Model\Order::ORDER_STATUS['finish'] => '訂單完成'
-        ]
+            \App\Model\Order::ORDER_STATUS['finish'] => '訂單完成',
+            \App\Model\Order::ORDER_STATUS['failure'] => '訂單付款失敗',
+        ],
+        'order_status_fronted_msg' => [
+            \App\Model\Order::ORDER_STATUS['create'] => '等待支付中',
+            \App\Model\Order::ORDER_STATUS['delete'] => '訂單取消',
+            \App\Model\Order::ORDER_STATUS['finish'] => '成功',
+            \App\Model\Order::ORDER_STATUS['failure'] => '失敗',
+        ],
     ],
     // -------------------------------------------------------------------
     // ProductController

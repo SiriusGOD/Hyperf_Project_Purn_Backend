@@ -334,6 +334,11 @@ class PayService
                 $this->logger->error('notifyPayAction  error:' . __LINE__ . json_encode($th->getMessage()));
                 var_dump($th->getMessage());
             }
+        }else{
+            // 付款失敗
+            $order = Order::where('pay_order_id', $data['order_id'])->first();
+            $order->status = Order::ORDER_STATUS['failure'];
+            $order->save();
         }
     }
 

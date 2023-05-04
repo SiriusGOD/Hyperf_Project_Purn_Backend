@@ -478,7 +478,7 @@ class MemberService extends BaseService
                 break;
         }
 
-        if (! empty($offset)) {
+        if (! empty($page) && $page > 0) {
             // $query = $query -> offset($offset);
             $query = $query->offset(($page - 1) * $step);
         }
@@ -539,6 +539,56 @@ class MemberService extends BaseService
         $model->save();
 
         return $model->code;
+    }
+
+    // 獲取會員訂單清單
+    public function getMemberList($user_id, $page, $limit)
+    {
+        // redis
+        $checkRedisKey = self::KEY.":MemberList:".$user_id.":".Carbon::now()->toDateString().":".$page.":".$limit;
+        if ($this->redis->exists($checkRedisKey)) {
+            $jsonResult = $this->redis->get($checkRedisKey);
+            return json_decode($jsonResult, true);
+        }
+
+        // 顯示幾筆
+        $step = $limit ?? Order::FRONTED_PAGE_PER;
+
+        // 撈取資料
+        $products_type = ['member', 'points'];
+        $query = Order::join('order_details', 'orders.id', 'order_details.order_id')
+                        ->join('products', 'order_details.product_id', 'products.id')
+                        ->join('pays', 'orders.payment_type', 'pays.id')
+                        ->selectRaw('products.name as product_name, orders.created_at, orders.status, orders.currency, orders.total_price, pays.name as pay_name')
+                        ->where('orders.user_id', $user_id)
+                        ->whereIn('products.type', $products_type)
+                        ->orderBy('orders.created_at', 'desc');
+        if (! empty($page) && $page > 0) {
+            $query = $query->offset(($page - 1) * $step);
+        }
+        if (! empty($limit)) {
+            $query = $query->limit($step);
+        }
+        $orders = $query->get();
+
+        // 整理資料
+        $data = [];
+        foreach ($orders as $key => $order) {
+            $data[$key]['product_name'] = $order -> product_name;
+            $data[$key]['created_at'] = $order -> created_at -> format('Y.m.d'); ;
+            $data[$key]['status'] = trans('default.order_control.order_status_fronted_msg')[$order -> status];
+            if($order -> currency == Product::CURRENCY[0]){
+                $data[$key]['price'] = $order -> total_price . " 元";
+            }else if($order -> currency == Product::CURRENCY[1]){
+                $data[$key]['price'] = $order -> total_price . " 點";
+            }
+            $data[$key]['pay_method'] =  $order -> pay_name;
+        }
+
+        $this->redis->set($checkRedisKey, json_encode($data));
+        $this->redis->expire($checkRedisKey, self::DAY);
+
+        return $data;
     }
 
       // 獲取個人推薦商品 (上架中的) (暫時遮掉)
@@ -638,19 +688,35 @@ class MemberService extends BaseService
     //     return $result;
       // }
 
-      // 隨機合併兩個陣列元素，保持原有資料的排序不變（即各個陣列的元素在合併後的陣列中排序與自身原來一致）
-      protected function shuffleMergeArray($array1, $array2)
-      {
-          $mergeArray = [];
-          $sum = count($array1) + count($array2);
-          for ($k = $sum; $k > 0; --$k) {
-              $number = mt_rand(1, 2);
-              if ($number == 1) {
-                  $mergeArray[] = $array2 ? array_shift($array2) : array_shift($array1);
-              } else {
-                  $mergeArray[] = $array1 ? array_shift($array1) : array_shift($array2);
-              }
-          }
-          return $mergeArray;
-      }
+    // 隨機合併兩個陣列元素，保持原有資料的排序不變（即各個陣列的元素在合併後的陣列中排序與自身原來一致）
+    protected function shuffleMergeArray($array1, $array2)
+    {
+        $mergeArray = [];
+        $sum = count($array1) + count($array2);
+        for ($k = $sum; $k > 0; --$k) {
+            $number = mt_rand(1, 2);
+            if ($number == 1) {
+                $mergeArray[] = $array2 ? array_shift($array2) : array_shift($array1);
+            } else {
+                $mergeArray[] = $array1 ? array_shift($array1) : array_shift($array2);
+            }
+        }
+        return $mergeArray;
+    }
+
+    // 刪除前台演員分類的快取
+    public function delFrontCache()
+    {
+        $service = make(ActorClassificationService::class);
+        $service->delRedis();
+    }
+
+    //刪除 會員購買紀錄 Redis
+    public function delMemberListRedis($user_id){
+        $checkRedisKey = self::KEY.":MemberList:".$user_id.":".Carbon::now()->toDateString();
+        $keys = $this->redis->keys( $checkRedisKey.'*');
+        foreach ($keys as $key) {
+            $this->redis->del($key);
+        }
+    }
 }

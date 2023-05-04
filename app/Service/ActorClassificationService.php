@@ -103,9 +103,9 @@ class ActorClassificationService
                 $query = $query->limit(self::GET_ACTOR_COUNT)->get()->toArray();
                 if (count($query) > 0) {
                     // 查詢是否追隨與作品數
-                    foreach ($query as $key => $value) {
-                        $actor_id = $value['id'];
-                        $name = trim($value['name']);
+                    foreach ($query as $key => $value2) {
+                        $actor_id = $value2['id'];
+                        $name = trim($value2['name']);
                         // 查詢是否追隨
                         if(MemberFollow::where('member_id', $userId)->where('correspond_type', Actor::class)->where('correspond_id', $actor_id)->whereNull('deleted_at')->exists()){
                             $query[$key]['is_follow'] = 1;
@@ -114,7 +114,7 @@ class ActorClassificationService
                         }
 
                         // avatar加上網域
-                        if(!empty($value['avatar']))$query[$key]['avatar'] = env('IMG_DOMAIN').$value['avatar'];
+                        if(!empty($value2['avatar']))$query[$key]['avatar'] = env('IMG_DOMAIN').$value2['avatar'];
 
                         // 查詢作品數
                         $numberOfWorks = ActorCorrespond::where('actor_id', $actor_id)->count();
