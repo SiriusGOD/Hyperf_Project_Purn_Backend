@@ -210,7 +210,6 @@ class ImageGroupService
             return true;
         }
 
-        var_dump('all fail');
         return $this->orderCheck($id, $memberId);
     }
 

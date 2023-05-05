@@ -67,7 +67,7 @@ class SearchController extends AbstractController
         $page = (int) $request->input('page', 0);
         $limit = (int) $request->input('limit', 10);
         $userId = (int) auth()->user()->getId();
-        $suggest = $suggestService->getTagProportionByUser($userId);
+        $suggest = $suggestService->getTagProportionByMemberTag($userId);
         $models = $service->suggest($suggest, $page, $limit);
         $data = [];
         $data['models'] = $models;

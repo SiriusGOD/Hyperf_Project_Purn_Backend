@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
+use App\Middleware\Auth\ApiAuthMiddleware;
+use App\Model\MemberCategorization;
 use App\Model\Navigation;
 use App\Request\NavigationDetailRequest;
 use App\Service\NavigationService;
@@ -19,18 +21,39 @@ use App\Service\SuggestService;
 use App\Service\VideoService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
 // TODO 完成導航列
 #[Controller]
+#[Middleware(ApiAuthMiddleware::class)]
 class NavigationController extends AbstractController
 {
+    public const DEFAULT_MATCH_COUNT = 3;
     #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, VideoService $service)
     {
+        $memberId = auth()->user()->getId();
         $data = Navigation::select('id', 'name', 'hot_order as order')->orderBy('hot_order')->get()->toArray();
-        return $this->success($data);
+        $memberNavs = MemberCategorization::where('member_id', $memberId)
+            ->select('id', 'name', 'hot_order as order')
+            ->where('is_first', 0)
+            ->orderBy('hot_order')
+            ->orderBy('id')
+            ->get();
+
+        $count = count($data);
+
+        $result = [];
+        foreach ($memberNavs as $nav) {
+            $nav['id'] = $count + $nav['id'];
+            $result[] = $nav;
+        }
+
+        $result = array_merge($data, $result);
+
+        return $this->success($result);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'search')]
@@ -41,10 +64,14 @@ class NavigationController extends AbstractController
         $limit = (int) $request->input('limit', 10);
         $id = (int) $request->input('id', 0);
         $userId = (int) auth()->user()->getId();
-        $suggest = $suggestService->getTagProportionByUser($userId);
+        if ($id > 3) {
+            $suggest = $suggestService->getTagProportionByMemberCategorization($id - self::DEFAULT_MATCH_COUNT);
+        } else {
+            $suggest = $suggestService->getTagProportionByMemberTag($userId);
+        }
         $data['model'] = match ($id) {
-            default => $service->navigationPopular($suggest, $page, $limit),
-            2 => $service->navigationSuggest($suggest, $page, $limit),
+            1 => $service->navigationPopular($suggest, $page, $limit),
+            default => $service->navigationSuggest($suggest, $page, $limit),
             3 => $service->navigationSuggestSortById($suggest, $page, $limit),
         };
         $path = '/api/navigation/search?id=' . $id . '&';
@@ -64,7 +91,7 @@ class NavigationController extends AbstractController
         $type = $request->input('type');
         $id = (int) $request->input('type_id');
         $userId = (int) auth()->user()->getId();
-        $suggest = $suggestService->getTagProportionByUser($userId);
+        $suggest = $suggestService->getTagProportionByMemberTag($userId);
         $data['model'] = $service->navigationDetail($suggest, $navId, $type, $id, $page, $limit);
         $path = '/api/navigation/detail?id=' . $id . '&';
         $simplePaginator = new SimplePaginator($page, $limit, $path);

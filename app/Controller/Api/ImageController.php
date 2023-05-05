@@ -61,7 +61,7 @@ class ImageController extends AbstractController
     {
         $page = (int) $request->input('page', 0);
         $userId = (int) auth()->user()->getId();
-        $suggest = $suggestService->getTagProportionByUser($userId);
+        $suggest = $suggestService->getTagProportionByMemberTag($userId);
         $models = $service->getImagesBySuggest($suggest, $page);
         $data = [];
         $data['models'] = $models;

@@ -11,14 +11,23 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\ImageGroup;
+use App\Model\MemberCategorizationDetail;
 use App\Model\MemberTag;
+use App\Model\TagCorrespond;
+use App\Model\Video;
+use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
 
 class SuggestService
 {
-    public const CACHE_KEY = 'user:suggest:';
+    public const MEMBER_TAG_CACHE_KEY = 'member_tag:suggest:';
+
+    public const MEMBER_CATEGORIZATION_CACHE_KEY = 'member_categorization:suggest:';
 
     public const MIN = 0.01;
+
+    public const LIMIT = 100;
 
     private Redis $redis;
 
@@ -43,16 +52,24 @@ class SuggestService
         return $model;
     }
 
-    public function getTagProportionByUser(int $userId): array
+    public function getTagProportionByMemberTag(int $memberId): array
     {
         $result = [];
-        $key = self::CACHE_KEY . $userId;
+        $key = self::MEMBER_TAG_CACHE_KEY . $memberId;
         if ($this->redis->exists($key)) {
             return json_decode($this->redis->get($key), true);
         }
 
-        $userTags = MemberTag::where('member_id', $userId)->orderByDesc('count')->get();
-        $sum = MemberTag::where('member_id', $userId)->sum('count');
+        $userTags = MemberTag::where('member_id', $memberId)
+            ->limit(self::LIMIT)
+            ->orderByDesc('count')
+            ->orderBy('id')
+            ->get();
+        $sum = MemberTag::where('member_id', $memberId)
+            ->limit(self::LIMIT)
+            ->orderByDesc('count')
+            ->orderBy('id')
+            ->sum('count');
 
         foreach ($userTags as $row) {
             $proportion = round($row->count / $sum, 2, PHP_ROUND_HALF_DOWN);
@@ -70,5 +87,84 @@ class SuggestService
         $this->redis->set($key, json_encode($result), 86400);
 
         return $result;
+    }
+
+    public function getTagProportionByMemberCategorization(int $memberCategorizationId): array
+    {
+        $key = self::MEMBER_CATEGORIZATION_CACHE_KEY . $memberCategorizationId;
+
+        if ($this->redis->exists($key)) {
+            return json_decode($this->redis->get($key), true);
+        }
+
+        $models = MemberCategorizationDetail::where('member_categorization_id', $memberCategorizationId)
+            ->orderByDesc('total_click')
+            ->orderBy('id')
+            ->limit(self::LIMIT)
+            ->get()
+            ->toArray();
+
+        $imageGroupTags = $this->getModelTags($models, ImageGroup::class);
+        $videoTags = $this->getModelTags($models, Video::class);
+        $tags = $this->mergeModelTags($videoTags, $imageGroupTags);
+        $sum = \Hyperf\Collection\collect($tags)->sum('total');
+
+        $result = [];
+        foreach ($tags as $row) {
+            $proportion = round($row['total'] / $sum, 2, PHP_ROUND_HALF_DOWN);
+
+            if ($proportion < self::MIN) {
+                break;
+            }
+
+            $result[] = [
+                'tag_id' => $row['tag_id'],
+                'proportion' => $proportion,
+            ];
+        }
+
+        $this->redis->set($key, json_encode($result), 86400);
+
+        return $result;
+    }
+
+    protected function getModelTags(array $memberCategorizationDetails, string $modelType): array
+    {
+        $ids = [];
+        foreach ($memberCategorizationDetails as $detail) {
+            if ($detail['type'] == $modelType) {
+                $ids[] = $detail['type_id'];
+            }
+        }
+        return TagCorrespond::where('correspond_type', $modelType)
+            ->whereIn('correspond_id', $ids)
+            ->groupBy('tag_id')
+            ->select(Db::raw('count(tag_id) as total'), 'tag_id')
+            ->get()
+            ->toArray();
+    }
+
+    protected function mergeModelTags(array ...$tagArr): array
+    {
+        $result = [];
+        foreach ($tagArr as $item) {
+            foreach ($item as $value) {
+                if (empty($result[$value['tag_id']])) {
+                    $result[$value['tag_id']] = [
+                        'tag_id' => $value['tag_id'],
+                        'total' => $value['total'],
+                    ];
+                }
+
+                $result[$value['tag_id']]['total'] += $value['total'];
+            }
+        }
+
+        $return = [];
+        foreach ($result as $row) {
+            $return[] = $row;
+        }
+
+        return $return;
     }
 }

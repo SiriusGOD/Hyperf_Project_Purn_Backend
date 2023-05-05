@@ -34,7 +34,7 @@ class SuggestServiceTest extends HttpTestCase
         $userTag->save();
 
         $service = make(SuggestService::class);
-        $result = $service->getTagProportionByUser(0);
+        $result = $service->getTagProportionByMemberTag(0);
 
         $userTag->delete();
         $this->assertSame($expect, $result[0]['tag_id']);
