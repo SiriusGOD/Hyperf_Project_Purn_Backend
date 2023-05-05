@@ -364,19 +364,19 @@ class MemberService extends BaseService
             $user["member_level_duration"] = 0;
         }else if($member_level_status == MemberLevel::TYPE_VALUE['vip']){
             // vip
-            $date_diff = BuyMemberLevel::where('member_id', $id)->where('member_level_type', MemberLevel::TYPE_LIST[0])->whereNull('deleted_at')->selectRaw('DATEDIFF(end_time, start_time) as date')->first();
+            $date_diff = BuyMemberLevel::where('member_id', $id)->where('member_level_type', MemberLevel::TYPE_LIST[0])->whereNull('deleted_at')->selectRaw('DATEDIFF(end_time, start_time) as date, DATEDIFF(end_time, now()) as now')->first();
             if($date_diff->date >= 3650){
                 $user["member_level_duration"] = null;
             }else{
-                $user["member_level_duration"] = (int)$date_diff->date;
+                $user["member_level_duration"] = (int)$date_diff->now;
             }
         }else{
             // 鑽石
-            $date_diff = BuyMemberLevel::where('member_id', $id)->where('member_level_type', MemberLevel::TYPE_LIST[1])->whereNull('deleted_at')->selectRaw('DATEDIFF(end_time, start_time) as date')->first();
+            $date_diff = BuyMemberLevel::where('member_id', $id)->where('member_level_type', MemberLevel::TYPE_LIST[1])->whereNull('deleted_at')->selectRaw('DATEDIFF(end_time, start_time) as date, DATEDIFF(end_time, now()) as now')->first();
             if($date_diff->date >= 3650){
                 $user["member_level_duration"] = null;
             }else{
-                $user["member_level_duration"] = (int)$date_diff->date;
+                $user["member_level_duration"] = (int)$date_diff->now;
             }
         }
 
