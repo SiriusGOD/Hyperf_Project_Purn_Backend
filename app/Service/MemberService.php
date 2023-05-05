@@ -503,16 +503,16 @@ class MemberService extends BaseService
             ->where('orders.status', Order::ORDER_STATUS['finish']);
         switch ($type) {
             case 'all':
-                $query = $query->whereIn('products.type', [Product::TYPE_LIST[0], Product::TYPE_LIST[1]]);
+                $query = $query->whereIn('products.type', [Product::TYPE_LIST_NAME['image'], Product::TYPE_LIST_NAME['video']]);
                 break;
             case 'image':
-                $query = $query->where('products.type', Product::TYPE_LIST[0]);
+                $query = $query->where('products.type', Product::TYPE_LIST_NAME['image']);
                 break;
             case 'video':
-                $query = $query->where('products.type', Product::TYPE_LIST[1]);
+                $query = $query->where('products.type', Product::TYPE_LIST_NAME['video']);
                 break;
             default:
-                $query = $query->whereIn('products.type', [Product::TYPE_LIST[0], Product::TYPE_LIST[1]]);
+                $query = $query->whereIn('products.type', [Product::TYPE_LIST_NAME['image'], Product::TYPE_LIST_NAME['video']]);
                 break;
         }
 
@@ -598,7 +598,7 @@ class MemberService extends BaseService
         $step = $limit ?? Order::FRONTED_PAGE_PER;
 
         // 撈取資料
-        $products_type = ['member', 'points'];
+        $products_type = [Product::TYPE_CORRESPOND_LIST['member'], Product::TYPE_CORRESPOND_LIST['points']];
         $query = Order::join('order_details', 'orders.id', 'order_details.order_id')
                         ->join('products', 'order_details.product_id', 'products.id')
                         ->join('pays', 'orders.payment_type', 'pays.id')

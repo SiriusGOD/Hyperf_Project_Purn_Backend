@@ -128,21 +128,21 @@ class ProductService
             case 'coin':
                 $query = Coin::join('products', function ($join) {
                     $join->on('coins.id', '=', 'products.correspond_id')
-                        ->where('products.type', Product::TYPE_LIST[3])
+                        ->where('products.type', Product::TYPE_CORRESPOND_LIST['points'])
                         ->where('expire', Product::EXPIRE['no']);
                 })->selectRaw('products.id, products.name, products.currency, products.selling_price, coins.type, coins.bonus')->where('coins.type', Coin::TYPE_LIST[0])->orderBy('coins.points')->get()->toArray();
                 break;
             case 'diamond':
                 $query = Coin::join('products', function ($join) {
                     $join->on('coins.id', '=', 'products.correspond_id')
-                        ->where('products.type', Product::TYPE_LIST[3])
+                        ->where('products.type', Product::TYPE_CORRESPOND_LIST['points'])
                         ->where('expire', Product::EXPIRE['no']);
                 })->selectRaw('products.id, products.name, products.currency, products.selling_price, coins.type, coins.bonus')->where('coins.type', Coin::TYPE_LIST[1])->orderBy('coins.points')->get()->toArray();
                 break;
             default:
                 $query = Coin::join('products', function ($join) {
                             $join->on('coins.id', '=', 'products.correspond_id')
-                                ->where('products.type', Product::TYPE_LIST[3])
+                                ->where('products.type', Product::TYPE_CORRESPOND_LIST['points'])
                                 ->where('expire', Product::EXPIRE['no']);
                         })->selectRaw('products.id, products.name, products.currency, products.selling_price, coins.type, coins.bonus')->where('coins.type', Coin::TYPE_LIST[0])->orderBy('coins.points')->get()->toArray();
                 break;
@@ -201,7 +201,7 @@ class ProductService
 
         $products = MemberLevel::join('products', function ($join) {
                     $join->on('member_levels.id', '=', 'products.correspond_id')
-                        ->where('products.type', Product::TYPE_LIST[2])
+                        ->where('products.type', Product::TYPE_CORRESPOND_LIST['member'])
                         ->where('expire', Product::EXPIRE['no']);
                 })->selectRaw('products.id, products.name, products.currency, products.selling_price, member_levels.type, member_levels.duration, member_levels.title, member_levels.description, member_levels.remark')->orderBy('member_levels.type')->orderBy('member_levels.duration')->get()->toArray();
         
