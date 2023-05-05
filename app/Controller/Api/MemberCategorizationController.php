@@ -55,6 +55,16 @@ class MemberCategorizationController extends AbstractController
     public function update(MemberCategorizationUpdateRequest $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
+
+        $exist = MemberCategorization::where('member_id', $memberId)
+            ->where('id', $request->input('id'))
+            ->where('is_first', 0)
+            ->exists();
+
+        if (! $exist) {
+            return $this->error(trans('validation.exists', ['attribute' => 'id']), 400);
+        }
+
         $id = $service->createOrUpdateMemberCategorization([
             'id' => $request->input('id', 0),
             'name' => $request->input('name'),
@@ -190,6 +200,7 @@ class MemberCategorizationController extends AbstractController
         $memberId = auth()->user()->getId();
         MemberCategorization::where('member_id', $memberId)
             ->where('id', $request->input('id'))
+            ->where('is_first', 0)
             ->delete();
 
         return $this->success();

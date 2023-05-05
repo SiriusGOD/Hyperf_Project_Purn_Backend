@@ -82,6 +82,7 @@ class MemberController extends AbstractController
                 'name' => trans('default.default_categorization_name'),
                 'hot_order' => 0,
                 'is_default' => 1,
+                'is_first' => 1,
             ]);
         }
 

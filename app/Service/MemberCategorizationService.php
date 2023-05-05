@@ -29,6 +29,7 @@ class MemberCategorizationService extends GenerateService
         $model->name = $params['name'];
         $model->hot_order = $params['hot_order'] ?? 0;
         $model->is_default = $params['is_default'] ?? 0;
+        $model->is_first = $params['is_first'] ?? 0;
         $model->save();
 
         return $model->id;

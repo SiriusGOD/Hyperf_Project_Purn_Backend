@@ -14,6 +14,7 @@ namespace App\Model;
  * @property int $is_default 
  * @property \Carbon\Carbon $created_at 
  * @property \Carbon\Carbon $updated_at 
+ * @property int $is_first 
  */
 class MemberCategorization extends Model
 {
@@ -30,5 +31,5 @@ class MemberCategorization extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'hot_order' => 'integer', 'is_default' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'hot_order' => 'integer', 'is_default' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'is_first' => 'integer'];
 }
