@@ -498,7 +498,7 @@ class MemberService extends BaseService
 
         $query = Order::join('order_details', 'order_details.order_id', 'orders.id')
             ->join('products', 'products.id', 'order_details.product_id')
-            ->select('products.id', 'products.type', 'products.correspond_id', 'products.name', 'products.expire')
+            ->select('products.id', 'products.type', 'products.correspond_id', 'products.name', 'products.expire', 'orders.currency', 'orders.created_at')
             ->where('orders.user_id', $memberId)
             ->where('orders.status', Order::ORDER_STATUS['finish']);
         switch ($type) {
@@ -530,6 +530,11 @@ class MemberService extends BaseService
             $video_arr = [];
             // ActorClassification::findOrFail($id);
             foreach ($model as $key => $value) {
+                // 用免費次數購買的免費商品 過隔天五點就不顯示在已購買項目中
+                if($value -> currency == Order::PAY_CURRENCY['free_quota']){
+                    if($value -> created_at < Carbon::now()->toDateString() . ' 05:00:00' && $value -> created_at < Carbon::now()->toDateString())continue;
+                }
+
                 if ($value->type == Product::TYPE_LIST[0]) {
                     // $image = ImageGroup::findOrFail($value->correspond_id);
                     $image = ImageGroup::leftJoin('images', 'image_groups.id', 'images.group_id')
