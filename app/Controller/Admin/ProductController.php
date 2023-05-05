@@ -252,14 +252,17 @@ class ProductController extends AbstractController
             case ImageGroup::class:
                 // 現金點數 或 鑽石點數(先寫死1顆)
                 $data['currency'] = Product::CURRENCY[1];
+                $product_type = 'image';
                 break;
             case Video::class:
                 // 現金點數 或 鑽石點數(先寫死1顆)
                 $data['currency'] = Product::CURRENCY[1];
+                $product_type = 'video';
                 break;
             case MemberLevel::class:
                 // 會員卡 -> 使用現金購買
                 $data['currency'] = Product::CURRENCY[0];
+                $product_type = 'member';
                 break;
             case Coin::class:
                 $coin = Coin::findOrFail($model->correspond_id);
@@ -271,6 +274,7 @@ class ProductController extends AbstractController
                     // 鑽石點數 -> 使用現金點數購買
                     $data['currency'] = Product::CURRENCY[1];
                 }
+                $product_type = 'points';
                 break;
         }
         $data['model'] = $model;
@@ -533,13 +537,13 @@ class ProductController extends AbstractController
             case 'image':
                 $query = Product::Join('image_groups', function ($join) use ($product_type) {
                             $join->on('image_groups.id', '=', 'products.correspond_id')
-                                ->where('products.type', $product_type);
+                                ->where('products.type', Product::TYPE_CORRESPOND_LIST[$product_type]);
                         })->selectRaw('products.*, image_groups.thumbnail as img_thumb');
                 break;
             case 'video':
                 $query = Product::Join('videos', function ($join) use ($product_type) {
                             $join->on('videos.id', '=', 'products.correspond_id')
-                                ->where('products.type', $product_type);
+                                ->where('products.type', Product::TYPE_CORRESPOND_LIST[$product_type]);
                         })->selectRaw('products.*, videos.cover_thumb as img_thumb, videos.m3u8');
                 break;
             default:
