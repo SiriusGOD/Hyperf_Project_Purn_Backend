@@ -25,6 +25,9 @@
                                             <option value="{{\App\Model\Order::ORDER_STATUS['finish']}}">
                                                 {{trans('default.order_control.order_status_finish') ?? '訂單完成'}}
                                             </option>
+                                            <option value="{{\App\Model\Order::ORDER_STATUS['failure']}}">
+                                                {{trans('default.order_control.order_status_failure') ?? '訂單付款失敗'}}
+                                            </option>
                                         </select>
                                     <button type="submit" class="btn btn-primary">查詢訂單</button>
                                     <label>{{trans('default.order_control.order_search_msg') ?? '訂單編號或訂單狀態請擇一，如兩者都選則以訂單編號為主'}}</label>

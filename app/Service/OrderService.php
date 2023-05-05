@@ -44,8 +44,8 @@ class OrderService
     {
         // 顯示幾筆
         $step = Order::PAGE_PER;
-        $query = Order::join('users', 'orders.user_id', 'users.id')
-            ->select('orders.*', 'users.name');
+        $query = Order::join('members', 'orders.user_id', 'members.id')
+            ->select('orders.*', 'members.name');
         if (! empty($order_number)) {
             $query = $query->where('orders.order_number', '=', $order_number);
         } elseif (! empty($order_status)) {
@@ -79,9 +79,9 @@ class OrderService
             return json_decode($jsonResult, true);
         }
 
-        $query = Order::join('users', 'orders.user_id', 'users.id')
-            ->select('orders.*', 'users.name')
-            ->where('users.id', '=', $user_id);
+        $query = Order::join('members', 'orders.user_id', 'members.id')
+            ->select('orders.*', 'members.name')
+            ->where('members.id', '=', $user_id);
         if (! empty($order_status)) {
             $query = $query->where('orders.status', '=', $order_status);
         }
@@ -234,9 +234,9 @@ class OrderService
     public function updateCache($user_id): void
     {
         $checkRedisKey = self::CACHE_KEY . ':' . $user_id . '::0:0';
-        $query = Order::join('users', 'orders.user_id', 'users.id')
-            ->select('orders.*', 'users.name')
-            ->where('users.id', '=', $user_id);
+        $query = Order::join('members', 'orders.user_id', 'usemembersrs.id')
+            ->select('orders.*', 'members.name')
+            ->where('members.id', '=', $user_id);
         $result = $query->get()->toArray();
 
         $this->redis->set($checkRedisKey, json_encode($result));

@@ -37,6 +37,9 @@
                                         <option value="{{\App\Model\Order::ORDER_STATUS['finish']}}" {{($model->status ?? '') == \App\Model\Order::ORDER_STATUS['finish'] ? 'selected' : ''}}>
                                             {{trans('default.order_control.order_status_finish') ?? '訂單完成'}}
                                         </option>
+                                        <option value="{{\App\Model\Order::ORDER_STATUS['failure']}}" {{($model->status ?? '') == \App\Model\Order::ORDER_STATUS['failure'] ? 'selected' : ''}}>
+                                            {{trans('default.order_control.order_status_failure') ?? '訂單付款失敗'}}
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="form-group">

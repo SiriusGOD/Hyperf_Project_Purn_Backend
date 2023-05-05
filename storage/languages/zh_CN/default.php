@@ -395,6 +395,7 @@ return [
         'order_status_create' => '訂單成立',
         'order_status_delete' => '訂單取消',
         'order_status_finish' => '訂單完成',
+        'order_status_failure' => '訂單付款失敗',
         'order_price' => '訂單金額',
         'order_details' => '訂單明細',
         'order_search_msg' => '訂單編號或訂單狀態請擇一，如兩者都選，則以訂單編號為主',
