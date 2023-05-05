@@ -440,6 +440,12 @@ return [
             \App\Model\Product::TYPE_CORRESPOND_LIST['points'] => '點數',
         ],
         'product_type_msg' => [
+            \App\Model\ImageGroup::class => '圖片',
+            \App\Model\Video::class => '影片',
+            \App\Model\MemberLevel::class => '會員',
+            \App\Model\Coin::class => '點數',
+        ],
+        'product_type_name' => [
             'image' => '圖片',
             'video' => '影片',
             'member' => '會員',

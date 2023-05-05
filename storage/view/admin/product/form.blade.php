@@ -19,7 +19,7 @@
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_type') ?? '商品類型'}}</label>
                                     <p>
-                                    {{trans('default.product_control.product_type_msg')[$product_type]}}
+                                    {{trans('default.product_control.product_type_name')[$product_type]}}
                                     </p>
                                 </div>
                                 <div class="form-group">
