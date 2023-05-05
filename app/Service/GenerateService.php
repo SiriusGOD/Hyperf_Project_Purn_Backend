@@ -72,7 +72,7 @@ class GenerateService
         return $result;
     }
 
-    protected function generateVideos(array $result, array $videos): array
+    public function generateVideos(array $result, array $videos): array
     {
         foreach ($videos as $video) {
             $video['cover_thumb'] = env('VIDEO_THUMB_URL', 'https://new.cnzuqiu.mobi') . $video['cover_thumb'];

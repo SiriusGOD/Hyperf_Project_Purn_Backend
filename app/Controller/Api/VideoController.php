@@ -20,6 +20,7 @@ use App\Request\GetPayImageRequest;
 use App\Request\VideoApiSuggestRequest;
 use App\Service\ActorService;
 use App\Service\ClickService;
+use App\Service\GenerateService;
 use App\Service\LikeService;
 use App\Service\RedeemService;
 use App\Service\SuggestService;
@@ -165,7 +166,7 @@ class VideoController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'pay_video')]
-    public function getPayVideo(GetPayImageRequest $request, VideoService $service)
+    public function getPayVideo(GetPayImageRequest $request, VideoService $service, GenerateService $generateService)
     {
         $id = (int) $request->input('id');
         $memberId = auth()->user()->getId();
@@ -174,8 +175,12 @@ class VideoController extends AbstractController
             return $this->error(trans('validation.is_not_pay'));
         }
 
-        $data = $service->getPayVideo($id)->toArray();
+        $model = $service->getPayVideo($id)->toArray();
+        $url = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $model['m3u8'];
 
-        return $this->success($data);
+
+        return $this->success([
+            'url' => $url,
+        ]);
     }
 }
