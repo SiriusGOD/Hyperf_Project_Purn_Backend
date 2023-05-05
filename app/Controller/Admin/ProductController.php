@@ -227,8 +227,8 @@ class ProductController extends AbstractController
     {
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = (int) auth('session')->user()->id;
-        // $data['type'] = Product::TYPE_CORRESPOND_LIST[$request->input('product_type')];
-        $data['type'] = $request->input('product_type');
+        $data['type'] = Product::TYPE_CORRESPOND_LIST[$request->input('product_type')];
+        // $data['type'] = $request->input('product_type');
         $data['correspond_id'] = $request->input('product_id') ? $request->input('product_id') : $request->input('correspond_id');
         $data['name'] = $request->input('product_name');
         $data['expire'] = (int) $request->input('expire');
@@ -249,19 +249,22 @@ class ProductController extends AbstractController
         $model->title = $model->name;
         $product_type = $model->type;
         switch ($product_type) {
-            case 'image':
+            case ImageGroup::class:
                 // 現金點數 或 鑽石點數(先寫死1顆)
                 $data['currency'] = Product::CURRENCY[1];
+                $product_type = 'image';
                 break;
-            case 'video':
+            case Video::class:
                 // 現金點數 或 鑽石點數(先寫死1顆)
                 $data['currency'] = Product::CURRENCY[1];
+                $product_type = 'video';
                 break;
-            case 'member':
+            case MemberLevel::class:
                 // 會員卡 -> 使用現金購買
                 $data['currency'] = Product::CURRENCY[0];
+                $product_type = 'member';
                 break;
-            case 'points':
+            case Coin::class:
                 $coin = Coin::findOrFail($model->correspond_id);
                 if ($coin->type == Coin::TYPE_LIST[0]) {
                     // 現金點數 -> 使用現金購買
@@ -271,6 +274,7 @@ class ProductController extends AbstractController
                     // 鑽石點數 -> 使用現金點數購買
                     $data['currency'] = Product::CURRENCY[1];
                 }
+                $product_type = 'points';
                 break;
         }
         $data['model'] = $model;
@@ -451,7 +455,7 @@ class ProductController extends AbstractController
                 case 'image':
                     $query = Product::Join('image_groups', function ($join) use ($product_type) {
                                 $join->on('image_groups.id', '=', 'products.correspond_id')
-                                    ->where('products.type', $product_type);
+                                    ->where('products.type', Product::TYPE_CORRESPOND_LIST[$product_type]);
                             })->leftJoin('clicks', function ($join) {
                                 $join->on('clicks.type_id', '=', 'image_groups.id')
                                     ->where('clicks.type', ImageGroup::class);
@@ -460,14 +464,14 @@ class ProductController extends AbstractController
                 case 'video':
                     $query = Product::Join('videos', function ($join) use ($product_type) {
                                 $join->on('videos.id', '=', 'products.correspond_id')
-                                    ->where('products.type', $product_type);
+                                    ->where('products.type', Product::TYPE_CORRESPOND_LIST[$product_type]);
                             })->leftJoin('clicks', function ($join) {
                                 $join->on('clicks.type_id', '=', 'videos.id')
                                     ->where('clicks.type', Video::class);
                             })->selectRaw('products.*, videos.cover_thumb as img_thumb, videos.m3u8, clicks.count');
                     break;
                 default:
-                    $query = Product::select('*')->where('type', $product_type);
+                    $query = Product::select('*')->where('type', Product::TYPE_CORRESPOND_LIST[$product_type]);
                     break;
             }
             $query_total = $query;
@@ -533,13 +537,13 @@ class ProductController extends AbstractController
             case 'image':
                 $query = Product::Join('image_groups', function ($join) use ($product_type) {
                             $join->on('image_groups.id', '=', 'products.correspond_id')
-                                ->where('products.type', $product_type);
+                                ->where('products.type', Product::TYPE_CORRESPOND_LIST[$product_type]);
                         })->selectRaw('products.*, image_groups.thumbnail as img_thumb');
                 break;
             case 'video':
                 $query = Product::Join('videos', function ($join) use ($product_type) {
                             $join->on('videos.id', '=', 'products.correspond_id')
-                                ->where('products.type', $product_type);
+                                ->where('products.type', Product::TYPE_CORRESPOND_LIST[$product_type]);
                         })->selectRaw('products.*, videos.cover_thumb as img_thumb, videos.m3u8');
                 break;
             default:

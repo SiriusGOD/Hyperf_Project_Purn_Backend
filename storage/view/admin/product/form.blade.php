@@ -14,12 +14,12 @@
                                 <input type="hidden" name="product_type" value="{{$product_type ?? null}}">
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.name') ?? '名稱'}}</label>
-                                    <input type="text" class="form-control" name="product_name" id="product_name" value="@if(!empty($model->title)){{$model->title}}@elseif(!empty($model->name)){{$model->name}}@endif">
+                                    <input type="text" class="form-control" name="product_name" id="product_name" value="@if(!empty($model->name)){{$model->name}}@elseif(!empty($model->title)){{$model->title}}@endif">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.product_control.product_type') ?? '商品類型'}}</label>
                                     <p>
-                                    {{trans('default.product_control.product_type_msg')[$product_type]}}
+                                    {{trans('default.product_control.product_type_name')[$product_type]}}
                                     </p>
                                 </div>
                                 <div class="form-group">

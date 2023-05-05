@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Model\Coin;
+use App\Model\MemberLevel;
 use HyperfExt\Hashing\Hash;
 
 /**
@@ -19,7 +21,7 @@ class ProductSeed implements BaseInterface
         // points cash
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'points';
+        $model->type = Coin::class;
         $model->correspond_id = 1;
         $model->name = '100';
         $model->expire = 0;
@@ -31,7 +33,7 @@ class ProductSeed implements BaseInterface
 
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'points';
+        $model->type = Coin::class;
         $model->correspond_id = 2;
         $model->name = '200';
         $model->expire = 0;
@@ -43,7 +45,7 @@ class ProductSeed implements BaseInterface
 
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'points';
+        $model->type = Coin::class;
         $model->correspond_id = 3;
         $model->name = '500';
         $model->expire = 0;
@@ -55,7 +57,7 @@ class ProductSeed implements BaseInterface
 
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'points';
+        $model->type = Coin::class;
         $model->correspond_id = 4;
         $model->name = '1000';
         $model->expire = 0;
@@ -67,7 +69,7 @@ class ProductSeed implements BaseInterface
 
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'points';
+        $model->type = Coin::class;
         $model->correspond_id = 5;
         $model->name = '2000';
         $model->expire = 0;
@@ -80,7 +82,7 @@ class ProductSeed implements BaseInterface
         // points diamond
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'points';
+        $model->type = Coin::class;
         $model->correspond_id = 6;
         $model->name = '5';
         $model->expire = 0;
@@ -92,7 +94,7 @@ class ProductSeed implements BaseInterface
 
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'points';
+        $model->type = Coin::class;
         $model->correspond_id = 7;
         $model->name = '10';
         $model->expire = 0;
@@ -104,7 +106,7 @@ class ProductSeed implements BaseInterface
         
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'points';
+        $model->type = Coin::class;
         $model->correspond_id = 8;
         $model->name = '20';
         $model->expire = 0;
@@ -116,7 +118,7 @@ class ProductSeed implements BaseInterface
 
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'points';
+        $model->type = Coin::class;
         $model->correspond_id = 9;
         $model->name = '50';
         $model->expire = 0;
@@ -128,7 +130,7 @@ class ProductSeed implements BaseInterface
 
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'points';
+        $model->type = Coin::class;
         $model->correspond_id = 10;
         $model->name = '100';
         $model->expire = 0;
@@ -141,7 +143,7 @@ class ProductSeed implements BaseInterface
         // member vip
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'member';
+        $model->type = MemberLevel::class;
         $model->correspond_id = 1;
         $model->name = '1天';
         $model->expire = 0;
@@ -153,7 +155,7 @@ class ProductSeed implements BaseInterface
 
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'member';
+        $model->type = MemberLevel::class;
         $model->correspond_id = 2;
         $model->name = '30天';
         $model->expire = 0;
@@ -165,7 +167,7 @@ class ProductSeed implements BaseInterface
 
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'member';
+        $model->type = MemberLevel::class;
         $model->correspond_id = 3;
         $model->name = '90天';
         $model->expire = 0;
@@ -177,7 +179,7 @@ class ProductSeed implements BaseInterface
 
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'member';
+        $model->type = MemberLevel::class;
         $model->correspond_id = 4;
         $model->name = '永久';
         $model->expire = 0;
@@ -190,7 +192,7 @@ class ProductSeed implements BaseInterface
         // member diamond
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'member';
+        $model->type = MemberLevel::class;
         $model->correspond_id = 5;
         $model->name = '1天';
         $model->expire = 0;
@@ -202,7 +204,7 @@ class ProductSeed implements BaseInterface
 
         $model = new \App\Model\Product();
         $model->user_id = 1;
-        $model->type = 'member';
+        $model->type = MemberLevel::class;
         $model->correspond_id = 6;
         $model->name = '30天';
         $model->expire = 0;

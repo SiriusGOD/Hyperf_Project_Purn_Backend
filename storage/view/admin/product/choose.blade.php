@@ -73,7 +73,7 @@
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $model->id}}</td>
                                             <td>
-                                            {{trans('default.product_control.product_type_msg')[$product_type]}}
+                                            {{trans('default.product_control.product_type_name')[$product_type]}}
                                             </td>
                                             <td>{{ $model->title}}</td>
                                             <!-- <td>{{ $model->img_thumb}}</td>

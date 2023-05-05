@@ -87,7 +87,7 @@ class ImageGroupService
 
         $actorIds = Actor::where('name', 'like', '%' . $keyword . '%')->get()->pluck('id')->toArray();
         if (! empty($actorIds)) {
-            $result = ActorCorrespond::where('correspond_type', 'image')
+            $result = ActorCorrespond::where('correspond_type', ImageGroup::class)
                 ->whereIn('actor_id', $actorIds)
                 ->get()
                 ->pluck('correspond_id')
