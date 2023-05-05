@@ -100,6 +100,6 @@ class ImageGroup extends Model
 
     protected function getPointAttribute()
     {
-        return 0;
+        return "0";
     }
 }
