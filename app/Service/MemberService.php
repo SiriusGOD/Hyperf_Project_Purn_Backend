@@ -503,16 +503,16 @@ class MemberService extends BaseService
             ->where('orders.status', Order::ORDER_STATUS['finish']);
         switch ($type) {
             case 'all':
-                $query = $query->whereIn('products.type', [Product::TYPE_LIST_NAME['image'], Product::TYPE_LIST_NAME['video']]);
+                $query = $query->whereIn('products.type', [ImageGroup::class, Video::class]);
                 break;
             case 'image':
-                $query = $query->where('products.type', Product::TYPE_LIST_NAME['image']);
+                $query = $query->where('products.type', ImageGroup::class);
                 break;
             case 'video':
-                $query = $query->where('products.type', Product::TYPE_LIST_NAME['video']);
+                $query = $query->where('products.type', Video::class);
                 break;
             default:
-                $query = $query->whereIn('products.type', [Product::TYPE_LIST_NAME['image'], Product::TYPE_LIST_NAME['video']]);
+                $query = $query->whereIn('products.type', [ImageGroup::class, Video::class]);
                 break;
         }
 
@@ -535,7 +535,7 @@ class MemberService extends BaseService
                     if($value -> created_at < Carbon::now()->toDateString() . ' 05:00:00' && $value -> created_at < Carbon::now()->toDateString())continue;
                 }
 
-                if ($value->type == Product::TYPE_LIST[0]) {
+                if ($value->type == Product::TYPE_CORRESPOND_LIST['image']) {
                     // $image = ImageGroup::findOrFail($value->correspond_id);
                     $image = ImageGroup::leftJoin('images', 'image_groups.id', 'images.group_id')
                         ->selectRaw('image_groups.thumbnail, count(*) as count')
@@ -551,8 +551,9 @@ class MemberService extends BaseService
                         'num' => $image->count ?? 0,
                     ]);
                 }
-
-                if ($value->type == Product::TYPE_LIST[1]) {
+                
+                if ($value->type == Product::TYPE_CORRESPOND_LIST['video']) {
+                    
                     $video = Video::findOrFail($value->correspond_id);
                     array_push($video_arr, [
                         'product_id' => $value->id,
