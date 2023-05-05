@@ -71,7 +71,7 @@ class TagGroupService
             ->join('tag_corresponds', 'tags.id', 'tag_corresponds.tag_id')
             ->select('tag_groups.id as group_id', 'tag_groups.name as group_name', 'tag_corresponds.tag_id', 'tags.name as tag_name', DB::raw('count(*) as product_num'))
             ->where('tag_groups.id', $group_id)
-            ->where('tag_corresponds.correspond_type', 'video')
+            ->where('tag_corresponds.correspond_type', Video::class)
             ->groupBy('tag_corresponds.tag_id')
             ->get()->toArray();
     }

@@ -91,7 +91,7 @@ class VideoService
         $videoIds = [];
         $query = $this->model;
         if (! empty($tagIds)) {
-            $videoIds = TagCorrespond::where('correspond_type', 'video')
+            $videoIds = TagCorrespond::where('correspond_type', Video::class)
                 ->whereIn('tag_id', $tagIds)
                 ->pluck('correspond_id');
         }
@@ -118,7 +118,7 @@ class VideoService
         $videoIds = [];
         $query = $this->model;
         if (! empty($corresponds)) {
-            $videoIds = ActorCorrespond::where('correspond_type', 'video')
+            $videoIds = ActorCorrespond::where('correspond_type', Video::class)
                 ->whereIn('actor_id', $corresponds['actors'])
                 ->pluck('correspond_id');
         }
@@ -184,7 +184,7 @@ class VideoService
         } else {
             $model = new ActorCorrespond();
         }
-        $model->where('correspond_type', 'video')->where('correspond_id', $videoId)->delete();
+        $model->where('correspond_type', Video::class)->where('correspond_id', $videoId)->delete();
     }
 
     // 計算Video總數
@@ -231,7 +231,7 @@ class VideoService
 
         $actorIds = Actor::where('name', 'like', '%' . $title . '%')->get()->pluck('id')->toArray();
         if (!empty($actorIds)) {
-            $result = ActorCorrespond::where('correspond_type', 'video')
+            $result = ActorCorrespond::where('correspond_type', Video::class)
                 ->whereIn('actor_id', $actorIds)
                 ->get()
                 ->pluck('correspond_id')

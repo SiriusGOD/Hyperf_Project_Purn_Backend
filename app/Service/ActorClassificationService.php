@@ -91,7 +91,7 @@ class ActorClassificationService
                 $classify_id = $value['id'];
                 $query = ActorCorrespond::join('videos', function ($join) {
                     $join->on('actor_corresponds.correspond_id', '=', 'videos.id')
-                        ->where('actor_corresponds.correspond_type', '=', 'video');
+                        ->where('actor_corresponds.correspond_type', '=', Video::class);
                 })
                     ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
                     ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
@@ -138,7 +138,7 @@ class ActorClassificationService
             $type = ActorClassification::find($type_id)->toArray();
             $query = ActorCorrespond::join('videos', function ($join) {
                 $join->on('actor_corresponds.correspond_id', '=', 'videos.id')
-                    ->where('actor_corresponds.correspond_type', '=', 'video');
+                    ->where('actor_corresponds.correspond_type', '=', Video::class);
             })
                 ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
                 ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
@@ -179,14 +179,14 @@ class ActorClassificationService
                     $clicks = ActorCorrespond::where('actor_id', $actor_id)->get();
                     foreach ($clicks as $key => $value) {
                         switch ($value -> correspond_type) {
-                            case 'image':
+                            case ImageGroup::class:
                                 $count = Click::join('click_details', 'clicks.id', 'click_details.click_id')
                                             ->where('click_details.created_at', '>=', $seven_days)
                                             ->where('clicks.type', ImageGroup::class)
                                             ->where('clicks.type_id', $value -> correspond_id)
                                             ->count();
                                 break;
-                            case 'video':
+                            case Video::class:
                                 $count = Click::join('click_details', 'clicks.id', 'click_details.click_id')
                                             ->where('click_details.created_at', '>=', $seven_days)
                                             ->where('clicks.type', Video::class)

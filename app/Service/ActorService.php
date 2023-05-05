@@ -14,6 +14,7 @@ namespace App\Service;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\ActorHasClassification;
+use App\Model\ImageGroup;
 use App\Model\MemberFollow;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
@@ -68,10 +69,10 @@ class ActorService
                 ->get()->toArray();
             foreach ($count_arr as $key2 => $value2) {
                 switch ($value2['correspond_type']) {
-                    case 'video':
+                    case Video::class:
                         $query[$key]['video_count'] = $value2['count'];
                         break;
-                    case 'image':
+                    case Image::class:
                         $query[$key]['image_count'] = $value2['count'];
                         break;
                 }
@@ -211,8 +212,8 @@ class ActorService
         // 撈取作品數
         $works = ActorCorrespond::selectRaw('correspond_type, count(*) as count')->where('actor_id', $actor_id)->groupBy('correspond_type')->get();
         foreach ($works as $key => $value) {
-            if($value -> correspond_type == 'video')$data['video_num'] = $value->count;
-            if($value -> correspond_type == 'image')$data['image_num'] = $value->count;
+            if($value -> correspond_type == Video::class)$data['video_num'] = $value->count;
+            if($value -> correspond_type == ImageGroup::class)$data['image_num'] = $value->count;
         }
         if(empty($data['video_num']))$data['video_num'] = 0;
         if(empty($data['image_num']))$data['image_num'] = 0;
