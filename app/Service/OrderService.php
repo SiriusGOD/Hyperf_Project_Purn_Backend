@@ -234,7 +234,7 @@ class OrderService
     public function updateCache($user_id): void
     {
         $checkRedisKey = self::CACHE_KEY . ':' . $user_id . '::0:0';
-        $query = Order::join('members', 'orders.user_id', 'usemembersrs.id')
+        $query = Order::join('members', 'orders.user_id', 'members.id')
             ->select('orders.*', 'members.name')
             ->where('members.id', '=', $user_id);
         $result = $query->get()->toArray();

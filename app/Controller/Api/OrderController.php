@@ -250,20 +250,20 @@ class OrderController extends AbstractController
                     return $this->error('該商品不可使用免費觀看次數購買', ErrorCode::BAD_REQUEST);
                 }
                 // 如果是圖片，確認圖片是否是免費圖片
-                if ($product['type'] != Product::TYPE_LIST[0]) {
+                if ($product['type'] == Product::TYPE_LIST[0]) {
                     $img = ImageGroup::where('id', $product['correspond_id'])->first()->toArray();
                     if ($img['pay_type'] != ImageGroup::IMAGE_GROUP_PAY_TYPE['free']) {
                         return $this->error('該商品不可使用免費觀看次數購買', ErrorCode::BAD_REQUEST);
                     }
                 }
                 // 如果是影片，確認影片是否是免費影片
-                if ($product['type'] != Product::TYPE_LIST[1]) {
+                if ($product['type'] == Product::TYPE_LIST[1]) {
                     $video = Video::where('id', $product['correspond_id'])->first()->toArray();
                     if ($video['is_free'] != Video::VIDEO_TYPE['free']) {
                         return $this->error('該商品不可使用免費觀看次數購買', ErrorCode::BAD_REQUEST);
                     }
                 }
-
+                
                 // 建立訂單
                 $result = $service->createOrder($data);
                 if ($result) {
