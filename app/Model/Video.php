@@ -85,7 +85,7 @@ class Video extends Model
         'diamond' => 2,
     ];
 
-    protected array $appends = ['model_type'];
+    protected array $appends = ['model_type', 'point'];
 
     /**
      * The table associated with the model.
@@ -104,6 +104,8 @@ class Video extends Model
      */
     protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'type' => 'integer', 'p_id' => 'integer', 'music_id' => 'integer', 'coins' => 'integer', 'thumb_width' => 'integer', 'thumb_height' => 'integer', 'gif_width' => 'integer', 'gif_height' => 'integer', 'onshelf_tm' => 'integer', 'rating' => 'integer', 'refresh_at' => 'integer', 'is_free' => 'integer', 'comment' => 'integer', 'status' => 'integer', 'thumb_start_time' => 'integer', 'thumb_duration' => 'integer', 'is_hide' => 'integer', 'is_recommend' => 'integer', 'is_feature' => 'integer', 'is_top' => 'integer', 'count_pay' => 'integer', 'club_id' => 'integer', 'topic_id' => 'integer', 'duration' => 'integer', 'likes' => 'integer', 'pay_type' => 'integer', 'hot_order' => 'integer', 'mod' => 'integer', 'category_id' => 'integer', 'cover_witdh' => 'integer', 'cover_height' => 'integer', 'total_click' => 'integer'];
 
+    protected array $hidden = ['coins'];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -117,5 +119,18 @@ class Video extends Model
     protected function getModelTypeAttribute()
     {
         return 'video';
+    }
+
+    protected function getPointAttribute()
+    {
+        $model = $this->hasOne(Product::class, 'correspond_id')
+            ->where('type', self::class)
+            ->where('currency', Product::TYPE_CORRESPOND_LIST['points'])
+            ->first();
+
+        if (empty($model)) {
+            return "0";
+        }
+        return (string) $model->selling_price;
     }
 }

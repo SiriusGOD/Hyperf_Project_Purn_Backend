@@ -48,7 +48,7 @@ class ImageGroup extends Model
      */
     protected array $casts = [];
 
-    protected array $appends = ['model_type', 'image_count'];
+    protected array $appends = ['model_type', 'image_count', 'point'];
 
     public function images()
     {
@@ -96,5 +96,10 @@ class ImageGroup extends Model
     protected function getImageCountAttribute()
     {
         return $this->images()->count();
+    }
+
+    protected function getPointAttribute()
+    {
+        return 0;
     }
 }

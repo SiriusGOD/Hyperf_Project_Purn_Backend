@@ -80,6 +80,7 @@ class GenerateService
             $video['m3u8'] = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $video['m3u8'];
             $video['source'] = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $video['source'];
             $video['actors'] = $this->getActors('video', $video['id']);
+            unset($video['coins']);
 
             $result[] = $video;
         }
