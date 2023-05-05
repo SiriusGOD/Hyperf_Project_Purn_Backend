@@ -59,414 +59,437 @@ class MemberService extends BaseService
         $this->logger = $loggerFactory->get('reply');
     }
 
-      public function apiGetUser(array $userInfo)
-      {
-          $user = $this->getUserFromAccountOrEmail($userInfo['account']);
+    public function apiGetUser(array $userInfo)
+    {
+        $user = $this->getUserFromAccountOrEmail($userInfo['account']);
 
-          if (! $user) {
-              return false;
-          }
+        if (! $user) {
+            return false;
+        }
 
-          return $user;
-      }
+        return $user;
+    }
 
-      public function checkPassword($plain, $hash): bool
-      {
-          if (password_verify($plain, $hash)) {
-              return true;
-          }
-          return false;
-      }
+    public function checkPassword($plain, $hash): bool
+    {
+        if (password_verify($plain, $hash)) {
+            return true;
+        }
+        return false;
+    }
 
-      public function apiRegisterUser(array $data): Member
-      {
-          $name = $data['name'];
-          if (empty($name)) {
-              $name = Member::VISITOR_NAME . substr(hash('sha256', $this->randomStr(), false), 0, 10);
-          }
-          $model = new Member();
-          $model->name = $name;
-          if (! empty($data['password'])) {
-              $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
-          }
-          $model->sex = $data['sex'];
-          $model->age = $data['age'];
-          $model->avatar = $model->avatar ?? '';
-          if (! empty($data['avatar'])) {
-              $model->avatar = $data['avatar'];
-          }
-          if (! empty($data['email'])) {
-              $model->email = $data['email'];
-          }
-          if (! empty($data['phone'])) {
-              $model->phone = $data['phone'];
-          }
-          // $model->email = $data['email'];
-          // $model->phone = $data['phone'];
-          $model->status = Member::STATUS['VISITORS'];
-          $model->member_level_status = Role::API_DEFAULT_USER_ROLE_ID;
-          $model->account = $data['account'];
-          $model->device = $data['device'];
-          $model->register_ip = $data['register_ip'];
-          $model->aff = 0;
-          $model->save();
-          $model->aff = md5((string) $model->id);
-          $model->save();
-          self::afterRegister($model, $data);
-          return $model;
-      }
+    public function apiRegisterUser(array $data): Member
+    {
+        $name = $data['name'];
+        if (empty($name)) {
+            $name = Member::VISITOR_NAME . substr(hash('sha256', $this->randomStr(), false), 0, 10);
+        }
+        $model = new Member();
+        $model->name = $name;
+        if (! empty($data['password'])) {
+            $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
+        $model->sex = $data['sex'];
+        $model->age = $data['age'];
+        $model->avatar = $model->avatar ?? '';
+        if (! empty($data['avatar'])) {
+            $model->avatar = $data['avatar'];
+        }
+        if (! empty($data['email'])) {
+            $model->email = $data['email'];
+        }
+        if (! empty($data['phone'])) {
+            $model->phone = $data['phone'];
+        }
+        // $model->email = $data['email'];
+        // $model->phone = $data['phone'];
+        $model->status = Member::STATUS['VISITORS'];
+        $model->member_level_status = Role::API_DEFAULT_USER_ROLE_ID;
+        $model->account = $data['account'];
+        $model->device = $data['device'];
+        $model->register_ip = $data['register_ip'];
+        $model->aff = 0;
+        $model->save();
+        $model->aff = md5((string) $model->id);
+        $model->save();
+        self::afterRegister($model, $data);
+        return $model;
+    }
 
-      // 代理Log
-      public function afterRegister(Member $model, array $data)
-      {
-          if (! empty($data['invited_code'])) {
-              $member = self::getMmemberByAff($data['invited_code']);
-              if ($member) {
-                  $model->invited_by = $member->id;
-                  $insert['invited_by'] = $member->id;
-                  $insert['member_id'] = $model->id;
-                  $insert['level'] = 1;
-                  $insert['invited_code'] = $data['invited_code'];
-                  $this->memberInviteLogService->initRow($insert);
-                  $this->memberInviteLogService->calcProxy($model);
-              }
-          }
-          $model->aff = md5((string) $model->id);
-          $model->save();
-      }
+    // 代理Log
+    public function afterRegister(Member $model, array $data)
+    {
+        if (! empty($data['invited_code'])) {
+            $member = self::getMmemberByAff($data['invited_code']);
+            if ($member) {
+                $model->invited_by = $member->id;
+                $insert['invited_by'] = $member->id;
+                $insert['member_id'] = $model->id;
+                $insert['level'] = 1;
+                $insert['invited_code'] = $data['invited_code'];
+                $this->memberInviteLogService->initRow($insert);
+                $this->memberInviteLogService->calcProxy($model);
+            }
+        }
+        $model->aff = md5((string) $model->id);
+        $model->save();
+    }
 
-      // 推廣碼找代理
-      public function getMmemberByAff(string $aff): Member
-      {
-          return Member::where('aff', $aff)->first();
-      }
+    // 推廣碼找代理
+    public function getMmemberByAff(string $aff): Member
+    {
+        return Member::where('aff', $aff)->first();
+    }
 
-      // 找一個代理
-      public function getProxy(): Member
-      {
-          return Member::where('aff', '!=', '')->orderBy('id', 'desc')->first();
-      }
+    // 找一個代理
+    public function getProxy(): Member
+    {
+        return Member::where('aff', '!=', '')->orderBy('id', 'desc')->first();
+    }
 
-      public function moveUserAvatar($file): string
-      {
-          $extension = $file->getExtension();
-          $filename = sha1(Carbon::now()->toDateTimeString());
-          if (! file_exists(BASE_PATH . '/public/avatar')) {
-              mkdir(BASE_PATH . '/public/avatar', 0755);
-          }
-          $imageUrl = '/image/' . $filename . '.' . $extension;
-          $path = BASE_PATH . '/public' . $imageUrl;
-          $file->moveTo($path);
+    public function moveUserAvatar($file): string
+    {
+        $extension = $file->getExtension();
+        $filename = sha1(Carbon::now()->toDateTimeString());
+        if (! file_exists(BASE_PATH . '/public/avatar')) {
+            mkdir(BASE_PATH . '/public/avatar', 0755);
+        }
+        $imageUrl = '/image/' . $filename . '.' . $extension;
+        $path = BASE_PATH . '/public' . $imageUrl;
+        $file->moveTo($path);
 
-          return $imageUrl;
-      }
+        return $imageUrl;
+    }
 
-      // token 存入redis
-      public function saveToken(int $userId, string $token): void
-      {
-          $key = self::CACHE_KEY . $userId;
-          $this->redis->set($key, $token);
-          $this->redis->expire($key, self::DAY);
-      }
+    // token 存入redis
+    public function saveToken(int $userId, string $token): void
+    {
+        $key = self::CACHE_KEY . $userId;
+        $this->redis->set($key, $token);
+        $this->redis->expire($key, self::DAY);
+    }
 
-      public function checkAndSaveDevice(int $userId, string $uuid): bool
-      {
-          $key = self::DEVICE_CACHE_KEY . $userId;
-          if (! $this->redis->exists($key)) {
-              $today = Carbon::now()->toDateString();
-              $nextDay = Carbon::parse($today . ' 00:00:00')->addDay()->timestamp;
-              $expire = $nextDay - time();
-              $this->redis->set($key, $uuid, $expire);
-              return true;
-          }
+    public function checkAndSaveDevice(int $userId, string $uuid): bool
+    {
+        $key = self::DEVICE_CACHE_KEY . $userId;
+        if (! $this->redis->exists($key)) {
+            $today = Carbon::now()->toDateString();
+            $nextDay = Carbon::parse($today . ' 00:00:00')->addDay()->timestamp;
+            $expire = $nextDay - time();
+            $this->redis->set($key, $uuid, $expire);
+            return true;
+        }
 
-          $redisUUid = $this->redis->get($key);
+        $redisUUid = $this->redis->get($key);
 
-          if ($redisUUid == $uuid) {
-              return true;
-          }
+        if ($redisUUid == $uuid) {
+            return true;
+        }
 
-          return false;
-      }
+        return false;
+    }
 
-      public function updateUser(int $id, array $data): void
-      {
-          $model = Member::find($id);
-          if (! empty($data['name']) and empty($model->name)) {
-              $model->name = $data['name'];
-          }
+    public function updateUser(int $id, array $data): void
+    {
+        $model = Member::find($id);
+        if (! empty($data['name']) and empty($model->name)) {
+            $model->name = $data['name'];
+        }
 
-          if (! empty($data['password'])) {
-              $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
-          }
+        if (! empty($data['password'])) {
+            $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
 
-          if (! empty($data['sex'])) {
-              $model->sex = $data['sex'];
-          }
+        if (! empty($data['sex'])) {
+            $model->sex = $data['sex'];
+        }
 
-          if (! empty($data['age'])) {
-              $model->age = $data['age'];
-          }
+        if (! empty($data['age'])) {
+            $model->age = $data['age'];
+        }
 
-          if (! empty($data['avatar'])) {
-              $model->avatar = $data['avatar'];
-          }
+        if (! empty($data['avatar'])) {
+            $model->avatar = $data['avatar'];
+        }
 
-          if (! empty($data['email'])) {
-              $model->email = $data['email'];
-          }
+        if (! empty($data['email'])) {
+            $model->email = $data['email'];
+        }
 
-          if (! empty($data['phone'])) {
-              $model->phone = $data['phone'];
-          }
+        if (! empty($data['phone'])) {
+            $model->phone = $data['phone'];
+        }
 
-          if (! empty($data['account'])) {
-              $model->account = $data['account'];
-              // 遊客 -> 會員未驗證
-              if ($model->status == Member::STATUS['VISITORS']) {
-                  $model->status = Member::STATUS['NOT_VERIFIED'];
-              }
-          }
+        if (! empty($data['account'])) {
+            $model->account = $data['account'];
+            // 遊客 -> 會員未驗證
+            if ($model->status == Member::STATUS['VISITORS']) {
+                $model->status = Member::STATUS['NOT_VERIFIED'];
+            }
+        }
 
-          if (! empty($data['device'])) {
-              $model->device = $data['device'];
-          }
+        if (! empty($data['device'])) {
+            $model->device = $data['device'];
+        }
 
-          if (! empty($data['last_ip'])) {
-              $model->last_ip = $data['last_ip'];
-          }
-          $model->save();
+        if (! empty($data['last_ip'])) {
+            $model->last_ip = $data['last_ip'];
+        }
+        $model->save();
 
-          $this -> delRedis($id);
-      }
+        $this -> delRedis($id);
+    }
 
-      // 使用者列表
-      public function getList($page, $pagePer)
-      {
-          // 撈取 遊客 註冊未驗證 註冊已驗證 會員
-          return Member::select('*')->where('status', '<=', 2)->offset(($page - 1) * $pagePer)->limit($pagePer)->orderBy('id', 'desc')->get();
-      }
+    // 使用者列表
+    public function getList($page, $pagePer)
+    {
+        // 撈取 遊客 註冊未驗證 註冊已驗證 會員
+        return Member::select('*')->where('status', '<=', 2)->offset(($page - 1) * $pagePer)->limit($pagePer)->orderBy('id', 'desc')->get();
+    }
 
-      // 使用者列表
-      public function allCount(): int
-      {
-          return Member::count();
-      }
+    // 使用者列表
+    public function allCount(): int
+    {
+        return Member::count();
+    }
 
-      public function storeUser(array $data)
-      {
-          $model = new Member();
-          if (! empty($data['id']) and Member::where('id', $data['id'])->exists()) {
-              $model = Member::find($data['id']);
-          }
+    public function storeUser(array $data)
+    {
+        $model = new Member();
+        if (! empty($data['id']) and Member::where('id', $data['id'])->exists()) {
+            $model = Member::find($data['id']);
+        }
 
-          if (! empty($data['name']) and empty($model->name)) {
-              $model->name = $data['name'];
-          }
-          if (! empty($data['password'])) {
-              $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
-          }
-          $model->sex = $data['sex'];
-          $model->age = $data['age'];
-          $model->avatar = $data['avatar'];
-          if (! empty($data['email'])) {
-              $model->email = $data['email'];
-          }
-          if (! empty($data['phone'])) {
-              $model->phone = $data['phone'];
-          }
-          $model->status = $data['status'];
-          $model->member_level_status = $data['member_level_status'];
-          $model->coins = $data['coins'];
-          $model->diamond_coins = $data['diamond_coins'];
-          $model->diamond_quota = $data['diamond_quota'];
-          $model->vip_quota = $data['vip_quota'];
-          $model->free_quota = $data['free_quota'];
-          $model->free_quota_limit = $data['free_quota_limit'];
+        if (! empty($data['name']) and empty($model->name)) {
+            $model->name = $data['name'];
+        }
+        if (! empty($data['password'])) {
+            $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
+        $model->sex = $data['sex'];
+        $model->age = $data['age'];
+        $model->avatar = $data['avatar'];
+        if (! empty($data['email'])) {
+            $model->email = $data['email'];
+        }
+        if (! empty($data['phone'])) {
+            $model->phone = $data['phone'];
+        }
+        $model->status = $data['status'];
+        $model->member_level_status = $data['member_level_status'];
+        $model->coins = $data['coins'];
+        $model->diamond_coins = $data['diamond_coins'];
+        $model->diamond_quota = $data['diamond_quota'];
+        $model->vip_quota = $data['vip_quota'];
+        $model->free_quota = $data['free_quota'];
+        $model->free_quota_limit = $data['free_quota_limit'];
 
-          $model->save();
+        $model->save();
 
-          if ($data['member_level_status'] > MemberLevel::NO_MEMBER_LEVEL) {
-              if (! empty($data['id']) and BuyMemberLevel::where('member_id', $data['id'])->where('member_level_type', MemberLevel::TYPE_LIST[$data['member_level_status'] - 1])->whereNull('deleted_at')->exists()) {
-                  $buy_model = BuyMemberLevel::where('member_id', $data['id'])->where('member_level_type', MemberLevel::TYPE_LIST[$data['member_level_status'] - 1])->whereNull('deleted_at')->first();
-                  $buy_model->start_time = $data['start_time'];
-                  $buy_model->end_time = $data['end_time'];
-                  $buy_model->save();
-              } else {
-                  $buy_model = new BuyMemberLevel();
-                  $buy_model->member_id = $model->id;
-                  $buy_model->member_level_type = MemberLevel::TYPE_LIST[$data['member_level_status'] - 1];
-                  $buy_model->member_level_id = 0;
-                  $buy_model->order_number = '';
-                  $buy_model->start_time = $data['start_time'];
-                  $buy_model->end_time = $data['end_time'];
-                  $buy_model->save();
-              }
-          }
-      }
+        if ($data['member_level_status'] > MemberLevel::NO_MEMBER_LEVEL) {
+            if (! empty($data['id']) and BuyMemberLevel::where('member_id', $data['id'])->where('member_level_type', MemberLevel::TYPE_LIST[$data['member_level_status'] - 1])->whereNull('deleted_at')->exists()) {
+                $buy_model = BuyMemberLevel::where('member_id', $data['id'])->where('member_level_type', MemberLevel::TYPE_LIST[$data['member_level_status'] - 1])->whereNull('deleted_at')->first();
+                $buy_model->start_time = $data['start_time'];
+                $buy_model->end_time = $data['end_time'];
+                $buy_model->save();
+            } else {
+                $buy_model = new BuyMemberLevel();
+                $buy_model->member_id = $model->id;
+                $buy_model->member_level_type = MemberLevel::TYPE_LIST[$data['member_level_status'] - 1];
+                $buy_model->member_level_id = 0;
+                $buy_model->order_number = '';
+                $buy_model->start_time = $data['start_time'];
+                $buy_model->end_time = $data['end_time'];
+                $buy_model->save();
+            }
+        }
+    }
 
-      public function deleteUser($id)
-      {
-          $record = Member::findOrFail($id);
-          $record->status = User::STATUS['DELETE'];
-          $record->save();
-      }
+    public function deleteUser($id)
+    {
+        $record = Member::findOrFail($id);
+        $record->status = User::STATUS['DELETE'];
+        $record->save();
+    }
 
-      public function getVerificationCode(int $memberId): string
-      {
-          $now = Carbon::now()->toDateTimeString();
-          $model = MemberVerification::where('member_id', $memberId)
-              ->where('expired_at', '>=', $now)
-              ->first();
+    public function getVerificationCode(int $memberId): string
+    {
+        $now = Carbon::now()->toDateTimeString();
+        $model = MemberVerification::where('member_id', $memberId)
+            ->where('expired_at', '>=', $now)
+            ->first();
 
-          if (! empty($model)) {
-              return $model->code;
-          }
+        if (! empty($model)) {
+            return $model->code;
+        }
 
-          return $this->createVerificationCode($memberId);
-      }
-      //刪除member Redis
-      public function delRedis(int $memberId){
-          $key = $this->defaultKey($memberId);
-          if($this->redis->exists($key)){
-            $this->redis->delete($key);
-          }
-      }
+        return $this->createVerificationCode($memberId);
+    }
+    //刪除member Redis
+    public function delRedis(int $memberId){
+        $key = $this->defaultKey($memberId);
+        if($this->redis->exists($key)){
+        $this->redis->delete($key);
+        }
+    }
 
-      //預設的key
-      public function defaultKey(int $id):string
-      {
-          return self::KEY . ':' . $id;
-      }
-      // 用id找用戶
-      public function getMember($id)
-      {
-          $key = $this->defaultKey($id);
-          if ($this->redis->exists($key)) {
-              $res = $this->redis->get($key);
-              return json_decode($res, true);
-          }
-          $user = Member::where("id",$id)->first();
-          $user = $user->toArray();
-          $urls = 
-          [
-            env("PURL1"),
-            env("PURL2"),
-            env("DURL1"),
-            env("DURL2"),
-          ];
-          $url = $urls[rand(0,count($urls)-1)];
-          $user["aff_url"] = $url."?invited_code=".$user['aff'];
-          $this->redis->set($key, json_encode($user));
-          $this->redis->expire($key, 86400);
-          return $user;
-      }
+    //預設的key
+    public function defaultKey(int $id):string
+    {
+        return self::KEY . ':' . $id;
+    }
+    // 用id找用戶
+    public function getMember($id)
+    {
+        $key = $this->defaultKey($id);
+        if ($this->redis->exists($key)) {
+            $res = $this->redis->get($key);
+            return json_decode($res, true);
+        }
+        $user = Member::where("id",$id)->first();
+        $user = $user->toArray();
+        $urls = 
+        [
+        env("PURL1"),
+        env("PURL2"),
+        env("DURL1"),
+        env("DURL2"),
+        ];
+        $url = $urls[rand(0,count($urls)-1)];
+        $user["aff_url"] = $url."?invited_code=".$user['aff'];
 
-      public function getUserFromAccountOrEmail(?string $account, ?string $email = null)
-      {
-          $user = [];
+        // 撈取會員天數
+        $member_level_status = $user["member_level_status"];
+        if($member_level_status == MemberLevel::NO_MEMBER_LEVEL){
+            $user["member_level_duration"] = 0;
+        }else if($member_level_status == MemberLevel::TYPE_VALUE['vip']){
+            // vip
+            $date_diff = BuyMemberLevel::where('member_id', $id)->where('member_level_type', MemberLevel::TYPE_LIST[0])->whereNull('deleted_at')->selectRaw('DATEDIFF(end_time, start_time) as date')->first();
+            if($date_diff->date >= 3650){
+                $user["member_level_duration"] = null;
+            }else{
+                $user["member_level_duration"] = (int)$date_diff->date;
+            }
+        }else{
+            // 鑽石
+            $date_diff = BuyMemberLevel::where('member_id', $id)->where('member_level_type', MemberLevel::TYPE_LIST[1])->whereNull('deleted_at')->selectRaw('DATEDIFF(end_time, start_time) as date')->first();
+            if($date_diff->date >= 3650){
+                $user["member_level_duration"] = null;
+            }else{
+                $user["member_level_duration"] = (int)$date_diff->date;
+            }
+        }
 
-          if (! empty($account)) {
-              $user = Member::where('account', $account)->first();
-          }
+        $this->redis->set($key, json_encode($user));
+        $this->redis->expire($key, 86400);
+        return $user;
+    }
 
-          if (empty($user) and ! empty($email)) {
-              $user = Member::where('email', $email)->first();
-          }
+    public function getUserFromAccountOrEmail(?string $account, ?string $email = null)
+    {
+        $user = [];
 
-          if (empty($user)) {
-              return false;
-          }
+        if (! empty($account)) {
+            $user = Member::where('account', $account)->first();
+        }
 
-          return $user;
-      }
+        if (empty($user) and ! empty($email)) {
+            $user = Member::where('email', $email)->first();
+        }
 
-      public function getMemberFollowList($user_id, $follow_type = '')
-      {
-          if (empty($follow_type)) {
-              $type_arr = MemberFollow::TYPE_LIST;
-          } else {
-              $type_arr = [$follow_type];
-          }
+        if (empty($user)) {
+            return false;
+        }
 
-          foreach ($type_arr as $key => $value) {
-              // image video略過 有需要再開啟
-              if ($value == 'image' || $value == 'video') {
-                  continue;
-              }
-              $class_name = MemberFollow::TYPE_CORRESPOND_LIST[$value];
-              switch ($value) {
-                  case 'image':
-                      $query = $class_name::join('member_follows', function ($join) use ($class_name) {
-                          $join->on('member_follows.correspond_id', '=', 'images.id')
-                              ->where('member_follows.correspond_type', '=', $class_name);
-                      })->select('images.id', 'images.title', 'images.thumbnail', 'images.description');
-                      break;
-                  case 'video':
-                      $query = $class_name::join('member_follows', function ($join) use ($class_name) {
-                          $join->on('member_follows.correspond_id', '=', 'videos.id')
-                              ->where('member_follows.correspond_type', '=', $class_name);
-                      })->select('videos.*');
-                      break;
-                  case 'actor':
-                      $query = $class_name::join('member_follows', function ($join) use ($class_name) {
-                          $join->on('member_follows.correspond_id', '=', 'actors.id')
-                              ->where('member_follows.correspond_type', '=', $class_name);
-                      })->select('actors.id', 'actors.name', 'actors.avatar');
-                      break;
-                  case 'tag':
-                      $query = $class_name::join('member_follows', function ($join) use ($class_name) {
-                          $join->on('member_follows.correspond_id', '=', 'tags.id')
-                              ->where('member_follows.correspond_type', '=', $class_name);
-                      })->select('tags.id', 'tags.name');
-                      break;
-                  default:
-                      # code...
-                      break;
-              }
-              $query = $query->where('member_follows.member_id', '=', $user_id)->whereNull('member_follows.deleted_at')->get()->toArray();
-              
-              if($value == 'actor'){
-                foreach ($query as $key2 => $value2) {
-                    // avatar加上網域
-                    if(!empty($value2['avatar']))$query[$key2]['avatar'] = env('IMG_DOMAIN').$value2['avatar'];
+        return $user;
+    }
 
-                    // 查詢作品數
-                    $numberOfWorks = ActorCorrespond::where('actor_id', $value2['id'])->count();
-                    $query[$key2]['numberOfWorks'] = $numberOfWorks;
-                }
-              }
-              $result[$value] = $query;
-          }
+    public function getMemberFollowList($user_id, $follow_type = '')
+    {
+        if (empty($follow_type)) {
+            $type_arr = MemberFollow::TYPE_LIST;
+        } else {
+            $type_arr = [$follow_type];
+        }
 
-          return $result;
-      }
+        foreach ($type_arr as $key => $value) {
+            // image video略過 有需要再開啟
+            if ($value == 'image' || $value == 'video') {
+                continue;
+            }
+            $class_name = MemberFollow::TYPE_CORRESPOND_LIST[$value];
+            switch ($value) {
+                case 'image':
+                    $query = $class_name::join('member_follows', function ($join) use ($class_name) {
+                        $join->on('member_follows.correspond_id', '=', 'images.id')
+                            ->where('member_follows.correspond_type', '=', $class_name);
+                    })->select('images.id', 'images.title', 'images.thumbnail', 'images.description');
+                    break;
+                case 'video':
+                    $query = $class_name::join('member_follows', function ($join) use ($class_name) {
+                        $join->on('member_follows.correspond_id', '=', 'videos.id')
+                            ->where('member_follows.correspond_type', '=', $class_name);
+                    })->select('videos.*');
+                    break;
+                case 'actor':
+                    $query = $class_name::join('member_follows', function ($join) use ($class_name) {
+                        $join->on('member_follows.correspond_id', '=', 'actors.id')
+                            ->where('member_follows.correspond_type', '=', $class_name);
+                    })->select('actors.id', 'actors.name', 'actors.avatar');
+                    break;
+                case 'tag':
+                    $query = $class_name::join('member_follows', function ($join) use ($class_name) {
+                        $join->on('member_follows.correspond_id', '=', 'tags.id')
+                            ->where('member_follows.correspond_type', '=', $class_name);
+                    })->select('tags.id', 'tags.name');
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+            $query = $query->where('member_follows.member_id', '=', $user_id)->whereNull('member_follows.deleted_at')->get()->toArray();
+            
+            if($value == 'actor'){
+            foreach ($query as $key2 => $value2) {
+                // avatar加上網域
+                if(!empty($value2['avatar']))$query[$key2]['avatar'] = env('IMG_DOMAIN').$value2['avatar'];
 
-      // 亂處產生一個string
-      public function randomStr($length = 8)
-      {
-          $url = '';
-          $charray = array_merge(range('a', 'z'), range('0', '9'));
-          $max = count($charray) - 1;
-          for ($i = 0; $i < $length; ++$i) {
-              $randomChar = mt_rand(0, $max);
-              $url .= $charray[$randomChar];
-          }
-          return $url;
-      }
+                // 查詢作品數
+                $numberOfWorks = ActorCorrespond::where('actor_id', $value2['id'])->count();
+                $query[$key2]['numberOfWorks'] = $numberOfWorks;
+            }
+            }
+            $result[$value] = $query;
+        }
 
-      public function createOrUpdateLoginLimitRedisKey(string $deviceId)
-      {
-          $now = Carbon::now()->timestamp;
-          $tomorrow = Carbon::tomorrow()->setHour(0)->setMinute(0)->setSecond(0)->timestamp;
-          $expire = $tomorrow - $now;
+        return $result;
+    }
 
-          if ($this->redis->exists(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $deviceId)) {
-              $this->redis->incr(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $deviceId);
-          } else {
-              $this->redis->set(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $deviceId, 1, $expire);
-          }
-      }
+    // 亂處產生一個string
+    public function randomStr($length = 8)
+    {
+        $url = '';
+        $charray = array_merge(range('a', 'z'), range('0', '9'));
+        $max = count($charray) - 1;
+        for ($i = 0; $i < $length; ++$i) {
+            $randomChar = mt_rand(0, $max);
+            $url .= $charray[$randomChar];
+        }
+        return $url;
+    }
+
+    public function createOrUpdateLoginLimitRedisKey(string $deviceId)
+    {
+        $now = Carbon::now()->timestamp;
+        $tomorrow = Carbon::tomorrow()->setHour(0)->setMinute(0)->setSecond(0)->timestamp;
+        $expire = $tomorrow - $now;
+
+        if ($this->redis->exists(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $deviceId)) {
+            $this->redis->incr(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $deviceId);
+        } else {
+            $this->redis->set(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $deviceId, 1, $expire);
+        }
+    }
 
     public function getMemberProductId($memberId, $type, $page, $pageSize = 0): array
     {
