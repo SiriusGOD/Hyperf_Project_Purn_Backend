@@ -21,6 +21,7 @@ use App\Request\ImageApiListRequest;
 use App\Request\ImageApiSearchRequest;
 use App\Request\ImageApiSuggestRequest;
 use App\Service\ClickService;
+use App\Service\GenerateService;
 use App\Service\ImageGroupService;
 use App\Service\ImageService;
 use App\Service\LikeService;
@@ -107,7 +108,7 @@ class ImageGroupController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'pay_image')]
-    public function getPayImage(GetPayImageRequest $request, ImageGroupService $service, ImageService $imageService)
+    public function getPayImage(GetPayImageRequest $request, ImageGroupService $service, ImageService $imageService, GenerateService $generateService)
     {
         $id = (int) $request->input('id');
         $memberId = auth()->user()->getId();
@@ -116,7 +117,8 @@ class ImageGroupController extends AbstractController
             return $this->error(trans('validation.is_not_pay'), 400);
         }
 
-        $data = $imageService->getImagesByImageGroup($id)->toArray();
+        $images = $imageService->getImagesByImageGroup($id)->toArray();
+        $data = $generateService->generateImage($id, $images);
 
         return $this->success($data);
     }
