@@ -125,7 +125,7 @@ class Video extends Model
     {
         $model = $this->hasOne(Product::class, 'correspond_id')
             ->where('type', self::class)
-            ->where('currency', Product::TYPE_CORRESPOND_LIST['points'])
+            ->where('currency', Product::CURRENCY[1])
             ->first();
 
         if (empty($model)) {
