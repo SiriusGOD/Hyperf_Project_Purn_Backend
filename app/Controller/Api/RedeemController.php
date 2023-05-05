@@ -35,7 +35,7 @@ class RedeemController extends AbstractController
         if($result ){
           return $this->success(['msg' => "可兌換"]);
         }
-        return $this->success(['msg' => "己過期或找不到優惠卷"]);
+        return $this->error(['msg' => "己過期或找不到優惠卷"]);
     }
 
     // 兌換影片
