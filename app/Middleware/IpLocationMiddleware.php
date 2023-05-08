@@ -39,7 +39,7 @@ class IpLocationMiddleware implements MiddlewareInterface
     public function __construct(Redis $redis, LoggerFactory $factory, TranslatorInterface $translator)
     {
         $this->redis = $redis;
-        $this->logger = $factory->get('hyperf', 'hyperf');
+        $this->logger = $factory->get();
         $this->translator = $translator;
     }
 
