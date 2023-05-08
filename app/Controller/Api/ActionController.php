@@ -22,8 +22,8 @@ class ActionController extends AbstractController
     }
 
     #[Middleware(ApiAuthMiddleware::class)]
-    #[RequestMapping(methods: ['POST'], path: 'Report')]
-    public function Report(RequestInterface $request)
+    #[RequestMapping(methods: ['POST'], path: 'report')]
+    public function report(RequestInterface $request)
     {
         $userId = auth('jwt')->user()->getId();
         $id = (int) $request->input('id', 0);
