@@ -232,7 +232,7 @@ class ImageGroupService
                 ->join('order_details', 'orders.id', '=', 'order_details.order_id')
                 ->join('products', 'order_details.product_id', '=', 'products.id')
                 ->where('products.type', ImageGroup::class)
-                ->where('products.correspond_id', $id)
+                ->where('products.id', $id)
                 ->where('orders.status', Order::ORDER_STATUS['finish'])
                 ->select('orders.currency', 'orders.created_at')
                 ->first();
