@@ -16,9 +16,10 @@ class VideoHeightWidthSeed implements BaseInterface
         $page = 0;
         $limit = 100;
         $forever = true;
+        \App\Model\Video::where('source', "0")->delete();
         while($forever) {
             $models = \App\Model\Video::whereNull('cover_height')
-                ->where('cover_full', "<>", 0)
+                ->where('cover_full', "<>", "0")
                 ->offset($page * $limit)
                 ->limit($limit)
                 ->get();
@@ -32,7 +33,10 @@ class VideoHeightWidthSeed implements BaseInterface
             $page++;
         }
 
-        \App\Model\Video::where('source', "0")->delete();
+        \App\Model\Video::where('cover_full', "0")->update([
+            'cover_height' => 0,
+            'cover_witdh' => 0,
+        ]);
     }
 
     protected function updateHeightAndWidth(\App\Model\Video $model)
