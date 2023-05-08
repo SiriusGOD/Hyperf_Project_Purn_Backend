@@ -23,44 +23,6 @@
                                     <input type="password" class="form-control" name="password" id="password"
                                            placeholder="{{trans('default.pass_def') ?? 'password'}}" value="">
                                 </div>
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.manager_control.manager_sex') ?? '性別'}}</label>
-                                    <select class="form-control form-control-lg" name="sex">
-                                        @foreach(trans('select.sex') as $key => $value)
-                                            <option value="{{$key}}" @if($key == $user->sex) selected=true @endif>{{$value}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.manager_control.manager_age') ?? '年齡'}}</label>
-                                    <input type="text" class="form-control" name="age" id="age"
-                                           value="{{$user->age}}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.image_profile_dec') ?? '圖片(不上傳就不更新，只接受圖片檔案(png jpeg gif))'}}</label>
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" name="avatar" id="customFile" accept="image/png, image/gif, image/jpeg">
-                                        <label class="custom-file-label" for="customFile">{{trans('default.choose_file') ?? '選擇檔案'}}</label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.manager_control.manager_email') ?? '電子郵件'}}</label>
-                                    <input type="text" class="form-control" name="email" id="email"
-                                           value="{{$user->email}}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.manager_control.manager_phone') ?? '電子郵件'}}</label>
-                                    <input type="text" class="form-control" name="phone" id="phone"
-                                           value="{{$user->phone}}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.manager_control.manager_status') ?? '狀態'}}</label>
-                                    <select class="form-control form-control-lg" name="status">
-                                        @foreach(trans('select.status') as $key => $value)
-                                            <option value="{{$key}}" @if($key == $user->status) selected=true @endif>{{$value}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
                                 @if($qrcode_image && env('GOOGLE_AUTH_VALID') && env('GOOGLE_AUTH_VALID'))
                                     <div class="form-group">
                                         <label for="exampleInputEmail1">{{trans('default.manager_control.GoogleAtuh') ?? 'Google Auth'}}</label>
