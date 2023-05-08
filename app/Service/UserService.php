@@ -52,13 +52,21 @@ class UserService
         if (! empty($data['password'])) {
             $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
         }
-        $model->sex = $data['sex'];
-        $model->age = $data['age'];
-        $model->avatar = $data['avatar'];
-        $model->email = $data['email'];
-        $model->phone = $data['phone'];
-        $model->status = User::STATUS['NORMAL'];
-        $model->role_id = Role::API_DEFAULT_USER_ROLE_ID;
+        $model->sex = isset($data['sex'])?$data['sex']:1;
+        $model->age = isset($data['age'])?$data['age']:18;
+        $model->email = isset($data['email'])?$data['email']:"a".time()."@gmail.com";
+        if (! empty($data['phone'])) {
+          $model->phone = $data['phone'];
+        }
+        if (! empty($data['avatar'])) {
+          $model->avatar = $data['avatar'];
+        }
+        if (! empty($data['status'])) {
+          $model->status = $data['status'];
+        }
+        if (! empty($data['role_id'])) {
+          $model->role_id = $data['role_id'];
+        }
         $model->save();
     }
 

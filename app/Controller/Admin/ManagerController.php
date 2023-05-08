@@ -77,13 +77,13 @@ class ManagerController extends AbstractController
         $path = '';
         if ($request->hasFile('avatar')) {
             $path = $service->moveUserAvatar($request->file('avatar'));
+            $data['avatar'] = $path;
         }
-        $data['avatar'] = $path;
         $data['name'] = $request->input('name');
         $data['sex'] = $request->input('sex');
         $data['age'] = $request->input('age');
-        $data['email'] = $request->input('email');
-        $data['phone'] = $request->input('phone');
+        $data['email'] = $request->input('email' , "a".time()."@gmail.com");
+        $data['phone'] = $request->input('phone',"0".time());
         $data['status'] = $request->input('status');
         $data['role_id'] = $request->input('role_id');
         $data['password'] = $request->input('password');

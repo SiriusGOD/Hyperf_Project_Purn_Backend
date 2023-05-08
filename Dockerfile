@@ -9,7 +9,14 @@ ENV TIMEZONE=${timezone:-"America/Los_Angeles"} \
     APP_NAME=$APP_NAME \
     SCAN_CACHEABLE=(true)
 
-
+# INSTALL PHP EXTENSIONS
+RUN apk update && apk upgrade
+RUN apk add --no-cache ${PHPIZE_DEPS} && \
+    pecl install ds && \
+    docker-php-ext-enable ds
+RUN apk --update add imagemagick imagemagick-dev
+RUN pecl install imagick
+RUN docker-php-ext-enable imagick
 
 RUN set -ex \
     && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
