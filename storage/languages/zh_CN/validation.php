@@ -153,16 +153,16 @@ return [
 
     'custom' => [
         'person.*.email' => [
-            'unique' => '每個人的郵箱地址必須是唯一的',
+            'unique' => '每个人的邮箱地址必须是唯一的',
         ]
     ],
 
-    'authorize' => '尚未登入，或權限不足',
-    'device_authorize' => '一天只能登入一個裝置',
-    'try_limit' => '請稍後重新嘗試',
-    'expire_code' => '驗證碼過期',
-    'change_device_limit' => '已超過當日可變更設備次數',
-    'is_not_pay' => '尚未購買本商品',
+    'authorize' => '尚未登入，或权限不足',
+    'device_authorize' => '一天只能登入一个装置',
+    'try_limit' => '请稍后重新尝试',
+    'expire_code' => '验证码过期',
+    'change_device_limit' => '已超过当日可变更设备次数',
+    'is_not_pay' => '尚未购买本商品',
 
     /*
     |--------------------------------------------------------------------------

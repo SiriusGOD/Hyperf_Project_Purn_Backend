@@ -17,6 +17,7 @@ use App\Controller\AbstractController;
 use App\Model\Video;
 use App\Request\ClickRequest;
 use App\Request\GetPayImageRequest;
+use App\Request\VideoApiSearchRequest;
 use App\Request\VideoApiSuggestRequest;
 use App\Service\ActorService;
 use App\Service\ClickService;
@@ -105,19 +106,15 @@ class VideoController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'search')]
-    public function search(RequestInterface $request, VideoService $service)
+    public function search(VideoApiSearchRequest $request, VideoService $service)
     {
         $title = $request->input('title');
         $length = $request->input('length', 0);
         $compare = $request->input('compare', 0);
         $page = (int) $request->input('page', 0);
-        $limit = (int) $request->input('page', Video::PAGE_PER);
+        $limit = (int) $request->input('limit', Video::PAGE_PER);
         $sortBy = (int) $request->input('sort_by');
         $isAsc = (int) $request->input('is_asc');
-        if (empty($title) || strlen($title) == 0) {
-            $result = ['message' => 'title 不得為空'];
-            return $this->success($result);
-        }
         $data = [];
         $data['models'] = $service->searchVideo($title, $compare, $length, $page, $limit, $sortBy, $isAsc);
         $path = '/api/video/search';

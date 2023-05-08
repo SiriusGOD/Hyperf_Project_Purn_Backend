@@ -71,7 +71,7 @@ class TagService
             foreach ($tags as $v) {
                 if (strlen($v) > 1) {
                     $tag = self::createTagByName($v, 1);
-                    self::createTagRelationship('video', $videoId, $tag->id);
+                    self::createTagRelationship(Video::class, $videoId, $tag->id);
                 }
             }
         }

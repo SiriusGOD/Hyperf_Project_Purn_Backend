@@ -47,7 +47,8 @@
         "hyperf/view-engine": "3.0.*",
         "intervention/image": "^2.7",
         "nesbot/carbon": "^2.62",
-        "pragmarx/google2fa": "^8.0"
+        "pragmarx/google2fa": "^8.0",
+        "zoujingli/ip2region": "^2.0"
     },
     "require-dev": {
         "filp/whoops": "^2.15",
