@@ -240,7 +240,10 @@ class ImageGroupService
 
         // 用免費次數購買的免費商品 過隔天就不顯示在已購買項目中
         if($order -> currency == Order::PAY_CURRENCY['free_quota']){
-            if($order -> created_at < Carbon::now()->toDateString())return false;
+            $date1 = Carbon::parse($order -> created_at);
+            $date2 = Carbon::now();
+            $diff = $date1->diff($date2);
+            if($diff > 0)return false;
         }
         return true;
     }
