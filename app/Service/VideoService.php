@@ -362,9 +362,9 @@ class VideoService
     public function isPay(int $id, int $memberId): bool
     {
         $member = Member::find($memberId);
-        $imageGroup = Video::find($id);
-
-        if ($imageGroup->pay_type > $member->member_level_status or $member->member_level_status == MemberLevel::NO_MEMBER_LEVEL) {
+        $video = Video::find($id);
+        
+        if ($video->is_free <= $member->member_level_status or $member->member_level_status == MemberLevel::NO_MEMBER_LEVEL) {
             return $this->orderCheck($id, $memberId);
         }
 
@@ -402,12 +402,18 @@ class VideoService
 
     protected function orderCheck(int $id, int $memberId): bool
     {
-        return Order::where('orders.user_id', $memberId)
-            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
-            ->join('products', 'order_details.product_id', '=', 'products.id')
-            ->where('products.type', Video::class)
-            ->where('products.correspond_id', $id)
-            ->where('orders.status', Order::ORDER_STATUS['finish'])
-            ->exists();
+        $order = Order::where('orders.user_id', $memberId)
+                ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+                ->join('products', 'order_details.product_id', '=', 'products.id')
+                ->where('products.type', Video::class)
+                ->where('products.correspond_id', $id)
+                ->where('orders.status', Order::ORDER_STATUS['finish'])->select('orders.currency', 'orders.created_at')->first();
+        if(empty($order))return false;
+
+        // 用免費次數購買的免費商品 過隔天就不顯示在已購買項目中
+        if($order -> currency == Order::PAY_CURRENCY['free_quota']){
+            if($order -> created_at < Carbon::now()->toDateString())return false;
+        }
+        return true;
     }
 }

@@ -413,8 +413,8 @@ class MemberService extends BaseService
         }
 
         foreach ($type_arr as $key => $value) {
-            // image video略過 有需要再開啟
-            if ($value == 'image' || $value == 'video') {
+            // image video tag略過 有需要再開啟
+            if ($value == 'image' || $value == 'video' || $value == 'tag') {
                 continue;
             }
             $class_name = MemberFollow::TYPE_CORRESPOND_LIST[$value];
@@ -532,7 +532,7 @@ class MemberService extends BaseService
             foreach ($model as $key => $value) {
                 // 用免費次數購買的免費商品 過隔天五點就不顯示在已購買項目中
                 if($value -> currency == Order::PAY_CURRENCY['free_quota']){
-                    if($value -> created_at < Carbon::now()->toDateString() . ' 05:00:00' && $value -> created_at < Carbon::now()->toDateString())continue;
+                    if($value -> created_at < Carbon::now()->toDateString())continue;
                 }
 
                 if ($value->type == Product::TYPE_CORRESPOND_LIST['image']) {
