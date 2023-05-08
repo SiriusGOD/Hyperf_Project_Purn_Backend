@@ -117,9 +117,8 @@ class ImageGroupController extends AbstractController
             return $this->error(trans('validation.is_not_pay'), 400);
         }
 
-        $images = $imageService->getImagesByImageGroup($id)->toArray();
-        $data = $generateService->generateImage($id, $images);
-
-        return $this->success($data);
+        return $this->success([
+            'is_pay' => 1,
+        ]);
     }
 }

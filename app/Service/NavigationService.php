@@ -170,6 +170,7 @@ class NavigationService extends GenerateService
             'tags', 'imagesLimit',
         ])
             ->whereIn('id', $imageGroupIds)
+            ->where('height', '>', 0)
             ->offset($limit * $page)
             ->limit($limit)
             ->get()
@@ -201,6 +202,7 @@ class NavigationService extends GenerateService
             ->whereIn('id', $ids)
             ->offset($limit * $page)
             ->limit($limit)
+            ->where('cover_height', '>', 0)
             ->get()
             ->toArray();
 

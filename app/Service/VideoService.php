@@ -89,7 +89,7 @@ class VideoService
     public function baseVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER, array $withoutIds = [])
     {
         $videoIds = [];
-        $query = $this->model;
+        $query = $this->model->where('cover_height', '>', 0);
         if (! empty($tagIds)) {
             $videoIds = TagCorrespond::where('correspond_type', Video::class)
                 ->whereIn('tag_id', $tagIds)
@@ -238,7 +238,7 @@ class VideoService
                 ->toArray();
             $ids = array_merge($ids, $result);
         }
-        $model = Video::where('title', 'like', "%{$title}%")
+        $model = Video::where('title', 'like', "%{$title}%")->where('cover_height', '>', 0)
             ->where('release_time', '<=', Carbon::now()->toDateTimeString());
         if ($compare > 0 && $length > 0) {
             if ($compare == 1) {
@@ -308,6 +308,7 @@ class VideoService
             ])
                 ->whereIn('id', $ids)
                 ->where('release_time', '<=', Carbon::now()->toDateTimeString())
+                ->where('cover_height', '>', 0)
                 ->offset($limit * $page)
                 ->limit($limit)
                 ->get()
@@ -393,6 +394,7 @@ class VideoService
     {
         return Video::with('tags')
             ->where('hot_order', '>=', 1)
+            ->where('cover_height', '>', 0)
             ->orderBy('hot_order')
             ->offset($page * $limit)
             ->limit($limit)

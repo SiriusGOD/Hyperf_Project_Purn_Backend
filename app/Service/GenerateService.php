@@ -24,20 +24,14 @@ class GenerateService
             $url = $this->getImageUrl($imageGroup);
             $imageGroup['thumbnail'] = $url . $imageGroup['thumbnail'];
             $imageGroup['url'] = $url . $imageGroup['url'];
-            $count = 0;
             if (empty($imageGroup['images_limit'])) {
                 $result[] = $imageGroup;
                 continue;
             }
             $imageGroup['actors'] = $this->getActors('image_group', $imageGroup['id']);
             foreach ($imageGroup['images_limit'] as $key => $image) {
-                if ($count >= ImageGroup::DEFAULT_FREE_LIMIT) {
-                    unset($imageGroup['images_limit'][$key]);
-                    continue;
-                }
                 $imageGroup['images_limit'][$key]['thumbnail'] = $url . $imageGroup['images_limit'][$key]['thumbnail'];
                 $imageGroup['images_limit'][$key]['url'] = $url . $imageGroup['images_limit'][$key]['url'];
-                ++$count;
             }
 
             $result[] = $imageGroup;

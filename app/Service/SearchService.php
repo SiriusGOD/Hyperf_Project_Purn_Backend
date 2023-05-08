@@ -101,6 +101,7 @@ class SearchService extends GenerateService
         $hotImages = ImageGroup::where('hot_order', '>=', 1)
             ->with(['tags', 'imagesLimit'])
             ->orderBy('hot_order')
+            ->where('height', '>', 0)
             ->offset($page * $limit)
             ->limit($limit)
             ->get();

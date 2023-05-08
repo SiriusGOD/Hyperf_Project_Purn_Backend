@@ -70,7 +70,7 @@ class ImageGroupService
             $query = $query->whereNotIn('id', $withoutIds);
         }
 
-        return $query->orderByDesc('id')->get();
+        return $query->where('height', '>', 0)->orderByDesc('id')->get();
     }
 
     public function getImageGroupsByKeyword(string $keyword, int $page, int $limit, ?int $sortBy = null, ?int $isAsc = null): Collection
@@ -99,6 +99,7 @@ class ImageGroupService
             'tags', 'imagesLimit',
         ])
             ->orWhere('title', 'like', '%' . $keyword . '%')
+            ->where('height', '>', 0)
             ->offset($limit * $page)
             ->limit($limit);
 
@@ -147,6 +148,7 @@ class ImageGroupService
             ])
                 ->whereIn('id', $imageIds)
                 ->offset($limit * $page)
+                ->where('height', '>', 0)
                 ->orderByDesc('id')
                 ->limit($limit)
                 ->get()
@@ -219,6 +221,7 @@ class ImageGroupService
             'tags', 'imagesLimit',
         ])
             ->where('hot_order', '>=', 1)
+            ->where('height', '>', 0)
             ->offset($limit * $page)
             ->limit($limit)
             ->orderByDesc('hot_order')
