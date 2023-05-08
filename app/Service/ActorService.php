@@ -14,8 +14,10 @@ namespace App\Service;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\ActorHasClassification;
+use App\Model\Image;
 use App\Model\ImageGroup;
 use App\Model\MemberFollow;
+use App\Model\Video;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
 
@@ -48,7 +50,7 @@ class ActorService
                 $d['user_id'] = 1;
                 $d['sex'] = 0;
                 $actor = self::storeActor($d);
-                $res = self::createActorRelationship('video', $videoId, $actor->id);
+                $res = self::createActorRelationship(Video::class, $videoId, $actor->id);
                 $ids['actorCorresponds'][] = $res->id;
                 $ids['actors'][] = $actor->id;
             }
@@ -72,7 +74,8 @@ class ActorService
                     case Video::class:
                         $query[$key]['video_count'] = $value2['count'];
                         break;
-                    case Image::class:
+                        //TODO 修改計算成套圖數量
+                    case ImageGroup::class:
                         $query[$key]['image_count'] = $value2['count'];
                         break;
                 }

@@ -17,6 +17,7 @@ use App\Model\MemberFollow;
 use App\Model\Actor;
 use App\Model\Click;
 use App\Model\ImageGroup;
+use App\Model\Video;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
 use Carbon\Carbon;
