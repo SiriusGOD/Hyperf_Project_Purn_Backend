@@ -79,7 +79,7 @@ class ActorController extends AbstractController
     public function isExist(RequestInterface $request, ActorService $service)
     {
         $memberId = auth()->user()->getId();
-        $id = $request->input('id', 0);
+        $id = $request->input('actor_id', 0);
         $exist = $service->isExist($memberId, $id);
 
         return $this->success([
