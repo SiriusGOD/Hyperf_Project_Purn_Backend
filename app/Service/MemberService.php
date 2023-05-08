@@ -755,12 +755,19 @@ class MemberService extends BaseService
         $service->delRedis();
     }
 
-    //刪除 會員購買紀錄 Redis
+    // 刪除 會員購買紀錄 Redis
     public function delMemberListRedis($user_id){
         $checkRedisKey = self::KEY.":MemberList:".$user_id.":".Carbon::now()->toDateString();
         $keys = $this->redis->keys( $checkRedisKey.'*');
         foreach ($keys as $key) {
             $this->redis->del($key);
         }
+    }
+
+    // 更新會員的演員追蹤快取
+    public function updateMemberFollowCache($user_id)
+    {
+        $service = make(ActorService::class);
+        $service->updateIsExistCache($user_id);
     }
 }

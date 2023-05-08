@@ -303,10 +303,14 @@ class MemberController extends AbstractController
             $model->correspond_type = MemberFollow::TYPE_CORRESPOND_LIST[$follow_type];
             $model->correspond_id = $follow_id;
             $model->save();
-            return $this->success();
-
+        
             // 刪除快取
             $service->delFrontCache();
+
+            // 更新會員追蹤演員快取
+            $service->updateMemberFollowCache($userId);
+            
+            return $this->success();
         }
 
         return $this->error('該會員已追蹤', ErrorCode::BAD_REQUEST);

@@ -31,6 +31,8 @@ class ActorService
 
     public const COUNT_EXPIRE = 180;
 
+    public const TTL_ONE_DAY = 86400;
+
     protected Redis $redis;
 
     public function __construct(Redis $redis, Actor $actor)
@@ -236,5 +238,47 @@ class ActorService
     {
         $service = make(ActorClassificationService::class);
         $service->delRedis();
+    }
+
+    // 判斷演員是否有追蹤
+    public function isExist($memberId, $id)
+    {
+        $redisKey = self::CACHE_KEY.':isExist:'.$memberId;
+        if ($this->redis->exists($redisKey)) {
+            $arr = json_decode($this->redis->get($redisKey), true);
+        }else{
+            $follows = MemberFollow::where('member_id', $memberId)->where('correspond_type', Actor::class)->select('correspond_id')->get()->toArray();
+            if(empty($follows)) return 0;
+
+            $arr = [];
+            foreach ($follows as $key => $value) {
+                array_push($arr, $value['correspond_id']);
+            }
+
+            $this->redis->set($redisKey, json_encode($arr));
+            $this->redis->expire($redisKey, self::TTL_ONE_DAY);
+        }
+        // 是否追蹤
+        if(in_array($id, $arr)){
+            // 是
+            return 1;
+        }else{
+            // 否
+            return 0;
+        }
+    }
+
+    // 更新會員的演員追蹤快取
+    public function updateIsExistCache($memberId): void
+    {
+        $redisKey = self::CACHE_KEY.':isExist:'.$memberId;
+        $follows = MemberFollow::where('member_id', $memberId)->where('correspond_type', Actor::class)->select('correspond_id')->get()->toArray();
+
+        $arr = [];
+        foreach ($follows as $key => $value) {
+            array_push($arr, $value['correspond_id']);
+        }
+        $this->redis->set($redisKey, json_encode($arr));
+        $this->redis->expire($redisKey, self::TTL_ONE_DAY);
     }
 }

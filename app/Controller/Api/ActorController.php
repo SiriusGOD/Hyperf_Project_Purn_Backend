@@ -21,6 +21,8 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Annotation\Middleware;
 use App\Middleware\Auth\ApiAuthMiddleware;
+use App\Model\MemberFollow;
+use App\Model\MemberTag;
 
 #[Controller]
 class ActorController extends AbstractController
@@ -71,5 +73,17 @@ class ActorController extends AbstractController
         $actor_id = (int) $request->input('actor_id', 0);
         $result = $service->getActorDetail($actor_id, $userId);
         return $this->success(['models' => $result]);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'isExist')]
+    public function isExist(RequestInterface $request, ActorService $service)
+    {
+        $memberId = auth()->user()->getId();
+        $id = $request->input('id', 0);
+        $exist = $service->isExist($memberId, $id);
+
+        return $this->success([
+            'is_exist' => $exist,
+        ]);
     }
 }
