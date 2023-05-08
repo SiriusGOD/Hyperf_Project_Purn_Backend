@@ -180,8 +180,8 @@ class TagService
         }
 
         return match ($type) {
-            'image_group' => ImageGroup::find($id)->tags()->pluck('tags.id')->toArray(),
-            default => Video::find($id)->tags()->pluck('tags.id')->toArray(),
+            'image_group' => ImageGroup::find($id)->tags()->pluck('tags.id')->toArray() ?? [],
+            default => Video::find($id)->tags()->pluck('tags.id')->toArray() ?? [],
         };
     }
 

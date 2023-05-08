@@ -66,6 +66,7 @@ class NavigationService extends GenerateService
         $videoLimit = $limit - $imageLimit;
         $videos = $this->navigationDetailVideos($suggest, $navId, $tagIds, $page, $videoLimit);
 
+        $returnResult = [];
         switch ($navId) {
             case 1:
                 $ids = $this->getIds($videos);
@@ -74,14 +75,22 @@ class NavigationService extends GenerateService
                 $ids = $this->getIds($imageGroups);
                 $clicks = $this->calculateNavigationPopularClick(ImageGroup::class, $ids);
                 $imageGroups = $this->sortClickAndModels($clicks, $videos);
-                return array_merge($imageGroups, $videos);
+                $returnResult = array_merge($imageGroups, $videos);
+                break;
             default:
                 $result = array_merge($imageGroups, $videos);
                 $collect = \Hyperf\Collection\collect($result);
                 $collect = $collect->sortByDesc('created_at');
 
-                return $collect->toArray();
+                $returnResult =  $collect->toArray();
         }
+
+        $items = [];
+        foreach ($returnResult as $value) {
+            $items[] = $value;
+        }
+
+        return $items;
     }
 
     public function navigationSuggest(array $suggest, int $page, int $limit): array
