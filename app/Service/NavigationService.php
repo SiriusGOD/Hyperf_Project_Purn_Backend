@@ -69,13 +69,9 @@ class NavigationService extends GenerateService
         $returnResult = [];
         switch ($navId) {
             case 1:
-                $ids = $this->getIds($videos);
-                $clicks = $this->calculateNavigationPopularClick(Video::class, $ids);
-                $videos = $this->sortClickAndModels($clicks, $videos);
-                $ids = $this->getIds($imageGroups);
-                $clicks = $this->calculateNavigationPopularClick(ImageGroup::class, $ids);
-                $imageGroups = $this->sortClickAndModels($clicks, $videos);
                 $returnResult = array_merge($imageGroups, $videos);
+                $collect = \Hyperf\Collection\collect($returnResult);
+                $returnResult = $collect->sortByDesc('total_click');
                 break;
             default:
                 $result = array_merge($imageGroups, $videos);
@@ -232,9 +228,15 @@ class NavigationService extends GenerateService
         $models = $this->imageGroupService->getImageGroups(null, $page, $otherLimit)->toArray();
 
         $result = array_merge($suggestModels, $models);
-        $ids = $this->getIds($result);
-        $clicks = $this->calculateNavigationPopularClick(Image::class, $ids);
-        return $this->sortClickAndModels($clicks, $result);
+        $collect = \Hyperf\Collection\collect($result);
+        $arr = $collect->sortByDesc('total_click');
+
+        $returnResult = [];
+        foreach ($arr as $value) {
+            $returnResult[] = $value;
+        }
+
+        return $returnResult;
     }
 
     protected function navigationPopularVideos(array $suggest, int $page, int $limit): array
@@ -250,9 +252,17 @@ class NavigationService extends GenerateService
         $models = $this->videoService->getVideos(null, $page, 9, $otherLimit)->toArray();
 
         $result = array_merge($suggestModels, $models);
-        $ids = $this->getIds($result);
-        $clicks = $this->calculateNavigationPopularClick(Video::class, $ids);
-        return $this->sortClickAndModels($clicks, $result);
+
+        $collect = \Hyperf\Collection\collect($result);
+        $arr = $collect->sortByDesc('total_click');
+
+        $returnResult = [];
+        foreach ($arr as $value) {
+            $returnResult[] = $value;
+        }
+
+        return $returnResult;
+
     }
 
     protected function calculateNavigationPopularClick(string $type, array $ids): array
