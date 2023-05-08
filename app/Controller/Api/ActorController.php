@@ -75,15 +75,15 @@ class ActorController extends AbstractController
         return $this->success(['models' => $result]);
     }
 
-    #[RequestMapping(methods: ['POST'], path: 'isExist')]
-    public function isExist(RequestInterface $request, ActorService $service)
+    #[RequestMapping(methods: ['POST'], path: 'isFollow')]
+    public function isFollow(RequestInterface $request, ActorService $service)
     {
         $memberId = auth()->user()->getId();
         $id = $request->input('actor_id', 0);
-        $exist = $service->isExist($memberId, $id);
+        $exist = $service->isFollow($memberId, $id);
 
         return $this->success([
-            'is_exist' => $exist,
+            'is_follow' => $exist,
         ]);
     }
 }

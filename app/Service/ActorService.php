@@ -241,7 +241,7 @@ class ActorService
     }
 
     // 判斷演員是否有追蹤
-    public function isExist($memberId, $id)
+    public function isFollow($memberId, $id)
     {
         $redisKey = self::CACHE_KEY.':isExist:'.$memberId;
         if ($this->redis->exists($redisKey)) {
