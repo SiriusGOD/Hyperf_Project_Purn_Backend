@@ -132,7 +132,7 @@ class OrderService
         ];
         switch ($arr['pay_method']) {
             case 'cash':
-                $data['order']['currency'] = Order::PAY_CURRENCY['cny'];
+                $data['order']['currency'] = $product['currency'];
                 $data['order']['total_price'] = $product['selling_price'] ?? 0;
                 break;
             case 'coin':
