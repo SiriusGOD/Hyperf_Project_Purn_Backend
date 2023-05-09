@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace HyperfTest\Cases;
 
 use App\Model\Member;
-use App\Model\Actor;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
 use App\Service\MemberService;
@@ -20,7 +19,7 @@ use App\Service\MemberService;
  * @internal
  * @coversNothing
  */
-class MemberFollowerApiTest extends HttpTestCase
+class MemberFollowTest extends HttpTestCase
 {
    /**
    * @var Client
@@ -43,9 +42,10 @@ class MemberFollowerApiTest extends HttpTestCase
       $user = Member::where('id',$memberId)->first();
       $token = auth()->login($user);
       make(MemberService::class)->saveToken($user->id, $token);
-      $data = $this->client->post('/api/member/addMemberIdsFollow', [
-          'ids' => [1,2,3,4,5,6,15],
-          'type' => "actor",
+      $data = $this->client->post('/api/member/getFollowList', [
+          'limit' => 4,
+          'page' => 0,
+          'type' => 'actor',
       ], [
           'Authorization' => 'Bearer ' . $token,
       ]);

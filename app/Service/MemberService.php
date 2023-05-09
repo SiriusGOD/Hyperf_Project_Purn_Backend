@@ -403,15 +403,17 @@ class MemberService extends BaseService
 
         return $user;
     }
-
-    public function getMemberFollowList($user_id, $follow_type = '')
+    //使用者追蹤清單
+    public function getMemberFollowList($user_id, $follow_type = '',int $page ,int $limit)
     {
         if (empty($follow_type)) {
             $type_arr = MemberFollow::TYPE_LIST;
         } else {
             $type_arr = [$follow_type];
         }
-
+        if($page == 1 ){
+          $page=0;
+        }
         foreach ($type_arr as $key => $value) {
             // image video tag略過 有需要再開啟
             if ($value == 'image' || $value == 'video' || $value == 'tag') {
@@ -447,17 +449,22 @@ class MemberService extends BaseService
                     # code...
                     break;
             }
-            $query = $query->where('member_follows.member_id', '=', $user_id)->whereNull('member_follows.deleted_at')->get()->toArray();
+
+            $query = $query->where('member_follows.member_id', '=', $user_id)
+                      ->whereNull('member_follows.deleted_at')
+                      ->offset($limit*$page)
+                      ->limit($limit)
+                      ->get()
+                      ->toArray();
             
             if($value == 'actor'){
-            foreach ($query as $key2 => $value2) {
-                // avatar加上網域
-                if(!empty($value2['avatar']))$query[$key2]['avatar'] = env('IMG_DOMAIN').$value2['avatar'];
-
-                // 查詢作品數
-                $numberOfWorks = ActorCorrespond::where('actor_id', $value2['id'])->count();
-                $query[$key2]['numberOfWorks'] = $numberOfWorks;
-            }
+              foreach ($query as $key2 => $value2) {
+                  // avatar加上網域
+                  if(!empty($value2['avatar']))$query[$key2]['avatar'] = env('IMG_DOMAIN').$value2['avatar'];
+                  // 查詢作品數
+                  $numberOfWorks = ActorCorrespond::where('actor_id', $value2['id'])->count();
+                  $query[$key2]['numberOfWorks'] = $numberOfWorks;
+              }
             }
             $result[$value] = $query;
         }
