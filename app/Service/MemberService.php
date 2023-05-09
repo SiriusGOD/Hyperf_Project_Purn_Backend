@@ -77,7 +77,7 @@ class MemberService extends BaseService
             ];
         }
         $key = self::LOGIN_LIMIT_CACHE_KEY . $deviceId;
-        if ($this->redis->exists($key) and $this->redis->get($key) >= 3) {
+        if ($this->redis->exists($key) and $this->redis->get($key) >= ((int)env('LOGIN_LIMIT')) ) {
           return [
                 'code' => 405,
                 'msg' => trans('validation.try_limit'),
