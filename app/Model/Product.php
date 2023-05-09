@@ -49,12 +49,13 @@ class Product extends Model
         'points' => Coin::class,
     ];
 
-    public const CURRENCY = ['CNY', 'COIN', 'DIAMOND'];
+    public const CURRENCY = ['CNY', 'COIN', 'DIAMOND', 'TWD'];
 
     public const CURRENCY_NAME = [
         'CNY' => '人民幣',
         'COIN' => '現金點數',
         'DIAMOND' => '鑽石點數',
+        'TWD' => '台幣'
     ];
 
     // 套圖 影片預設鑽石價錢

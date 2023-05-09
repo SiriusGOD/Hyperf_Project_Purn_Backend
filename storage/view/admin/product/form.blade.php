@@ -29,6 +29,9 @@
                                             <option value="{{\App\Model\Product::CURRENCY[0]}}" {{($model->currency ?? '') == \App\Model\Product::CURRENCY[0] ? 'selected' : ''}}>
                                                 {{\App\Model\Product::CURRENCY_NAME['CNY']}}
                                             </option>
+                                            <option value="{{\App\Model\Product::CURRENCY[3]}}" {{($model->currency ?? '') == \App\Model\Product::CURRENCY[3] ? 'selected' : ''}}>
+                                                {{\App\Model\Product::CURRENCY_NAME['TWD']}}
+                                            </option>
                                         @elseif($currency == \App\Model\Product::CURRENCY[1])
                                             <option value="{{\App\Model\Product::CURRENCY[1]}}" {{($model->currency ?? '') == \App\Model\Product::CURRENCY[1] ? 'selected' : ''}}>
                                                 {{\App\Model\Product::CURRENCY_NAME['COIN']}}

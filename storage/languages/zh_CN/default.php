@@ -453,7 +453,8 @@ return [
         ],
         'product_currency_msg' => [
             'CNY' => '人民币',
-            'COIN' => '现金点数'
+            'COIN' => '现金点数',
+            'TWD' => '台币'
         ],
         'product_origin_type' => [
             0 => '免费',

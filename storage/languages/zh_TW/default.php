@@ -453,7 +453,8 @@ return [
         ],
         'product_currency_msg' => [
             'CNY' => '人民幣',
-            'COIN' => '現金點數'
+            'COIN' => '現金點數',
+            'TWD' => '台幣'
         ],
         'product_origin_type' => [
             0 => '免費',
