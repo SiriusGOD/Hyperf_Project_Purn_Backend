@@ -336,12 +336,13 @@ class MemberController extends AbstractController
         if (! empty($model)) {
             $model->deleted_at = Carbon::now();
             $model->save();
+            // 刪除快取
+            $service->delFrontCache();
+
+            // 更新會員追蹤演員快取
+            $service->updateMemberFollowCache($userId);
             return $this->success();
         }
-
-        // 刪除快取
-        $service->delFrontCache();
-
         return $this->error('查無該會員追蹤資料', ErrorCode::BAD_REQUEST);
     }
     //追蹤清單

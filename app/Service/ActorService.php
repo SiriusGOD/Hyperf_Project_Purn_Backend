@@ -247,7 +247,7 @@ class ActorService
         if ($this->redis->exists($redisKey)) {
             $arr = json_decode($this->redis->get($redisKey), true);
         }else{
-            $follows = MemberFollow::where('member_id', $memberId)->where('correspond_type', Actor::class)->select('correspond_id')->get()->toArray();
+            $follows = MemberFollow::where('member_id', $memberId)->where('correspond_type', Actor::class)->whereNull('deleted_at')->select('correspond_id')->get()->toArray();
             if(empty($follows)) return 0;
 
             $arr = [];
@@ -272,7 +272,7 @@ class ActorService
     public function updateIsExistCache($memberId): void
     {
         $redisKey = self::CACHE_KEY.':isExist:'.$memberId;
-        $follows = MemberFollow::where('member_id', $memberId)->where('correspond_type', Actor::class)->select('correspond_id')->get()->toArray();
+        $follows = MemberFollow::where('member_id', $memberId)->where('correspond_type', Actor::class)->whereNull('deleted_at')->select('correspond_id')->get()->toArray();
 
         $arr = [];
         foreach ($follows as $key => $value) {
