@@ -22,7 +22,6 @@ class ImageHeightWidthSeed implements BaseInterface
                 ->offset($page * $limit)
                 ->limit($limit)
                 ->get();
-            var_dump($models->count());
 
             if ($models->isEmpty()) {
                 $forever = false;

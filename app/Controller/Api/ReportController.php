@@ -12,22 +12,22 @@ use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Controller\AbstractController;
 
 #[Controller]
-class ActionController extends AbstractController
+#[Middleware(ApiAuthMiddleware::class)]
+class ReportController extends AbstractController
 {
-    #[RequestMapping(methods: ['POST'], path: 'getReportItem')]
-    public function getReportItem(RequestInterface $request)
+    #[RequestMapping(methods: ['POST'], path: 'list')]
+    public function list(RequestInterface $request)
     {
-        $data = ['播放卡頓','我認為不該出現在這','內容血腥','內容噁心','長得太醜'];
+        $data = trans('report.details');
         return $this->success(['models' => $data]);
     }
 
-    #[Middleware(ApiAuthMiddleware::class)]
-    #[RequestMapping(methods: ['POST'], path: 'report')]
-    public function report(RequestInterface $request)
+    #[RequestMapping(methods: ['POST'], path: 'create')]
+    public function create(RequestInterface $request)
     {
         $userId = auth('jwt')->user()->getId();
         $id = (int) $request->input('id', 0);
-        $desc = $request->input('desc', 0);
+        $desc = $request->input('desc', "");
         return $this->success();
     }
 }
