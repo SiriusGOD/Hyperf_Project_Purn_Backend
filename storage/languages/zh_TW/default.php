@@ -158,7 +158,12 @@ return [
         'hot_order' => '大家都在看排序',
         'hot_order_desc' => '0 不排序，越小越前面',
     ],
-
+    'withdraw'=>[
+      'title'=>'提現列表',
+      'pass'=>'審核通過',
+      'cancel'=>'取消申請',
+      'money'=>'提現金額'
+    ],
     'user-step'=>[
       'index' => '列表',
       'username' => '管理者',
@@ -215,6 +220,7 @@ return [
     ],
     // left box
     'leftbox' => [
+        'withdraw' =>'提現管理',
         'tittle' => '入口網站後台控制',
         'manager' => '使用者管理',
         'role' => '角色管理',
