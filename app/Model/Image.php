@@ -14,18 +14,22 @@ namespace App\Model;
 use Hyperf\Database\Model\SoftDeletes;
 
 /**
- * @property int $id
- * @property int $user_id
- * @property string $title
- * @property string $thumbnail
- * @property string $url
- * @property string $description
- * @property int $group_id
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property string $deleted_at
- * @property int $sync_id
- * @property User $user
+ * @property int $id 
+ * @property int $user_id 
+ * @property string $title 
+ * @property string $thumbnail 
+ * @property string $url 
+ * @property string $description 
+ * @property int $group_id 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property string $deleted_at 
+ * @property int $sync_id 
+ * @property int $thumbnail_height 
+ * @property int $thumbnail_weight 
+ * @property int $height 
+ * @property int $weight 
+ * @property-read User $user 
  */
 class Image extends Model
 {
@@ -48,7 +52,7 @@ class Image extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'group_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'sync_id' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'group_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'sync_id' => 'integer', 'thumbnail_height' => 'integer', 'thumbnail_weight' => 'integer', 'height' => 'integer', 'weight' => 'integer'];
 
     public function user()
     {

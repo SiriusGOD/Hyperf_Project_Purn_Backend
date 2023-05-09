@@ -146,6 +146,7 @@ class ImageGroupSyncTask
 
     protected function createImage(array $image, int $imageGroupId): void
     {
+
         $model = new Image();
         $model->user_id = self::ADMIN_ID;
         $model->title = '';
@@ -154,6 +155,12 @@ class ImageGroupSyncTask
         $model->description = '';
         $model->group_id = $imageGroupId;
         $model->sync_id = $image['id'];
+        $url = env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live');
+        $imageInfo = getimagesize($url . $model->url);
+        $model->thumbnail_height = $imageInfo[1] ?? 0;
+        $model->thumbnail_weight = $imageInfo[0] ?? 0;
+        $model->height = $imageInfo[1] ?? 0;
+        $model->weight = $imageInfo[0] ?? 0;
         $model->save();
     }
 }
