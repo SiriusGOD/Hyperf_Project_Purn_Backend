@@ -45,6 +45,9 @@ class IpLocationMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        if(env("APP_ENV")=="local"){
+          return $handler->handle($request);
+        }
         $ip = $this->getIP($request->getServerParams());
         $content = $this->redis->get(self::CACHE_KEY);
         if (empty($content)) {
