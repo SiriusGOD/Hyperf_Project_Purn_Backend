@@ -49,11 +49,7 @@ class IpLocationMiddleware implements MiddlewareInterface
           return $handler->handle($request);
         }
         $ip = $this->getIP($request->getServerParams());
-        $content = $this->redis->get(self::CACHE_KEY);
-        if (empty($content)) {
-            $content = \XdbSearcher::loadContentFromFile(BASE_PATH . '/vendor/zoujingli/ip2region/ip2region.xdb');
-            $this->redis->set(self::CACHE_KEY, $content);
-        }
+        $content = \XdbSearcher::loadContentFromFile(BASE_PATH . '/vendor/zoujingli/ip2region/ip2region.xdb');
 
         $searcher = \XdbSearcher::newWithBuffer($content);
 

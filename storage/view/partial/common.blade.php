@@ -95,6 +95,17 @@
                     </li>
                 @endif
 
+               @if(authPermission('withdraw-index'))
+                    <li class="nav-item">
+                        <a href="/admin/withdraw/index" class="nav-link {{$withdraw_active ?? ''}}">
+                            <i class="nav-icon far fa-id-card"></i>
+                            <p>
+                            {{trans('default.leftbox.withdraw') ?? '提現管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
+
                @if(authPermission('proxy-index'))
                     <li class="nav-item">
                         <a href="/admin/proxy/index" class="nav-link {{$proxy_active ?? ''}}">

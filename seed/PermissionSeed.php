@@ -47,6 +47,13 @@ class PermissionSeed implements BaseInterface
                 'advertisement-expire',
                 'advertisement-store',
             ],
+            #現提 
+            'withdraw' => [
+                'withdraw-index',
+                'withdraw-detail',
+                'withdraw-pass',
+                'withdraw-cancel',
+            ],
         ];
 
         foreach ($permissions as $main => $permission) {

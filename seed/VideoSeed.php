@@ -59,9 +59,10 @@ class VideoSeed implements BaseInterface
             'is_top'           => 0,
             'count_pay'        => 0,
             'club_id'          => 0,
+            'cover_full'       => '/upload/xiao/20230425/2023042516462562832.jpg'
         ];
 
-        for($i=1 ; $i<=100 ; $i++){
+        for($i=1 ; $i<=36 ; $i++){
             $insertData['tags'] = $rand->getRandTagActor(5,"TAG");
             $insertData['actors'] = $rand->getRandTagActor(5,"ACTOR");
             $insertData['title'] = $rand->getRandTitle();
