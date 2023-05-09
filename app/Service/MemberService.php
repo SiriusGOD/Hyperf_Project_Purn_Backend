@@ -40,11 +40,9 @@ class MemberService extends BaseService
     public const DEVICE_CACHE_KEY = 'member:device:';
 
     public const EXPIRE_VERIFICATION_MINUTE = 10;
-
+    public const LOGIN_LIMIT_CACHE_KEY = 'login_limit:';
     public const DAY = 86400;
-
     protected Redis $redis;
-
     protected $memberInviteLogService;
 
     protected \Psr\Log\LoggerInterface $logger;
@@ -68,6 +66,24 @@ class MemberService extends BaseService
         }
 
         return $user;
+    }
+    //登入次數限制上限三次
+    public function loginLimit($deviceId)
+    {
+        if (empty($deviceId)) {
+          return [
+                'code' => 403,
+                'msg' => trans('validation.required', ['attribute' => 'device_id']),
+            ];
+        }
+        $key = self::LOGIN_LIMIT_CACHE_KEY . $deviceId;
+        if ($this->redis->exists($key) and $this->redis->get($key) >= 3) {
+          return [
+                'code' => 405,
+                'msg' => trans('validation.try_limit'),
+            ];
+        }
+        return false;
     }
 
     public function checkPassword($plain, $hash): bool
@@ -491,10 +507,10 @@ class MemberService extends BaseService
         $tomorrow = Carbon::tomorrow()->setHour(0)->setMinute(0)->setSecond(0)->timestamp;
         $expire = $tomorrow - $now;
 
-        if ($this->redis->exists(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $deviceId)) {
-            $this->redis->incr(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $deviceId);
+        if ($this->redis->exists(self::LOGIN_LIMIT_CACHE_KEY . $deviceId)) {
+            $this->redis->incr(self::LOGIN_LIMIT_CACHE_KEY . $deviceId);
         } else {
-            $this->redis->set(LoginLimitMiddleware::LOGIN_LIMIT_CACHE_KEY . $deviceId, 1, $expire);
+            $this->redis->set(self::LOGIN_LIMIT_CACHE_KEY . $deviceId, 1, $expire);
         }
     }
 

@@ -99,7 +99,11 @@ class MemberController extends AbstractController
             'device' => $request->input('device'),
             'last_ip' => $ip,
         ]);
-
+        //登入資數限制
+        $loginLimitRes = $service->loginLimit($request->input('device_id'));
+        if(is_array($loginLimitRes)){
+            return $this->response->json($loginLimitRes);
+        }
         $service->createOrUpdateLoginLimitRedisKey($request->input('device_id'));
 
         $service->saveToken($user->id, $token);
