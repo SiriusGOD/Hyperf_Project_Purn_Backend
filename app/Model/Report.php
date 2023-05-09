@@ -20,6 +20,23 @@ namespace App\Model;
  */
 class Report extends Model
 {
+
+    public const TYPE = [
+        'hide' => 1,
+        'report' => 2,
+    ];
+
+    public const STATUS = [
+        'new' => 0,
+        'pass' => 1,
+        'no_pass' => 2,
+    ];
+
+    public const MODEL_TYPE = [
+        'image_group'=> ImageGroup::class,
+        'video' => Video::class,
+    ];
+
     /**
      * The table associated with the model.
      */

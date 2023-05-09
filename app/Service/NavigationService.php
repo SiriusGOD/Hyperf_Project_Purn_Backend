@@ -11,7 +11,6 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use App\Model\Image;
 use App\Model\ImageGroup;
 use App\Model\Navigation;
 use App\Model\Video;
@@ -66,7 +65,6 @@ class NavigationService extends GenerateService
         $videoLimit = $limit - $imageLimit;
         $videos = $this->navigationDetailVideos($suggest, $navId, $tagIds, $page, $videoLimit);
 
-        $returnResult = [];
         switch ($navId) {
             case 1:
                 $returnResult = array_merge($imageGroups, $videos);
@@ -78,7 +76,7 @@ class NavigationService extends GenerateService
                 $collect = \Hyperf\Collection\collect($result);
                 $collect = $collect->sortByDesc('created_at');
 
-                $returnResult =  $collect->toArray();
+                $returnResult = $collect->toArray();
         }
 
         $items = [];
@@ -160,15 +158,23 @@ class NavigationService extends GenerateService
         $otherLimit = 0;
         $percent = self::DETAIL_PERCENTS[$navId];
         $typeLimit = (int) floor($percent[1] * $limit);
+        $hideIds = ReportService::getHideIds(ImageGroup::class);
 
         $imageGroupIds = $this->tagService->getTypeIdsByTagIds($tagIds, ImageGroup::class, $page, $typeLimit);
-        $imageGroups = ImageGroup::with([
+        $query = ImageGroup::with([
             'tags', 'imagesLimit',
         ])
             ->whereIn('id', $imageGroupIds)
+            ->whereNotIn('id', $hideIds)
             ->where('height', '>', 0)
             ->offset($limit * $page)
-            ->limit($limit)
+            ->limit($limit);
+
+        if (! empty($hideIds)) {
+            $query = $query->whereNotIn('id', $hideIds);
+        }
+
+        $imageGroups = $query
             ->get()
             ->toArray();
 
@@ -190,16 +196,22 @@ class NavigationService extends GenerateService
         $otherLimit = 0;
         $percent = self::DETAIL_PERCENTS[$navId];
         $typeLimit = (int) floor($percent[1] * $limit);
+        $hideIds = ReportService::getHideIds(Video::class);
 
         $ids = $this->tagService->getTypeIdsByTagIds($tagIds, Video::class, $page, $typeLimit);
-        $videos = Video::with([
+        $query = Video::with([
             'tags',
         ])
             ->whereIn('id', $ids)
             ->offset($limit * $page)
             ->limit($limit)
-            ->where('cover_height', '>', 0)
-            ->get()
+            ->where('cover_height', '>', 0);
+
+        if (! empty($hideIds)) {
+            $query = $query->whereNotIn('id', $hideIds);
+        }
+
+        $videos = $query->get()
             ->toArray();
 
         $userLimit = $limit - count($videos);
@@ -262,7 +274,6 @@ class NavigationService extends GenerateService
         }
 
         return $returnResult;
-
     }
 
     protected function calculateNavigationPopularClick(string $type, array $ids): array
