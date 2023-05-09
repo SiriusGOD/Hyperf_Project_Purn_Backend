@@ -197,8 +197,6 @@ class ProductService
             return json_decode($jsonResult, true);
         }
 
-        $now = Carbon::now()->toDateTimeString();
-
         $products = MemberLevel::join('products', function ($join) {
                     $join->on('member_levels.id', '=', 'products.correspond_id')
                         ->where('products.type', Product::TYPE_CORRESPOND_LIST['member'])

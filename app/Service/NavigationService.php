@@ -11,7 +11,6 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use App\Model\Image;
 use App\Model\ImageGroup;
 use App\Model\Navigation;
 use App\Model\Video;
@@ -65,20 +64,19 @@ class NavigationService extends GenerateService
         $imageGroups = $this->navigationDetailImageGroups($suggest, $navId, $tagIds, $page, $imageLimit);
         $videoLimit = $limit - $imageLimit;
         $videos = $this->navigationDetailVideos($suggest, $navId, $tagIds, $page, $videoLimit);
+        $returnResult = $this->generateImageGroups([], $imageGroups);
+        $returnResult = $this->generateVideos($returnResult, $videos);
 
-        $returnResult = [];
         switch ($navId) {
             case 1:
-                $returnResult = array_merge($imageGroups, $videos);
                 $collect = \Hyperf\Collection\collect($returnResult);
                 $returnResult = $collect->sortByDesc('total_click');
                 break;
             default:
-                $result = array_merge($imageGroups, $videos);
-                $collect = \Hyperf\Collection\collect($result);
+                $collect = \Hyperf\Collection\collect($returnResult);
                 $collect = $collect->sortByDesc('created_at');
 
-                $returnResult =  $collect->toArray();
+                $returnResult = $collect->toArray();
         }
 
         $items = [];
@@ -262,7 +260,6 @@ class NavigationService extends GenerateService
         }
 
         return $returnResult;
-
     }
 
     protected function calculateNavigationPopularClick(string $type, array $ids): array

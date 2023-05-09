@@ -45,7 +45,7 @@ class Product extends Model
     public const TYPE_CORRESPOND_LIST = [
         'image' => ImageGroup::class,
         'video' => Video::class,
-        'member' => Member::class,
+        'member' => MemberLevel::class,
         'points' => Coin::class,
     ];
 

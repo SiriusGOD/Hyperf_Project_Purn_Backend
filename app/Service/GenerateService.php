@@ -15,6 +15,7 @@ use App\Constants\Constants;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\ImageGroup;
+use App\Model\Video;
 
 class GenerateService
 {
@@ -28,7 +29,7 @@ class GenerateService
                 $result[] = $imageGroup;
                 continue;
             }
-            $imageGroup['actors'] = $this->getActors('image_group', $imageGroup['id']);
+            $imageGroup['actors'] = $this->getActors(ImageGroup::class, $imageGroup['id']);
             foreach ($imageGroup['images_limit'] as $key => $image) {
                 $imageGroup['images_limit'][$key]['thumbnail'] = $url . $imageGroup['images_limit'][$key]['thumbnail'];
                 $imageGroup['images_limit'][$key]['url'] = $url . $imageGroup['images_limit'][$key]['url'];
@@ -73,7 +74,7 @@ class GenerateService
             $video['full_m3u8'] = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $video['full_m3u8'];
             $video['m3u8'] = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $video['m3u8'];
             $video['source'] = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $video['source'];
-            $video['actors'] = $this->getActors('video', $video['id']);
+            $video['actors'] = $this->getActors(Video::class, $video['id']);
             unset($video['coins']);
 
             $result[] = $video;
