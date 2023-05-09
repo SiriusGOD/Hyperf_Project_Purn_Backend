@@ -17,7 +17,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-
+use Hyperf\Logger\LoggerFactory;
+use App\Util\CRYPT;
 class ApiEncryptMiddleware implements MiddlewareInterface
 {
     /**
@@ -25,35 +26,29 @@ class ApiEncryptMiddleware implements MiddlewareInterface
      */
     protected $container;
     protected $response;
-
-    public function __construct(ContainerInterface $container, HttpResponse $response)
+    protected $encrypt;
+    protected $logger;
+    public function __construct(LoggerFactory $logger,ContainerInterface $container, HttpResponse $response)
     {
         $this->container = $container;
         $this->response = $response;
+        $this->logger = $logger;
+        $this->encrypt = env('PARAMS_ENCRYPT_FLAG');
     }
     
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $key = env("APP_KEY");
-        $signKey = env("SIGN_KEY");
-        $attrs = $request->getAttribute('Hyperf\HttpServer\Router\Dispatched');
         $parsedBody = $request->getParsedBody();
-        $header = $request->getHeaders();
-        $signature = isset($header["headers"]["X-HMAC-Signature"]) ? $header["headers"]["X-HMAC-Signature"] : false;
-        if ($signature) {
-            // 對加密後的資料進行解密
-            $decryptedData = openssl_decrypt(base64_decode($parsedBody['data']), 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
-            // 重新計算簽名
-            $expectedSignature = hash_hmac('sha256', base64_decode($parsedBody['data']), $signKey);
-            $service = di(\App\Service\EncryptService::class);
-            if ($service->hasPermission($attrs->handler->callback, 
-                $parsedBody, 
-                $signature, 
-                $expectedSignature, 
-                $decryptedData )) 
-            {
-                return $handler->handle($request);
-            }
-        }
+        $logger = $this->logger->get('test');
+        if($this->encrypt){
+            $attrs = $request->getAttribute('Hyperf\HttpServer\Router\Dispatched');
+            $data = CRYPT::decrypt($parsedBody['data']);
+            $request = $request->withAttribute('data',json_decode($data,true)); // 將解密後的數據存儲到請求對象中
+            $logger->info('parse_data : '.json_encode($data));
+            $logger->info('attrs:'.json_encode($attrs));
+        }else{
+            $request = $request->withAttribute('data',$parsedBody ); // 將解密後的數據存儲到請求對象中
+        } 
+        return $handler->handle($request);
     }
 }
