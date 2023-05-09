@@ -13,6 +13,7 @@ namespace App\Service;
 
 use App\Model\CustomerService;
 use App\Model\CustomerServiceDetail;
+use App\Util\General;
 
 class CustomerServiceService
 {
@@ -36,17 +37,9 @@ class CustomerServiceService
         $model->member_id = $params['member_id'];
         $model->type = $params['type'];
         $model->title = $params['title'];
-        $model->is_unread = 0;
         $model->save();
 
         return $model;
-    }
-
-    public function setMainUnRead(int $id): void
-    {
-        $model = CustomerService::find($id);
-        $model->is_unread = 1;
-        $model->save();
     }
 
     public function setAdminDetailRead(int $id): void
@@ -65,5 +58,26 @@ class CustomerServiceService
             ->update([
                 'is_read' => 1,
             ]);
+    }
+
+    public function list(int $memberId, int $page, int $limit, string $url) : array
+    {
+        $models = CustomerService::where('member_id', $memberId)
+            ->with('customerServiceCovers')
+            ->offset($page * $limit)
+            ->limit($limit)
+            ->orderByDesc('id')
+            ->get()
+            ->toArray();
+
+        $result = [];
+        foreach ($models as $model) {
+            foreach ($model['customer_service_covers'] as $key => $row) {
+                $model['customer_service_covers'][$key]['url'] = $url . $row['url'];
+            }
+            $result[] = $model;
+        }
+
+        return $result;
     }
 }

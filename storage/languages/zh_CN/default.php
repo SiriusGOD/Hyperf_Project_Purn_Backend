@@ -115,7 +115,8 @@ return [
     'type' => "类型",
     'preview' => "预览",
     'click_num' => "点击次数",
-    'default_categorization_name' => '所有分类',
+    'default_categorization_name' => '未整理分类',
+    'default_all_categorization_name' => '所有分类',
     // -------------------------------------------------------------------
     // video
     'video' => [

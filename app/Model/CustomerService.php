@@ -12,15 +12,14 @@ declare(strict_types=1);
 namespace App\Model;
 
 /**
- * @property int $id
- * @property int $member_id
- * @property int $type
- * @property string $title
- * @property int $is_unread
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property CustomerServiceDetail[]|\Hyperf\Database\Model\Collection $details
- * @property Member $member
+ * @property int $id 
+ * @property int $member_id 
+ * @property int $type 
+ * @property string $title 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property-read \Hyperf\Database\Model\Collection|CustomerServiceDetail[] $details 
+ * @property-read Member $member 
  */
 class CustomerService extends Model
 {
@@ -43,7 +42,9 @@ class CustomerService extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'type' => 'integer', 'is_unread' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'type' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    protected array $appends = ['detail_count'];
 
     public function details()
     {
@@ -58,5 +59,15 @@ class CustomerService extends Model
     public function lastUpdatedAt()
     {
         return $this->details()->orderByDesc('id')->first()->updated_at;
+    }
+
+    public function getDetailCountAttribute()
+    {
+        return $this->details()->where('is_read', 0)->count();
+    }
+
+    public function customerServiceCovers()
+    {
+        return $this->hasMany(CustomerServiceCover::class);
     }
 }
