@@ -180,7 +180,7 @@ class MemberCategorizationService extends GenerateService
             'id' => 0,
             'member_id' => $memberId,
             'name' => trans('default.default_all_categorization_name'),
-            'is_default' => 1,
+            'is_default' => 0,
             'is_first' => 1,
             'created_at' => Carbon::now()->toDateTimeString(),
             'updated_at' => Carbon::now()->toDateTimeString(),
