@@ -9,12 +9,6 @@ class General
         // 取得網址前綴
         $urlArr = parse_url($url);
         $port = $urlArr['port'] ?? '80';
-        if (! empty(env('TEST_IMG_URL'))) {
-            $host = env('TEST_IMG_URL');
-        } else {
-            $host = $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $port;
-        }
-
-        return $host;
+        return $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $port;
     }
 }

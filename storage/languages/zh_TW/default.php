@@ -115,7 +115,8 @@ return [
     'type' => "類型",
     'preview' => "預覽",
     'click_num' => "點擊次數",
-    'default_categorization_name' => '所有分類',
+    'default_categorization_name' => '未整理分類',
+    'default_all_categorization_name' => '所有分類',
     // -------------------------------------------------------------------
     // video
     'video' => [

@@ -103,11 +103,12 @@ class MemberCategorizationController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'list')]
-    public function list(RequestInterface $request)
+    public function list(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
         $page = $request->input('page', 0);
         $limit = $request->input('limit', Constants::DEFAULT_PAGE_PER);
+        $isMain = $request->input('is_main', 0);
         $models = MemberCategorization::where('member_id', $memberId)
             ->orderByDesc('is_default')
             ->orderBy('hot_order')
@@ -116,8 +117,14 @@ class MemberCategorizationController extends AbstractController
             ->get()
             ->toArray();
 
+        $result = $models;
+
+        if ($isMain) {
+            $result = $service->isMain($memberId, $models);
+        }
+
         $data = [
-            'models' => $models,
+            'models' => $result,
         ];
 
         $path = '/api/member_categorization/list';

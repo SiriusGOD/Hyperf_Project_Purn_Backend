@@ -16,6 +16,7 @@ use App\Model\ImageGroup;
 use App\Model\MemberCategorization;
 use App\Model\MemberCategorizationDetail;
 use App\Model\Video;
+use Carbon\Carbon;
 
 class MemberCategorizationService extends GenerateService
 {
@@ -171,5 +172,59 @@ class MemberCategorizationService extends GenerateService
         }
 
         return $this->generateImageGroups($data, $result);
+    }
+
+    public function getDefault(int $memberId) : array
+    {
+        $default = [
+            'id' => 0,
+            'member_id' => $memberId,
+            'name' => trans('default.default_all_categorization_name'),
+            'is_default' => 1,
+            'is_first' => 1,
+            'created_at' => Carbon::now()->toDateTimeString(),
+            'updated_at' => Carbon::now()->toDateTimeString(),
+            'member_categorization_details' => [],
+        ];
+        $ids = MemberCategorization::where('member_id', $memberId)->get()->pluck('id')->toArray();
+        if(empty($ids)) {
+            return $default;
+        }
+
+        $models = MemberCategorizationDetail::whereIn('member_categorization_id', $ids)->orderByDesc('id')->get()->toArray();
+        $result = [];
+        $result = $this->getVideoDetail($models, $result);
+
+        $collect = \Hyperf\Collection\collect($this->getImageGroupsDetail($models, $result));
+        $rows = $collect->sortByDesc('created_time')->toArray();
+
+        $result = [];
+
+        foreach ($rows as $row) {
+            $result[] = $row;
+        }
+        $default['member_categorization_details'] = $result;
+
+        return $default;
+    }
+
+    public function IsMain(int $memberId, array $models) : array
+    {
+        $result = [];
+        foreach ($models as $model) {
+            $model['member_categorization_details'] = $this->getDetails([
+                'id' => $model['id'],
+                'page' => 0,
+                'limit' => 5,
+                'sort_by' => 'created_time',
+                'is_asc' => 2,
+            ]);
+
+            $result[] = $model;
+        }
+
+        array_unshift($result, $this->getDefault($memberId));
+
+        return $result;
     }
 }

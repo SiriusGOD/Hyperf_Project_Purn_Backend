@@ -14,6 +14,7 @@ namespace App\Controller\Api;
 use App\Controller\AbstractController;
 use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\CustomerService;
+use App\Model\CustomerServiceCover;
 use App\Model\CustomerServiceDetail;
 use App\Request\CustomerServiceApiReplyRequest;
 use App\Request\CustomerServiceCreateRequest;
@@ -36,19 +37,13 @@ use App\Middleware\ApiEncryptMiddleware;
 class CustomerServiceController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'list')]
-    public function list(RequestInterface $request)
+    public function list(RequestInterface $request, CustomerServiceService $service)
     {
         $page = (int) $request->input('page', 0);
         $limit = (int) $request->input('limit', CustomerService::PAGE_PER);
         $memberId = auth()->user()->getId();
-        $models = CustomerService::where('member_id', $memberId)
-            ->offset($page * $limit)
-            ->limit($limit)
-            ->orderByDesc('id')
-            ->get()
-            ->toArray();
         $data = [];
-        $data['models'] = $models;
+        $data['models'] = $service->list($memberId, $page, $limit, General::getImageUrl($request->url()));
         $path = '/api/customer_service/list';
         $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
@@ -84,15 +79,47 @@ class CustomerServiceController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'create')]
-    public function create(RequestInterface $request, CustomerServiceService $service)
+    public function create(RequestInterface $request, CustomerServiceService $service, ImageService $imageService)
     {
         $memberId = auth()->user()->getId();
-        $model = $service->create([
+        $customServiceModel = $service->create([
             'member_id' => $memberId,
             'type' => $request->input('type'),
             'title' => $request->input('title'),
         ]);
-        return $this->success(['id' => $model->id]);
+
+        if ($request->hasFile('cover_one')) {
+            $file = $request->file('cover_one');
+
+            $result = $imageService->moveImageFile($file);
+            $model = new CustomerServiceCover();
+            $model->customer_service_id = $customServiceModel->id;
+            $model->url = $result['url'];
+            $model->save();
+        }
+
+        if ($request->hasFile('cover_two')) {
+            $file = $request->file('cover_two');
+
+            $result = $imageService->moveImageFile($file);
+            $model = new CustomerServiceCover();
+            $model->customer_service_id = $customServiceModel->id;
+            $model->url = $result['url'];
+            $model->save();
+        }
+
+        if ($request->hasFile('cover_three')) {
+            $file = $request->file('cover_three');
+
+            $result = $imageService->moveImageFile($file);
+            $model = new CustomerServiceCover();
+            $model->customer_service_id = $customServiceModel->id;
+            $model->url = $result['url'];
+            $model->save();
+        }
+
+
+        return $this->success(['id' => $customServiceModel->id]);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'reply')]

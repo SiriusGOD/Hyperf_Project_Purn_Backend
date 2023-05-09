@@ -32,4 +32,9 @@ class MemberCategorization extends Model
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'hot_order' => 'integer', 'is_default' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'is_first' => 'integer'];
+
+    public function memberCategorizationDetails()
+    {
+        return $this->hasMany(MemberCategorizationDetail::class);
+    }
 }
