@@ -21,12 +21,16 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\ApiEncryptMiddleware;
+
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 class StageVideoController extends AbstractController
 {
     // 編輯儲存影片分類
     #[RequestMapping(methods: ['POST'], path: 'editStageCate')]
-    public function editStageCate(StageVideoRequest $request, StageVideoService $stageVideoService)
+    public function editStageCate(RequestInterface $request, StageVideoService $stageVideoService)
     {
         $userId = auth('jwt')->user()->getId();
         if (! $userId) {

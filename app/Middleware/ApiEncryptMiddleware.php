@@ -17,7 +17,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Hyperf\Logger\LoggerFactory;
 use App\Util\CRYPT;
 class ApiEncryptMiddleware implements MiddlewareInterface
 {
@@ -26,29 +25,19 @@ class ApiEncryptMiddleware implements MiddlewareInterface
      */
     protected $container;
     protected $response;
-    protected $encrypt;
-    protected $logger;
-    public function __construct(LoggerFactory $logger,ContainerInterface $container, HttpResponse $response)
+    public function __construct(ContainerInterface $container, HttpResponse $response)
     {
         $this->container = $container;
         $this->response = $response;
-        $this->logger = $logger;
-        $this->encrypt = env('PARAMS_ENCRYPT_FLAG');
     }
     
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $parsedBody = $request->getParsedBody();
-        $logger = $this->logger->get('test');
-        if($this->encrypt){
-            $attrs = $request->getAttribute('Hyperf\HttpServer\Router\Dispatched');
+        if(env('PARAMS_ENCRYPT_FLAG')){
+            $parsedBody = $request->getParsedBody();
             $data = CRYPT::decrypt($parsedBody['data']);
-            $request = $request->withAttribute('data',json_decode($data,true)); // 將解密後的數據存儲到請求對象中
-            $logger->info('parse_data : '.json_encode($data));
-            $logger->info('attrs:'.json_encode($attrs));
-        }else{
-            $request = $request->withAttribute('data',$parsedBody ); // 將解密後的數據存儲到請求對象中
-        } 
+            $request = $request->withParsedBody(json_decode($data,true)); // 將解密後的數據存儲到請求對象中
+        }
         return $handler->handle($request);
     }
 }

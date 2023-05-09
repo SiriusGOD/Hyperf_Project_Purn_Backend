@@ -23,13 +23,15 @@ use App\Service\ImageService;
 use App\Util\General;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
-use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Qbhy\HyperfAuth\AuthMiddleware;
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 #[Middleware(ApiAuthMiddleware::class)]
 class CustomerServiceController extends AbstractController
 {
@@ -54,7 +56,7 @@ class CustomerServiceController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'detail')]
-    public function detail(CustomerServiceDetailRequest $request)
+    public function detail(RequestInterface $request)
     {
         $page = (int) $request->input('page', 0);
         $limit = (int) $request->input('limit', CustomerService::PAGE_PER);
@@ -82,7 +84,7 @@ class CustomerServiceController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'create')]
-    public function create(CustomerServiceCreateRequest $request, CustomerServiceService $service)
+    public function create(RequestInterface $request, CustomerServiceService $service)
     {
         $memberId = auth()->user()->getId();
         $model = $service->create([
@@ -94,7 +96,7 @@ class CustomerServiceController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'reply')]
-    public function reply(CustomerServiceApiReplyRequest $request, CustomerServiceService $service, ImageService $imageService): PsrResponseInterface
+    public function reply(RequestInterface $request, CustomerServiceService $service, ImageService $imageService): PsrResponseInterface
     {
         $userId = auth()->user()->getId();
         $id = (int) $request->input('id');

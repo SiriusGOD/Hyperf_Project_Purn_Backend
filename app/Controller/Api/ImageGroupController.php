@@ -30,12 +30,16 @@ use App\Service\SuggestService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
+use Hyperf\HttpServer\Annotation\Middleware;
+use Hyperf\HttpServer\Contract\RequestInterface;
+use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 class ImageGroupController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'list')]
-    public function list(ImageApiListRequest $request, ImageGroupService $service, SearchService $searchService)
+    public function list(RequestInterface $request, ImageGroupService $service, SearchService $searchService)
     {
         $tagIds = $request->input('tags');
         $page = (int) $request->input('page', 0);
@@ -50,7 +54,7 @@ class ImageGroupController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'search')]
-    public function search(ImageApiSearchRequest $request, ImageGroupService $service, SearchService $searchService)
+    public function search(RequestInterface $request, ImageGroupService $service, SearchService $searchService)
     {
         $keyword = $request->input('keyword');
         $page = (int) $request->input('page', 0);
@@ -68,7 +72,7 @@ class ImageGroupController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'suggest')]
-    public function suggest(ImageApiSuggestRequest $request, SuggestService $suggestService, ImageGroupService $service, SearchService $searchService)
+    public function suggest(RequestInterface $request, SuggestService $suggestService, ImageGroupService $service, SearchService $searchService)
     {
         $page = (int) $request->input('page', 0);
         $userId = (int) auth()->user()->getId();
@@ -84,7 +88,7 @@ class ImageGroupController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'click')]
-    public function saveClick(ClickRequest $request, ClickService $service)
+    public function saveClick(RequestInterface $request, ClickService $service)
     {
         $id = (int) $request->input('id');
         $service->addClick(ImageGroup::class, $id);
@@ -100,7 +104,7 @@ class ImageGroupController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'like')]
-    public function saveLike(ClickRequest $request, LikeService $service)
+    public function saveLike(RequestInterface $request, LikeService $service)
     {
         $id = (int) $request->input('id');
         $service->addLike(ImageGroup::class, $id);
@@ -108,7 +112,7 @@ class ImageGroupController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'pay_image')]
-    public function getPayImage(GetPayImageRequest $request, ImageGroupService $service, ImageService $imageService, GenerateService $generateService)
+    public function getPayImage(RequestInterface $request, ImageGroupService $service, ImageService $imageService, GenerateService $generateService)
     {
         $id = (int) $request->input('id');
         $memberId = auth()->user()->getId();

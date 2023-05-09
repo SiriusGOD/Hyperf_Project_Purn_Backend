@@ -17,12 +17,16 @@ use App\Request\ActivityRequest;
 use App\Service\BaseService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
+use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 class ActivityController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'create')]
-    public function create(ActivityRequest $request, BaseService $service)
+    public function create(RequestInterface $request, BaseService $service)
     {
         $model = new MemberActivity();
         $model->member_id = auth()->user()->getId();

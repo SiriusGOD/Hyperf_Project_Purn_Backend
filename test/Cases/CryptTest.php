@@ -75,6 +75,7 @@ class CryptTest extends HttpTestCase
           $body = [
               'data' => 'mlRo487bb5LiQTxRZ0wJ+4HvFa+9QQLI3rATKk7hNiMyK7Zf+0qh4npdYHSfawX1D9MbPY/g5JRF7tQYC49aYacWh2tuk4PYQ7/CkSTh/TlC8G8OZx/n/i2AzLfUK03LoPz2OxyYzFOMcJt0WkzW98fsO+gNFFCpV9voxeoCT+8=', // 在 body 中加入加密後的資料（需進行 base64 編碼）
           ];
+          print_r($body);
       } else {
           $body =  json_decode($str,true); 
       }

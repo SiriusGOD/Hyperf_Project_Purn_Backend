@@ -16,15 +16,19 @@ use App\Request\ProductApiRequest;
 use App\Service\ProductService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
+use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 class ProductController extends AbstractController
 {
     /**
      * 獲取上架中的商品列表.
      */
     #[RequestMapping(methods: ['POST'], path: 'list')]
-    public function list(ProductApiRequest $request, ProductService $service)
+    public function list(RequestInterface $request, ProductService $service)
     {
         // member coin diamond
         $type = $request->input('type', 'coin');
@@ -36,7 +40,7 @@ class ProductController extends AbstractController
      * 獲取上架中的商品數.
      */
     #[RequestMapping(methods: ['POST'], path: 'count')]
-    public function count(ProductApiRequest $request, ProductService $service)
+    public function count(RequestInterface $request, ProductService $service)
     {
         $keyword = $request->input('keyword', '');
         $result = $service->getCount($keyword);
