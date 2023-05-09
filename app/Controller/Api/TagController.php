@@ -18,7 +18,11 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\ApiEncryptMiddleware;
+
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 class TagController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'list')]

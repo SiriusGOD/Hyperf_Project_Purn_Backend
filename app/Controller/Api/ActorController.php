@@ -19,12 +19,14 @@ use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\HttpServer\Annotation\Middleware;
 use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\MemberFollow;
 use App\Model\MemberTag;
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 class ActorController extends AbstractController
 {
     #[Middleware(ApiAuthMiddleware::class)]

@@ -25,16 +25,18 @@ use App\Request\MemberCategorizationUpdateRequest;
 use App\Service\MemberCategorizationService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
-use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 #[Middleware(ApiAuthMiddleware::class)]
 class MemberCategorizationController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'create')]
-    public function create(MemberCategorizationCreateRequest $request, MemberCategorizationService $service)
+    public function create(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
         $id = $service->createOrUpdateMemberCategorization([
@@ -52,7 +54,7 @@ class MemberCategorizationController extends AbstractController
     }
 
     #[RequestMapping(methods: ['PUT'], path: 'update')]
-    public function update(MemberCategorizationUpdateRequest $request, MemberCategorizationService $service)
+    public function update(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
 
@@ -80,7 +82,7 @@ class MemberCategorizationController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'detail/create')]
-    public function createDetail(MemberCategorizationDetailCreateRequest $request, MemberCategorizationService $service)
+    public function createDetail(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
         $exist = MemberCategorization::where('member_id', $memberId)
@@ -157,7 +159,7 @@ class MemberCategorizationController extends AbstractController
     }
 
     #[RequestMapping(methods: ['PUT'], path: 'detail/update')]
-    public function updateDetail(MemberCategorizationDetailUpdateRequest $request, MemberCategorizationService $service)
+    public function updateDetail(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
         $exist = MemberCategorization::where('member_id', $memberId)
@@ -177,7 +179,7 @@ class MemberCategorizationController extends AbstractController
     }
 
     #[RequestMapping(methods: ['DELETE'], path: 'detail/delete')]
-    public function deleteDetail(MemberCategorizationDetailDeleteRequest $request, MemberCategorizationService $service)
+    public function deleteDetail(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
         $detail = MemberCategorizationDetail::find($request->input('id'));
@@ -195,7 +197,7 @@ class MemberCategorizationController extends AbstractController
     }
 
     #[RequestMapping(methods: ['DELETE'], path: 'delete')]
-    public function delete(MemberCategorizationDeleteRequest $request, MemberCategorizationService $service)
+    public function delete(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
         MemberCategorization::where('member_id', $memberId)

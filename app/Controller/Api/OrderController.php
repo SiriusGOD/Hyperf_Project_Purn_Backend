@@ -27,14 +27,19 @@ use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 
+use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\ApiEncryptMiddleware;
+
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 class OrderController extends AbstractController
 {
     /**
      * 獲取使用者訂單.
      */
     #[RequestMapping(methods: ['POST'], path: 'list')]
-    public function list(OrderRequest $request, OrderService $service)
+    public function list(RequestInterface $request, OrderService $service)
     {
         $user_id = auth('jwt')->user()->getId();
         $order_status = $request->input('order_status');
@@ -53,7 +58,7 @@ class OrderController extends AbstractController
      * 新增使用者訂單.
      */
     #[RequestMapping(methods: ['POST'], path: 'create')]
-    public function create(OrderRequest $request, OrderService $service, PayService $pay_service)
+    public function create(RequestInterface $request, OrderService $service, PayService $pay_service)
     {
         $data['user_id'] = auth('jwt')->user()->getId();
         $data['prod_id'] = $request->input('product_id', 0);
@@ -307,7 +312,7 @@ class OrderController extends AbstractController
      * 修改訂單狀態.
      */
     #[RequestMapping(methods: ['POST'], path: 'delete')]
-    public function delete(OrderRequest $request, OrderService $service)
+    public function delete(RequestInterface $request, OrderService $service)
     {
         $user_id = auth('jwt')->user()->getId();
         $order_num = $request->input('order_num');
@@ -323,7 +328,7 @@ class OrderController extends AbstractController
      * 查詢訂單資訊.
      */
     #[RequestMapping(methods: ['POST'], path: 'search')]
-    public function search(OrderRequest $request, OrderService $service)
+    public function search(RequestInterface $request, OrderService $service)
     {
         $order_num = $request->input('order_num');
         $result = $service->searchOrders($order_num, '');

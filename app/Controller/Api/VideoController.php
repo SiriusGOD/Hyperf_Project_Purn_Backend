@@ -34,7 +34,11 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\Logger\LoggerFactory;
 use Psr\Log\LoggerInterface;
 
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\ApiEncryptMiddleware;
+
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 class VideoController extends AbstractController
 {
     protected LoggerInterface $logger;
@@ -124,7 +128,7 @@ class VideoController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'suggest')]
-    public function suggest(VideoApiSuggestRequest $request, VideoService $service, SuggestService $suggestService)
+    public function suggest(RequestInterface $request, VideoService $service, SuggestService $suggestService)
     {
         $page = (int) $request->input('page', 0);
         $userId = (int) auth()->user()->getId();
@@ -139,7 +143,7 @@ class VideoController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'click')]
-    public function saveClick(ClickRequest $request, ClickService $service)
+    public function saveClick(RequestInterface $request, ClickService $service)
     {
         $id = (int) $request->input('id');
         $service->addClick(Video::class, $id);
@@ -155,7 +159,7 @@ class VideoController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'like')]
-    public function saveLike(ClickRequest $request, LikeService $service)
+    public function saveLike(RequestInterface $request, LikeService $service)
     {
         $id = (int) $request->input('id');
         $service->addLike(Video::class, $id);
@@ -163,7 +167,7 @@ class VideoController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'pay_video')]
-    public function getPayVideo(GetPayImageRequest $request, VideoService $service, GenerateService $generateService)
+    public function getPayVideo(RequestInterface $request, VideoService $service, GenerateService $generateService)
     {
         $id = (int) $request->input('id');
         $memberId = auth()->user()->getId();

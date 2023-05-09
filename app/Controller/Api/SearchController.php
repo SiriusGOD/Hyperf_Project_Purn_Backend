@@ -23,11 +23,15 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\ApiEncryptMiddleware;
+
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 class SearchController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'list')]
-    public function list(ImageApiListRequest $request, SearchService $service, TagService $tagService)
+    public function list(RequestInterface $request, SearchService $service, TagService $tagService)
     {
         $tagIds = $request->input('tags', []);
         $page = (int) $request->input('page', 0);
@@ -45,7 +49,7 @@ class SearchController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'keyword')]
-    public function keyword(ImageApiSearchRequest $request, SearchService $service)
+    public function keyword(RequestInterface $request, SearchService $service)
     {
         $keyword = $request->input('keyword');
         $page = (int) $request->input('page', 0);
@@ -62,7 +66,7 @@ class SearchController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'suggest')]
-    public function suggest(VideoApiSuggestRequest $request, SearchService $service, SuggestService $suggestService)
+    public function suggest(RequestInterface $request, SearchService $service, SuggestService $suggestService)
     {
         $page = (int) $request->input('page', 0);
         $limit = (int) $request->input('limit', 10);

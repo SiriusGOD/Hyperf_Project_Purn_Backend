@@ -24,12 +24,16 @@ use App\Service\SuggestService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
+use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 class ImageController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'list')]
-    public function list(ImageApiListRequest $request, ImageService $service)
+    public function list(RequestInterface $request, ImageService $service)
     {
         $tagIds = $request->input('tags');
         $page = (int) $request->input('page', 0);
@@ -43,7 +47,7 @@ class ImageController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'search')]
-    public function search(ImageApiSearchRequest $request, ImageService $service)
+    public function search(RequestInterface $request, ImageService $service)
     {
         $keyword = $request->input('keyword');
         $page = (int) $request->input('page', 0);
@@ -57,7 +61,7 @@ class ImageController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'suggest')]
-    public function suggest(ImageApiSuggestRequest $request, SuggestService $suggestService, ImageService $service)
+    public function suggest(RequestInterface $request, SuggestService $suggestService, ImageService $service)
     {
         $page = (int) $request->input('page', 0);
         $userId = (int) auth()->user()->getId();
@@ -72,7 +76,7 @@ class ImageController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'click')]
-    public function saveClick(ClickRequest $request, ClickService $service)
+    public function saveClick(RequestInterface $request, ClickService $service)
     {
         $id = (int) $request->input('id');
         $service->addClick(Image::class, $id);
@@ -80,7 +84,7 @@ class ImageController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'click/popular')]
-    public function getClickPopular(ClickService $service)
+    public function getClickPopular(RequestInterface $service)
     {
         $result = $service->getPopularClick(Image::class);
 
@@ -88,7 +92,7 @@ class ImageController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'like')]
-    public function saveLike(ClickRequest $request, LikeService $service)
+    public function saveLike(RequestInterface $request, LikeService $service)
     {
         $id = (int) $request->input('id');
         $service->addLike(Image::class, $id);

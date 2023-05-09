@@ -9,17 +9,15 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace HyperfTest\Cases;
-
+use App\Model\Member;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
 use App\Service\RedeemService;
 use App\Service\MemberRedeemService;
 use App\Service\VideoService;
-use App\Service\EncryptService;
 use App\Util\CRYPT;
 use Hyperf\Redis\Redis;
-
-use Hyperf\Utils\Codec\Json;
+use App\Service\MemberService;
 
 /**
  * @internal
@@ -48,33 +46,48 @@ class CryptTest extends HttpTestCase
         $this->redis = make(Redis::class);
     }
 
-    public function testApiList()
+    public function testEnc()
+    {
+      $str = '{"t":"1683190025267","device_id":"wAzt9xjmverqL2AptOD","device":"ios"}';
+      $data1 = CRYPT::encrypt($str); // 在 body 中加入加密後的資料（需進行 base64 編碼）
+      $data2 = CRYPT::decrypt($data1); // 在 body 中加入加密後的資料（需進行 base64 編碼）
+      $this->assertSame($data2, $str);
+    }
+
+    public function testActorList()
     {
       // 发送端
-      $key = env("APP_KEY");
-      $signKey = env("SIGN_KEY");
-      $data = ["page" => 1,'t'=>time()];
-      // 將資料進行加密
-      $encryptedData = openssl_encrypt(json_encode($data), 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
-      // 對加密後的資料進行簽名
-      $signature = hash_hmac('sha256', $encryptedData, $signKey);
-      // 設定請求的 header 和 body
+      $user = Member::first();
+      $token = auth()->login($user);
+      make(MemberService::class)->saveToken($user->id, $token);
+      //加密前用json
+      $str = '{"t":"1683190025267","device_id":"wAzt9xjmverqL2AptOD","device":"ios"}';
+      //第一次加密後
+
       $headers = [
           'Content-Type' => 'application/json',
-          'X-HMAC-Signature' => $signature, // 在 header 中加入簽名
+          //'X-HMAC-Signature' => base64_encode($signature), // 在 header 中加入簽名
       ];
-      $body = [
-          'data' => base64_encode($encryptedData), // 在 body 中加入加密後的資料（需進行 base64 編碼）
-      ];
+      if (env('PARAMS_ENCRYPT_FLAG')) {
+          $body = [
+              'data' => CRYPT::encrypt($str), // 在 body 中加入加密後的資料（需進行 base64 編碼）
+          ];
+          $body = [
+              'data' => 'mlRo487bb5LiQTxRZ0wJ+4HvFa+9QQLI3rATKk7hNiMyK7Zf+0qh4npdYHSfawX1D9MbPY/g5JRF7tQYC49aYacWh2tuk4PYQ7/CkSTh/TlC8G8OZx/n/i2AzLfUK03LoPz2OxyYzFOMcJt0WkzW98fsO+gNFFCpV9voxeoCT+8=', // 在 body 中加入加密後的資料（需進行 base64 編碼）
+          ];
+          print_r($body);
+      } else {
+          $body =  json_decode($str,true); 
+      }
       // 發送請求
-      $res = $this->client->post('/api/actor/list', $body, ['headers' => $headers]);
+      $res = $this->client->post('/api/member/login',
+          $body,
+          [
+              'Authorization' => 'Bearer ' . $token,
+              'headers' => $headers
+          ]
+      );
+      print_r([$res, '2result' ]);
       $this->assertSame(200, (int)$res['code']);
    }
-
-  public function testEnst()
-  {
-    $ser = new \App\Lib\Pinyin();
-    $res=$ser::getPinyin("喔您u");
-    print_r([$res]);
-  }
 }

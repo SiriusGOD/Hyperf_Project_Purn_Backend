@@ -17,6 +17,7 @@ use App\Job\EmailVerificationJob;
 use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Middleware\LoginLimitMiddleware;
 use App\Middleware\TryLimitMiddleware;
+use App\Middleware\ApiEncryptMiddleware;
 use App\Model\Member;
 use App\Model\MemberFollow;
 use App\Model\MemberTag;
@@ -40,11 +41,11 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 class MemberController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'login')]
-    #[Middleware(LoginLimitMiddleware::class)]
-    public function login(MemberLoginRequest $request, MemberService $service, MemberCategorizationService $memberCategorizationService)
+    public function login(RequestInterface $request, MemberService $service, MemberCategorizationService $memberCategorizationService)
     {
         $user = $service->apiGetUser([
             'email' => $request->input('email'),
@@ -118,7 +119,7 @@ class MemberController extends AbstractController
 
     #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'tag')]
-    public function addMemberTag(AddMemberTagRequest $request)
+    public function addMemberTag(RequestInterface $request)
     {
         $tags = $request->input('tags');
         $userId = auth('jwt')->user()->getId();
@@ -145,7 +146,7 @@ class MemberController extends AbstractController
 
     #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['PUT'], path: 'update')]
-    public function update(MemberApiUpdateRequest $request, MemberService $service)
+    public function update(RequestInterface $request, MemberService $service)
     {
         $userId = auth('jwt')->user()->getId();
         $path = '';
@@ -178,7 +179,7 @@ class MemberController extends AbstractController
 
     #[Middleware(TryLimitMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'verification')]
-    public function sendVerification(SendVerificationRequest $request, MemberService $service, DriverFactory $factory)
+    public function sendVerification(RequestInterface $request, MemberService $service, DriverFactory $factory)
     {
         if (auth()->check()) {
             $member = auth()->user();
@@ -200,7 +201,7 @@ class MemberController extends AbstractController
 
     #[Middleware(TryLimitMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'reset_verification')]
-    public function sendResetVerification(SendVerificationRequest $request, MemberService $service, DriverFactory $factory)
+    public function sendResetVerification(RequestInterface $request, MemberService $service, DriverFactory $factory)
     {
         if (auth()->check()) {
             $member = auth()->user();
@@ -222,7 +223,7 @@ class MemberController extends AbstractController
 
     #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'verification/register_check')]
-    public function checkRegisterVerificationCode(RegisterVerificationRequest $request)
+    public function checkRegisterVerificationCode(RequestInterface $request)
     {
         $member = auth()->user();
         $now = Carbon::now()->toDateTimeString();
@@ -243,7 +244,7 @@ class MemberController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'verification/reset_password_check')]
-    public function checkResetPasswordVerificationCode(ResetPasswordVerificationRequest $request, MemberService $service)
+    public function checkResetPasswordVerificationCode(RequestInterface $request, MemberService $service)
     {
         $account = $request->input('account');
         if (empty($account)) {
@@ -273,7 +274,7 @@ class MemberController extends AbstractController
 
     // 追蹤多個標籤
     #[RequestMapping(methods: ['POST'], path: 'addMemberIdsFollow')]
-    public function addMemberIdsFollow(AddFollowerRequest $request, MemberService $memberService, MemberFollowService $memberFollowService)
+    public function addMemberIdsFollow(RequestInterface $request, MemberService $memberService, MemberFollowService $memberFollowService)
     {
         $follow_ids = $request->input('ids');
         $type = $request->input('type');
@@ -287,7 +288,7 @@ class MemberController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'addFollow')]
-    public function addMemberFollow(AddMemberFollowRequest $request, MemberService $service)
+    public function addMemberFollow(RequestInterface $request, MemberService $service)
     {
         $follow_id = $request->input('id');
         $follow_type = $request->input('type');
@@ -317,7 +318,7 @@ class MemberController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'deleteFollow')]
-    public function deleteMemberFollow(AddMemberFollowRequest $request, MemberService $service)
+    public function deleteMemberFollow(RequestInterface $request, MemberService $service)
     {
         $userId = auth('jwt')->user()->getId();
         $follow_type = $request->input('type');

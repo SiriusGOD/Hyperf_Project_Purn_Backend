@@ -21,12 +21,14 @@ use App\Service\SuggestService;
 use App\Service\VideoService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
-use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
-// TODO 完成導航列
+use Hyperf\HttpServer\Annotation\Middleware;
+use App\Middleware\ApiEncryptMiddleware;
+
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 #[Middleware(ApiAuthMiddleware::class)]
 class NavigationController extends AbstractController
 {
@@ -82,7 +84,7 @@ class NavigationController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'detail')]
-    public function detail(NavigationDetailRequest $request, NavigationService $service, SuggestService $suggestService)
+    public function detail(RequestInterface $request, NavigationService $service, SuggestService $suggestService)
     {
         $data = [];
         $page = (int) $request->input('page', 0);
