@@ -15,6 +15,7 @@ use App\Constants\Constants;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\BuyMemberLevel;
+use App\Model\ImageGroup;
 use App\Model\Member;
 use App\Model\MemberHasVideo;
 use App\Model\MemberLevel;
@@ -103,6 +104,12 @@ class VideoService
         $query = $query->offset($limit * $page)->limit($limit);
         if (! empty($videoIds)) {
             $query = $query->whereIn('id', $videoIds);
+        }
+
+        $hideIds = ReportService::getHideIds(Video::class);
+
+        if (! empty($hideIds)) {
+            $withoutIds = array_merge($withoutIds, $hideIds);
         }
 
         if (! empty($withoutIds)) {
@@ -249,8 +256,14 @@ class VideoService
         }
 
         if (! empty($ids)) {
-            $model->whereIn('id', $ids);
+            $model = $model->whereIn('id', $ids);
         }
+
+        $hideIds = ReportService::getHideIds(Video::class);
+        if(! empty($hideIds)) {
+            $model = $model->whereNotIn('id', $hideIds);
+        }
+
         if (! empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
             if ($isAsc == 1) {
                 $model = $model->orderBy('total_click');
@@ -288,6 +301,7 @@ class VideoService
     {
         $result = [];
         $useIds = [];
+        $hideIds = ReportService::getHideIds(Video::class);
         foreach ($suggest as $value) {
             $limit = $value['proportion'] * $inputLimit;
             if ($limit < 1) {
@@ -303,16 +317,20 @@ class VideoService
 
             $useIds = array_unique(array_merge($ids, $useIds));
 
-            $models = Video::with([
+            $query = Video::with([
                 'tags',
             ])
                 ->whereIn('id', $ids)
                 ->where('release_time', '<=', Carbon::now()->toDateTimeString())
                 ->where('cover_height', '>', 0)
                 ->offset($limit * $page)
-                ->limit($limit)
-                ->get()
-                ->toArray();
+                ->limit($limit);
+
+            if(! empty($hideIds)) {
+                $query = $query->whereNotIn('id', $hideIds);
+            }
+
+            $models = $query->get()->toArray();
 
             $result = array_merge($models, $result);
         }
@@ -392,14 +410,19 @@ class VideoService
 
     public function getVideosByHotOrder(int $page, int $limit): array
     {
-        return Video::with('tags')
+        $hideIds = ReportService::getHideIds(Video::class);
+        $query = Video::with('tags')
             ->where('hot_order', '>=', 1)
             ->where('cover_height', '>', 0)
             ->orderBy('hot_order')
             ->offset($page * $limit)
-            ->limit($limit)
-            ->get()
-            ->toArray();
+            ->limit($limit);
+
+        if (! empty($hideIds)) {
+            $query = $query->whereNotIn('id', $hideIds);
+        }
+
+        return $query->get()->toArray();
     }
 
     protected function orderCheck(int $id, int $memberId): bool

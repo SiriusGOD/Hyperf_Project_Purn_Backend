@@ -15,6 +15,8 @@ use App\Constants\Constants;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\ImageGroup;
+use App\Model\Report;
+use Hyperf\Redis\Redis;
 use App\Model\Video;
 
 class GenerateService

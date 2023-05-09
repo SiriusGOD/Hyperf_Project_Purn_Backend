@@ -15,7 +15,6 @@ use App\Constants\Constants;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\BuyMemberLevel;
-use App\Model\Image;
 use App\Model\ImageGroup;
 use App\Model\Member;
 use App\Model\MemberLevel;
@@ -56,6 +55,8 @@ class ImageGroupService
                 ->pluck('correspond_id');
         }
 
+        $hideIds = ReportService::getHideIds(ImageGroup::class);
+
         $query = ImageGroup::with([
             'tags', 'imagesLimit',
         ])
@@ -64,6 +65,10 @@ class ImageGroupService
 
         if (! empty($imageIds)) {
             $query = $query->whereIn('id', $imageIds);
+        }
+
+        if (! empty($hideIds)) {
+            $withoutIds = array_merge($withoutIds, $hideIds);
         }
 
         if (! empty($withoutIds)) {
@@ -107,13 +112,18 @@ class ImageGroupService
             $query = $query->orWhereIn('id', $imageIds);
         }
 
+        $hideIds = ReportService::getHideIds(ImageGroup::class);
+        if(! empty($hideIds)) {
+            $query = $query->whereNotIn('id', $hideIds);
+        }
+
         if (! empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
             if ($isAsc == 1) {
                 $query = $query->orderBy('total_click');
             } else {
                 $query = $query->orderByDesc('total_click');
             }
-        } elseif(! empty($sortBy) and $sortBy == Constants::SORT_BY['created_time']) {
+        } elseif (! empty($sortBy) and $sortBy == Constants::SORT_BY['created_time']) {
             if ($isAsc == 1) {
                 $query = $query->orderBy('id');
             } else {
@@ -128,6 +138,7 @@ class ImageGroupService
     {
         $result = [];
         $useImageIds = [];
+        $hideIds = ReportService::getHideIds(ImageGroup::class);
         foreach ($suggest as $value) {
             $limit = $value['proportion'] * $inputLimit;
             if ($limit < 1) {
@@ -143,16 +154,20 @@ class ImageGroupService
 
             $useImageIds = array_unique(array_merge($imageIds, $useImageIds));
 
-            $models = ImageGroup::with([
+            $query = ImageGroup::with([
                 'tags', 'imagesLimit',
             ])
                 ->whereIn('id', $imageIds)
                 ->offset($limit * $page)
                 ->where('height', '>', 0)
                 ->orderByDesc('id')
-                ->limit($limit)
-                ->get()
-                ->toArray();
+                ->limit($limit);
+
+            if (! empty($hideIds)) {
+                $query = $query->whereNotIn('id', $hideIds);
+            }
+
+            $models = $query->get()->toArray();
 
             $result = array_merge($models, $result);
         }
@@ -217,36 +232,45 @@ class ImageGroupService
 
     public function getImageGroupsByHotOrder(int $page, int $limit): array
     {
-        return ImageGroup::with([
+        $hideIds = ReportService::getHideIds(ImageGroup::class);
+        $query = ImageGroup::with([
             'tags', 'imagesLimit',
         ])
             ->where('hot_order', '>=', 1)
             ->where('height', '>', 0)
             ->offset($limit * $page)
             ->limit($limit)
-            ->orderByDesc('hot_order')
-            ->get()
-            ->toArray();
+            ->orderByDesc('hot_order');
+
+        if (! empty($hideIds)) {
+            $query = $query->whereNotIn('id', $hideIds);
+        }
+
+        return $query->get()->toArray();
     }
 
     protected function orderCheck(int $id, int $memberId): bool
     {
         $order = Order::where('orders.user_id', $memberId)
-                ->join('order_details', 'orders.id', '=', 'order_details.order_id')
-                ->join('products', 'order_details.product_id', '=', 'products.id')
-                ->where('products.type', ImageGroup::class)
-                ->where('products.id', $id)
-                ->where('orders.status', Order::ORDER_STATUS['finish'])
-                ->select('orders.currency', 'orders.created_at')
-                ->first();
-        if(empty($order))return false;
+            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+            ->join('products', 'order_details.product_id', '=', 'products.id')
+            ->where('products.type', ImageGroup::class)
+            ->where('products.id', $id)
+            ->where('orders.status', Order::ORDER_STATUS['finish'])
+            ->select('orders.currency', 'orders.created_at')
+            ->first();
+        if (empty($order)) {
+            return false;
+        }
 
         // 用免費次數購買的免費商品 過隔天就不顯示在已購買項目中
-        if($order -> currency == Order::PAY_CURRENCY['free_quota']){
-            $date1 = Carbon::parse($order -> created_at);
+        if ($order->currency == Order::PAY_CURRENCY['free_quota']) {
+            $date1 = Carbon::parse($order->created_at);
             $date2 = Carbon::now();
             $diff = $date1->diff($date2);
-            if($diff > 0)return false;
+            if ($diff > 0) {
+                return false;
+            }
         }
         return true;
     }
