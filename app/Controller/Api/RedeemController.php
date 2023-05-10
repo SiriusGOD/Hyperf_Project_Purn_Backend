@@ -37,10 +37,10 @@ class RedeemController extends AbstractController
     {
         $code = $request->input('code');
         $result = $redeemService->checkRedeem($code);
-        if($result ){
-          return $this->success(['msg' =>trans('default.redeem.success')]);
+        if($result){
+          return $this->success(['msg' =>trans('default.redeem.can')]);
         }
-        return $this->error(trans('default.redeem.expired') , RedeemCode::EXPIRED_CODE);
+        return $this->error(trans('default.redeem.faild') , RedeemCode::EXPIRED_CODE);
     }
 
     // 兌換影片
