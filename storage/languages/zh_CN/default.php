@@ -260,6 +260,7 @@ return [
         'pay' => '支付管理',
         'proxy' => '代理管理',
         'navigation' => '导航管理',
+        'report' => '检举管理',
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -579,12 +580,32 @@ return [
         'pay_method' => '支付方式',
     ],
     // -------------------------------------------------------------------
-    // PayController
+    // NavigationController
     'navigation_control' => [
         'navigation_control' => '导航管理',
         'navigation_edit' => '编辑导航',
         'navigation_name' => '名称',
         'navigation_hot_order' => '排序',
+    ],
+    // -------------------------------------------------------------------
+    // NavigationController
+    'report_control' => [
+        'report_control' => '检举管理',
+        'report_edit' => '编辑导航',
+        'report_type' => '类型',
+        'report_type_arr' => [
+            \App\Model\ImageGroup::class => '图片',
+            \App\Model\Video::class => '影片',
+        ],
+        'report_content' => '检举内容',
+        'report_reason' => '检举理由',
+        'report_status' => '检举状态',
+        'report_name' => '检举人名称',
+        'report_status_arr' => [
+            0 => '未处理',
+            1 => '通过',
+            2 => '未通过',
+        ],
     ],
     // -------------------------------------------------------------------
 ];

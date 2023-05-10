@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace App\Model;
 
 
+use Hyperf\Database\Model\SoftDeletes;
+
 /**
  * @property-read \Hyperf\Database\Model\Collection|Image[] $images 
  * @property-read \Hyperf\Database\Model\Collection|Tag[] $tags 
@@ -22,6 +24,7 @@ namespace App\Model;
  */
 class ImageGroup extends Model
 {
+    use SoftDeletes;
     public const PAGE_PER = 10;
 
     public const DEFAULT_FREE_LIMIT = 3;
@@ -52,7 +55,7 @@ class ImageGroup extends Model
 
     public function images()
     {
-        return $this->hasMany(Image::class, 'group_id');
+        return $this->hasMany(Image::class, 'group_id')->withTrashed();
     }
 
     public function tags()

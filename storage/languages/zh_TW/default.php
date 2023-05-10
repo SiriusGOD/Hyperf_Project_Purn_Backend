@@ -258,6 +258,7 @@ return [
         'pay' => '支付管理',
         'proxy' => '代理管理',
         'navigation' => '導航管理',
+        'report' => '檢舉管理',
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -585,4 +586,23 @@ return [
         'navigation_hot_order' => '排序',
     ],
     // -------------------------------------------------------------------
+    // ReportController
+    'report_control' => [
+        'report_control' => '檢舉管理',
+        'report_edit' => '編輯導航',
+        'report_type' => '類型',
+        'report_type_arr' => [
+            \App\Model\ImageGroup::class => '圖片',
+            \App\Model\Video::class => '影片',
+        ],
+        'report_content' => '檢舉內容',
+        'report_reason' => '檢舉理由',
+        'report_status' => '檢舉狀態',
+        'report_name' => '檢舉人名稱',
+        'report_status_arr' => [
+            0 => '未處理',
+            1 => '通過',
+            2 => '未通過',
+        ],
+    ],
 ];

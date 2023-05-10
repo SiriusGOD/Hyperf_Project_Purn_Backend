@@ -36,7 +36,6 @@ class MemberCategorizationController extends AbstractController
         $id = $service->createOrUpdateMemberCategorization([
             'name' => $request->input('name'),
             'member_id' => $memberId,
-            'hot_order' => $request->input('hot_order'),
             'is_default' => $request->input('is_default'),
         ]);
 

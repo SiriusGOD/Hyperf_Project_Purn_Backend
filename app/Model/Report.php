@@ -20,7 +20,7 @@ namespace App\Model;
  */
 class Report extends Model
 {
-
+    public const PAGE_PER = 10;
     public const TYPE = [
         'hide' => 1,
         'report' => 2,
@@ -51,4 +51,9 @@ class Report extends Model
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'member_id' => 'integer', 'user_id' => 'integer', 'model_id' => 'integer', 'type' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    public function member()
+    {
+        return $this->belongsTo(Member::class);
+    }
 }

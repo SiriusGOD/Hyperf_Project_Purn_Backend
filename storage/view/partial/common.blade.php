@@ -328,6 +328,16 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('navigation-index'))
+                    <li class="nav-item">
+                        <a href="/admin/report/index" class="nav-link {{$report_active ?? ''}}">
+                            <i class="nav-icon fas fa-bug"></i>
+                            <p>
+                                {{trans('default.leftbox.report') ?? '檢舉'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

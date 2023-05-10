@@ -14,6 +14,7 @@ namespace App\Service;
 use App\Model\ImageGroup;
 use App\Model\Report;
 use App\Model\Video;
+use App\Util\General;
 use Hyperf\Redis\Redis;
 
 class ReportService
@@ -70,5 +71,19 @@ class ReportService
         }
 
         return [];
+    }
+
+    public function generateReport(array $models) : array
+    {
+        $result = [];
+        foreach ($models as $model) {
+            if ($model['model_type'] == Video::class) {
+                $video = Video::withTrashed()->where('id', $model['model_id'])->first();
+                $model['video_url'] = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $video->source;
+            }
+            $result[] = $model;
+        }
+
+        return $result;
     }
 }
