@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Service;
 use App\Constants\WithdrawCode;
 use App\Model\MemberWithdraw;
-use App\Model\Member;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
@@ -29,7 +28,12 @@ class WithdrawService extends BaseService
         $this->logger = $loggerFactory->get('withdraw');
     }
 
-    //提現列表
+    //提現取得
+    public function fetch(int $id){
+      return $this->get(MemberWithdraw::class , $id);
+    }
+
+    //提現數量
     public function count(int $status){
       return MemberWithdraw::where('status',$status)->count();
     }
