@@ -55,11 +55,12 @@ class MemberCategorizationService extends GenerateService
         $model->save();
     }
 
-    public function updateMemberCategorizationDetail(array $params): void
+    public function updateMemberCategorizationDetails(array $params): void
     {
-        $model = MemberCategorizationDetail::find($params['id']);
-        $model->member_categorization_id = $params['member_categorization_id'];
-        $model->save();
+        MemberCategorizationDetail::whereIn('id', $params['ids'])
+            ->update([
+                'member_categorization_id' => $params['member_categorization_id'],
+            ]);
     }
 
     public function getDetails(array $params): array
@@ -126,6 +127,111 @@ class MemberCategorizationService extends GenerateService
             ]);
     }
 
+    public function getDefault(array $params): array
+    {
+        return [
+            'id' => 0,
+            'member_id' => $params['member_id'],
+            'name' => trans('default.default_all_categorization_name'),
+            'is_default' => 0,
+            'is_first' => 1,
+            'created_at' => Carbon::now()->toDateTimeString(),
+            'updated_at' => Carbon::now()->toDateTimeString(),
+            'member_categorization_details' => $this->getDefaultDetail($params),
+        ];
+    }
+
+    public function getDefaultDetail(array $params): array
+    {
+        $ids = MemberCategorization::where('member_id', $params['member_id'])
+            ->get()
+            ->pluck('id')
+            ->toArray();
+        if (empty($ids)) {
+            return [];
+        }
+
+        $query = MemberCategorizationDetail::whereIn('member_categorization_id', $ids)
+            ->offset($params['page'] * $params['limit'])
+            ->limit($params['limit'])
+            ->orderByDesc('id');
+
+        if (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['click']) {
+            if ($params['is_asc'] == 1) {
+                $query = $query->orderBy('total_click');
+            } else {
+                $query = $query->orderByDesc('total_click');
+            }
+        } elseif (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['created_time']) {
+            if ($params['is_asc'] == 1) {
+                $query = $query->orderBy('id');
+            } else {
+                $query = $query->orderByDesc('id');
+            }
+        }
+        $models = $query->get()->toArray();
+        $result = [];
+        $result = $this->getVideoDetail($models, $result);
+
+        $collect = \Hyperf\Collection\collect($this->getImageGroupsDetail($models, $result));
+        if (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['click']) {
+            if ($params['is_asc'] == 1) {
+                $collect = $collect->sortBy('total_click');
+            } else {
+                $collect = $collect->sortByDesc('total_click');
+            }
+        } elseif (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['created_time']) {
+            if ($params['is_asc'] == 1) {
+                $collect = $collect->sortBy('member_categorization_detail_id');
+            } else {
+                $collect = $collect->sortByDesc('member_categorization_detail_id');
+            }
+        }
+
+        $result = [];
+
+        foreach ($collect->toArray() as $row) {
+            $result[] = $row;
+        }
+
+        return $result;
+    }
+
+    public function IsMain(int $memberId, array $models): array
+    {
+        $result = [];
+        foreach ($models as $model) {
+            $model['member_categorization_details'] = $this->getDetails([
+                'id' => $model['id'],
+                'page' => 0,
+                'limit' => 5,
+                'sort_by' => 'created_time',
+                'is_asc' => 2,
+            ]);
+
+            $result[] = $model;
+        }
+
+        array_unshift($result, $this->getDefault([
+            'member_id' => $memberId,
+            'page' => 0,
+            'limit' => 5,
+            'sort_by' => 'created_time',
+            'is_asc' => 2,
+        ]));
+
+        return $result;
+    }
+
+    public function updateOrder(array $ids): void
+    {
+        foreach ($ids as $key => $id) {
+            MemberCategorization::where('id', $id)->update([
+                'hot_order' => $key + 1,
+            ]);
+        }
+    }
+
     protected function getVideoDetail(array $models, array $data): array
     {
         $ids = [];
@@ -172,59 +278,5 @@ class MemberCategorizationService extends GenerateService
         }
 
         return $this->generateImageGroups($data, $result);
-    }
-
-    public function getDefault(int $memberId) : array
-    {
-        $default = [
-            'id' => 0,
-            'member_id' => $memberId,
-            'name' => trans('default.default_all_categorization_name'),
-            'is_default' => 0,
-            'is_first' => 1,
-            'created_at' => Carbon::now()->toDateTimeString(),
-            'updated_at' => Carbon::now()->toDateTimeString(),
-            'member_categorization_details' => [],
-        ];
-        $ids = MemberCategorization::where('member_id', $memberId)->get()->pluck('id')->toArray();
-        if(empty($ids)) {
-            return $default;
-        }
-
-        $models = MemberCategorizationDetail::whereIn('member_categorization_id', $ids)->orderByDesc('id')->get()->toArray();
-        $result = [];
-        $result = $this->getVideoDetail($models, $result);
-
-        $collect = \Hyperf\Collection\collect($this->getImageGroupsDetail($models, $result));
-        $rows = $collect->sortByDesc('created_time')->toArray();
-
-        $result = [];
-
-        foreach ($rows as $row) {
-            $result[] = $row;
-        }
-        $default['member_categorization_details'] = $result;
-
-        return $default;
-    }
-
-    public function IsMain(int $memberId, array $models) : array
-    {
-        $result = [];
-        foreach ($models as $model) {
-            $model['member_categorization_details'] = $this->getDetails([
-                'id' => $model['id'],
-                'page' => 0,
-                'limit' => 5,
-                'sort_by' => 'created_time',
-                'is_asc' => 2,
-            ]);
-
-            $result[] = $model;
-        }
-
-        array_unshift($result, $this->getDefault($memberId));
-
-        return $result;
     }
 }

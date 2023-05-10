@@ -543,7 +543,9 @@ return [
         'customer_service_title' => '標題',
         'customer_service_updated_at' => '更新時間',
         'customer_service_type_array' => [
-            1 => '客服問題',
+            1 => '儲值問題',
+            2 => '推廣問題',
+            3 => '提現問題',
         ],
     ],
     'customer_service_detail_control' => [

@@ -13,22 +13,16 @@ namespace App\Controller\Api;
 
 use App\Constants\Constants;
 use App\Controller\AbstractController;
+use App\Middleware\ApiEncryptMiddleware;
 use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\MemberCategorization;
 use App\Model\MemberCategorizationDetail;
-use App\Request\MemberCategorizationCreateRequest;
-use App\Request\MemberCategorizationDeleteRequest;
-use App\Request\MemberCategorizationDetailCreateRequest;
-use App\Request\MemberCategorizationDetailDeleteRequest;
-use App\Request\MemberCategorizationDetailUpdateRequest;
-use App\Request\MemberCategorizationUpdateRequest;
 use App\Service\MemberCategorizationService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\HttpServer\Annotation\Middleware;
-use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
@@ -46,9 +40,29 @@ class MemberCategorizationController extends AbstractController
             'is_default' => $request->input('is_default'),
         ]);
 
+        $ids = MemberCategorization::where('member_id', $memberId)
+            ->where('id', '<>', $id)
+            ->orderBy('hot_order')
+            ->orderByDesc('id')
+            ->get()
+            ->pluck('id')
+            ->toArray();
+
+        $result = $ids;
         if ($request->input('is_default') == 1) {
             $service->setDefault($memberId, $id);
+            array_unshift($result, $id);
+        } else {
+            $result = [];
+            foreach ($ids as $key => $value) {
+                if ($key == 1) {
+                    $result[] = $id;
+                }
+                $result[] = $value;
+            }
         }
+
+        $service->updateOrder($result);
 
         return $this->success();
     }
@@ -77,6 +91,26 @@ class MemberCategorizationController extends AbstractController
         if ($request->input('is_default') == 1) {
             $service->setDefault($memberId, $id);
         }
+
+        return $this->success();
+    }
+
+    #[RequestMapping(methods: ['PUT'], path: 'update/order')]
+    public function updateOrder(RequestInterface $request, MemberCategorizationService $service)
+    {
+        $memberId = auth()->user()->getId();
+
+        $ids = $request->input('ids');
+        $count = MemberCategorization::where('member_id', $memberId)
+            ->whereIn('id', $ids)
+            ->count();
+
+        if ($count != count($ids)) {
+            return $this->error(trans('validation.exists', ['attribute' => 'id']), 400);
+        }
+
+        $service->updateOrder($ids);
+        $service->setDefault($memberId, $ids[0]);
 
         return $this->success();
     }
@@ -136,17 +170,37 @@ class MemberCategorizationController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'detail/list')]
     public function detail(RequestInterface $request, MemberCategorizationService $service)
     {
+        $id = $request->input('member_categorization_id', 0);
         $memberId = auth()->user()->getId();
+
+        $page = $request->input('page', 0);
+        $limit = $request->input('limit', Constants::DEFAULT_PAGE_PER);
+
+        if ($id == 0) {
+            $data = [
+                'models' => $service->getDefaultDetail([
+                    'member_id' => $memberId,
+                    'page' => $page,
+                    'limit' => $limit,
+                    'sort_by' => $request->input('sort_by'),
+                    'is_asc' => $request->input('is_asc'),
+                ]),
+            ];
+
+            $path = '/api/member_categorization/detail';
+            $simplePaginator = new SimplePaginator($page, $limit, $path);
+            $data = array_merge($data, $simplePaginator->render());
+            return $this->success($data);
+        }
+
         $exist = MemberCategorization::where('member_id', $memberId)
-            ->where('id', $request->input('member_categorization_id', 0))
+            ->where('id', $id)
             ->exists();
 
         if (empty($exist)) {
             return $this->error(trans('validation.authorize'), 401);
         }
 
-        $page = $request->input('page', 0);
-        $limit = $request->input('limit', Constants::DEFAULT_PAGE_PER);
         $models = $service->getDetails([
             'id' => $request->input('member_categorization_id', 0),
             'page' => $page,
@@ -177,8 +231,18 @@ class MemberCategorizationController extends AbstractController
             return $this->error(trans('validation.authorize'), 401);
         }
 
-        $service->updateMemberCategorizationDetail([
-            'id' => $request->input('member_categorization_id'),
+        $ids = $request->input('ids');
+        $count = MemberCategorization::where('member_id', $memberId)
+            ->join('member_categorization_details', 'member_categorizations.id', '=', 'member_categorization_details.member_categorization_id')
+            ->whereIn('member_categorization_details.id', $ids)
+            ->count();
+
+        if ($count != count($ids)) {
+            return $this->error(trans('validation.authorize'), 401);
+        }
+
+        $service->updateMemberCategorizationDetails([
+            'ids' => $ids,
             'member_categorization_id' => $request->input('member_categorization_id'),
         ]);
 
@@ -189,16 +253,22 @@ class MemberCategorizationController extends AbstractController
     public function deleteDetail(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
-        $detail = MemberCategorizationDetail::find($request->input('id'));
-        $exist = MemberCategorization::where('member_id', $memberId)
-            ->where('id', $detail->member_categorization_id)
-            ->exists();
+        $ids = $request->input('ids');
 
-        if (empty($exist)) {
+        if (empty($ids)) {
+            return $this->error(trans('validation.required', ['attribute' => 'ids']), 401);
+        }
+
+        $count = MemberCategorization::where('member_id', $memberId)
+            ->join('member_categorization_details', 'member_categorizations.id', '=', 'member_categorization_details.member_categorization_id')
+            ->whereIn('member_categorization_details.id', $ids)
+            ->count();
+
+        if ($count != count($ids)) {
             return $this->error(trans('validation.authorize'), 401);
         }
 
-        $detail->delete();
+        MemberCategorizationDetail::whereIn('id', $ids)->delete();
 
         return $this->success();
     }

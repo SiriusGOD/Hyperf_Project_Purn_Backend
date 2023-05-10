@@ -545,7 +545,9 @@ return [
         'customer_service_title' => '标题',
         'customer_service_updated_at' => '更新时间',
         'customer_service_type_array' => [
-            1 => '客服问题',
+            1 => '储值问题',
+            2 => '推广问题',
+            3 => '提现问题',
         ],
     ],
     'customer_service_detail_control' => [

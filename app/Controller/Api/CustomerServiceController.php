@@ -142,4 +142,18 @@ class CustomerServiceController extends AbstractController
         $service->setApiDetailRead($id);
         return $this->success([]);
     }
+
+    #[RequestMapping(methods: ['POST'], path: 'type/list')]
+    public function typeList()
+    {
+        $result = [];
+        foreach (trans('default.customer_service_control.customer_service_type_array') as $key => $value) {
+            $key = (int) $key;
+            $result[] = [
+                'id' => $key,
+                'name' => $value
+            ];
+        }
+        return $this->success($result);
+    }
 }

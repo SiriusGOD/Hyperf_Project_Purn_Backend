@@ -25,10 +25,6 @@ class CustomerService extends Model
 {
     public const PAGE_PER = 10;
 
-    public const TYPE = [
-        'normal' => 1,
-    ];
-
     /**
      * The table associated with the model.
      */
