@@ -13,6 +13,8 @@ namespace App\Constants;
 
 class RedeemCode
 {
+    //己過期
+    public const EXPIRED_CODE = 11001;
     public const VIP = 1;
 
     public const DIAMOND = 2;

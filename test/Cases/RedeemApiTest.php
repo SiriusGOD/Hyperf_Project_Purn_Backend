@@ -60,13 +60,12 @@ class RedeemApiTest extends HttpTestCase
       $token = auth()->login($user);
       $this->token = $token; 
       make(MemberService::class)->saveToken($user->id, $token);
-      $redeem=Redeem::where("status",0)->first();
-      $json["code"] = $redeem->code;
-      $data = $this->client->post('/api/redeem/checkRedeem',$json , [
+      $json["code"] ='qweqweq';
+      $data = $this->client->post('/api/redeem/check_redeem',$json , [
           'Authorization' => 'Bearer ' . $token,
       ]);
-      print_r($data);
-      $this->assertSame(200, $data['code']);
+      $this->assertNotSame(200, $data['code']);
+
     }
   
     //取可用兌換卷

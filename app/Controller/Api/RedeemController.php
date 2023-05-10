@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Constants\ErrorCode;
+use App\Constants\RedeemCode;
 use App\Controller\AbstractController;
 use App\Model\MemberRedeem;
 use App\Model\MemberRedeemVideo;
@@ -31,15 +32,15 @@ use App\Middleware\ApiEncryptMiddleware;
 class RedeemController extends AbstractController
 {
     // 檢查兌換碼
-    #[RequestMapping(methods: ['POST'], path: 'checkRedeem')]
+    #[RequestMapping(methods: ['POST'], path: 'check_redeem')]
     public function checkRedeem(RequestInterface $request, RedeemService $redeemService)
     {
         $code = $request->input('code');
         $result = $redeemService->checkRedeem($code);
         if($result ){
-          return $this->success(['msg' => "可兌換"]);
+          return $this->success(['msg' =>trans('default.redeem.success')]);
         }
-        return $this->error(['msg' => "己過期或找不到優惠卷"]);
+        return $this->error(trans('default.redeem.expired') , RedeemCode::EXPIRED_CODE);
     }
 
     // 兌換影片
@@ -49,7 +50,7 @@ class RedeemController extends AbstractController
         $memberId = auth('jwt')->user()->getId();
         $videoId = $request->input('video_id');
         if (empty($videoId)) {
-            return $this->error('video id 字段是必须的', ErrorCode::BAD_REQUEST);
+            return $this->error(trans('default.redeem.video_id_required'), ErrorCode::BAD_REQUEST);
         }
         $result = $redeemService->redeemVideo($memberId, $videoId);
         return $this->success(['models' => $result]);
@@ -62,7 +63,7 @@ class RedeemController extends AbstractController
         $memberId = auth('jwt')->user()->getId();
         $code = $request->input('code');
         if (empty($code)) {
-            return $this->error('code 字段是必须的', ErrorCode::BAD_REQUEST);
+            return $this->error(trans('default.redeem.code_required'), ErrorCode::BAD_REQUEST);
         }
         $result = $redeemService->executeRedeemCode($code, $memberId);
         return $this->success($result);
