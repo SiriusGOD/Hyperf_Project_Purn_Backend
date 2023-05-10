@@ -54,6 +54,7 @@ class IpLocationMiddleware implements MiddlewareInterface
         $searcher = \XdbSearcher::newWithBuffer($content);
 
         $region = $searcher->search($ip);
+        
         if (empty($region)) {
             return $handler->handle($request);
         }
@@ -62,7 +63,13 @@ class IpLocationMiddleware implements MiddlewareInterface
         if (!empty($arr[2]) and $arr[2] == '台湾省') {
             $this->logger->info('ip 為 : ' . $ip . '設定為 zh_TW');
             $this->translator->setLocale('zh_TW');
+            $isTW = 1;
+        }else{
+            $isTW = 0;
         }
+
+        // 將值存儲在請求物件中
+        $request = $request->withAttribute('isTW', $isTW);
 
         return $handler->handle($request);
     }

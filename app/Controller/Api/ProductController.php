@@ -30,9 +30,11 @@ class ProductController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, ProductService $service)
     {
+        // 獲取使用者地區是否是台灣
+        $isTW = $request->getAttribute('isTW');
         // member coin diamond
         $type = $request->input('type', 'coin');
-        $result = $service->getListByType($type);
+        $result = $service->getListByType($type, $isTW);
         return $this->success($result);
     }
 
@@ -56,8 +58,10 @@ class ProductController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'getMemberProductList')]
     public function getMemberList(ProductApiRequest $request, ProductService $service)
     {
+        // 獲取使用者地區是否是台灣
+        $isTW = $request->getAttribute('isTW');
         // member
-        $result = $service->getListByMember();
+        $result = $service->getListByMember($isTW);
 
         return $this->success($result);
     }
