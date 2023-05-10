@@ -175,7 +175,9 @@ return [
     // redeem
     'redeem' => [
         'insert' => '新增優惠卷',
-        'expired' => '己過期或兌換過',
+        'can' => '可兌換',
+        'expired' => '己過期',
+        'faild' => '兌換失敗',
         'success' => '兌換成功',
         'video_id_required' => 'video id 字段是必须的',
         'code_required' => 'code 字段是必须的',

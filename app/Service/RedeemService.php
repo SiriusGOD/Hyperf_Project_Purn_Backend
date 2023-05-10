@@ -90,10 +90,14 @@ class RedeemService extends BaseService
           return false;
       }
 
-      // 使用者兌換卷 by code
+      // 檢查兌換卷
       public function checkRedeem(string $code)
       {
-          $model = $this->redeem->where('code', $code)->first();
+          $end = Carbon::now()->toDateTimeString();  
+          print_r([$end, $code ,RedeemCode::ABLE]);
+          $model = $this->redeem->where('status', RedeemCode::ABLE)
+                                ->where('code', $code)
+                                ->where('end','>=', $end)->exists();
           return $model ;
       }
       // 使用者兌換卷 by code
