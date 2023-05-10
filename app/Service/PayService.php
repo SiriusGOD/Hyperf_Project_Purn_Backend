@@ -58,13 +58,14 @@ class PayService
             // $product = Product::find($arr['prod_id'])->toArray();
             $product = $arr['product'];
 
-            $member_aff = 'testcode'; // 之後改成從redis獲取 (邀请码)
+            $member_aff = $arr['user']['aff']; // 之後改成從redis獲取 (邀请码)
             $data['app_name'] = env('APP_NAME');
             $data['app_type'] = ($arr['oauth_type'] == 'web') ? 'pc' : $arr['oauth_type'];
             $data['aff'] = "{$member_aff}:{$arr['prod_id']}"; // 区分 '邀請碼 :产品'
             $data['amount'] = (string) $product['selling_price'];
             $sign = $this->make_sign_pay($data, env('PAY_SIGNKEY'));
             $data['ip'] = $arr['ip'];
+            
             // 撈取支付方式
             if ($arr['payment_type'] == 0) {
                 $pay_way['pronoun'] = Order::PAY_WAY_MAP_NEW[$arr['payment_type']];
@@ -78,7 +79,6 @@ class PayService
             $data['product'] = 'vip'; // vip or coins
 
             $result = $this->curlPost(env('PAY_URL'), $data);
-
             if (! isset($result['success']) && $result['success'] != true) {
                 $this->logger->error('生成支付鏈接失敗', $result);
             }
@@ -106,7 +106,7 @@ class PayService
              echo 'Curl error: ' . curl_error($ch);
          }*/
         curl_close($ch);
-        return $result;
+        return json_decode($result, true);
     }
 
     // 亂處產生一個測試網址
