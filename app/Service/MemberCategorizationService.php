@@ -220,7 +220,26 @@ class MemberCategorizationService extends GenerateService
             'is_asc' => 2,
         ]));
 
-        return $result;
+
+        $data = [];
+        foreach ($result as $model) {
+            $temp = [];
+            foreach ($model['member_categorization_details'] as $row) {
+                $url = '';
+                if (!empty($row['url'])) {
+                    $url = $row['url'];
+                }
+
+                if (!empty($row['cover_thumb'])) {
+                    $url = $row['cover_thumb'];
+                }
+                $temp[] = $url;
+            }
+            $model['member_categorization_details'] = $temp;
+            $data[] = $model;
+        }
+
+        return $data;
     }
 
     public function updateOrder(array $ids): void
