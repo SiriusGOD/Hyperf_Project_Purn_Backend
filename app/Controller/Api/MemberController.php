@@ -148,7 +148,7 @@ class MemberController extends AbstractController
     }
 
     #[Middleware(ApiAuthMiddleware::class)]
-    #[RequestMapping(methods: ['PUT'], path: 'update')]
+    #[RequestMapping(methods: ['POST'], path: 'update')]
     public function update(RequestInterface $request, MemberService $service)
     {
         $userId = auth('jwt')->user()->getId();

@@ -66,7 +66,7 @@ class MemberCategorizationController extends AbstractController
         return $this->success();
     }
 
-    #[RequestMapping(methods: ['PUT'], path: 'update')]
+    #[RequestMapping(methods: ['POST'], path: 'update')]
     public function update(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
@@ -94,7 +94,7 @@ class MemberCategorizationController extends AbstractController
         return $this->success();
     }
 
-    #[RequestMapping(methods: ['PUT'], path: 'update/order')]
+    #[RequestMapping(methods: ['POST'], path: 'update/order')]
     public function updateOrder(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
@@ -218,7 +218,7 @@ class MemberCategorizationController extends AbstractController
         return $this->success($data);
     }
 
-    #[RequestMapping(methods: ['PUT'], path: 'detail/update')]
+    #[RequestMapping(methods: ['POST'], path: 'detail/update')]
     public function updateDetail(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
@@ -248,7 +248,7 @@ class MemberCategorizationController extends AbstractController
         return $this->success();
     }
 
-    #[RequestMapping(methods: ['DELETE'], path: 'detail/delete')]
+    #[RequestMapping(methods: ['POST'], path: 'detail/delete')]
     public function deleteDetail(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
@@ -272,7 +272,7 @@ class MemberCategorizationController extends AbstractController
         return $this->success();
     }
 
-    #[RequestMapping(methods: ['DELETE'], path: 'delete')]
+    #[RequestMapping(methods: ['POST'], path: 'delete')]
     public function delete(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
