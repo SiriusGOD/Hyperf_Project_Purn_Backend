@@ -94,25 +94,14 @@ class WithdrawController extends AbstractController
     }
 
 
-    #[RequestMapping(methods: ['GET'], path: 'edit')]
-    public function edit(RequestInterface $request, UserService $service, RoleService $roleService)
+    #[RequestMapping(methods: ['GET'], path: 'set')]
+    public function set(RequestInterface $request, ResponseInterface $response, WithdrawService $roleService)
     {
         $id = $request->input('id');
-        $user = $service->findUser(intval($id));
-        $data['user'] = $user;
-        $data['google2fa_url'] = '';
-        $data['qrcode_image'] = '';
         // 如果 還沒設定GOOGLE 驗證碼
         $data['navbar'] = trans('default.manager_control.manager_update');
         $data['user_active'] = 'active';
         $data['roles'] = $roleService->getAll();
-        return $this->render->render('admin.withdraw.form', $data);
-    }
-
-    #[RequestMapping(methods: ['POST'], path: 'delete')]
-    public function delete(RequestInterface $request, ResponseInterface $response, UserService $service): PsrResponseInterface
-    {
-        $service->deleteUser($request->input('id'));
         return $response->redirect('/admin/withdraw/index');
     }
 }

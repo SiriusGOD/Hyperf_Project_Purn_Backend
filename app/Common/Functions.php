@@ -91,7 +91,20 @@ if (! function_exists('stdLog')) {
         return di()->get(StdoutLoggerInterface::class);
     }
 }
-
+/*
+ *
+ *日誌生成 
+ */
+if (! function_exists('errLog')) {
+    /**
+     * @param mixed $str
+     */
+    function errLog($str = 'log')
+    {
+        stdLog()->info($str);
+        return logger("errLog")->info($str);
+    }
+}
 /*
  * 文件日志
  */

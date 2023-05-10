@@ -10,7 +10,9 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace App\Service;
+use App\Constants\WithdrawCode;
 use App\Model\MemberWithdraw;
+use App\Model\Member;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
@@ -58,4 +60,96 @@ class WithdrawService extends BaseService
         return $model;
     }
 
+    //更新提現訂單設定 
+    public function setWithDraw(array $inputData){
+        $id = $inputData['id'];
+        $flag = $inputData['flag'];
+        $admin_name = auth('session')->user()->name;
+        $withdraw = MemberWithdraw::where('id', $id)->where('status', 0)->first();
+
+        if (is_null($withdraw)) {
+          return [trans('default.withdraw.no_data'), WithdrawCode::NO_DATA];
+        }
+        if ('usdt' == $flag) {
+            $update = [
+                'status'     => WithdrawCode::STATUS_POST,
+                'channel'    => 'usdt-' . $admin_name,
+                'cash_id'    => 'usdt-' . md5($admin_name),
+                'order_desc' => "[$admin_name] usdt处理",
+                'updated_at' => time(),
+            ];
+            $isOk = $withdraw->update($update);
+            if ($isOk) {
+                return [trans('default.withdraw.withdraw_usdt_success'), WithdrawCode::USDT_SUCCESS];
+          //      return $this->ajaxSuccess('USDT 操作成功');
+            }
+      
+        } elseif ('refuse' == $flag) {
+            //审核不通过 退回申请余额
+            $update = [
+                'status'     => WithdrawCode::STATUS_REFUSE,
+                'order_desc' => "[$admin_name] 拒绝处理",
+                'updated_at' => time(),
+            ];
+            $isOk = $withdraw->update($update);
+            if ($isOk) {
+                if($withdraw->withdraw_from == WithdrawCode::DRAW_TYPE_PROXY){//代理
+                    Member::where(['id' => $withdraw->member_id])->increment('tui_coins', $withdraw->coins);
+                }elseif($withdraw->withdraw_from == WithdrawCode::DRAW_TYPE_MV){//视频 ｜ 裸聊
+                    Member::where(['id' => $withdraw->member_id])->increment('g_coins', $withdraw->coins);
+                }
+                //return $this->ajaxSuccess('提现拒绝操作成功');
+                return [trans('default.withdraw.no_data') , WithdrawCode::REJECT_WITHDRAW];
+            }
+        } elseif ('pass' == $flag) {
+            /** @var MemberModel $memberinfo */
+            $memberinfo = $withdraw->load('withMember')->withMember;
+
+            $app_type = $memberinfo->oauth_type;
+            //发起请求
+            $data = array(
+                "app_id"      => $withdraw->id,
+                "app_name"    => env("SYSTEM_ID"),
+                "app_type"    => ($app_type != 'pwa' && $app_type != 'web') ? $app_type : 'pc',
+                "username"    => trim($withdraw->name),
+                "type"        => 'bankcard',
+                "card_number" => trim($withdraw->account),
+                'bankcode'    => '',
+                "amount"      => $withdraw->amount,
+                "aff"         => $memberinfo->aff,
+                "phone"       => "",
+                "notify_url"  => env("SYSTEM_NOTIFY_WITHDRAW_URL"),
+            );
+            ksort($data);
+            $str = "";
+            foreach ($data as $row) {
+                $str .= $row;
+            }
+            $user_withdraw_key = env('pay.user_withraw_key');
+            $user_withdraw_url = env('pay.user_withraw_url');
+            env("APP_ENV") != 'product' && $user_withdraw_url = '';
+            $data['sign'] = md5($str . $user_withdraw_key);
+            errLog('proxy:'.var_export($data,true));
+            $re = di(\App\Service\CurlService::class)->deleteMp4($user_withdraw_url, $data);
+            errLog('proxy-result:' . var_export([$data, $re], true));
+            $re = json_decode($re, true);
+            if (isset($re['success']) && $re['success'] == true && $re['data']['code'] == 200) {
+                $data = [
+                    'updated_at' => time(),
+                    'status'     => WithdrawCode::STATUS_SUCCESS,
+                    'channel'    => $re['data']['channel'],
+                    'cash_id'    => $re['data']['order_id'],
+                    'descp'      => "[$admin_name] 批准审核"
+                ];
+                MemberWithdraw::where(['id' => $withdraw->id])->update($data);
+                //return $this->ajaxSuccess('请款操作成功');
+                return [ trans('default.withdraw.withdraw_pass_success'), WithdrawCode::PASS_WITHDRAW];
+            }
+            return [ $re['errors'][0]['message'], WithdrawCode::AJAX_ERROR];
+            //return $this->ajaxError($re['errors'][0]['message']);
+        }
+        return [ trans('default.withdraw.withdraw_faild'), WithdrawCode::OPERATION_ERROR];
+        //$this->ajaxError('操作失败，联系管理员~'); 
+
+    }
 }

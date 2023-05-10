@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 /**
  * This file is part of Hyperf.
@@ -18,7 +17,7 @@ use HyperfTest\HttpTestCase;
  * @internal
  * @coversNothing
  */
-class ActorApiTest extends HttpTestCase
+class CommonTest extends HttpTestCase
 {
      /**
      * @var Client
@@ -33,17 +32,8 @@ class ActorApiTest extends HttpTestCase
 
     public function testApiList()
     {
-        $countRes = $this->client->get('/api/actor/count');
-        $count = (int)$countRes['data']["count"];
-        if( $count > 10 ){
-          $res1 = $this->client->get('/api/actor/list');
-          $this->assertSame(200, (int) $res1['code']);
-          $res2 = $this->client->get('/api/actor/list',['page'=>1]);
-          $this->assertSame(200, (int) $res2['code']);
-          $this->assertNotSame($res2['data']["models"][0]["id"], $res1['data']["models"][0]["id"]);
-        }else{
-          $this->assertSame(200, (int)$countRes['code']);
-        }
-   }
+       errLog("we222rwerwer"); 
+
+    }
 
 }

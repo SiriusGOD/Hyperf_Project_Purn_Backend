@@ -161,6 +161,11 @@ return [
     ],
 
     'withdraw'=>[
+      'no_data' => '查無資料',
+      'withdraw_reject' => '提现拒绝操作成功',
+      'withdraw_pass_success'=>'请款操作成功',
+      'withdraw_faild'=>'操作失败，联系管理员~',
+      'withdraw_usdt_success'=>'USDT 操作成功~',
       'title'=>'提現列表',
       'pass'=>'審核通過',
       'cancel'=>'取消申請',
