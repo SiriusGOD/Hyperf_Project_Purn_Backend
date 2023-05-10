@@ -94,7 +94,6 @@ class RedeemService extends BaseService
       public function checkRedeem(string $code)
       {
           $end = Carbon::now()->toDateTimeString();  
-          print_r([$end, $code ,RedeemCode::ABLE]);
           $model = $this->redeem->where('status', RedeemCode::ABLE)
                                 ->where('code', $code)
                                 ->where('end','>=', $end)->exists();
