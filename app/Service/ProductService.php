@@ -113,9 +113,16 @@ class ProductService
     }
 
     // 獲取商品列表 (點數 鑽石)
-    public function getListByType($type)
+    public function getListByType($type, $isTW)
     {
-        $checkRedisKey = self::CACHE_KEY . ':' . $type;
+        $checkRedisKey = self::CACHE_KEY . ':' . $type .':';
+        if($isTW == 1){
+            $checkRedisKey .= 'TW';
+            $compareCurrency = Product::CURRENCY[3];
+        }else{
+            $checkRedisKey .= 'OtherRegion'; 
+            $compareCurrency = Product::CURRENCY[0];
+        }
 
         if ($this->redis->exists($checkRedisKey)) {
             $jsonResult = $this->redis->get($checkRedisKey);
@@ -123,13 +130,14 @@ class ProductService
         }
 
         $now = Carbon::now()->toDateTimeString();
-
+        
         switch ($type) {
             case 'coin':
-                $query = Coin::join('products', function ($join) {
+                $query = Coin::join('products', function ($join) use ($compareCurrency) {
                     $join->on('coins.id', '=', 'products.correspond_id')
                         ->where('products.type', Product::TYPE_CORRESPOND_LIST['points'])
-                        ->where('expire', Product::EXPIRE['no']);
+                        ->where('expire', Product::EXPIRE['no'])
+                        ->where('products.currency', $compareCurrency);
                 })->selectRaw('products.id, products.name, products.currency, products.selling_price, coins.type, coins.bonus')->where('coins.type', Coin::TYPE_LIST[0])->orderBy('coins.points')->get()->toArray();
                 break;
             case 'diamond':
@@ -188,9 +196,16 @@ class ProductService
     }
 
     // 獲取商品列表 (會員卡)
-    public function getListByMember()
+    public function getListByMember($isTW)
     {   
-        $checkRedisKey = self::CACHE_KEY . ':member';
+        $checkRedisKey = self::CACHE_KEY . ':member:';
+        if($isTW == 1){
+            $checkRedisKey .= 'TW';
+            $compareCurrency = Product::CURRENCY[3];
+        }else{
+            $checkRedisKey .= 'OtherRegion'; 
+            $compareCurrency = Product::CURRENCY[0];
+        }
 
         if ($this->redis->exists($checkRedisKey)) {
             $jsonResult = $this->redis->get($checkRedisKey);
@@ -213,7 +228,7 @@ class ProductService
             // 撈取個商品的支付方式   
             $pay_query = PayCorrespond::join('pays', 'pays.id', 'pay_corresponds.pay_id')->where('pays.expire', Pay::EXPIRE['no'])->where('pay_corresponds.product_id', $value['id'])->select('pays.id', 'pays.name', 'pays.pronoun')->get()->toArray();
 
-            if($value['type'] == MemberLevel::TYPE_LIST['0']){
+            if($value['type'] == MemberLevel::TYPE_LIST['0'] && $value['currency'] == $compareCurrency){
                 array_push($vip_arr, array(
                     'id' => $value['id'],
                     'name' => $value['name'],
@@ -228,7 +243,7 @@ class ProductService
                     $vip_index = $vip_key;
                 }
                 $vip_key++;
-            }else{
+            }else if($value['currency'] == $compareCurrency){
                 array_push($diamond_arr, array(
                     'id' => $value['id'],
                     'name' => $value['name'],
