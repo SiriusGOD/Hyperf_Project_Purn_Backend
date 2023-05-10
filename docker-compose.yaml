@@ -14,15 +14,17 @@ services:
       - backend
   php:
     restart: always
-    container_name: php
-    build: ./php
+    container_name: prontrest_php
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     image: hyperf:2.6.4 
     expose:
       - "9501"
     ports:
       - "9501:9501"
     volumes:
-      - /Users/mac/code/comp101/first_video:/var/www
+      - .:/var/www
     environment:
       TZ: Asia/Shanghai
     networks:
