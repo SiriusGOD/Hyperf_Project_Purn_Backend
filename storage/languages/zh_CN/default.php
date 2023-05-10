@@ -166,6 +166,7 @@ return [
       'withdraw_pass_success'=>'请款操作成功',
       'withdraw_faild'=>'操作失败，联系管理员~',
       'withdraw_usdt_success'=>'USDT 操作成功~',
+      'pass_usdt' => 'USDT提領',
       'title'=>'提現列表',
       'pass'=>'審核通過',
       'cancel'=>'取消申請',

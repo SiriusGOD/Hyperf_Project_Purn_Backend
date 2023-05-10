@@ -95,6 +95,7 @@ class BaseService
     {
         if (isset($datas['id']) && ! empty($datas['id'])) {
             $model = $model->where('id', $datas['id'])->first();
+            unset($datas['id']);
         } else {
             $model = new $model();
         }

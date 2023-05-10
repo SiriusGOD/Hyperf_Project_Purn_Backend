@@ -66,7 +66,6 @@ class WithdrawService extends BaseService
         $flag = $inputData['flag'];
         $admin_name = auth('session')->user()->name;
         $withdraw = MemberWithdraw::where('id', $id)->where('status', 0)->first();
-
         if (is_null($withdraw)) {
           return [trans('default.withdraw.no_data'), WithdrawCode::NO_DATA];
         }
@@ -76,7 +75,7 @@ class WithdrawService extends BaseService
                 'channel'    => 'usdt-' . $admin_name,
                 'cash_id'    => 'usdt-' . md5($admin_name),
                 'order_desc' => "[$admin_name] usdt处理",
-                'updated_at' => time(),
+                'updated_at' => date("Y-m-d H:i:s"),
             ];
             $isOk = $withdraw->update($update);
             if ($isOk) {
@@ -89,34 +88,33 @@ class WithdrawService extends BaseService
             $update = [
                 'status'     => WithdrawCode::STATUS_REFUSE,
                 'order_desc' => "[$admin_name] 拒绝处理",
-                'updated_at' => time(),
+                'updated_at' => date("Y-m-d H:i:s"),
             ];
-            $isOk = $withdraw->update($update);
+            $update['id'] = $id ;
+            $isOk = $this->modelStore($withdraw, $update);
             if ($isOk) {
                 if($withdraw->withdraw_from == WithdrawCode::DRAW_TYPE_PROXY){//代理
-                    Member::where(['id' => $withdraw->member_id])->increment('tui_coins', $withdraw->coins);
+                    //Member::where(['id' => $withdraw->member_id])->increment('tui_coins', $withdraw->coins);
                 }elseif($withdraw->withdraw_from == WithdrawCode::DRAW_TYPE_MV){//视频 ｜ 裸聊
-                    Member::where(['id' => $withdraw->member_id])->increment('g_coins', $withdraw->coins);
+                    //Member::where(['id' => $withdraw->member_id])->increment('g_coins', $withdraw->coins);
                 }
                 //return $this->ajaxSuccess('提现拒绝操作成功');
-                return [trans('default.withdraw.no_data') , WithdrawCode::REJECT_WITHDRAW];
+                return [trans('default.withdraw.withdraw_reject') , WithdrawCode::REJECT_WITHDRAW];
             }
         } elseif ('pass' == $flag) {
             /** @var MemberModel $memberinfo */
-            $memberinfo = $withdraw->load('withMember')->withMember;
 
-            $app_type = $memberinfo->oauth_type;
             //发起请求
             $data = array(
                 "app_id"      => $withdraw->id,
                 "app_name"    => env("SYSTEM_ID"),
-                "app_type"    => ($app_type != 'pwa' && $app_type != 'web') ? $app_type : 'pc',
+                "app_type"    => 'app',
                 "username"    => trim($withdraw->name),
                 "type"        => 'bankcard',
                 "card_number" => trim($withdraw->account),
                 'bankcode'    => '',
                 "amount"      => $withdraw->amount,
-                "aff"         => $memberinfo->aff,
+                "aff"         => $withdraw->member->aff,
                 "phone"       => "",
                 "notify_url"  => env("SYSTEM_NOTIFY_WITHDRAW_URL"),
             );

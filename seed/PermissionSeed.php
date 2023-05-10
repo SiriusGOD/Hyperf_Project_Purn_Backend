@@ -53,6 +53,7 @@ class PermissionSeed implements BaseInterface
                 'withdraw-detail',
                 'withdraw-pass',
                 'withdraw-cancel',
+                'withdraw-set',
             ],
         ];
 

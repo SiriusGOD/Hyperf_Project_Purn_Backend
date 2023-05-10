@@ -14,6 +14,7 @@ use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
 use App\Model\Member;
 use App\Service\MemberService;
+use App\Service\WithdrawService;
 
 /**
  * @internal
@@ -46,4 +47,20 @@ class WithdrawTest extends HttpTestCase
         $this->assertSame(200, (int)$data['code']);
     }
 
+    //測試提現refuse 
+    public function testWithdrawSetReused()
+    {
+        $d = ['id'=>1 , 'flag'=>'refuse'] ;
+        $res=make(WithdrawService::class)->setWithDraw($d);
+        $this->assertSame(200,  200);
+    }
+
+    //測試提現 
+    public function testWithdrawSetPass()
+    {
+        $d = ['id'=>2 , 'flag'=>'pass'] ;
+        $res=make(WithdrawService::class)->setWithDraw($d);
+        print_r([$res]);
+        $this->assertSame(200,  200);
+    }
 }

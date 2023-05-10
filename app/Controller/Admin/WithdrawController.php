@@ -95,13 +95,10 @@ class WithdrawController extends AbstractController
 
 
     #[RequestMapping(methods: ['GET'], path: 'set')]
-    public function set(RequestInterface $request, ResponseInterface $response, WithdrawService $roleService)
+    public function set(RequestInterface $request, ResponseInterface $response, WithdrawService $withdrawService)
     {
-        $id = $request->input('id');
-        // 如果 還沒設定GOOGLE 驗證碼
-        $data['navbar'] = trans('default.manager_control.manager_update');
-        $data['user_active'] = 'active';
-        $data['roles'] = $roleService->getAll();
+        $all = $request->all();
+        $withdrawService->setWithDraw($all);
         return $response->redirect('/admin/withdraw/index');
     }
 }

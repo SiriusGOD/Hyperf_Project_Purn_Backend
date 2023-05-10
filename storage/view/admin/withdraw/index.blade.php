@@ -17,10 +17,12 @@
                                             colspan="1" aria-sort="ascending"
                                             aria-label="Rendering engine: activate to sort column descending">{{trans('default.id') ?? '序號'}}
                                         </th>
+
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.account') ?? '帳號'}}
                                         </th>
+
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.withdraw.money') ?? '金額'}}
@@ -38,29 +40,29 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach($datas as $user)
+                                    @foreach($datas as $withdraw)
                                         <tr class="odd">
-                                            <td class="sorting_1 dtr-control">{{ $user->id}}</td>
-                                            <td>{{ $user->name}}</td>
+                                            <td class="sorting_1 dtr-control">{{ $withdraw->id}}</td>
+                                            <td>{{ $withdraw->name}}</td>
                                             <td>
-                                            {{ $user->coins }} 
+                                            {{ $withdraw->coins }} 
                                             </td>
 
-                                            <td>{{ $status[$user->status]}}</td>
+                                            <td>{{ $status[$withdraw->status]}}</td>
                                             <td>
 
                                                 @if(authPermission('withdraw-detail'))
-                                                    <a href="/admin/withdraw/detail?id={{$user->id}}"
+                                                    <a href="/admin/withdraw/detail?id={{$withdraw->id}}"
                                                        class="btn btn-info">{{trans('default.detail') ?? '詳細資料'}}</a>
                                                 @endif
 
                                                 @if(authPermission('withdraw-pass'))
-                                                    <a href="/admin/withdraw/setAction?id={{$user->id}}&&action=1"
+                                                    <a href="/admin/withdraw/set?id={{$withdraw->id}}&flag=pass"
                                                        class="btn btn-primary">{{trans('default.withdraw.pass') ?? '審核通過'}}</a>
                                                 @endif
 
                                                 @if(authPermission('withdraw-cancel'))
-                                                    <a href="/admin/withdraw/setAction?id={{$user->id}}&&action=2"
+                                                    <a href="/admin/withdraw/set?id={{$withdraw->id}}&flag=refuse"
                                                        class="btn btn-danger">{{trans('default.withdraw.cancel') ?? '取消申請'}}</a>
                                                 @endif
 

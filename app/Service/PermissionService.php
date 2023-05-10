@@ -84,6 +84,7 @@ class PermissionService
         $callBackStr = explode('Controller', $callBackStr[1]);
         $key = strtolower($callBackStr[0]) . '-' . $callbacks[1];
         $flag = self::checkPermission($key);
+        errLog($key."----" .$flag);
         self::recordStep($key);
         if ($flag) {
             return true;
