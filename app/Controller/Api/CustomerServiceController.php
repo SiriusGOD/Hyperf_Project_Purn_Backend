@@ -151,7 +151,7 @@ class CustomerServiceController extends AbstractController
             $key = (int) $key;
             $result[] = [
                 'id' => $key,
-                'name' => $value
+                'name' => $value,
             ];
         }
         return $this->success($result);

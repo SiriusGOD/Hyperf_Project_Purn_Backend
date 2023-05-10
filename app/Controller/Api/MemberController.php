@@ -15,7 +15,6 @@ use App\Constants\ErrorCode;
 use App\Controller\AbstractController;
 use App\Job\EmailVerificationJob;
 use App\Middleware\Auth\ApiAuthMiddleware;
-use App\Middleware\LoginLimitMiddleware;
 use App\Middleware\TryLimitMiddleware;
 use App\Middleware\ApiEncryptMiddleware;
 use App\Model\Member;
@@ -81,7 +80,7 @@ class MemberController extends AbstractController
             $memberCategorizationService->createOrUpdateMemberCategorization([
                 'member_id' => $user->id,
                 'name' => trans('default.default_categorization_name'),
-                'hot_order' => 0,
+                'hot_order' => 1,
                 'is_default' => 1,
                 'is_first' => 1,
             ]);

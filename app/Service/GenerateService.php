@@ -15,8 +15,6 @@ use App\Constants\Constants;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\ImageGroup;
-use App\Model\Report;
-use Hyperf\Redis\Redis;
 use App\Model\Video;
 
 class GenerateService
@@ -85,6 +83,20 @@ class GenerateService
         return $result;
     }
 
+    public function generateImage(int $id, array $images): array
+    {
+        $imageGroup = ImageGroup::find($id)->toArray();
+        $url = $this->getImageUrl($imageGroup);
+        $result = [];
+        foreach ($images as $key => $image) {
+            $image['thumbnail'] = $url . $image['thumbnail'];
+            $image['url'] = $url . $image['url'];
+            $result[] = $image;
+        }
+
+        return $result;
+    }
+
     protected function getBaseUrl()
     {
         return env('TEST_IMG_URL');
@@ -115,20 +127,6 @@ class GenerateService
 
         foreach ($models as $model) {
             $result[] = $model['id'];
-        }
-
-        return $result;
-    }
-
-    public function generateImage(int $id, array $images) : array
-    {
-        $imageGroup = ImageGroup::find($id)->toArray();
-        $url = $this->getImageUrl($imageGroup);
-        $result = [];
-        foreach ($images as $key => $image) {
-            $image['thumbnail'] = $url . $image['thumbnail'];
-            $image['url'] = $url . $image['url'];
-            $result[] = $image;
         }
 
         return $result;
