@@ -69,28 +69,23 @@ class WithdrawController extends AbstractController
         return $this->render->render('admin.withdraw.index', $data);
     }
 
-    #[RequestMapping(methods: ['POST'], path: 'store')]
-    public function store(UserUpdateRequest $request, ResponseInterface $response, UserService $service): PsrResponseInterface
+    #[RequestMapping(methods: ['GET'], path: 'detail')]
+    public function detail(UserUpdateRequest $request): PsrResponseInterface
     {
-        $path = '';
-        if ($request->hasFile('avatar')) {
-            $path = $service->moveUserAvatar($request->file('avatar'));
-            $data['avatar'] = $path;
+        $id = $request->input('id');
+        $users = $this->withdrawService->get($id);
+        $data['last_page'] = ceil($total / WithdrawCode::PAGE_PER);
+        if ($total == 0) {
+            $data['last_page'] = 1;
         }
-        $service->storeUser($data);
-        return $response->redirect('/admin/withdraw/index');
-    }
-
-    #[RequestMapping(methods: ['GET'], path: 'create')]
-    public function create(RoleService $roleService)
-    {
-        $data['google2fa_url'] = '';
-        $data['qrcode_image'] = '';
-        $data['navbar'] = trans('default.manager_control.manager_insert');
-        $data['user'] = new User();
-        $data['roles'] = $roleService->getAll();
-        $data['user_active'] = 'active';
-        return $this->render->render('admin.withdraw.form', $data);
+        $data['status'] = WithdrawCode::STATUS;
+        $data['total'] = $total;
+        $data['datas'] = $users;
+        $data['page'] = $page;
+        $data['step'] = WithdrawCode::PAGE_PER;
+        $data['navbar'] = trans('default.withdraw.detail');
+        $data['withdraw_active'] = 'active';
+        return $this->render->render('admin.withdraw.index', $data);
     }
 
 

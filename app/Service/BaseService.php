@@ -125,6 +125,11 @@ class BaseService
         return $res;
     }
 
+    // 共用取得
+    public function get($model,  int $id)
+    {
+      return $model->where('id', $id)->first();
+    }
     // 共用清單
     public function list($model, array $where, int $page, int $limit)
     {

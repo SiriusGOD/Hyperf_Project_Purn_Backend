@@ -161,6 +161,7 @@ return [
     ],
     'withdraw'=>[
       'no_data' => '查無資料',
+      'detail' => '提現詳細資料',
       'withdraw_reject' => '提现拒绝操作成功',
       'withdraw_pass_success'=>'请款操作成功',
       'withdraw_faild'=>'操作失败，联系管理员~',
