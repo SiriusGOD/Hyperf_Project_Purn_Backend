@@ -98,7 +98,7 @@ class OrderController extends AbstractController
     {
         // 顯示幾筆
         $step = Order::PAGE_PER;
-        $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
+        $page = $request->input('page') ? intval($request->input('page'), 10) : 0;
         $order_number = $request->input('order_number');
         $order_status = $request->input('order_status');
         $orders = $service->searchOrders($order_number, $order_status, $page);

@@ -40,7 +40,7 @@ class OrderService
     }
 
     // 取得訂單
-    public function searchOrders($order_number, $order_status, $page = 1): object
+    public function searchOrders($order_number, $order_status, $page = 0): object
     {
         // 顯示幾筆
         $step = Order::PAGE_PER;
@@ -51,7 +51,7 @@ class OrderService
         } elseif (! empty($order_status)) {
             $query = $query->where('orders.status', '=', $order_status);
         }
-        $query = $query->offset(($page - 1) * $step)
+        $query = $query->offset($page * $step)
             ->orderByDesc('orders.id')
             ->limit($step);
         return $query->get();
