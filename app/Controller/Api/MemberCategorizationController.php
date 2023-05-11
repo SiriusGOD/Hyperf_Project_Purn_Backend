@@ -188,6 +188,7 @@ class MemberCategorizationController extends AbstractController
                     'limit' => $limit,
                     'sort_by' => $request->input('sort_by'),
                     'is_asc' => $request->input('is_asc'),
+                    'filter' => $request->input('filter'),
                 ]),
             ];
 
@@ -211,6 +212,7 @@ class MemberCategorizationController extends AbstractController
             'limit' => $limit,
             'sort_by' => $request->input('sort_by'),
             'is_asc' => $request->input('is_asc'),
+            'filter' => $request->input('filter'),
         ]);
 
         $data = [

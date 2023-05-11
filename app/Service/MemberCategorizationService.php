@@ -92,6 +92,10 @@ class MemberCategorizationService extends GenerateService
             }
         }
 
+        if (!empty($params['filter'])) {
+            $query = $query->where('type', $params['filter']);
+        }
+
         $models = $query->get();
         if (empty($models)) {
             return [];
@@ -122,6 +126,11 @@ class MemberCategorizationService extends GenerateService
         }
 
         return $rows;
+    }
+
+    public function getCount(int $id) : int
+    {
+        return MemberCategorizationDetail::where('member_categorization_id', $id)->count();
     }
 
     public function setDefault(int $memberId, int $id): void
@@ -179,6 +188,12 @@ class MemberCategorizationService extends GenerateService
                 $query = $query->orderByDesc('id');
             }
         }
+
+        if (!empty($params['filter'])) {
+            $query = $query->where('type', $params['filter']);
+        }
+
+
         $models = $query->get()->toArray();
         $result = [];
         $result = $this->getVideoDetail($models, $result);
@@ -205,6 +220,19 @@ class MemberCategorizationService extends GenerateService
         }
 
         return $result;
+    }
+
+    public function getDefaultCount(int $memberId) : int
+    {
+        $ids = MemberCategorization::where('member_id', $memberId)
+            ->get()
+            ->pluck('id')
+            ->toArray();
+        if (empty($ids)) {
+            return 0;
+        }
+
+        return MemberCategorizationDetail::whereIn('member_categorization_id', $ids)->count();
     }
 
     public function IsMain(int $memberId, array $models): array
