@@ -95,6 +95,7 @@ return [
     'status' => '状态',
     'status_one' => '未完成',
     'status_second' => '已完成',
+    'option' => '操作',
     'change_status_fail' => '改为未完成',
     'change_status_true' => '改为已完成',
     'ip' => 'IP位址',
@@ -174,6 +175,13 @@ return [
       'money'=>'提現金額'
     ],
 
+    'channels'=>[
+        'title' => '渠道 ',
+        'name' => '列表',
+        'url' => '網址',
+        'params' => '參數',
+        'amount' => '说明',
+    ],
     'user-step'=>[
         'index' => '列表',
         'username' => '管理者',

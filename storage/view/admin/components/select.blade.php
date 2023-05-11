@@ -1,0 +1,1 @@
+{!! Form::select( $name,  modelsAssociation($setting['association']) , null, ['class' => 'form-control']) !!}
