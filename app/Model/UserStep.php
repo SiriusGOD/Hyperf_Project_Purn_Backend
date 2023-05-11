@@ -44,4 +44,34 @@ class UserStep extends Model
     {
         return $this->belongsTo(Role::class);
     }
+    
+    /**
+     * 欄位基本設定 
+     */
+    public function tableFieldsSetting()
+    {
+        return  [
+            'user_name' => [
+                'type' => 'text',
+                'required' => true,
+                'search' => true,
+                'search' => [
+                    'level' => 'like'
+                ],
+            ],            
+            'user_id' => [
+                'type' => 'text',
+                'required' => false,
+                'search' => true,
+            ],
+            'action' => [
+                'type' => 'text',
+                'required' => false,
+            ],
+            'comment' => [
+                'type' => 'text',
+                'required' => true,
+            ]
+        ];
+    }
 }

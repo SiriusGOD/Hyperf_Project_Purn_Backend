@@ -117,6 +117,7 @@ return [
     'click_num' => "點擊次數",
     'default_categorization_name' => '未整理分類',
     'default_all_categorization_name' => '所有分類',
+    'option' => '操作',
     // -------------------------------------------------------------------
     // video
     'video' => [
@@ -179,6 +180,14 @@ return [
       'comment' => '說明',
       'title' => '操作日誌'
     ],
+    'channels'=>[
+        'title' => '渠道 ',
+        'url' => '網址',
+        'name' => '列表',
+        'params' => '參數',
+        'amount' => '说明',
+    ],
+
     // redeem
     'redeem' => [
         'insert' => '新增優惠卷',
