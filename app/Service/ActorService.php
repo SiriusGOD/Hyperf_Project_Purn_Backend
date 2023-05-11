@@ -98,7 +98,7 @@ class ActorService
             }
 
             // avatar加上網域
-            if(!empty($value['avatar']))$query[$key]['avatar'] = env('IMG_DOMAIN').$value['avatar'];
+            if(!empty($value['avatar']))$query[$key]['avatar'] = env('TEST_IMG_URL').$value['avatar'];
         }
         return $query;
     }

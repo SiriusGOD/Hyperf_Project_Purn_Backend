@@ -476,7 +476,7 @@ class MemberService extends BaseService
             if($value == 'actor'){
               foreach ($query as $key2 => $value2) {
                   // avatar加上網域
-                  if(!empty($value2['avatar']))$query[$key2]['avatar'] = env('IMG_DOMAIN').$value2['avatar'];
+                  if(!empty($value2['avatar']))$query[$key2]['avatar'] = env('TEST_IMG_URL').$value2['avatar'];
                   // 查詢作品數
                   $numberOfWorks = ActorCorrespond::where('actor_id', $value2['id'])->count();
                   $query[$key2]['numberOfWorks'] = $numberOfWorks;
