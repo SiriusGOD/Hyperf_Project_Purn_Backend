@@ -14,7 +14,11 @@ namespace App\Controller\Api;
 use App\Controller\AbstractController;
 use App\Job\MemberHideModelJob;
 use App\Middleware\Auth\ApiAuthMiddleware;
+use App\Model\ImageGroup;
+use App\Model\MemberCategorization;
+use App\Model\MemberCategorizationDetail;
 use App\Model\Report;
+use App\Model\Video;
 use App\Service\ReportService;
 use Hyperf\AsyncQueue\Driver\DriverFactory;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -49,6 +53,7 @@ class ReportController extends AbstractController
         $exist = Report::where('member_id', $memberId)
             ->where('model_type', $modelType)
             ->where('model_id', $modelId)
+            ->where('status', '<>', Report::STATUS['cancel'])
             ->exists();
 
         if ($exist) {
@@ -63,6 +68,41 @@ class ReportController extends AbstractController
             'type' => $type,
             'status' => $status,
         ]);
+
+        $ids = MemberCategorization::where('member_id', $memberId)->get()->pluck('id')->toArray();
+        MemberCategorizationDetail::where('type', $modelType)
+            ->where('type_id', $modelId)
+            ->whereIn('member_categorization_id', $ids)
+            ->delete();
+
+        $driver = $factory->get('default');
+        $driver->push(new MemberHideModelJob($memberId));
+
+        return $this->success();
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'cancel')]
+    public function cancel(RequestInterface $request, ReportService $service, DriverFactory $factory)
+    {
+        $memberId = auth('jwt')->user()->getId();
+        $modelType = Report::MODEL_TYPE[$request->input('model_type')] ?? null;
+        $modelId = $request->input('model_id');
+
+        if (empty($modelType) or empty($modelId)) {
+            return $this->error(trans('validation.exists', ['attribute' => 'model_type or model_id']), 400);
+        }
+
+        Report::where('member_id', $memberId)
+            ->where('model_type', $modelType)
+            ->where('model_id', $modelId)
+            ->update([
+                'status' => Report::STATUS['cancel'],
+            ]);
+
+        match ($modelType) {
+            ImageGroup::class => ImageGroup::withTrashed()->where('id', $modelId)->restore(),
+            default => Video::withTrashed()->where('id', $modelId)->restore(),
+        };
 
         $driver = $factory->get('default');
         $driver->push(new MemberHideModelJob($memberId));

@@ -397,10 +397,11 @@ return [
         'image_group_pay_type_types' => [
             0 => '免費',
             1 => 'vip',
-            2 => '鑽石'
+            2 => '鑽石',
         ],
         'image_group_hot_order' => '大家都在看排序',
         'image_group_hot_order_desc' => ' 0 不排序，越小越前面',
+        'image_group_control_is_delete' => '是否刪除',
     ],
     // -------------------------------------------------------------------
     // OrderController
@@ -604,6 +605,7 @@ return [
             0 => '未處理',
             1 => '通過',
             2 => '未通過',
+            3 => '取消',
         ],
     ],
 ];

@@ -6,6 +6,8 @@ namespace App\Model;
 
 
 
+use Hyperf\Database\Model\SoftDeletes;
+
 /**
  * @property int $id 
  * @property int $member_categorization_id 
@@ -17,6 +19,7 @@ namespace App\Model;
  */
 class MemberCategorizationDetail extends Model
 {
+    use SoftDeletes;
     public const TYPES = [
         'video' => Video::class,
         'image_group' => ImageGroup::class,

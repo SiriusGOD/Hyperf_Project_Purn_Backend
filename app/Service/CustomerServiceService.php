@@ -13,7 +13,6 @@ namespace App\Service;
 
 use App\Model\CustomerService;
 use App\Model\CustomerServiceDetail;
-use App\Util\General;
 
 class CustomerServiceService
 {
@@ -60,7 +59,7 @@ class CustomerServiceService
             ]);
     }
 
-    public function list(int $memberId, int $page, int $limit, string $url) : array
+    public function list(int $memberId, int $page, int $limit, string $url): array
     {
         $models = CustomerService::where('member_id', $memberId)
             ->with('customerServiceCovers')

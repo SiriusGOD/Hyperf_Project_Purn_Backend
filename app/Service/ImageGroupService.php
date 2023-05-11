@@ -31,7 +31,7 @@ class ImageGroupService
 {
     public function storeImageGroup(array $data): ImageGroup
     {
-        $model = ImageGroup::findOrNew($data['id']);
+        $model = ImageGroup::withTrashed()->findOrNew($data['id']);
         $model->user_id = $data['user_id'];
         $model->title = $data['title'];
         if (! empty($data['url'])) {
@@ -41,6 +41,7 @@ class ImageGroupService
         $model->description = $data['description'];
         $model->pay_type = $data['pay_type'];
         $model->hot_order = $data['hot_order'];
+        $model->deleted_at = $data['deleted_at'] ?? null;
         $model->save();
 
         return $model;
@@ -181,7 +182,7 @@ class ImageGroupService
     {
         $step = ImageGroup::PAGE_PER;
         $page = $params['page'];
-        $query = ImageGroup::with(['user'])->offset(($page - 1) * $step)
+        $query = ImageGroup::withTrashed()->with(['user'])->offset(($page - 1) * $step)
             ->limit($step)
             ->leftJoin('clicks', function ($join) {
                 $join->on('image_groups.id', '=', 'clicks.type_id')->where('clicks.type', ImageGroup::class);
