@@ -34,7 +34,7 @@ class SimplePaginator
         ];
 
         if (! empty($this->path)) {
-            if (str_contains('?', $this->path)) {
+            if (!str_contains('?', $this->path)) {
                 $this->path .= '?';
             }
             $result['next'] = $this->path . 'page=' . ($this->page + 1);

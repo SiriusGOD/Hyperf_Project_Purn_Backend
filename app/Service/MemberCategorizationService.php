@@ -92,7 +92,7 @@ class MemberCategorizationService extends GenerateService
             }
         }
 
-        if (!empty($params['filter'])) {
+        if (! empty($params['filter'])) {
             $query = $query->where('type', $params['filter']);
         }
 
@@ -128,9 +128,11 @@ class MemberCategorizationService extends GenerateService
         return $rows;
     }
 
-    public function getCount(int $id) : int
+    public function getCount(int $id, string $type): int
     {
-        return MemberCategorizationDetail::where('member_categorization_id', $id)->count();
+        return MemberCategorizationDetail::where('member_categorization_id', $id)
+            ->where('type', $type)
+            ->count();
     }
 
     public function setDefault(int $memberId, int $id): void
@@ -189,10 +191,9 @@ class MemberCategorizationService extends GenerateService
             }
         }
 
-        if (!empty($params['filter'])) {
+        if (! empty($params['filter'])) {
             $query = $query->where('type', $params['filter']);
         }
-
 
         $models = $query->get()->toArray();
         $result = [];
@@ -222,7 +223,7 @@ class MemberCategorizationService extends GenerateService
         return $result;
     }
 
-    public function getDefaultCount(int $memberId) : int
+    public function getDefaultCount(int $memberId, string $type): int
     {
         $ids = MemberCategorization::where('member_id', $memberId)
             ->get()
@@ -232,7 +233,9 @@ class MemberCategorizationService extends GenerateService
             return 0;
         }
 
-        return MemberCategorizationDetail::whereIn('member_categorization_id', $ids)->count();
+        return MemberCategorizationDetail::whereIn('member_categorization_id', $ids)
+            ->where('type', $type)
+            ->count();
     }
 
     public function IsMain(int $memberId, array $models): array
