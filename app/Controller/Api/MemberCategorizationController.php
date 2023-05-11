@@ -225,7 +225,7 @@ class MemberCategorizationController extends AbstractController
         $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
         $data['video_count'] = $service->getCount($memberId, Video::class);
-        $data['image_group_id'] = $service->getCount($memberId, ImageGroup::class);
+        $data['image_group_count'] = $service->getCount($memberId, ImageGroup::class);
         return $this->success($data);
     }
 
