@@ -54,7 +54,12 @@ class CustomerService extends Model
 
     public function lastUpdatedAt()
     {
-        return $this->details()->orderByDesc('id')->first()->updated_at;
+        $model =  $this->details()->orderByDesc('id')->first();
+        if (empty($model)) {
+            return $this->updated_at;
+        }
+
+        return $model->updated_at;
     }
 
     public function getDetailCountAttribute()
