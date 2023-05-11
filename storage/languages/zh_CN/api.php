@@ -8,7 +8,9 @@ return [
     ],
     'member_control' => [
         'is_follow' => '该会员已追踪',
-        'no_follow_data' => '查无该会员追踪资料'
+        'no_follow_data' => '查无该会员追踪资料',
+        'dollar' => '元',
+        'point' => '点'
     ],
     'order_control' =>[
         'no_product_data' => '查无商品资料',

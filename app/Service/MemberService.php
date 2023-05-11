@@ -645,9 +645,9 @@ class MemberService extends BaseService
             $data[$key]['created_at'] = $order -> created_at -> format('Y.m.d'); ;
             $data[$key]['status'] = trans('default.order_control.order_status_fronted_msg')[$order -> status];
             if($order -> currency == Product::CURRENCY[0]){
-                $data[$key]['price'] = $order -> total_price . " 元";
+                $data[$key]['price'] = $order -> total_price . " " . trans('api.member_control.dollar');
             }else if($order -> currency == Product::CURRENCY[1]){
-                $data[$key]['price'] = $order -> total_price . " 点";
+                $data[$key]['price'] = $order -> total_price . " " . trans('api.member_control.point');
             }
             $data[$key]['pay_method'] =  $order -> pay_name;
         }

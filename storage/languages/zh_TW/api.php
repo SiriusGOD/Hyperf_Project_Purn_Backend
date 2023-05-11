@@ -9,6 +9,8 @@ return [
     'member_control' => [
         'is_follow' => '該會員已追蹤',
         'no_follow_data' => '查無該會員追蹤資料',
+        'dollar' => '元',
+        'point' => '點'
     ],
     'order_control' =>[
         'no_product_data' => '查無商品資料',
