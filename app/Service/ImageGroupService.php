@@ -25,6 +25,7 @@ use Carbon\Carbon;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Database\Model\Collection;
 use Hyperf\DbConnection\Db;
+use function Swoole\Coroutine\Http\get;
 
 class ImageGroupService
 {
@@ -134,11 +135,12 @@ class ImageGroupService
         return $query->get();
     }
 
-    public function getImageGroupsBySuggest(array $suggest, int $page, int $inputLimit = ImageGroup::PAGE_PER): array
+    public function getImageGroupsBySuggest(array $suggest, int $page, int $inputLimit, array $withoutIds = []): array
     {
         $result = [];
         $useImageIds = [];
-        $hideIds = ReportService::getHideIds(ImageGroup::class);
+        $reportHideIds = ReportService::getHideIds(ImageGroup::class);
+        $hideIds = array_merge($reportHideIds, $withoutIds);
         foreach ($suggest as $value) {
             $limit = $value['proportion'] * $inputLimit;
             if ($limit < 1) {

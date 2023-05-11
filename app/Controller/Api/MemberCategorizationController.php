@@ -15,8 +15,10 @@ use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Middleware\ApiEncryptMiddleware;
 use App\Middleware\Auth\ApiAuthMiddleware;
+use App\Model\ImageGroup;
 use App\Model\MemberCategorization;
 use App\Model\MemberCategorizationDetail;
+use App\Model\Video;
 use App\Service\MemberCategorizationService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -126,11 +128,14 @@ class MemberCategorizationController extends AbstractController
             return $this->error(trans('validation.authorize'), 401);
         }
 
+        $type = MemberCategorizationDetail::TYPES[$request->input('type')];
         $service->createMemberCategorizationDetail([
             'member_categorization_id' => $request->input('member_categorization_id'),
-            'type' => MemberCategorizationDetail::TYPES[$request->input('type')],
+            'type' => $type,
             'type_id' => $request->input('type_id'),
         ]);
+
+        $service->updateCache($memberId, $type);
 
         return $this->success();
     }
@@ -248,6 +253,43 @@ class MemberCategorizationController extends AbstractController
         return $this->success();
     }
 
+    #[RequestMapping(methods: ['POST'], path: 'detail/update/feed')]
+    public function updateDetailWithType(RequestInterface $request, MemberCategorizationService $service)
+    {
+        $memberId = auth()->user()->getId();
+        $type = MemberCategorizationDetail::TYPES[$request->input('type')] ?? null;
+        $id = $request->input('type_id');
+
+        if (empty($type) or empty($id)) {
+            return $this->error(trans('validation.required', ['attribute' => 'type or type_id']), 400);
+        }
+
+        $exist = MemberCategorization::where('member_id', $memberId)
+            ->where('id', $request->input('member_categorization_id', 0))
+            ->exists();
+
+        if (empty($exist)) {
+            return $this->error(trans('validation.authorize'), 401);
+        }
+
+        $model = MemberCategorization::where('member_id', $memberId)
+            ->join('member_categorization_details', 'member_categorizations.id', '=', 'member_categorization_details.member_categorization_id')
+            ->where('member_categorization_details.type', $type)
+            ->where('member_categorization_details.type_id', $id)
+            ->first();
+
+        if (empty($model)) {
+            return $this->error(trans('validation.authorize'), 401);
+        }
+
+        $service->updateMemberCategorizationDetails([
+            'ids' => [$model->id],
+            'member_categorization_id' => $request->input('member_categorization_id'),
+        ]);
+
+        return $this->success();
+    }
+
     #[RequestMapping(methods: ['POST'], path: 'detail/delete')]
     public function deleteDetail(RequestInterface $request, MemberCategorizationService $service)
     {
@@ -255,7 +297,7 @@ class MemberCategorizationController extends AbstractController
         $ids = $request->input('ids');
 
         if (empty($ids)) {
-            return $this->error(trans('validation.required', ['attribute' => 'ids']), 401);
+            return $this->error(trans('validation.required', ['attribute' => 'ids']), 400);
         }
 
         $count = MemberCategorization::where('member_id', $memberId)
@@ -269,6 +311,40 @@ class MemberCategorizationController extends AbstractController
 
         MemberCategorizationDetail::whereIn('id', $ids)->delete();
 
+        $service->updateCache($memberId, ImageGroup::class);
+        $service->updateCache($memberId, Video::class);
+
+        return $this->success();
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'detail/delete/feed')]
+    public function deleteDetailWithType(RequestInterface $request, MemberCategorizationService $service)
+    {
+        $memberId = auth()->user()->getId();
+        $id = $request->input('type_id');
+        $type = MemberCategorizationDetail::TYPES[$request->input('type')] ?? null;
+
+        if (empty($id) or empty($type)) {
+            return $this->error(trans('validation.required', ['attribute' => 'id']), 400);
+        }
+
+        $exist = MemberCategorization::where('member_id', $memberId)
+            ->join('member_categorization_details', 'member_categorizations.id', '=', 'member_categorization_details.member_categorization_id')
+            ->where('member_categorization_details.type', $type)
+            ->where('member_categorization_details.type_id', $id)
+            ->exists();
+
+        if (! $exist) {
+            return $this->error(trans('validation.authorize'), 401);
+        }
+
+        MemberCategorizationDetail::where('type', $type)->where('type_id', $id)->delete();
+
+        match ($type) {
+            ImageGroup::class => $service->updateCache($memberId, ImageGroup::class),
+            default => $service->updateCache($memberId, Video::class),
+        };
+
         return $this->success();
     }
 
@@ -280,6 +356,11 @@ class MemberCategorizationController extends AbstractController
             ->where('id', $request->input('id'))
             ->where('is_first', 0)
             ->delete();
+
+        MemberCategorizationDetail::where('member_categorization_id')->delete();
+
+        $service->updateCache($memberId, ImageGroup::class);
+        $service->updateCache($memberId, Video::class);
 
         return $this->success();
     }

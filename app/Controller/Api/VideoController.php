@@ -133,7 +133,7 @@ class VideoController extends AbstractController
         $page = (int) $request->input('page', 0);
         $userId = (int) auth()->user()->getId();
         $suggest = $suggestService->getTagProportionByMemberTag($userId);
-        $models = $service->getVideosBySuggest($suggest, $page);
+        $models = $service->getVideosBySuggest($suggest, $page, Video::PAGE_PER);
         $data = [];
         $data['models'] = $models;
         $path = '/api/video/suggest';

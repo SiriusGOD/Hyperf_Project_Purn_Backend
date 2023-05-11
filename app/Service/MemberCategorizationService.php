@@ -17,9 +17,19 @@ use App\Model\MemberCategorization;
 use App\Model\MemberCategorizationDetail;
 use App\Model\Video;
 use Carbon\Carbon;
+use Hyperf\Redis\Redis;
 
 class MemberCategorizationService extends GenerateService
 {
+    public const CACHE_KEY = 'member_category:';
+
+    public Redis $redis;
+
+    public function __construct(Redis $redis)
+    {
+        $this->redis = $redis;
+    }
+
     public function createOrUpdateMemberCategorization(array $params): int
     {
         $model = new MemberCategorization();
@@ -220,17 +230,16 @@ class MemberCategorizationService extends GenerateService
             'is_asc' => 2,
         ]));
 
-
         $data = [];
         foreach ($result as $model) {
             $temp = [];
             foreach ($model['member_categorization_details'] as $row) {
                 $url = '';
-                if (!empty($row['url'])) {
+                if (! empty($row['url'])) {
                     $url = $row['url'];
                 }
 
-                if (!empty($row['cover_thumb'])) {
+                if (! empty($row['cover_thumb'])) {
                     $url = $row['cover_thumb'];
                 }
                 $temp[] = $url;
@@ -249,6 +258,32 @@ class MemberCategorizationService extends GenerateService
                 'hot_order' => $key + 1,
             ]);
         }
+    }
+
+    public function getTypeIdByMemberIdAndType(int $memberId, string $type): array
+    {
+        $key = $this->getCacheKey($memberId, $type);
+        if ($this->redis->exists($key)) {
+            return json_decode($this->redis->get($key), true);
+        }
+
+        return $this->updateCache($memberId, $type);
+    }
+
+    public function updateCache(int $memberId, string $type): array
+    {
+        $key = $this->getCacheKey($memberId, $type);
+
+        $ids = MemberCategorization::where('member_id', $memberId)->get()->pluck('id')->toArray();
+        $typeIds = MemberCategorizationDetail::whereIn('member_categorization_id', $ids)
+            ->where('type', $type)
+            ->get()
+            ->pluck('type_id')
+            ->toArray();
+
+        $this->redis->set($key, json_encode($typeIds));
+
+        return $typeIds;
     }
 
     protected function getVideoDetail(array $models, array $data): array
@@ -297,5 +332,14 @@ class MemberCategorizationService extends GenerateService
         }
 
         return $this->generateImageGroups($data, $result);
+    }
+
+    protected function getCacheKey(int $memberId, string $type): string
+    {
+        $typeKey = match ($type) {
+            ImageGroup::class => 'image_group',
+            default => 'videos',
+        };
+        return self::CACHE_KEY . $memberId . ':' . $typeKey;
     }
 }
