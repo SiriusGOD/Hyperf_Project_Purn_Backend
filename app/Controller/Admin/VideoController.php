@@ -58,7 +58,7 @@ class VideoController extends AbstractController
             'tag_ids' => $request->input('tags'),
         ]);
 
-        $videos = $query->get();
+        $videos = $query->orderBy('id','desc')->get();
         $query = Video::select('*');
         $total = $query->count();
         $data['last_page'] = ceil($total / $step);
