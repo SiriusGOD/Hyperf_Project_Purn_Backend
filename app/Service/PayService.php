@@ -161,33 +161,33 @@ class PayService
                 ->where('pay_order_id', $data['order_id'])->first();
             if (empty($order)) {
                 $this->logger->error('查無對應系統訂單', $data);
-                return '查無對應系統訂單';
+                return trans('api.pay_control.search_no_order');
             }
 
             // 比對訂單狀態 須為訂單成立狀態
             if ($order->status != Order::ORDER_STATUS['create']) {
                 $data['sys_order_id'] = $order->id;
                 $this->logger->error('該訂單狀態並非訂單成立', $data);
-                return '該訂單狀態並非訂單成立';
+                return trans('api.pay_control.no_create_order_status');
             }
 
             // 確認訂單對應商品是否存在
             $product = Product::where('id', $order->product_id)->first();
             if (empty($product)) {
                 $this->logger->error('查無對應系統訂單的商品', $data);
-                return '查無對應系統訂單的商品';
+                return trans('api.pay_control.no_order_product');
             }
 
             // 確認訂單對應商品是否是上架狀態
             if ($product->expire != Product::EXPIRE['no']) {
                 $this->logger->error('此商品已下架', $data);
-                return '此商品已下架';
+                return trans('api.pay_control.product_off_shelf');
             }
             // 確認訂單用戶是否存在
             $member = Member::where('id', $order->user_id)->where('status', '<', Member::STATUS['DISABLE'])->first();
             if (empty($member)) {
                 $this->logger->error('查無訂單用戶', $data);
-                return '查無訂單用戶';
+                return trans('api.pay_control.search_no_member');
             }
 
             // 更新訂單狀態

@@ -58,9 +58,9 @@ class MemberCashController extends AbstractController
         $data['member_id'] = auth('jwt')->user()->getId();
         if (false) {
            // if ($member->expired_at < time()) {
-                return $this->error('up主会员过期，先购买年会员再试~', 422);
+                return $this->error(trans('api.member_cash_control.membership_expires'), 422);
             //} elseif ($member->vip_level < MemberModel::VIP_LEVEL_YEAR) {
-                return $this->error('先购买年会员再试~', 422);
+                return $this->error(trans('api.member_cash_control.buy_membership_expires'), 422);
             //}
         }
         $withdraw_type = 1;//收款方式 银行卡
@@ -145,6 +145,6 @@ class MemberCashController extends AbstractController
         //}
         //MemberModel::clearFor($this->member);
         //redis()->setex($redisKey, 600, 1);
-        return $this->success(['success' => true, 'msg' => '提交成功,请等待后台审核操作']);
+        return $this->success(['success' => true, 'msg' => trans('api.member_cash_control.success')]);
     }
 }

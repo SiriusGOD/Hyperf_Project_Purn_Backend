@@ -43,7 +43,8 @@ class StageVideoController extends AbstractController
         if ($res) {
             return $this->success(['msg' => 'success']);
         }
-        return $this->success(['msg' => 'faild']);
+        // return $this->success(['msg' => 'faild']);
+        return $this->error(trans('api.stage_video_control.failed'), Apicode::BAD_REQUEST);
     }
 
     // 刪除Stage影片分類

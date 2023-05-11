@@ -54,7 +54,7 @@ class MemberController extends AbstractController
         if (! empty($user)) {
             $check = $service->checkPassword($request->input('password', ''), $user->password);
             if (! $check and ! empty($user->password)) {
-                return $this->error(trans('validation.authorize'), 401);
+                return $this->error(trans('validation.password_error'), 401);
             }
         } elseif (! empty($request->input('account')) and ! empty($request->input('device_id'))) {
             return $this->error(trans('validation.authorize'), 401);
@@ -287,7 +287,7 @@ class MemberController extends AbstractController
         if ($res) {
             return $this->success();
         }
-        return $this->error('該會員已追蹤', ErrorCode::BAD_REQUEST);
+        return $this->error(trans('api.member_control.is_follow'), ErrorCode::BAD_REQUEST);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'addFollow')]
@@ -317,7 +317,7 @@ class MemberController extends AbstractController
             return $this->success();
         }
 
-        return $this->error('該會員已追蹤', ErrorCode::BAD_REQUEST);
+        return $this->error(trans('api.member_control.is_follow'), ErrorCode::BAD_REQUEST);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'deleteFollow')]
@@ -342,7 +342,7 @@ class MemberController extends AbstractController
             $service->updateMemberFollowCache($userId);
             return $this->success();
         }
-        return $this->error('查無該會員追蹤資料', ErrorCode::BAD_REQUEST);
+        return $this->error(trans('api.member_control.no_follow_data'), ErrorCode::BAD_REQUEST);
     }
     //追蹤清單
     #[Middleware(ApiAuthMiddleware::class)]
