@@ -125,6 +125,7 @@ class MemberService extends BaseService
         $model->device = $data['device'];
         $model->register_ip = $data['register_ip'];
         $model->aff = 0;
+        $model->aff_url = $data['aff_url'];;
         $model->save();
         $model->aff = md5((string) $model->id);
         $model->save();

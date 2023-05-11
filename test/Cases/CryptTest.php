@@ -61,7 +61,7 @@ class CryptTest extends HttpTestCase
       $token = auth()->login($user);
       make(MemberService::class)->saveToken($user->id, $token);
       //加密前用json
-      $str = '{"t":"1683190025267","device_id":"wAzt9xjmverqL2AptOD","device":"ios"}';
+      $str = '{"t":"1683190025267","device_id":"wAzt9xjmverqL2AptOD","device":"ios","aff_url":"https://dotblogs.com.tw/momoBear/2020/02/27/143725"}';
       //第一次加密後
 
       $headers = [
