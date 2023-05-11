@@ -70,6 +70,7 @@ class MemberController extends AbstractController
                 'email' => $request->input('email', ''),
                 'phone' => $request->input('phone', ''),
                 'name' => $request->input('name', ''),
+                'aff_url'=> $request->input('aff_url', ''),
                 'invited_code' => $request->input('invited_code', ''),
             ]);
 

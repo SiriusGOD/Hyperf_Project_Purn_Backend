@@ -16,36 +16,36 @@ use Hyperf\DbConnection\Model\Model;
 use Qbhy\HyperfAuth\Authenticatable;
 
 /**
- * @property int $id
- * @property string $name
- * @property string $account
- * @property string $password
- * @property int $sex
- * @property int $age
- * @property string $avatar
- * @property string $email
- * @property string $phone
- * @property int $status
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property string $uuid
- * @property int $member_level_status
- * @property string $device
- * @property string $register_ip
- * @property string $last_ip
- * @property string $coins
- * @property string $diamond_coins
- * @property int $diamond_quota
- * @property int $vip_quota
- * @property int $free_quota
- * @property string $aff
- * @property int $invited_by
- * @property int $invited_num
- * @property string $tui_coins
- * @property string $total_tui_coins
- * @property mixed $is_selected_tag
- * @property mixed $is_vip_experience
- * @property mixed $is_diamond_experience
+ * @property int $id 
+ * @property string $name 
+ * @property string $account 
+ * @property string $password 
+ * @property int $sex 
+ * @property int $age 
+ * @property string $avatar 
+ * @property string $email 
+ * @property string $phone 
+ * @property int $status 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property string $uuid 
+ * @property int $member_level_status 
+ * @property string $device 
+ * @property string $register_ip 
+ * @property string $last_ip 
+ * @property string $coins 
+ * @property string $diamond_coins 
+ * @property int $diamond_quota 
+ * @property int $vip_quota 
+ * @property int $free_quota 
+ * @property int $free_quota_limit 
+ * @property string $aff 
+ * @property int $invited_by 
+ * @property int $invited_num 
+ * @property string $tui_coins 
+ * @property string $total_tui_coins 
+ * @property string $aff_url 
+ * @property-read mixed $is_selected_tag 
  */
 class Member extends Model implements Authenticatable
 {
@@ -71,7 +71,7 @@ class Member extends Model implements Authenticatable
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'sex' => 'integer', 'age' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'member_level_status' => 'integer', 'diamond_quota' => 'integer', 'vip_quota' => 'integer', 'free_quota' => 'integer', 'invited_by' => 'integer', 'invited_num' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'sex' => 'integer', 'age' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'member_level_status' => 'integer', 'diamond_quota' => 'integer', 'vip_quota' => 'integer', 'free_quota' => 'integer', 'free_quota_limit' => 'integer', 'invited_by' => 'integer', 'invited_num' => 'integer'];
 
     protected array $hidden = ['password'];
 
