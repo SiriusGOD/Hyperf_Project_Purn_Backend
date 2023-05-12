@@ -378,13 +378,13 @@ class MemberController extends AbstractController
      * 獲取該使用者的購買清單
      */
     #[Middleware(ApiAuthMiddleware::class)]
-    #[RequestMapping(methods: ['POST'], path: 'getMemberList')]
-    public function getMemberList(RequestInterface $request, MemberService $service)
+    #[RequestMapping(methods: ['POST'], path: 'getMemberOrderList')]
+    public function getMemberOrderList(RequestInterface $request, MemberService $service)
     {
         $user_id = auth('jwt')->user()->getId();
         $page = $request->input('page', 0);
         $limit = $request->input('limit');
-        $result = $service->getMemberList($user_id, $page, $limit);
+        $result = $service->getMemberOrderList($user_id, $page, $limit);
         return $this->success(['models' => $result]);
     }
 

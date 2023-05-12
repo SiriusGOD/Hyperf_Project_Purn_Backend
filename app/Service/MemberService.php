@@ -619,10 +619,10 @@ class MemberService extends BaseService
     }
 
     // 獲取會員訂單清單
-    public function getMemberList($user_id, $page, $limit)
+    public function getMemberOrderList($user_id, $page, $limit)
     {
         // redis
-        $checkRedisKey = self::KEY.":MemberList:".$user_id.":".Carbon::now()->toDateString().":".$page.":".$limit;
+        $checkRedisKey = self::KEY.":MemberOrderList:".$user_id.":".Carbon::now()->toDateString().":".$page.":".$limit;
         if ($this->redis->exists($checkRedisKey)) {
             $jsonResult = $this->redis->get($checkRedisKey);
             return json_decode($jsonResult, true);
