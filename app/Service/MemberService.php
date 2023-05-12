@@ -13,6 +13,7 @@ namespace App\Service;
 
 use App\Middleware\LoginLimitMiddleware;
 use App\Model\Advertisement;
+use App\Constants\MemberCode;
 use App\Model\BuyMemberLevel;
 use App\Model\ImageGroup;
 use App\Model\Member;
@@ -72,14 +73,14 @@ class MemberService extends BaseService
     {
         if (empty($deviceId)) {
           return [
-                'code' => 403,
+                'code' => MemberCode::EMPTY_DEVICE_ERROR,
                 'msg' => trans('validation.required', ['attribute' => 'device_id']),
             ];
         }
         $key = self::LOGIN_LIMIT_CACHE_KEY . $deviceId;
         if ($this->redis->exists($key) and $this->redis->get($key) >= ((int)env('LOGIN_LIMIT')) ) {
           return [
-                'code' => 405,
+                'code' => MemberCode::TRY_LIMIT_ERROR,
                 'msg' => trans('validation.try_limit'),
             ];
         }

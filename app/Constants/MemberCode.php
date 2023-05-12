@@ -21,5 +21,7 @@ class MemberCode
     public const AUT_ERROR2 = 4013;
     //'validation.authorize error
     public const AUT_ERROR3 = 4014;
+    public const EMPTY_DEVICE_ERROR = 4031;
+    public const TRY_LIMIT_ERROR = 4051;
 
 }
