@@ -14,6 +14,7 @@ use App\Model\MemberCashAccount;
 
 class MemberCashAccountService extends BaseService
 {
+    //提現銀行輸入
     public function store(array $data)
     {
         $model = MemberCashAccount::findOrNew($data['id']);

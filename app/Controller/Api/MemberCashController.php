@@ -13,7 +13,6 @@ namespace App\Controller\Api;
 
 use App\Constants\WithdrawCode;
 use App\Controller\AbstractController;
-use App\Request\MemberWithdrawRequest;
 use App\Service\ActorClassificationService;
 use App\Service\MemberCashAccountService;
 use App\Service\WithdrawService;
@@ -22,6 +21,7 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Annotation\Middleware;
 use App\Middleware\ApiEncryptMiddleware;
+use App\Util\Check;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
@@ -63,6 +63,12 @@ class MemberCashController extends AbstractController
                 return $this->error(trans('api.member_cash_control.buy_membership_expires'), 422);
             //}
         }
+        $requires  = ['name','account','channel','account_name','withdraw_type','withdraw_amount'] ; 
+        $inputs = $request->all();
+        $check=Check::require($inputs , $requires);
+        if($check){
+          return $this->error( trans('default.withdraw.empty_error', ["key" => $check]), WithdrawCode::EMPTY_ERROR);  
+        }
         $withdraw_type = 1;//收款方式 银行卡
         $withdraw_from = 3;  //2代理 3 视频收益
         $withdraw_amount= $request->input("withdraw_amount"); 
@@ -70,10 +76,10 @@ class MemberCashController extends AbstractController
         $withdraw_amount_money= 0;
 
         $insert_data = [
-                'id'            =>null,
-                'member_id'     =>auth('jwt')->user()->getId(),
-                'uuid'          =>$data['member_id'],
-                'type'          => $withdraw_type,
+                'id'            => null,
+                'member_id'     => auth('jwt')->user()->getId(),
+                'uuid'          => auth('jwt')->user()->getId(),
+                'type'          => $request->input("withdraw_type"),
                 'account_name'  => $request->input("account_name"),//开户行
                 'account'       => $request->input("account") ,//账号
                 'name'          => $request->input("name"),//开户姓名

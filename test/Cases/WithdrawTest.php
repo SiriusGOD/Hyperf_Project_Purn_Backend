@@ -38,7 +38,7 @@ class WithdrawTest extends HttpTestCase
         $user = Member::first();
         $token = auth()->login($user);
         make(MemberService::class)->saveToken($user->id, $token);
-        $str = '{"version": "1.0.3", "bundle_id": "tips.ks", "channel": "", "via": "", "build_id": "", "oauth_type": "android", "oauth_id": "dd6537bf016a6c09741a95b5590275ca", "account_name": "中国银行","account": "6217003370004076152","name": "玉莲","withdraw_amount": 500.00}';
+        $str = '{"account_name": "中国银行","account": "6217003370004076152","name": "玉莲","withdraw_amount": 500.00,"withdraw_type":1}';
         $json = json_decode($str,true);
         $data = $this->client->post('/api/member_cash/withdraw',$json, [
             'Authorization' => 'Bearer ' . $token,

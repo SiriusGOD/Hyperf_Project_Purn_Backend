@@ -162,6 +162,7 @@ return [
     ],
 
     'withdraw'=>[
+      'empty_error' =>'缺少參數 :key',
       'detail' => '提現詳細資料',
       'no_data' => '查無資料',
       'withdraw_reject' => '提现拒绝操作成功',
