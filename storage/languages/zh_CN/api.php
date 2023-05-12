@@ -35,6 +35,7 @@ return [
         'buy_failed' => '购买商品失败',
         'update_success' => '订单状态更新成功',
         'no_order' => '该会员下查无此订单或该订单已取消',
+        'parameter_error' => '参数错误',
     ],
     'pay_control' => [
         'search_no_order' => '查无对应系统订单',

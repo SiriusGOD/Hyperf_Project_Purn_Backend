@@ -66,9 +66,20 @@ class OrderController extends AbstractController
             return $this->error(trans('validation.filled', ['attribute' => 'product id']), ErrorCode::BAD_REQUEST);
         }
         $data['payment_type'] = $request->input('payment_type', 0);
-        $data['oauth_type'] = $request->input('oauth_type', 'web');
-        $data['pay_proxy'] = $request->input('pay_proxy', 'online');
+        // $data['oauth_type'] = $request->input('oauth_type', 'web');
+
+        // 先預設online之後要依照支付類別取 agent/online
+        $data['pay_proxy'] = 'online';
         $data['pay_method'] = $request->input('pay_method');
+
+        // 判斷參數是否正確
+        if($data['payment_type'] == 0 && $data['pay_method'] == 'cash'){
+            return  $this->error(trans('api.order_control.parameter_error'), ErrorCode::BAD_REQUEST);
+        }
+        if($data['payment_type'] > 0 && $data['pay_method'] != 'cash'){
+            return  $this->error(trans('api.order_control.parameter_error'), ErrorCode::BAD_REQUEST);
+        }
+
 
         // agent or online
         $base_service = di(\App\Service\BaseService::class);
@@ -89,6 +100,7 @@ class OrderController extends AbstractController
         }
         $data['user'] = $data['user']->toArray();
         $user = $data['user'];
+        $data['oauth_type'] = $user['device'];
 
         switch ($data['pay_method']) {
             case 'cash':
