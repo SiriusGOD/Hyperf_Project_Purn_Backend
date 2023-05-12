@@ -127,7 +127,7 @@ class CustomerServiceController extends AbstractController
     {
         $userId = auth()->user()->getId();
         $id = (int) $request->input('id');
-        $message = $request->input('message');
+        $message = $request->input('message', "");
         $params = [
             'id' => $id,
             'member_id' => $userId,
