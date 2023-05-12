@@ -30,6 +30,7 @@ class Report extends Model
         'new' => 0,
         'pass' => 1,
         'no_pass' => 2,
+        'cancel' => 3,
     ];
 
     public const MODEL_TYPE = [

@@ -28,13 +28,20 @@
                                     <label for="exampleInputEmail1">{{ trans('default.image_group_control.image_group_pay_type') ?? '套圖描述'}}</label>
                                     <select name="pay_type" class="form-control">
                                         @foreach(trans('default.image_group_control.image_group_pay_type_types') as $key => $value)
-                                            <option value="{{ $key }}" @if($key == ($model->pay_type ?? null)) @endif>{{ $value }}</option>
+                                            <option value="{{ $key }}" @if($key == ($model->pay_type ?? null)) selected @endif>{{ $value }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{ trans('default.image_group_control.image_group_hot_order') ?? '大家都在看排序'}}{{ trans('default.image_group_control.image_group_hot_order_desc') }}</label>
                                     <input type="text" class="form-control" name="hot_order" id="hot_order" placeholder="{{ trans('default.name_msg_def') ?? '請輸入名稱'}}" value="{{$model->hot_order ?? ''}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{ trans('default.image_group_control.is_delete') ?? '是否刪除'}}</label>
+                                    <select name="deleted_at">
+                                        <option value="">no</option>
+                                        <option value="" @if(!empty($model->deleted_at)) selected @endif>yes</option>
+                                    </select>
                                 </div>
                                 @include('partial.tagSelect')
                                 <button type="submit" class="btn btn-primary">{{ trans('default.submit') ?? '送出'}}</button>

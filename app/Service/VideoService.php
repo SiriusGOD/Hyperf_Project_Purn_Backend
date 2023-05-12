@@ -143,7 +143,7 @@ class VideoService
             unset($data['user_id'], $data['uuid'], $data['release_at'], $data['refreshed_at']);
 
             if (! empty($data['_id']) and Video::where('_id', $data['_id'])->exists()) {
-                $model = Video::where('_id',$data['_id'])->first();
+                $model = Video::withTrashed()->where('_id',$data['_id'])->first();
                 // del tvideo'tag
                 self::delVideoCorrespond($model->id, 'tags');
                 // del video'actor
@@ -162,6 +162,7 @@ class VideoService
             $model->description = '';
             $model->refreshed_at = date('Y-m-d H:i:s');
             $model->user_id = 1;
+            $model->deleted_at = !empty($data['deleted_at']) ? $data['deleted_at'] : null;
             if ($model->save()) {
                 $data['id'] = null;
                 $data['type'] = Product::TYPE_LIST[1];
@@ -342,7 +343,7 @@ class VideoService
     public function adminSearchVideoQuery(array $params): Builder
     {
         $step = Video::PAGE_PER;
-        $query = Video::offset(($params['page'] - 1) * $step)->limit($step)
+        $query = Video::withTrashed()->offset(($params['page'] - 1) * $step)->limit($step)
             ->leftJoin('clicks', function ($join) {
                 $join->on('videos.id', '=', 'clicks.type_id')->where('clicks.type', Video::class);
             })
