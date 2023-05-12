@@ -39,6 +39,18 @@ class MemberCashController extends AbstractController
         return $this->success(['models' => $result]);
     }
 
+    /*
+     * 提領記錄
+     * */
+    #[RequestMapping(methods: ['POST'], path: 'withdrawList')]
+    public function withdrawList(RequestInterface $request, WithdrawService $withdrawService)
+    {
+        $page = $request->input('page',0);
+        $limit= $request->input('limit',10);
+        $member_id = auth('jwt')->user()->getId();
+        $result = $withdrawService->myWithdrawList($page, $limit ,$member_id);
+        return $this->success(['models' => $result]);
+    }
 
     #[RequestMapping(methods: ['POST'], path: 'getListByClassification')]
     public function getListByClassification(RequestInterface $request, ActorClassificationService $service)

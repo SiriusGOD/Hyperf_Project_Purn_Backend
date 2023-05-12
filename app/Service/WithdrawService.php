@@ -38,6 +38,13 @@ class WithdrawService extends BaseService
       return MemberWithdraw::where('status',$status)->count();
     }
   
+    //會員提現列表
+    public function myWithdrawList(int $page, int $limit, int $member_id){
+      return MemberWithdraw::where('member_id',$member_id)
+                    ->offset(($page - 1) * $limit)
+                    ->limit($limit)->get();
+    }
+
     //提現列表
     public function withdrawList(int $page, int $limit, int $status){
       return MemberWithdraw::where('status',$status)

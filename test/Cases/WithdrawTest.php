@@ -47,20 +47,19 @@ class WithdrawTest extends HttpTestCase
         $this->assertSame(200, (int)$data['code']);
     }
 
-    //測試提現refuse 
-    public function testWithdrawSetReused()
-    {
-        $d = ['id'=>1 , 'flag'=>'refuse'] ;
-        $res=make(WithdrawService::class)->setWithDraw($d);
-        $this->assertSame(200,  200);
-    }
-
     //測試提現 
-    public function testWithdrawSetPass()
+    public function testWithdrawList()
     {
-        $d = ['id'=>2 , 'flag'=>'pass'] ;
-        $res=make(WithdrawService::class)->setWithDraw($d);
-        print_r([$res]);
-        $this->assertSame(200,  200);
+        $user = Member::first();
+        $token = auth()->login($user);
+        $limit =2;
+        make(MemberService::class)->saveToken($user->id, $token);
+        $str = '{"page":0,"limit":'.$limit.'}';
+        $json = json_decode($str,true);
+        $data = $this->client->post('/api/member_cash/withdrawList',$json, [
+            'Authorization' => 'Bearer ' . $token,
+        ]);
+        print_r([ json_encode($data) ]);
+        $this->assertSame( $limit, count($data['data']['models']) );
     }
 }
