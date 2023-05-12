@@ -803,4 +803,11 @@ class MemberService extends BaseService
         $service = make(ActorService::class);
         $service->updateIsExistCache($user_id);
     }
+
+    // 刪除會員快取
+    public function delMemberRedis($user_id)
+    {
+        $key = $this->defaultKey($user_id);
+        $this->redis->del($key);
+    }
 }

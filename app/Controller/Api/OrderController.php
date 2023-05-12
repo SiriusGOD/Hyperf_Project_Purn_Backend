@@ -302,6 +302,9 @@ class OrderController extends AbstractController
             $order->pay_amount = $pay_amount;
             $order->status = Order::ORDER_STATUS['finish'];
             $order->save();
+            // 刪除會員快取
+            $service -> delMemberRedis($data['user_id']);
+            
             return $this->success($pay_res['data'], trans('api.order_control.buy_success'));
         }
         return $this->error(trans('api.order_control.buy_failed'), ErrorCode::BAD_REQUEST);

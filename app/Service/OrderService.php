@@ -434,4 +434,11 @@ class OrderService
         $service = make(MemberService::class);
         $service->delMemberListRedis($user_id);
     }
+
+    // 刪除會員快取
+    public function delMemberRedis($user_id)
+    {
+        $service = make(MemberService::class);
+        $service->delMemberRedis($user_id);
+    }
 }
