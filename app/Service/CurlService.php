@@ -13,8 +13,6 @@ namespace App\Service;
 
 use Hyperf\Redis\Redis;
 
-use function Hyperf\Support\value;
-
 class CurlService
 {
     public const CACHE_KEY = 'curl';
