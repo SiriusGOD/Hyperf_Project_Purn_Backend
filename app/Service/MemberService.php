@@ -11,18 +11,14 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
-use App\Middleware\LoginLimitMiddleware;
-use App\Model\Advertisement;
 use App\Constants\MemberCode;
 use App\Model\BuyMemberLevel;
 use App\Model\ImageGroup;
 use App\Model\Member;
 use App\Model\MemberFollow;
 use App\Model\MemberLevel;
-use App\Model\MemberTag;
 use App\Model\MemberVerification;
 use App\Model\Order;
-use App\Model\OrderDetail;
 use App\Model\Product;
 use App\Model\Role;
 use App\Model\User;
@@ -31,6 +27,7 @@ use App\Model\ActorCorrespond;
 use Carbon\Carbon;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
+use Hyperf\Utils\Str;
 
 class MemberService extends BaseService
 {
@@ -125,14 +122,26 @@ class MemberService extends BaseService
         $model->account = $data['account'];
         $model->device = $data['device'];
         $model->register_ip = $data['register_ip'];
-        $model->aff = 0;
+        $model->aff = Str::random(5);
         $model->aff_url = $data['aff_url'];;
-        $model->save();
-        $model->aff = md5((string) $model->id);
-        $model->save();
-        self::afterRegister($model, $data);
-        return $model;
-    }
+        try {
+          // code that may throw an exception
+          if($model->save()){
+            self::afterRegister($model, $data);
+            return $model;
+          }else{
+            $str= "something errors ";
+            errLog($str);
+            return false;
+          }
+          
+        } catch (\Exception $e) {
+          // handle the exception
+          $str= "An error occurred: " . $e->getMessage();
+          errLog($str);
+          return false;
+        }
+  }
 
     // 代理Log
     public function afterRegister(Member $model, array $data)
@@ -149,7 +158,6 @@ class MemberService extends BaseService
                 $this->memberInviteLogService->calcProxy($model);
             }
         }
-        $model->aff = md5((string) $model->id);
         $model->save();
     }
 

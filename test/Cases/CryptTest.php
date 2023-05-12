@@ -48,7 +48,7 @@ class CryptTest extends HttpTestCase
 
     public function testEnc()
     {
-      $str = '{"t":"1683190025267","device_id":"wAzt9xjmverqL2AptOD","device":"ios"}';
+      $str = '{"t":"1683190025267","device_id":"wAztqqqqtOD32221","device":"ios"}';
       $data1 = CRYPT::encrypt($str); // 在 body 中加入加密後的資料（需進行 base64 編碼）
       $data2 = CRYPT::decrypt($data1); // 在 body 中加入加密後的資料（需進行 base64 編碼）
       $this->assertSame($data2, $str);
@@ -61,7 +61,7 @@ class CryptTest extends HttpTestCase
       $token = auth()->login($user);
       make(MemberService::class)->saveToken($user->id, $token);
       //加密前用json
-      $str = '{"t":"1683190025267","device_id":"wAzt9xjmverqL2AptOD","device":"ios","aff_url":"https://dotblogs.com.tw/momoBear/2020/02/27/143725"}';
+      $str = '{"t":"1683190025267","device_id":"az21qr1qerqL2qq2AptOD14","device":"ios","aff_url":"https://dotblogs.com.tw/momoBear/2020/02/27/143725"}';
       //第一次加密後
 
       $headers = [
