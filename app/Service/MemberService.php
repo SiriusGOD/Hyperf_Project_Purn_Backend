@@ -790,7 +790,7 @@ class MemberService extends BaseService
 
     // 刪除 會員購買紀錄 Redis
     public function delMemberListRedis($user_id){
-        $checkRedisKey = self::KEY.":MemberList:".$user_id.":".Carbon::now()->toDateString();
+        $checkRedisKey = self::KEY.":MemberOrderList:".$user_id.":".Carbon::now()->toDateString();
         $keys = $this->redis->keys( $checkRedisKey.'*');
         foreach ($keys as $key) {
             $this->redis->del($key);
