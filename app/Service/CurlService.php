@@ -13,6 +13,8 @@ namespace App\Service;
 
 use Hyperf\Redis\Redis;
 
+use function Hyperf\Support\value;
+
 class CurlService
 {
     public const CACHE_KEY = 'curl';
@@ -153,29 +155,56 @@ class CurlService
         #返回数据
         return $result;
     }
+
     /**
      * 上传图片到图片服务器
-     * @param string $uuid
-     * @param string $filePath 路径
+     * @param string $id 唯一标识
+     * @param string $imgPath 图片路径
+     * @param string $position 存放位置 actors,ads,av,head,icons,lusir,pay,upload,xiao,youtube,im
      * @param string $remoteUrl 服务器上传url地址
+     * @param string $_id 番号
      * @return array {code:1,msg:"09159db1a99acb773ecf8490c01973ee.jpeg"}
      * @throws Exception
      */
-    public static function uploadMp42Remote($uuid, $filePath, $remoteUrl = null)
+    public function upload2Remote($id, $imgPath, $position, $remoteUrl = null, $_id = '')
     {
+
         if ($remoteUrl === null) {
-            $remoteUrl = config('upload.mp4_upload', 'http://video.ycomesc.com:2082/uploadMp4.php');
+            $remoteUrl = env('IMAGE_UPLOAD','https://new.ycomesc.live/imgUpload.php');
         }
-        //$cover = new \CURLFile(realpath($filePath), mime_content_type(realpath($filePath)));
-        $cover = curl_file_create(realpath($filePath),mime_content_type(realpath($filePath)),'video');
-        //var_dump($cover);die;
-        $timestamp = time();
+        $cover = curl_file_create(realpath($imgPath), mime_content_type($imgPath));
+        if ($position == 'ads') {
+            $id .= time() . mt_rand(1, 999);
+        }
         $data = [
-            'uuid'     => $uuid,
-            'video'    => $cover,
-            'timestamp' => $timestamp,
-            'sign' => md5($timestamp . config('upload.mp4_key', 'e096db7c006958f226bc469c27237b65')),
+            'id'       => $id,
+            '_id'      => $_id,
+            'position' => $position,
         ];
-        return self::post($remoteUrl,$data,[],1000);
+        $img_key = env('IMAGE_KEY', '132f1537f85scxpcm59f7e318b9epa51');
+        $sign = $this -> make_sign($data, $img_key);
+        $data['cover'] = $cover;
+        $data['sign'] = $sign;
+        return self::post($remoteUrl , $data);
+    }
+
+    #签名
+    public function make_sign($array, $signKey)
+    {
+        if (empty($array)) return '';
+        ksort($array);
+        //$string = http_build_query($array);
+
+        $arr_temp = array();
+        foreach ($array as $key => $val) {
+            $arr_temp[] = $key . '=' . $val;
+        }
+        $string = implode('&', $arr_temp);
+
+        $string = $string . $signKey;
+
+        #先sha256签名 再md5签名
+        $sign_str = md5(hash('sha256', $string));
+        return $sign_str;
     }
 }
