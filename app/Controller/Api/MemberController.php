@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Constants\ErrorCode;
+use App\Constants\MemberCode;
 use App\Controller\AbstractController;
 use App\Job\EmailVerificationJob;
 use App\Middleware\Auth\ApiAuthMiddleware;
@@ -54,10 +55,10 @@ class MemberController extends AbstractController
         if (! empty($user)) {
             $check = $service->checkPassword($request->input('password', ''), $user->password);
             if (! $check and ! empty($user->password)) {
-                return $this->error(trans('validation.password_error'), 401);
+                return $this->error(trans('validation.password_error'), MemberCode::PAS_ERROR);
             }
         } elseif (! empty($request->input('account')) and ! empty($request->input('device_id'))) {
-            return $this->error(trans('validation.authorize'), 401);
+            return $this->error(trans('validation.authorize'), MemberCode::AUT_ERROR);
         } else {
             $base_service = di(\App\Service\BaseService::class);
             $ip = $base_service->getIp($request->getHeaders(), $request->getServerParams());
@@ -75,7 +76,7 @@ class MemberController extends AbstractController
             ]);
 
             if (empty($user)) {
-                return $this->error(trans('validation.authorize'), 401);
+                return $this->error(trans('validation.authorize'), MemberCode::AUT_ERROR2);
             }
 
             $memberCategorizationService->createOrUpdateMemberCategorization([
@@ -88,7 +89,7 @@ class MemberController extends AbstractController
         }
 
         if (! $service->checkAndSaveDevice($user->id, $request->input('device_id'))) {
-            return $this->error(trans('validation.authorize'), 401);
+            return $this->error(trans('validation.authorize'), MemberCode::AUT_ERROR3);
         }
 
         $token = auth()->login($user);
