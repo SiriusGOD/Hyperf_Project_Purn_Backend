@@ -40,6 +40,18 @@ class MemberCashController extends AbstractController
     }
 
     /*
+     * 我的收益明細
+     * */
+    #[RequestMapping(methods: ['POST'], path: 'myincomeList')]
+    public function myincomeList(RequestInterface $request, WithdrawService $withdrawService)
+    {
+        $page = $request->input('page',0);
+        $limit= $request->input('limit',10);
+        $member_id = auth('jwt')->user()->getId();
+        $result = $withdrawService->incomeList($page, $limit ,$member_id);
+        return $this->success(['models' => $result]);
+    }
+    /*
      * 提領記錄
      * */
     #[RequestMapping(methods: ['POST'], path: 'withdrawList')]

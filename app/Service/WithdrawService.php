@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Service;
 use App\Constants\WithdrawCode;
 use App\Model\MemberWithdraw;
+use App\Model\Order;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
@@ -38,6 +39,12 @@ class WithdrawService extends BaseService
       return MemberWithdraw::where('status',$status)->count();
     }
   
+    //我的 收益明細
+    public function incomeList(int $page, int $limit, int $member_id){
+      return MemberWithdraw::where('member_id',$member_id)
+                    ->offset(($page - 1) * $limit)
+                    ->limit($limit)->get();
+    }
     //會員提現列表
     public function myWithdrawList(int $page, int $limit, int $member_id){
       return MemberWithdraw::where('member_id',$member_id)
