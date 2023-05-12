@@ -94,7 +94,11 @@ class NavigationController extends AbstractController
         $type = $request->input('type');
         $id = (int) $request->input('type_id');
         $userId = (int) auth()->user()->getId();
-        $suggest = $suggestService->getTagProportionByMemberTag($userId);
+        if ($navId > 3) {
+            $suggest = $suggestService->getTagProportionByMemberCategorization($id - self::DEFAULT_MATCH_COUNT);
+        } else {
+            $suggest = $suggestService->getTagProportionByMemberTag($userId);
+        }
         $data['models'] = $service->navigationDetail($suggest, $navId, $type, $id, $page, $limit);
         $path = '/api/navigation/detail?id=' . $id . '&';
         $simplePaginator = new SimplePaginator($page, $limit, $path);

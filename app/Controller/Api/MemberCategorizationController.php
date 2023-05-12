@@ -72,9 +72,10 @@ class MemberCategorizationController extends AbstractController
     public function update(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
+        $id = $request->input('id', 0) - NavigationController::DEFAULT_MATCH_COUNT;
 
         $exist = MemberCategorization::where('member_id', $memberId)
-            ->where('id', $request->input('id'))
+            ->where('id', $id)
             ->where('is_first', 0)
             ->exists();
 
@@ -82,15 +83,15 @@ class MemberCategorizationController extends AbstractController
             return $this->error(trans('validation.exists', ['attribute' => 'id']), 400);
         }
 
-        $id = $service->createOrUpdateMemberCategorization([
-            'id' => $request->input('id', 0),
+        $effectId = $service->createOrUpdateMemberCategorization([
+            'id' => $id,
             'name' => $request->input('name'),
             'member_id' => $memberId,
             'hot_order' => $request->input('hot_order'),
         ]);
 
         if ($request->input('is_default') == 1) {
-            $service->setDefault($memberId, $id);
+            $service->setDefault($memberId, $effectId);
         }
 
         return $this->success();
@@ -102,16 +103,22 @@ class MemberCategorizationController extends AbstractController
         $memberId = auth()->user()->getId();
 
         $ids = $request->input('ids');
+
+        $idsArr = [];
+        foreach ($ids as $id) {
+            $idsArr[] = $id - NavigationController::DEFAULT_MATCH_COUNT;
+        }
+
         $count = MemberCategorization::where('member_id', $memberId)
-            ->whereIn('id', $ids)
+            ->whereIn('id', $idsArr)
             ->count();
 
-        if ($count != count($ids)) {
+        if ($count != count($idsArr)) {
             return $this->error(trans('validation.exists', ['attribute' => 'id']), 400);
         }
 
-        $service->updateOrder($ids);
-        $service->setDefault($memberId, $ids[0]);
+        $service->updateOrder($idsArr);
+        $service->setDefault($memberId, $idsArr[0]);
 
         return $this->success();
     }
@@ -120,8 +127,9 @@ class MemberCategorizationController extends AbstractController
     public function createDetail(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
+        $id = $request->input('member_categorization_id', 0) - NavigationController::DEFAULT_MATCH_COUNT;
         $exist = MemberCategorization::where('member_id', $memberId)
-            ->where('id', $request->input('member_categorization_id', 0))
+            ->where('id', $id)
             ->exists();
 
         if (empty($exist)) {
@@ -130,7 +138,7 @@ class MemberCategorizationController extends AbstractController
 
         $type = MemberCategorizationDetail::TYPES[$request->input('type')];
         $service->createMemberCategorizationDetail([
-            'member_categorization_id' => $request->input('member_categorization_id'),
+            'member_categorization_id' => $id,
             'type' => $type,
             'type_id' => $request->input('type_id'),
         ]);
@@ -154,11 +162,16 @@ class MemberCategorizationController extends AbstractController
             ->offset($page * $limit)
             ->get()
             ->toArray();
+        $rows = [];
+        foreach ($models as $model) {
+            $model['id'] = $model['id'] + NavigationController::DEFAULT_MATCH_COUNT;
+            $rows[] = $model;
+        }
 
-        $result = $models;
+        $result = $rows;
 
         if ($isMain) {
-            $result = $service->isMain($memberId, $models);
+            $result = $service->isMain($memberId, $rows);
         }
 
         $data = [
@@ -199,6 +212,7 @@ class MemberCategorizationController extends AbstractController
             return $this->success($data);
         }
 
+        $id = $id - NavigationController::DEFAULT_MATCH_COUNT;
         $exist = MemberCategorization::where('member_id', $memberId)
             ->where('id', $id)
             ->exists();
@@ -230,8 +244,9 @@ class MemberCategorizationController extends AbstractController
     public function updateDetail(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
+        $id = $request->input('member_categorization_id', 0) - NavigationController::DEFAULT_MATCH_COUNT;
         $exist = MemberCategorization::where('member_id', $memberId)
-            ->where('id', $request->input('member_categorization_id', 0))
+            ->where('id', $id)
             ->exists();
 
         if (empty($exist)) {
@@ -250,7 +265,7 @@ class MemberCategorizationController extends AbstractController
 
         $service->updateMemberCategorizationDetails([
             'ids' => $ids,
-            'member_categorization_id' => $request->input('member_categorization_id'),
+            'member_categorization_id' => $id,
         ]);
 
         return $this->success();
@@ -261,14 +276,15 @@ class MemberCategorizationController extends AbstractController
     {
         $memberId = auth()->user()->getId();
         $type = MemberCategorizationDetail::TYPES[$request->input('type')] ?? null;
-        $id = $request->input('type_id');
+        $typeId = $request->input('type_id');
 
-        if (empty($type) or empty($id)) {
+        if (empty($type) or empty($typeId)) {
             return $this->error(trans('validation.required', ['attribute' => 'type or type_id']), 400);
         }
 
+        $memberCategorizationId = $request->input('member_categorization_id', 0) - NavigationController::DEFAULT_MATCH_COUNT;
         $exist = MemberCategorization::where('member_id', $memberId)
-            ->where('id', $request->input('member_categorization_id', 0))
+            ->where('id', $memberCategorizationId)
             ->exists();
 
         if (empty($exist)) {
@@ -278,7 +294,7 @@ class MemberCategorizationController extends AbstractController
         $model = MemberCategorization::where('member_id', $memberId)
             ->join('member_categorization_details', 'member_categorizations.id', '=', 'member_categorization_details.member_categorization_id')
             ->where('member_categorization_details.type', $type)
-            ->where('member_categorization_details.type_id', $id)
+            ->where('member_categorization_details.type_id', $typeId)
             ->first();
 
         if (empty($model)) {
@@ -287,7 +303,7 @@ class MemberCategorizationController extends AbstractController
 
         $service->updateMemberCategorizationDetails([
             'ids' => [$model->id],
-            'member_categorization_id' => $request->input('member_categorization_id'),
+            'member_categorization_id' => $memberCategorizationId,
         ]);
 
         return $this->success();
@@ -355,12 +371,13 @@ class MemberCategorizationController extends AbstractController
     public function delete(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
+        $id = $request->input('id') - NavigationController::DEFAULT_MATCH_COUNT;
         MemberCategorization::where('member_id', $memberId)
-            ->where('id', $request->input('id'))
+            ->where('id', $id)
             ->where('is_first', 0)
             ->delete();
 
-        MemberCategorizationDetail::where('member_categorization_id')->delete();
+        MemberCategorizationDetail::where('member_categorization_id', $id)->delete();
 
         $service->updateCache($memberId, ImageGroup::class);
         $service->updateCache($memberId, Video::class);
@@ -401,6 +418,7 @@ class MemberCategorizationController extends AbstractController
             ]);
         }
 
+        $id = $id - NavigationController::DEFAULT_MATCH_COUNT;
         return $this->success([
             'video_count' => $service->getCount($id, Video::class),
             'image_group_count' => $service->getCount($id, ImageGroup::class),

@@ -70,7 +70,9 @@ class NavigationService extends GenerateService
         switch ($navId) {
             case 1:
                 $collect = \Hyperf\Collection\collect($returnResult);
-                $returnResult = $collect->sortByDesc('total_click');
+                $collect = $collect->sortByDesc('total_click');
+
+                $returnResult = $collect->toArray();
                 break;
             default:
                 $collect = \Hyperf\Collection\collect($returnResult);
@@ -180,7 +182,7 @@ class NavigationService extends GenerateService
     protected function navigationDetailImageGroups(array $suggest, int $navId, array $tagIds, int $page, int $limit): array
     {
         $otherLimit = 0;
-        $percent = self::DETAIL_PERCENTS[$navId];
+        $percent = self::DETAIL_PERCENTS[$navId] ?? [0.2, 0.8];
         $typeLimit = (int) floor($percent[1] * $limit);
         $hideIds = ReportService::getHideIds(ImageGroup::class);
 
@@ -218,7 +220,7 @@ class NavigationService extends GenerateService
     protected function navigationDetailVideos(array $suggest, int $navId, array $tagIds, int $page, int $limit): array
     {
         $otherLimit = 0;
-        $percent = self::DETAIL_PERCENTS[$navId];
+        $percent = self::DETAIL_PERCENTS[$navId] ?? [0.2, 0.8];
         $typeLimit = (int) floor($percent[1] * $limit);
         $hideIds = ReportService::getHideIds(Video::class);
 
