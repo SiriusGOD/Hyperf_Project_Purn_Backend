@@ -104,6 +104,12 @@ class ReportController extends AbstractController
             default => Video::withTrashed()->where('id', $modelId)->restore(),
         };
 
+        $ids = MemberCategorization::where('member_id', $memberId)->get()->pluck('id')->toArray();
+        MemberCategorizationDetail::withTrashed()->where('type', $modelType)
+            ->where('type_id', $modelId)
+            ->whereIn('member_categorization_id', $ids)
+            ->restore();
+
         $driver = $factory->get('default');
         $driver->push(new MemberHideModelJob($memberId));
 
