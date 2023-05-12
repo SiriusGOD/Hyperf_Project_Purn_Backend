@@ -88,8 +88,11 @@ class MemberController extends AbstractController
             ]);
         }
 
-        if (! $service->checkAndSaveDevice($user->id, $request->input('device_id'))) {
-            return $this->error(trans('validation.authorize'), MemberCode::AUT_ERROR3);
+        // 測試環境先關閉
+        if (env('APP_ENV')== 'product') {
+            if (! $service->checkAndSaveDevice($user->id, $request->input('device_id'))) {
+                return $this->error(trans('validation.authorize'), MemberCode::AUT_ERROR3);
+            }
         }
 
         $token = auth()->login($user);
