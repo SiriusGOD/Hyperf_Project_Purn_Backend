@@ -71,7 +71,7 @@ class NavigationController extends AbstractController
         } else {
             $suggest = $suggestService->getTagProportionByMemberTag($userId);
         }
-        $data['model'] = match ($id) {
+        $data['models'] = match ($id) {
             1 => $service->navigationPopular($suggest, $page, $limit),
             2 => $service->navigationSuggest($suggest, $page, $limit),
             3 => $service->navigationSuggestSortById($suggest, $page, $limit),
@@ -95,7 +95,7 @@ class NavigationController extends AbstractController
         $id = (int) $request->input('type_id');
         $userId = (int) auth()->user()->getId();
         $suggest = $suggestService->getTagProportionByMemberTag($userId);
-        $data['model'] = $service->navigationDetail($suggest, $navId, $type, $id, $page, $limit);
+        $data['models'] = $service->navigationDetail($suggest, $navId, $type, $id, $page, $limit);
         $path = '/api/navigation/detail?id=' . $id . '&';
         $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());

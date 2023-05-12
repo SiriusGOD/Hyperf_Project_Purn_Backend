@@ -350,7 +350,7 @@ class MemberCategorizationService extends GenerateService
             }
         }
 
-        $imageGroups = ImageGroup::with(['images', 'tags'])->whereIn('id', $ids)->get()->toArray();
+        $imageGroups = ImageGroup::with(['imagesLimit', 'tags'])->whereIn('id', $ids)->get()->toArray();
 
         $result = [];
         foreach ($imageGroups as $imageGroup) {
