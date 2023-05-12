@@ -174,7 +174,7 @@ class MemberCategorizationController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'detail/list')]
     public function detail(RequestInterface $request, MemberCategorizationService $service)
     {
-        $id = $request->input('member_categorization_id', 0);
+        $id = (int) $request->input('member_categorization_id', 0);
         $memberId = auth()->user()->getId();
 
         $page = $request->input('page', 0);
@@ -209,7 +209,7 @@ class MemberCategorizationController extends AbstractController
         }
 
         $models = $service->getDetails([
-            'id' => $request->input('member_categorization_id', 0),
+            'id' => $id,
             'page' => $page,
             'limit' => $limit,
             'sort_by' => $request->input('sort_by'),
@@ -224,8 +224,8 @@ class MemberCategorizationController extends AbstractController
         $path = '/api/member_categorization/detail';
         $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
-        $data['video_count'] = $service->getCount($memberId, Video::class);
-        $data['image_group_count'] = $service->getCount($memberId, ImageGroup::class);
+        $data['video_count'] = $service->getCount($id, Video::class);
+        $data['image_group_count'] = $service->getCount($id, ImageGroup::class);
         return $this->success($data);
     }
 
