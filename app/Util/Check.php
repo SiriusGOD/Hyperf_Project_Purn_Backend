@@ -12,6 +12,6 @@ class Check
             return $key;
         }
       }
-      return true;
+      return false;
     }
 }
