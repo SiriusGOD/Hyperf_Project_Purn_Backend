@@ -47,6 +47,7 @@ class ImageService
         $imageUrl = '/image/' . $filename . '.' . $extension;
         $path = BASE_PATH . '/public' . $imageUrl;
         $file->moveTo($path);
+        chmod($path, 0755);
 
         return [
             'url' => $imageUrl,
