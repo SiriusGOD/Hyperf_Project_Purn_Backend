@@ -19,6 +19,10 @@ class UploadImageSeed implements BaseInterface
         $models = \App\Model\Advertisement::all();
 
         foreach ($models as $model) {
+            $fullPath = BASE_PATH . '/public' . $model->image_url;
+            if(!file_exists($fullPath)) {
+                continue;
+            }
             $uploadService = \Hyperf\Support\make(UploadService::class);
             $pathArr = explode('/', $model->image_url);
             $name = $pathArr[count($pathArr) - 1];
@@ -30,6 +34,10 @@ class UploadImageSeed implements BaseInterface
         $models = \App\Model\CustomerServiceDetail::where('image_url', '<>', '')->get();
 
         foreach ($models as $model) {
+            $fullPath = BASE_PATH . '/public' . $model->image_url;
+            if(!file_exists($fullPath)) {
+                continue;
+            }
             $uploadService = \Hyperf\Support\make(UploadService::class);
             $pathArr = explode('/', $model->image_url);
             $name = $pathArr[count($pathArr) - 1];
@@ -41,6 +49,10 @@ class UploadImageSeed implements BaseInterface
         $models = \App\Model\CustomerServiceCover::all();
 
         foreach ($models as $model) {
+            $fullPath = BASE_PATH . '/public' . $model->url;
+            if(!file_exists($fullPath)) {
+                continue;
+            }
             $uploadService = \Hyperf\Support\make(UploadService::class);
             $pathArr = explode('/', $model->url);
             $name = $pathArr[count($pathArr) - 1];
@@ -52,6 +64,10 @@ class UploadImageSeed implements BaseInterface
         $models = \App\Model\Actor::all();
 
         foreach ($models as $model) {
+            $fullPath = BASE_PATH . '/public' . $model->avatar;
+            if(!file_exists($fullPath)) {
+                continue;
+            }
             $uploadService = \Hyperf\Support\make(UploadService::class);
             $pathArr = explode('/', $model->avatar);
             $name = $pathArr[count($pathArr) - 1];
