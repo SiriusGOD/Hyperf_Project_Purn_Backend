@@ -35,17 +35,29 @@ class ProxyController extends AbstractController
         return $this->success(['code' => $result['aff']]);
     }
 
+    // 我的錢包
+    #[RequestMapping(methods: ['POST'], path: 'wallet')]
+    public function wallet(ProxyService $proxyService, MemberService $memberService)
+    {
+        $memberId = auth('jwt')->user()->getId();
+        $data = [];
+        $data['models']['proxy'] = $proxyService->downlintTotal($memberId);
+        $data['models']['coins'] = $memberService->getMemberSimple($memberId ,["coins"])->coins;
+        $data['models']['income'] = $proxyService->incomeTotal($memberId);
+        return $this->success($data);
+    }
     // 我的收益
     #[RequestMapping(methods: ['POST'], path: 'myIncome')]
     public function myIncome(RequestInterface $request, ProxyService $proxyService)
     {
         $memberId = auth('jwt')->user()->getId();
         $page = $request->input('page', 1);
+        $limit = $request->input('limit', ProxyService::LIMIT);
         $result = $proxyService->myIncome($memberId, $page);
         $data = [];
         $data['models'] = $result;
         $path = '/api/proxy/myIncome';
-        $simplePaginator = new SimplePaginator($page, ProxyService::LIMIT, $path);
+        $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);
     }

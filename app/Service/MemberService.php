@@ -365,6 +365,10 @@ class MemberService extends BaseService
     {
         return self::KEY . ':' . $id;
     }
+    public function getMemberSimple($id , $select)
+    {
+        return Member::select($select)->where("id",$id)->first();
+    }
     // 用id找用戶
     public function getMember($id)
     {

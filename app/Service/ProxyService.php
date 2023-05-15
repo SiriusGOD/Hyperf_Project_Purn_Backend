@@ -119,14 +119,38 @@ class ProxyService extends BaseService
         return false;
     }
 
+    // 我的代理統計 -收益
+    public function incomeTotal(int $memberId)
+    {
+        $query = $this->memberInviteReceiveLog->select(Db::raw('SUM(reach_amount) as total_income'))
+                ->where('member_id', $memberId);
+        $result = $query->first();
+        return $result->total_income;
+    }
+
+    // 我的代理統計
+    public function downlintTotal(int $memberId):array
+    {
+        $query = $this->memberInviteLog
+                ->select('level', Db::raw('COUNT(*) as count'))
+                ->where('invited_by', $memberId)
+                ->whereIn('level', [1, 2, 3, 4])
+                ->groupBy('level');        
+        $results = $query->get();
+
+        foreach ($results as $result) {
+            $level = $result->level;
+            $r[$level] =$result->count;
+        }
+        return $r;
+    }
     // 我的下線
     public function downline(int $memberId, int $page)
     {
         $limit = self::LIMIT;
         $where['invited_by'] = $memberId;
-        $model = $this->memberInviteLog->with(['inviter' => function ($query) {
-            $query->select('id', 'name');
-        }])->with(['member' => function ($query) {
+        $model = $this->memberInviteLog
+           ->with(['member' => function ($query) {
             $query->select('id', 'name');
         }]);
         return $this->list($model, $where, $page, $limit);
