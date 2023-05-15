@@ -22,6 +22,7 @@ use App\Model\Product;
 use App\Model\Video;
 use App\Request\OrderRequest;
 use App\Service\OrderService;
+use App\Service\ProxyService;
 use App\Service\PayService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -58,7 +59,7 @@ class OrderController extends AbstractController
      * 新增使用者訂單.
      */
     #[RequestMapping(methods: ['POST'], path: 'create')]
-    public function create(RequestInterface $request, OrderService $service, PayService $pay_service)
+    public function create(RequestInterface $request, OrderService $service, PayService $pay_service ,ProxyService $proxyService)
     {
         $data['user_id'] = auth('jwt')->user()->getId();
         $data['prod_id'] = $request->input('product_id', 0);
@@ -302,6 +303,12 @@ class OrderController extends AbstractController
             $order->pay_amount = $pay_amount;
             $order->status = Order::ORDER_STATUS['finish'];
             $order->save();
+
+            //存入我的收益明細
+            if($data['pay_method'] == "coin"  && $order->pay_amount>0 ){
+                //返傭
+                $proxyService->rebate($member, $order);
+            }
             // 刪除會員快取
             $service -> delMemberRedis($data['user_id']);
 

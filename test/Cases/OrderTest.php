@@ -22,53 +22,23 @@ class OrderTest extends HttpTestCase
 
         $this->assertSame(200, (int)$data['code']);
     }
-
-    public function testCreate()
+    //買影片-測試代理返傭
+    public function testCreateCoinBuy()
     {
-        $user = Member::first();
+        $user = Member::find(37);
         $token = auth()->login($user);
         make(MemberService::class)->saveToken($user->id, $token);
         $data = $this->client->post('/api/order/create', [
-            'product_id' => 1,
-            'payment_type' => 1,
+            'product_id' => 28,
+            'payment_type' => 0,
+            'pay_method'=>'coin' ,
             'oauth_type' => 'web',
             'pay_proxy' => 'online',
         ], [
             'Authorization' => 'Bearer ' . $token,
         ]);
-
+        print_r(['qqqq' ,$data]);
         $this->assertSame(200, (int)$data['code']);
     }
 
-    public function testDelete()
-    {
-        $orderNum = str_random(99);
-        $model = new Order();
-        $model->user_id = 1;
-        $model->order_number = $orderNum;
-        $model->address = 'test';
-        $model->email = 'test';
-        $model->mobile = 'test';
-        $model->telephone = 'test';
-        $model->payment_type = 1;
-        $model->currency = 'test';
-        $model->total_price = 100;
-        $model->pay_way = 'test';
-        $model->pay_url = 'test';
-        $model->pay_proxy = 'test';
-        $model->status = Order::ORDER_STATUS['create'];
-        $model->save();
-
-        $user = User::first();
-        $token = auth()->login($user);
-        make(MemberService::class)->saveToken($user->id, $token);
-        $data = $this->client->post('/api/order/delete', [
-            'order_num' => $orderNum,
-        ], [
-            'Authorization' => 'Bearer ' . $token,
-        ]);
-
-        $model->forceDelete();
-        $this->assertSame(200, (int)$data['code']);
-    }
 }

@@ -16,7 +16,6 @@ use App\Model\Member;
 use App\Model\MemberInviteLog;
 use App\Model\MemberInviteReceiveLog;
 use App\Model\Order;
-use App\Model\Product;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
@@ -145,7 +144,7 @@ class ProxyService extends BaseService
     }
 
     // 返傭
-    public function rebate(Member $member, Order $order, Product $product)
+    public function rebate(Member $member, Order $order)
     {
         Db::beginTransaction();
         $wg = new \Hyperf\Utils\WaitGroup();
@@ -155,6 +154,7 @@ class ProxyService extends BaseService
         // 怕使用者 充了數馬上提出
         try {
             // if ($product->type != Product::TYPE_LIST[1]) {
+            //買影片之類的用現金點數扣
             $money = $order->pay_amount;
             // 查看上層代理
             $res = $this->memberInviteLog->where('member_id', $member->id)->get();
