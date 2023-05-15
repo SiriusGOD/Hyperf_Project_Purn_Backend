@@ -16,6 +16,7 @@ use App\Model\Actor;
 use App\Model\ActorHasClassification;
 use App\Request\ActorRequest;
 use App\Service\ActorService;
+use App\Util\General;
 use Carbon\Carbon;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
@@ -87,13 +88,8 @@ class ActorController extends AbstractController
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $extension = $request->file('image')->getExtension();
-            $filename = sha1(Carbon::now()->toDateTimeString());
-            if (! file_exists(BASE_PATH . '/public/actor')) {
-                mkdir(BASE_PATH . '/public/actor', 0755);
-            }
-            $imageUrl = '/actor/' . $filename . '.' . $extension;
-            $file->moveTo(BASE_PATH . '/public' . $imageUrl);
+            $dataArr = General::uploadImage($file, 'actor');
+            $imageUrl = $dataArr['url'];
         }
         if (! empty($imageUrl)) {
             $data['image_url'] = $imageUrl;

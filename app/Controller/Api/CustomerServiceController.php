@@ -12,24 +12,20 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
+use App\Middleware\ApiEncryptMiddleware;
 use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\CustomerService;
 use App\Model\CustomerServiceCover;
 use App\Model\CustomerServiceDetail;
-use App\Request\CustomerServiceApiReplyRequest;
-use App\Request\CustomerServiceCreateRequest;
-use App\Request\CustomerServiceDetailRequest;
 use App\Service\CustomerServiceService;
 use App\Service\ImageService;
 use App\Util\General;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
-use Qbhy\HyperfAuth\AuthMiddleware;
-use Hyperf\HttpServer\Annotation\Middleware;
-use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
@@ -43,7 +39,7 @@ class CustomerServiceController extends AbstractController
         $limit = (int) $request->input('limit', CustomerService::PAGE_PER);
         $memberId = auth()->user()->getId();
         $data = [];
-        $data['models'] = $service->list($memberId, $page, $limit, General::getImageUrl($request->url()));
+        $data['models'] = $service->list($memberId, $page, $limit, \Hyperf\Support\env('VIDEO_THUMB_URL', 'https://new.cnzuqiu.mobi'));
         $path = '/api/customer_service/list';
         $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
@@ -63,9 +59,8 @@ class CustomerServiceController extends AbstractController
             ->get()
             ->toArray();
 
-
         $result = [];
-        $url = General::getImageUrl($request->url());
+        $url = \Hyperf\Support\env('VIDEO_THUMB_URL', 'https://new.cnzuqiu.mobi');
         foreach ($models as $model) {
             $model['image_url'] = $url . $model['image_url'];
             $result[] = $model;
@@ -79,7 +74,7 @@ class CustomerServiceController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'create')]
-    public function create(RequestInterface $request, CustomerServiceService $service, ImageService $imageService)
+    public function create(RequestInterface $request, CustomerServiceService $service)
     {
         $memberId = auth()->user()->getId();
         $customServiceModel = $service->create([
@@ -91,7 +86,7 @@ class CustomerServiceController extends AbstractController
         if ($request->hasFile('cover_one')) {
             $file = $request->file('cover_one');
 
-            $result = $imageService->moveImageFile($file);
+            $result = General::uploadImage($file);
             $model = new CustomerServiceCover();
             $model->customer_service_id = $customServiceModel->id;
             $model->url = $result['url'];
@@ -101,7 +96,7 @@ class CustomerServiceController extends AbstractController
         if ($request->hasFile('cover_two')) {
             $file = $request->file('cover_two');
 
-            $result = $imageService->moveImageFile($file);
+            $result = General::uploadImage($file);
             $model = new CustomerServiceCover();
             $model->customer_service_id = $customServiceModel->id;
             $model->url = $result['url'];
@@ -111,23 +106,22 @@ class CustomerServiceController extends AbstractController
         if ($request->hasFile('cover_three')) {
             $file = $request->file('cover_three');
 
-            $result = $imageService->moveImageFile($file);
+            $result = General::uploadImage($file);
             $model = new CustomerServiceCover();
             $model->customer_service_id = $customServiceModel->id;
             $model->url = $result['url'];
             $model->save();
         }
 
-
         return $this->success(['id' => $customServiceModel->id]);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'reply')]
-    public function reply(RequestInterface $request, CustomerServiceService $service, ImageService $imageService): PsrResponseInterface
+    public function reply(RequestInterface $request, CustomerServiceService $service): PsrResponseInterface
     {
         $userId = auth()->user()->getId();
         $id = (int) $request->input('id');
-        $message = $request->input('message', "");
+        $message = $request->input('message', '');
         $params = [
             'id' => $id,
             'member_id' => $userId,
@@ -135,7 +129,7 @@ class CustomerServiceController extends AbstractController
         ];
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $result = $imageService->moveImageFile($file);
+            $result = General::uploadImage($file);
             $params['image_url'] = $result['url'];
         }
         $service->reply($params);

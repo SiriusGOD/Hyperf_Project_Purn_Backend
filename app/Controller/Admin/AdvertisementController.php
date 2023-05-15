@@ -15,6 +15,8 @@ use App\Controller\AbstractController;
 use App\Model\Advertisement;
 use App\Request\AdvertisementRequest;
 use App\Service\AdvertisementService;
+use App\Service\UploadService;
+use App\Util\General;
 use Carbon\Carbon;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -71,21 +73,17 @@ class AdvertisementController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'store')]
-    public function store(AdvertisementRequest $request, ResponseInterface $response, AdvertisementService $service): PsrResponseInterface
+    public function store(AdvertisementRequest $request, ResponseInterface $response, AdvertisementService $service, UploadService $uploadService): PsrResponseInterface
     {
         $imageUrl = null;
+        $data = [];
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $extension = $request->file('image')->getExtension();
-            $filename = sha1(Carbon::now()->toDateTimeString());
-            if (! file_exists(BASE_PATH . '/public/advertisement')) {
-                mkdir(BASE_PATH . '/public/advertisement', 0755);
-            }
-            $imageUrl = '/advertisement/' . $filename . '.' . $extension;
-            $file->moveTo(BASE_PATH . '/public' . $imageUrl);
-            $imageInfo = getimagesize(BASE_PATH . '/public' . $imageUrl);
-            $data['height'] = $imageInfo[1] ?? null;
-            $data['weight'] = $imageInfo[0] ?? null;
+            $dataArr = General::uploadImage($file, 'advertisement');
+            $imageUrl = $dataArr['url'];
+            $data['height'] = $dataArr['height'];
+            $data['weight'] = $dataArr['weight'];
+
         }
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = auth('session')->user()->id;

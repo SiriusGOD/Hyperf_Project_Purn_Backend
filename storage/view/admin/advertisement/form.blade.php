@@ -22,7 +22,7 @@
                                 </div>
                                 <div class="form-group" id="modelImage">
                                     @if(!empty($model->image_url))
-                                    <img src="{{$model->image_url}}" alt="image" style="width:100px">
+                                    <img src="{{\Hyperf\Support\env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live') . $model->image_url}}" alt="image" style="width:100px">
                                     @endif
                                 </div>
                                 <div class="form-group" id="selectedFiles"></div>

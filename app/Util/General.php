@@ -2,16 +2,30 @@
 
 namespace App\Util;
 
+use App\Service\UploadService;
+use Carbon\Carbon;
+use Hyperf\HttpMessage\Upload\UploadedFile;
+
 class General
 {
-    public static function getImageUrl(string $url)
+    public static function uploadImage(UploadedFile $file, string $directory = '') : array
     {
-        if (!empty(\Hyperf\Support\env('TEST_IMG_URL'))) {
-            return \Hyperf\Support\env('TEST_IMG_URL');
+        $extension = $file->getExtension();
+        $filename = sha1(Carbon::now()->toDateTimeString());
+        if (! file_exists(BASE_PATH . '/public/tmp')) {
+            mkdir(BASE_PATH . '/public/tmp', 0755);
         }
-        // 取得網址前綴
-        $urlArr = parse_url($url);
-        $port = $urlArr['port'] ?? '80';
-        return $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $port;
+        $imageUrl = '/tmp/' . $filename . '.' . $extension;
+        $file->moveTo(BASE_PATH . '/public' . $imageUrl);
+        $imageInfo = getimagesize(BASE_PATH . '/public' . $imageUrl);
+        $uploadService = \Hyperf\Support\make(UploadService::class);
+        $res = $uploadService->upload2Remote($filename, BASE_PATH . '/public' . $imageUrl, $directory);
+        $data = [];
+        $data['height'] = $imageInfo[1] ?? null;
+        $data['weight'] = $imageInfo[0] ?? null;
+        $data['url'] = $res['msg'];
+        unlink(BASE_PATH . '/public' . $imageUrl);
+
+        return $data;
     }
 }

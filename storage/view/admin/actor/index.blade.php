@@ -59,7 +59,7 @@
                                             <td class="sorting_1 dtr-control">{{ $model->id}}</td>
                                             <td>{{ $model->name}}</td>
                                             <td>
-                                                <img src="{{$model->avatar}}" alt="" style="width:100px">
+                                                <img src="{{\Hyperf\Support\env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live') . $model->avatar}}" alt="" style="width:100px">
                                             </td>
                                             <td>{{ $model->sex ==1 ? "女" :"男"}}</td>
                                             <td>{{ $model->classification}}</td>

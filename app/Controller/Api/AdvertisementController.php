@@ -13,6 +13,7 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Service\AdvertisementService;
+use App\Util\General;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -26,14 +27,7 @@ class AdvertisementController extends AbstractController
         $data = $service->getAdvertisements();
         $result = [];
         // 取得網址前綴
-        $url = $request->url();
-        $urlArr = parse_url($url);
-        $port = $urlArr['port'] ?? '80';
-        if (! empty(env('TEST_IMG_URL'))) {
-            $host = env('TEST_IMG_URL');
-        } else {
-            $host = $urlArr['scheme'] . '://' . $urlArr['host'] . ':' . $port;
-        }
+        $host = \Hyperf\Support\env('VIDEO_THUMB_URL', 'https://new.cnzuqiu.mobi');
         foreach ($data as $item) {
             $item['image_url'] = $host . $item['image_url'];
             $result[] = $item;

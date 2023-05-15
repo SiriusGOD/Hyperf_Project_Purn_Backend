@@ -12,7 +12,7 @@ namespace HyperfTest\Cases;
 
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
-use App\Service\CurlService;
+use App\Service\UploadService;
 use App\Service\MemberRedeemService;
 use Hyperf\Redis\Redis;
 /**
@@ -38,7 +38,7 @@ class CentImgTest extends HttpTestCase
         parent::__construct($name, $data, $dataName);
         $this->client = make(Client::class);
         $this->memberRedeem = make(MemberRedeemService::class);
-        $this->curl = make(CurlService::class);
+        $this->curl = make(UploadService::class);
         $this->redis = make(Redis::class);
     }
 

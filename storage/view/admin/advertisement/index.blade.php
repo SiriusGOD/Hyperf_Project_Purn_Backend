@@ -77,7 +77,7 @@
                                             <td class="sorting_1 dtr-control">{{ $model->id}}</td>
                                             <td>{{ $model->name}}</td>
                                             <td>
-                                                <img src="{{$model->image_url}}" alt="image" style="width:100px">
+                                                <img src="{{\Hyperf\Support\env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live') . $model->image_url}}" alt="image" style="width:100px">
                                             </td>
                                             <td>{{ $model->url}}</td>
                                             <td>

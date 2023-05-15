@@ -146,7 +146,7 @@ class WithdrawService extends BaseService
             env("APP_ENV") != 'product' && $user_withdraw_url = '';
             $data['sign'] = md5($str . $user_withdraw_key);
             errLog('proxy:'.var_export($data,true));
-            $re = di(\App\Service\CurlService::class)->deleteMp4($user_withdraw_url, $data);
+            $re = di(\App\Service\UploadService::class)->deleteMp4($user_withdraw_url, $data);
             errLog('proxy-result:' . var_export([$data, $re], true));
             $re = json_decode($re, true);
             if (isset($re['success']) && $re['success'] == true && $re['data']['code'] == 200) {

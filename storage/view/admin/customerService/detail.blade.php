@@ -62,7 +62,7 @@
                                             <td class="sorting_1 dtr-control">{{ $model->message }}</td>
                                             <td class="sorting_1 dtr-control">
                                                 @if(!empty($model->image_url))
-                                                    <img src="{{ $model->image_url }}">
+                                                    <img src="{{\Hyperf\Support\env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live') . $model->image_url }}">
                                                 @endif
                                             </td>
                                             <td class="sorting_1 dtr-control">{{ $model->created_at }}</td>
