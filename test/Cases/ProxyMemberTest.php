@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace HyperfTest\Cases;
 use App\Service\ProxyService;
+use App\Model\Member;
 use App\Service\MemberService;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
@@ -74,4 +75,21 @@ class ProxyMemberTest extends HttpTestCase
         ];
     }
 
+    //更新會員
+    public function testUpdateMember()
+    {
+        $user = Member::orderBy('id','desc')->first();
+        $token = auth()->login($user);
+        make(MemberService::class)->saveToken($user->id, $token);
+        $insertArray = self::memberExp();
+        $q = "after_".rand(10001,999999)."_za";
+        $insertArray["account"] = $q;
+        $insertArray["email"] = $q."@example.com";
+        $insertArray["password"] = password_hash('q123456', PASSWORD_DEFAULT);
+        $data = $this->client->post('/api/member/update', $insertArray ,[
+            'Authorization' => 'Bearer ' . $token,
+        ]
+        );
+        $this->assertSame(200, (int)$data['code']);
+    }
 }
