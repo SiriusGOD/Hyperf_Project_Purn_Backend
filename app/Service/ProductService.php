@@ -175,8 +175,8 @@ class ProductService
                 $query[$key]['bonus'] = (string) $query[$key]['bonus'];
             }
         }
-        // $this->redis->set($checkRedisKey, json_encode($query));
-        // $this->redis->expire($checkRedisKey, self::TTL_30_Min);
+        $this->redis->set($checkRedisKey, json_encode($query));
+        $this->redis->expire($checkRedisKey, self::TTL_30_Min);
 
         return $query;
     }
