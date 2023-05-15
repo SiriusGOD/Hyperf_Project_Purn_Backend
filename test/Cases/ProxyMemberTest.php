@@ -52,9 +52,10 @@ class ProxyMemberTest extends HttpTestCase
         $insertArray = self::memberExp();
         $q = "s_".date("YmdHis")."_".rand(11,99);
         $insertArray["name"] = $q;
+        //$insertArray["account"] = $q;
         $insertArray["email"] =$q."@example.com";
         $insertArray["invited_code"] = $member->aff;
-        $insertArray["device_id"] = md5( (string)$member->aff.time().date('YmdHis') );
+        $insertArray["device_id"] = md5((string)$member->aff.time().date('YmdHis') );
         $data = $this->client->post('/api/member/login', $insertArray);
         $this->assertSame(200, (int)$data['code']);
     }
@@ -62,7 +63,7 @@ class ProxyMemberTest extends HttpTestCase
     public function memberExp(){
         return  [
             'name' => 'John',
-            'password' => 'password',
+            'password' => password_hash('q123456', PASSWORD_DEFAULT),
             'email' => 'john@example.com',
             'member_level_status' => 1,
             'device' => 'ios',

@@ -39,12 +39,14 @@ class ProxyApiTest extends HttpTestCase
     public function testAddmember()
     {
         $model = new \App\Model\Member();
-        $model->name = 'test'.time();
+        $acc = 'test'.time();
+        $model->name = $acc;
+        $model->account = $acc;
         $model->password = password_hash('q123456', PASSWORD_DEFAULT);
         $model->sex = 1;
         $model->age = 20;
         $model->avatar = '';
-        $model->email = 'admin'.time().'@admin.com';
+        $model->email = $acc.'@admin.com';
         $model->phone = '0912'.rand(111111,999999);
         $model->status = 1;
         $model->member_level_status =0;
