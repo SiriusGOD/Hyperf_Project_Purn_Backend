@@ -698,8 +698,8 @@ class MemberService extends BaseService
             $data[$key]['pay_method'] =  $order -> pay_name;
         }
 
-        // $this->redis->set($checkRedisKey, json_encode($data));
-        // $this->redis->expire($checkRedisKey, self::DAY);
+        $this->redis->set($checkRedisKey, json_encode($data));
+        $this->redis->expire($checkRedisKey, self::DAY);
 
         return $data;
     }
