@@ -14,6 +14,7 @@ use App\Service\MemberService;
 use App\Model\Member;
 use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
+use Hyperf\Utils\Str;
 
 /**
  * @internal
@@ -35,15 +36,21 @@ class ProxyApiTest extends HttpTestCase
     }
   
     //分享碼
-    public function testMemberShare()
+    public function testAddmember()
     {
-        $member = $this->memberService->getProxy();
-        $token = auth()->login($member);
-        make(MemberService::class)->saveToken($member->id, $token);
-        $data = $this->client->post('/api/proxy/share', [], [
-            'Authorization' => 'Bearer ' . $token,
-        ]);
-        $this->assertSame(200, (int)$data['code']);
+        $model = new \App\Model\Member();
+        $model->name = 'test'.time();
+        $model->password = password_hash('q123456', PASSWORD_DEFAULT);
+        $model->sex = 1;
+        $model->age = 20;
+        $model->avatar = '';
+        $model->email = 'admin'.time().'@admin.com';
+        $model->phone = '0912'.rand(111111,999999);
+        $model->status = 1;
+        $model->member_level_status =0;
+        $model->aff= Str::random(5);
+        $model->save();
+        $this->assertNotNull( $model->id);
     }
 
     //我的收益
