@@ -325,7 +325,9 @@ class PayService
                 // 查看代理等級給返傭
                 if ($order->status == Order::ORDER_STATUS['finish']) {
                     // 返傭
-                    $this->proxyService->rebate($member, $order, $product);
+                    //改寫在order/create
+                    //存入我的收益明細
+                    //$this->proxyService->rebate($member, $order, $product);
                 }
 
                 $this -> delMemberRedis($member->id);

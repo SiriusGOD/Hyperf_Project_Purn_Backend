@@ -49,7 +49,7 @@ class ProxyOrderTest extends HttpTestCase
           [
             'Authorization' => 'Bearer ' . $token,
         ]);
-        $this->assertSame("訂單新增成功", $data['msg']);
+        $this->assertSame(200, $data['code']);
     }
 
     public function testPayOrder()
