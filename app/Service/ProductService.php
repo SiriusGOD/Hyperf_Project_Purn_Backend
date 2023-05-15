@@ -235,7 +235,12 @@ class ProductService
         foreach ($products as $key => $value) {
             // 撈取個商品的支付方式   
             $pay_query = PayCorrespond::join('pays', 'pays.id', 'pay_corresponds.pay_id')->where('pays.expire', Pay::EXPIRE['no'])->where('pay_corresponds.product_id', $value['id'])->select('pays.id', 'pays.name', 'pays.pronoun')->get()->toArray();
-
+            // 插入預設的現金點數支付
+            array_unshift($pay_query,  array(
+                'id' => 0,
+                'name' => trans('api.product_control.pay_coin'),
+                'pronoun' => 'coin'
+            ));
             if($value['type'] == MemberLevel::TYPE_LIST['0'] && $value['currency'] == $compareCurrency){
                 array_push($vip_arr, array(
                     'id' => $value['id'],
