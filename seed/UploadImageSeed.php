@@ -20,7 +20,7 @@ class UploadImageSeed implements BaseInterface
 
         foreach ($models as $model) {
             $fullPath = BASE_PATH . '/public' . $model->image_url;
-            if(!file_exists($fullPath)) {
+            if(!is_file($fullPath)) {
                 continue;
             }
             $uploadService = \Hyperf\Support\make(UploadService::class);
@@ -35,7 +35,7 @@ class UploadImageSeed implements BaseInterface
 
         foreach ($models as $model) {
             $fullPath = BASE_PATH . '/public' . $model->image_url;
-            if(!file_exists($fullPath)) {
+            if(!is_file($fullPath)) {
                 continue;
             }
             $uploadService = \Hyperf\Support\make(UploadService::class);
@@ -50,7 +50,7 @@ class UploadImageSeed implements BaseInterface
 
         foreach ($models as $model) {
             $fullPath = BASE_PATH . '/public' . $model->url;
-            if(!file_exists($fullPath)) {
+            if(!is_file($fullPath)) {
                 continue;
             }
             $uploadService = \Hyperf\Support\make(UploadService::class);
@@ -65,7 +65,7 @@ class UploadImageSeed implements BaseInterface
 
         foreach ($models as $model) {
             $fullPath = BASE_PATH . '/public' . $model->avatar;
-            if(!file_exists($fullPath)) {
+            if(!is_file($fullPath)) {
                 continue;
             }
             $uploadService = \Hyperf\Support\make(UploadService::class);
