@@ -12,17 +12,19 @@ declare(strict_types=1);
 namespace App\Model;
 
 /**
- * @property int $id
- * @property int $member_id
- * @property int $invite_by
- * @property string $order_sn
- * @property string $amount
- * @property string $reach_amount
- * @property int $level
- * @property string $rate
- * @property int $type
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property int $id 
+ * @property int $member_id 
+ * @property int $invite_by 
+ * @property string $order_sn 
+ * @property string $amount 
+ * @property string $reach_amount 
+ * @property int $level 
+ * @property string $rate 
+ * @property int $type 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property string $product_name 
+ * @property-read Member $member 
  */
 class MemberInviteReceiveLog extends Model
 {
@@ -34,7 +36,7 @@ class MemberInviteReceiveLog extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['member_id', 'invite_by', 'reach_amount', 'amount', 'level', 'rate', 'type', 'order_sn'];
+    protected array $fillable = ['member_id', 'invite_by', 'reach_amount', 'amount', 'level', 'rate', 'type', 'order_sn','product_name'];
 
     /**
      * The attributes that should be cast to native types.

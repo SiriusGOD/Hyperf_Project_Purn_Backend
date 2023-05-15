@@ -315,7 +315,7 @@ class OrderController extends AbstractController
             //存入我的收益明細
             if($data['pay_method'] == "coin"  && $order->pay_amount>0 ){
                 //返傭
-                $proxyService->rebate($member, $order);
+                $proxyService->rebate($member, $order, $product);
             }
             // 刪除會員快取
             $service -> delMemberRedis($data['user_id']);

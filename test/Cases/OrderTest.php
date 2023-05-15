@@ -37,7 +37,6 @@ class OrderTest extends HttpTestCase
             'oauth_type' => 'web',
             'pay_proxy' => 'online',
         ];
-        print_r([$postData]);
         $data = $this->client->post('/api/order/create', $postData, [
             'Authorization' => 'Bearer ' . $token,
         ]);

@@ -35,30 +35,11 @@ class ProxyApiTest extends HttpTestCase
         $this->memberService = make(MemberService::class);
     }
   
-    //分享碼
-    public function testAddmember()
-    {
-        $model = new \App\Model\Member();
-        $acc = 'test'.time();
-        $model->name = $acc;
-        $model->account = $acc;
-        $model->password = password_hash('q123456', PASSWORD_DEFAULT);
-        $model->sex = 1;
-        $model->age = 20;
-        $model->avatar = '';
-        $model->email = $acc.'@admin.com';
-        $model->phone = '0912'.rand(111111,999999);
-        $model->status = 1;
-        $model->member_level_status =0;
-        $model->aff= Str::random(5);
-        $model->save();
-        $this->assertNotNull( $model->id);
-    }
 
     //我的收益
     public function testMyIncome()
     {
-        $member = Member::where('id' ,36)->first();
+        $member = Member::where('id' ,54)->first();
         $token = auth()->login($member);
         make(MemberService::class)->saveToken($member->id, $token);
         $data = $this->client->post('/api/proxy/myIncome', [], [

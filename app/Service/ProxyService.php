@@ -137,14 +137,15 @@ class ProxyService extends BaseService
     {
         $limit = self::LIMIT;
         $where['member_id'] = $memberId;
-        $model = $this->memberInviteReceiveLog->with(['member' => function ($query) {
+        $model = $this->memberInviteReceiveLog->select("id",'product_name','reach_amount','level',"member_id","created_at")->with(
+          ['member' => function ($query) {
             $query->select('id', 'name');
         }]);
         return $this->list($model, $where, $page, $limit);
     }
 
     // 返傭
-    public function rebate(Member $member, Order $order)
+    public function rebate(Member $member, Order $order , $product)
     {
         Db::beginTransaction();
         $wg = new \Hyperf\Utils\WaitGroup();
@@ -169,12 +170,13 @@ class ProxyService extends BaseService
                 $return['order_sn'] = $order->order_number;
                 $return['amount'] = $money;
                 $return['reach_amount'] = $amount;
+                $return['product_name'] =  $product["name"];
                 $return['level'] = $userLevel;
                 $return['rate'] = $uRate;
                 $return['type'] = ($proxy->level == 1) ? 0 : 1; // 0 直推 1 跨级收益
                 $wg->add(1);
                 // 返傭
-                co(function () use ($wg, $return, $memberInviteReceiveLog, $memberModel, $amount) {
+                co(function () use ($wg, $return,$memberInviteReceiveLog, $memberModel, $amount) {
                     try {
                         $member = $memberModel->find((int) $return['member_id']);
                         $member->coins = $member->coins + $amount;
