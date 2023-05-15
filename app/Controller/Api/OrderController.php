@@ -70,11 +70,10 @@ class OrderController extends AbstractController
         $data['payment_type'] = $payment_type;
         // $data['oauth_type'] = $request->input('oauth_type', 'web');
 
-        // 先預設online之後要依照支付類別取 agent/online
+        // 依照支付類別取 agent/online
         // 撈取支付代稱
-        $pay = Pay::where('id', $payment_type)->select('pronoun')->first();
-
-        $data['pay_proxy'] = 'online';
+        $pay = Pay::where('id', $payment_type)->select('pronoun', 'proxy')->first();
+        $data['pay_proxy'] = $pay -> proxy ?? 'online';
         $data['pay_method'] = $request->input('pay_method');
 
         // 判斷參數是否正確
