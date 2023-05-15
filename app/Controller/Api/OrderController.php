@@ -30,6 +30,7 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Annotation\Middleware;
 use App\Middleware\ApiEncryptMiddleware;
+use App\Model\Pay;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
@@ -65,10 +66,14 @@ class OrderController extends AbstractController
         if (empty($data['prod_id'])) {
             return $this->error(trans('validation.filled', ['attribute' => 'product id']), ErrorCode::BAD_REQUEST);
         }
-        $data['payment_type'] = $request->input('payment_type', 0);
+        $payment_type = $request->input('payment_type', 0);
+        $data['payment_type'] = $payment_type;
         // $data['oauth_type'] = $request->input('oauth_type', 'web');
 
         // 先預設online之後要依照支付類別取 agent/online
+        // 撈取支付代稱
+        $pay = Pay::where('id', $payment_type)->select('pronoun')->first();
+
         $data['pay_proxy'] = 'online';
         $data['pay_method'] = $request->input('pay_method');
 
@@ -79,7 +84,6 @@ class OrderController extends AbstractController
         if($data['payment_type'] > 0 && $data['pay_method'] != 'cash'){
             return  $this->error(trans('api.order_control.parameter_error'), ErrorCode::BAD_REQUEST);
         }
-
 
         // agent or online
         $base_service = di(\App\Service\BaseService::class);
@@ -101,6 +105,7 @@ class OrderController extends AbstractController
         $data['user'] = $data['user']->toArray();
         $user = $data['user'];
         $data['oauth_type'] = $user['device'];
+
 
         switch ($data['pay_method']) {
             case 'cash':
@@ -297,6 +302,10 @@ class OrderController extends AbstractController
 
         // 變更訂單狀態為已完成 (除了現金購買外)
         if ($re) {
+            $pay_res['data']['pay_url'] = '';
+            $pay_res['data']['pay_way'] = $pay->pronoun ?? 'local';
+            $pay_res['data']['pay_proxy'] = 'online';
+            $pay_res['data']['pay_order_id'] = '';
             $pay_res['data']['order_num'] = $result;
             $order = Order::where('order_number', $result)->first();
             $order->pay_amount = $pay_amount;
