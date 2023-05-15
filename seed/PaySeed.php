@@ -18,6 +18,7 @@ class PaySeed implements BaseInterface
         $model->user_id = 1;
         $model->name = '微信支付';
         $model->pronoun = 'wechat';
+        $model->proxy = 'online';
         $model->expire = 0;
         $model->save();
 
@@ -25,6 +26,7 @@ class PaySeed implements BaseInterface
         $model->user_id = 1;
         $model->name = '银联支付';
         $model->pronoun = 'bankcard';
+        $model->proxy = 'online';
         $model->expire = 0;
         $model->save();
 
@@ -32,6 +34,7 @@ class PaySeed implements BaseInterface
         $model->user_id = 1;
         $model->name = '支付宝支付';
         $model->pronoun = 'alipay';
+        $model->proxy = 'online';
         $model->expire = 0;
         $model->save();
 
@@ -39,6 +42,7 @@ class PaySeed implements BaseInterface
         $model->user_id = 1;
         $model->name = '数字人民币支付';
         $model->pronoun = 'ecny';
+        $model->proxy = 'online';
         $model->expire = 0;
         $model->save();
 
@@ -47,6 +51,7 @@ class PaySeed implements BaseInterface
         $model->user_id = 1;
         $model->name = 'VISA支付';
         $model->pronoun = 'visa';
+        $model->proxy = 'online';
         $model->expire = 0;
         $model->save();
 
@@ -54,6 +59,7 @@ class PaySeed implements BaseInterface
         $model->user_id = 1;
         $model->name = '商家代理支付';
         $model->pronoun = 'agent';
+        $model->proxy = 'agent';
         $model->expire = 0;
         $model->save();
 
