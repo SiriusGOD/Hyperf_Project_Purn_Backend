@@ -64,7 +64,7 @@ class ProxyMemberTest extends HttpTestCase
     public function memberExp(){
         return  [
             'name' => 'John',
-            'password' => password_hash('q123456', PASSWORD_DEFAULT),
+            'password' => 'a123456',
             'email' => 'john@example.com',
             'member_level_status' => 1,
             'device' => 'ios',
@@ -82,14 +82,25 @@ class ProxyMemberTest extends HttpTestCase
         $token = auth()->login($user);
         make(MemberService::class)->saveToken($user->id, $token);
         $insertArray = self::memberExp();
-        $q = "after_".rand(10001,999999)."_za";
+        $q = "a".rand(100010,999999);
         $insertArray["account"] = $q;
         $insertArray["email"] = $q."@example.com";
-        $insertArray["password"] = password_hash('q123456', PASSWORD_DEFAULT);
+        $insertArray["password"] ='a123456';
         $data = $this->client->post('/api/member/update', $insertArray ,[
             'Authorization' => 'Bearer ' . $token,
         ]
         );
+        $this->assertSame(200, (int)$data['code']);
+    }
+    //更新會員
+    public function testLoginMember()
+    {
+        $insertArray["account"] = "a974866";
+        $insertArray["device"] = "web";
+        $insertArray["device_id"] = rand(111111111,9999999999)."web";
+        $insertArray["password"] ='a123456';
+        $data = $this->client->post('/api/member/login', $insertArray );
+        print_r($data);
         $this->assertSame(200, (int)$data['code']);
     }
 }
