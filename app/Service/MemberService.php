@@ -24,6 +24,7 @@ use App\Model\Role;
 use App\Model\User;
 use App\Model\Video;
 use App\Model\ActorCorrespond;
+use App\Model\Coin;
 use Carbon\Carbon;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
@@ -636,7 +637,7 @@ class MemberService extends BaseService
         $query = Order::join('order_details', 'orders.id', 'order_details.order_id')
                         ->join('products', 'order_details.product_id', 'products.id')
                         ->join('pays', 'orders.payment_type', 'pays.id')
-                        ->selectRaw('products.name as product_name, orders.created_at, orders.status, orders.currency, orders.total_price, pays.name as pay_name')
+                        ->selectRaw('products.name as product_name, orders.created_at, orders.status, orders.currency, orders.total_price, pays.name as pay_name, products.type, products.correspond_id')
                         ->where('orders.user_id', $user_id)
                         ->whereIn('products.type', $products_type)
                         ->orderBy('orders.created_at', 'desc');
@@ -651,14 +652,49 @@ class MemberService extends BaseService
         // 整理資料
         $data = [];
         foreach ($orders as $key => $order) {
-            $data[$key]['product_name'] = $order -> product_name;
+            switch ($order -> type) {
+                case Product::TYPE_CORRESPOND_LIST['member']:
+                    $member_level_type = MemberLevel::where('id', $order -> correspond_id)->select('type')->first();
+                    if($member_level_type -> type == MemberLevel::TYPE_LIST[0]){
+                        $data[$key]['product_name'] = trans('api.member_control.vip_level') . '-' . $order -> product_name;
+                    }else{
+                        $data[$key]['product_name'] = trans('api.member_control.diamond_level') . '-' . $order -> product_name;
+                    }
+                    break;
+                case Product::TYPE_CORRESPOND_LIST['points']:
+                    $coin_type = Coin::where('id', $order -> correspond_id)->select('type')->first();
+                    if($coin_type -> type == Coin::TYPE_LIST[0]){
+                        $data[$key]['product_name'] = trans('api.member_control.cash_coin') . '-' . $order -> product_name;
+                    }else{
+                        $data[$key]['product_name'] = trans('api.member_control.diamond_coin') . '-' . $order -> product_name;
+                    }
+                    break;
+            }
             $data[$key]['created_at'] = $order -> created_at -> format('Y.m.d'); ;
             $data[$key]['status'] = trans('default.order_control.order_status_fronted_msg')[$order -> status];
-            if($order -> currency == Product::CURRENCY[0]){
-                $data[$key]['price'] = $order -> total_price . " " . trans('api.member_control.dollar');
-            }else if($order -> currency == Product::CURRENCY[1]){
-                $data[$key]['price'] = $order -> total_price . " " . trans('api.member_control.point');
+            switch ($order -> status) {
+                case Order::ORDER_STATUS['create']:
+                    $data[$key]['statusColor'] = Order::STATUS_COLOR['yellow'];
+                    break;
+                case Order::ORDER_STATUS['delete']:
+                    $data[$key]['statusColor'] = Order::STATUS_COLOR['red'];
+                    break;
+                case Order::ORDER_STATUS['finish']:
+                    $data[$key]['statusColor'] = Order::STATUS_COLOR['black'];
+                    break;
+                case Order::ORDER_STATUS['failure']:
+                    $data[$key]['statusColor'] = Order::STATUS_COLOR['orange'];
+                    break;
+                default:
+                    $data[$key]['statusColor'] = Order::STATUS_COLOR['yellow'];
+                    break;
             }
+            $data[$key]['price'] = $order -> total_price;
+            // if($order -> currency == Product::CURRENCY[0]){
+            //     $data[$key]['price'] .= " " . trans('api.member_control.dollar');
+            // }else if($order -> currency == Product::CURRENCY[1]){
+            //     $data[$key]['price'] .= " " . trans('api.member_control.point');
+            // }
             $data[$key]['pay_method'] =  $order -> pay_name;
         }
 

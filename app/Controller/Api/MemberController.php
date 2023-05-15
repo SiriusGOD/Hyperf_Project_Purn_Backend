@@ -55,7 +55,7 @@ class MemberController extends AbstractController
         if (! empty($user)) {
             $check = $service->checkPassword($request->input('password', ''), $user->password);
             if (! $check and ! empty($user->password)) {
-                return $this->error(trans('validation.password_error'), MemberCode::PAS_ERROR);
+                return $this->error(trans('validation.password_error'), 401);
             }
         } elseif (! empty($request->input('account')) and ! empty($request->input('device_id'))) {
             return $this->error(trans('validation.authorize'), MemberCode::AUT_ERROR);

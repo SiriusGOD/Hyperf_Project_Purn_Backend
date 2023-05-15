@@ -18,6 +18,17 @@
                                     <input type="text" class="form-control" name="pronoun" id="pronoun" placeholder="" value="{{$model->pronoun ?? ''}}">
                                 </div>
                                 <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.pay_control.pay_type') ?? '支付類型'}}</label>
+                                    <select class="form-control form-control-lg" name="proxy">
+                                        <option value="{{\App\Model\Pay::PROXY[0]}}" {{$model->proxy == \App\Model\Pay::PROXY[0] ? 'selected' : ''}}>
+                                            {{trans('default.pay_control.pay_proxy_online') ?? '線上支付'}}
+                                        </option>
+                                        <option value="{{\App\Model\Pay::PROXY[1]}}" {{$model->proxy == \App\Model\Pay::PROXY[1] ? 'selected' : ''}}>
+                                            {{trans('default.pay_control.pay_proxy_agent') ?? '代理支付'}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.expire') ?? '狀態'}}</label>
                                     <select class="form-control form-control-lg" name="expire">
                                         <option value="{{\App\Model\Product::EXPIRE['no']}}" {{$model->expire == \App\Model\Product::EXPIRE['no'] ? 'selected' : ''}}>

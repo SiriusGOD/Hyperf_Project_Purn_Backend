@@ -590,6 +590,13 @@ return [
         'pay_open' => '開啟',
         'pay_close' => '關閉',
         'pay_method' => '支付方式',
+        'pay_proxy_online' => '線上支付',
+        'pay_proxy_agent' => '代理支付',
+        'pay_type' => '支付類型',
+        'pay_proxy' => [
+            'online' => '線上支付',
+            'agent' => '代理支付',
+        ]
     ],
     // -------------------------------------------------------------------
     // PayController

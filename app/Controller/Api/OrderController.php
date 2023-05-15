@@ -31,6 +31,7 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Annotation\Middleware;
 use App\Middleware\ApiEncryptMiddleware;
+use App\Model\Pay;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
@@ -66,11 +67,14 @@ class OrderController extends AbstractController
         if (empty($data['prod_id'])) {
             return $this->error(trans('validation.filled', ['attribute' => 'product id']), ErrorCode::BAD_REQUEST);
         }
-        $data['payment_type'] = $request->input('payment_type', 0);
+        $payment_type = $request->input('payment_type', 0);
+        $data['payment_type'] = $payment_type;
         // $data['oauth_type'] = $request->input('oauth_type', 'web');
 
-        // 先預設online之後要依照支付類別取 agent/online
-        $data['pay_proxy'] = 'online';
+        // 依照支付類別取 agent/online
+        // 撈取支付代稱
+        $pay = Pay::where('id', $payment_type)->select('pronoun', 'proxy')->first();
+        $data['pay_proxy'] = $pay -> proxy ?? 'online';
         $data['pay_method'] = $request->input('pay_method');
 
         // 判斷參數是否正確
@@ -80,7 +84,6 @@ class OrderController extends AbstractController
         if($data['payment_type'] > 0 && $data['pay_method'] != 'cash'){
             return  $this->error(trans('api.order_control.parameter_error'), ErrorCode::BAD_REQUEST);
         }
-
 
         // agent or online
         $base_service = di(\App\Service\BaseService::class);
@@ -102,6 +105,7 @@ class OrderController extends AbstractController
         $data['user'] = $data['user']->toArray();
         $user = $data['user'];
         $data['oauth_type'] = $user['device'];
+
 
         switch ($data['pay_method']) {
             case 'cash':
@@ -192,7 +196,7 @@ class OrderController extends AbstractController
                     return $this->error(trans('api.order_control.not_enough_diamond_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 確認商品是否是影片或套圖
-                if ($product['type'] != Product::TYPE_CORRESPOND_LIST['image'] && $product['type'] != Product::TYPE_CORRESPOND_LIST['video']) {
+                if ($product['type'] != Product::TYPE_LIST[0] && $product['type'] != Product::TYPE_LIST[1]) {
                     return $this->error(trans('api.order_control.not_buy_with_diamond_quota'), ErrorCode::BAD_REQUEST);
                 }
 
@@ -223,7 +227,7 @@ class OrderController extends AbstractController
                     return $this->error(trans('api.order_control.not_enough_vip_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 確認商品是否是影片或套圖
-                if ($product['type'] != Product::TYPE_CORRESPOND_LIST['image'] && $product['type'] != Product::TYPE_CORRESPOND_LIST['video']) {
+                if ($product['type'] != Product::TYPE_LIST[0] && $product['type'] != Product::TYPE_LIST[1]) {
                     return $this->error(trans('api.order_control.not_buy_with_vip_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 如果是圖片，確認圖片是否是vip或免費
@@ -265,7 +269,7 @@ class OrderController extends AbstractController
                     return $this->error(trans('api.order_control.not_enough_free_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 確認商品是否是影片或套圖
-                if ($product['type'] != Product::TYPE_CORRESPOND_LIST['image'] && $product['type'] != Product::TYPE_CORRESPOND_LIST['video']) {
+                if ($product['type'] != Product::TYPE_LIST[0] && $product['type'] != Product::TYPE_LIST[1]) {
                     return $this->error(trans('api.order_control.not_buy_with_free_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 如果是圖片，確認圖片是否是免費圖片
@@ -298,6 +302,10 @@ class OrderController extends AbstractController
 
         // 變更訂單狀態為已完成 (除了現金購買外)
         if ($re) {
+            $pay_res['data']['pay_url'] = '';
+            $pay_res['data']['pay_way'] = $pay->pronoun ?? 'local';
+            $pay_res['data']['pay_proxy'] = 'online';
+            $pay_res['data']['pay_order_id'] = '';
             $pay_res['data']['order_num'] = $result;
             $order = Order::where('order_number', $result)->first();
             $order->pay_amount = $pay_amount;
