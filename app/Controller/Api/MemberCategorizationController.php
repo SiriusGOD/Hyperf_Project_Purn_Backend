@@ -87,7 +87,6 @@ class MemberCategorizationController extends AbstractController
             'id' => $id,
             'name' => $request->input('name'),
             'member_id' => $memberId,
-            'hot_order' => $request->input('hot_order'),
         ]);
 
         if ($request->input('is_default') == 1) {
