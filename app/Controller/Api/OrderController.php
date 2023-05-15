@@ -141,12 +141,12 @@ class OrderController extends AbstractController
                     // var_dump('扣現金點數');
                     $member->coins = $user['coins'] - $product['selling_price'];
                     // 如果是購買鑽石點數，則會員鑽石點數需要更新
-                    if ($product['type'] == Product::TYPE_LIST[3]) {
+                    if ($product['type'] == Product::TYPE_CORRESPOND_LIST['points']) {
                         $coin = Coin::where('id', $product['correspond_id'])->first();
                         $member->diamond_coins = (float) $member->diamond_coins + $coin->points + $coin->bonus;
                     }
                     // 如果是會員卡(則要做會員升等)
-                    if ($product['type'] == Product::TYPE_LIST[2]) {
+                    if ($product['type'] == Product::TYPE_CORRESPOND_LIST['member']) {
                         $data['order_number'] = $result;
                         $service->memberLevelUp($data);
                     }
@@ -191,7 +191,7 @@ class OrderController extends AbstractController
                     return $this->error(trans('api.order_control.not_enough_diamond_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 確認商品是否是影片或套圖
-                if ($product['type'] != Product::TYPE_LIST[0] && $product['type'] != Product::TYPE_LIST[1]) {
+                if ($product['type'] != Product::TYPE_CORRESPOND_LIST['image'] && $product['type'] != Product::TYPE_CORRESPOND_LIST['video']) {
                     return $this->error(trans('api.order_control.not_buy_with_diamond_quota'), ErrorCode::BAD_REQUEST);
                 }
 
@@ -222,11 +222,11 @@ class OrderController extends AbstractController
                     return $this->error(trans('api.order_control.not_enough_vip_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 確認商品是否是影片或套圖
-                if ($product['type'] != Product::TYPE_LIST[0] && $product['type'] != Product::TYPE_LIST[1]) {
+                if ($product['type'] != Product::TYPE_CORRESPOND_LIST['image'] && $product['type'] != Product::TYPE_CORRESPOND_LIST['video']) {
                     return $this->error(trans('api.order_control.not_buy_with_vip_quota'), ErrorCode::BAD_REQUEST);
                 }
-                // 如果是圖片，確認圖片是否是vip或免費影片
-                // if ($product['type'] == Product::TYPE_LIST[0]) {
+                // 如果是圖片，確認圖片是否是vip或免費
+                // if ($product['type'] == Product::TYPE_CORRESPOND_LIST['image']) {
                 //     $img = ImageGroup::where('id', $product['correspond_id'])->first()->toArray();
                 //     if ($img['pay_type'] == ImageGroup::IMAGE_GROUP_PAY_TYPE['diamond']) {
                 //         return $this->error('該商品不可使用VIP觀看次數購買', ErrorCode::BAD_REQUEST);
@@ -234,7 +234,7 @@ class OrderController extends AbstractController
                 // }
 
                 // 如果是影片，確認影片是否是vip或免費影片
-                if ($product['type'] == Product::TYPE_LIST[1]) {
+                if ($product['type'] == Product::TYPE_CORRESPOND_LIST['video']) {
                     $video = Video::where('id', $product['correspond_id'])->first()->toArray();
                     if ($video['is_free'] == Video::VIDEO_TYPE['diamond']) {
                         return $this->error(trans('api.order_control.not_buy_with_vip_quota'), ErrorCode::BAD_REQUEST);
@@ -264,18 +264,18 @@ class OrderController extends AbstractController
                     return $this->error(trans('api.order_control.not_enough_free_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 確認商品是否是影片或套圖
-                if ($product['type'] != Product::TYPE_LIST[0] && $product['type'] != Product::TYPE_LIST[1]) {
+                if ($product['type'] != Product::TYPE_CORRESPOND_LIST['image'] && $product['type'] != Product::TYPE_CORRESPOND_LIST['video']) {
                     return $this->error(trans('api.order_control.not_buy_with_free_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 如果是圖片，確認圖片是否是免費圖片
-                if ($product['type'] == Product::TYPE_LIST[0]) {
+                if ($product['type'] == Product::TYPE_CORRESPOND_LIST['image']) {
                     $img = ImageGroup::where('id', $product['correspond_id'])->first()->toArray();
                     if ($img['pay_type'] != ImageGroup::IMAGE_GROUP_PAY_TYPE['free']) {
                         return $this->error(trans('api.order_control.not_buy_with_free_quota'), ErrorCode::BAD_REQUEST);
                     }
                 }
                 // 如果是影片，確認影片是否是免費影片
-                if ($product['type'] == Product::TYPE_LIST[1]) {
+                if ($product['type'] == Product::TYPE_CORRESPOND_LIST['video']) {
                     $video = Video::where('id', $product['correspond_id'])->first()->toArray();
                     if ($video['is_free'] != Video::VIDEO_TYPE['free']) {
                         return $this->error(trans('api.order_control.not_buy_with_free_quota'), ErrorCode::BAD_REQUEST);
@@ -304,7 +304,7 @@ class OrderController extends AbstractController
             $order->save();
             // 刪除會員快取
             $service -> delMemberRedis($data['user_id']);
-            
+
             return $this->success($pay_res['data'], trans('api.order_control.buy_success'));
         }
         return $this->error(trans('api.order_control.buy_failed'), ErrorCode::BAD_REQUEST);

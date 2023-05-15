@@ -204,7 +204,7 @@ class PayService
                     $order->save();
 
                     // 會員卡
-                    if ($product->type == Product::TYPE_LIST[2]) {
+                    if ($product->type == Product::TYPE_CORRESPOND_LIST['member']) {
                         // 獲取會員卡天數
                         $member_level = MemberLevel::where('id', $product->correspond_id)->first();
                         $duration = $member_level->duration;
@@ -327,6 +327,8 @@ class PayService
                     // 返傭
                     $this->proxyService->rebate($member, $order, $product);
                 }
+
+                $this -> delMemberRedis($member->id);
                 $this->logger->info('執行結束', $data);
             } catch (\Throwable $th) {
                 // throw $th;
@@ -371,5 +373,12 @@ class PayService
     public function getPayList()
     {
         return Pay::select('id', 'name', 'pronoun')->where('expire', Pay::EXPIRE['no'])->get();
+    }
+
+    // 刪除會員快取
+    public function delMemberRedis($user_id)
+    {
+        $service = make(MemberService::class);
+        $service->delMemberRedis($user_id);
     }
 }
