@@ -10,7 +10,11 @@ return [
         'is_follow' => '该会员已追踪',
         'no_follow_data' => '查无该会员追踪资料',
         'dollar' => '元',
-        'point' => '点'
+        'point' => '点',
+        'vip_level' => 'VIP卡',
+        'diamond_level' => '钻石卡',
+        'cash_coin' => '现金点数',
+        'diamond_coin' => '钻石点数',
     ],
     'order_control' =>[
         'no_product_data' => '查无商品资料',

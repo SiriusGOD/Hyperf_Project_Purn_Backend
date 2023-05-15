@@ -50,6 +50,13 @@ class Order extends Model
         'free_quota' => 'FREE_QUOTA',
     ];
 
+    public const STATUS_COLOR = [
+        'yellow' => 0,
+        'red' => 1,
+        'black' => 2,
+        'orange' => 3
+    ];
+
     /**
      * The table associated with the model.
      *
