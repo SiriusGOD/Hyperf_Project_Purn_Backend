@@ -54,3 +54,9 @@ https://adminlte.io/docs/3.2/dependencies.html
 資源中心 過來的m3u8 影片加上 
 
 https://video.iwanna.tv/
+
+### ELK 安裝
+
+docker run --name kib-01 --link elasticsearch -p 5601:5601 kibana:7.4.2
+docker run --link elasticsearch -p 5601:5601 docker.elastic.co/kibana/kibana:<欲安裝的版本號>
+教學:https://myapollo.com.tw/blog/docker-elasticsearch/
