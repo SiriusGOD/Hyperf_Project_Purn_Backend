@@ -674,19 +674,19 @@ class MemberService extends BaseService
             $data[$key]['status'] = trans('default.order_control.order_status_fronted_msg')[$order -> status];
             switch ($order -> status) {
                 case Order::ORDER_STATUS['create']:
-                    $data[$key]['statusColor'] = Order::STATUS_COLOR['yellow'];
+                    $data[$key]['status_color'] = Order::STATUS_COLOR['yellow'];
                     break;
                 case Order::ORDER_STATUS['delete']:
-                    $data[$key]['statusColor'] = Order::STATUS_COLOR['red'];
+                    $data[$key]['status_color'] = Order::STATUS_COLOR['red'];
                     break;
                 case Order::ORDER_STATUS['finish']:
-                    $data[$key]['statusColor'] = Order::STATUS_COLOR['black'];
+                    $data[$key]['status_color'] = Order::STATUS_COLOR['black'];
                     break;
                 case Order::ORDER_STATUS['failure']:
-                    $data[$key]['statusColor'] = Order::STATUS_COLOR['orange'];
+                    $data[$key]['status_color'] = Order::STATUS_COLOR['orange'];
                     break;
                 default:
-                    $data[$key]['statusColor'] = Order::STATUS_COLOR['yellow'];
+                    $data[$key]['status_color'] = Order::STATUS_COLOR['yellow'];
                     break;
             }
             $data[$key]['price'] = $order -> total_price;
