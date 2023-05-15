@@ -191,7 +191,7 @@ class OrderController extends AbstractController
                     return $this->error(trans('api.order_control.not_enough_diamond_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 確認商品是否是影片或套圖
-                if ($product['type'] != Product::TYPE_CORRESPOND_LIST['image'] && $product['type'] != Product::TYPE_CORRESPOND_LIST['video']) {
+                if ($product['type'] != Product::TYPE_LIST[0] && $product['type'] != Product::TYPE_LIST[1]) {
                     return $this->error(trans('api.order_control.not_buy_with_diamond_quota'), ErrorCode::BAD_REQUEST);
                 }
 
@@ -222,7 +222,7 @@ class OrderController extends AbstractController
                     return $this->error(trans('api.order_control.not_enough_vip_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 確認商品是否是影片或套圖
-                if ($product['type'] != Product::TYPE_CORRESPOND_LIST['image'] && $product['type'] != Product::TYPE_CORRESPOND_LIST['video']) {
+                if ($product['type'] != Product::TYPE_LIST[0] && $product['type'] != Product::TYPE_LIST[1]) {
                     return $this->error(trans('api.order_control.not_buy_with_vip_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 如果是圖片，確認圖片是否是vip或免費
@@ -264,7 +264,7 @@ class OrderController extends AbstractController
                     return $this->error(trans('api.order_control.not_enough_free_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 確認商品是否是影片或套圖
-                if ($product['type'] != Product::TYPE_CORRESPOND_LIST['image'] && $product['type'] != Product::TYPE_CORRESPOND_LIST['video']) {
+                if ($product['type'] != Product::TYPE_LIST[0] && $product['type'] != Product::TYPE_LIST[1]) {
                     return $this->error(trans('api.order_control.not_buy_with_free_quota'), ErrorCode::BAD_REQUEST);
                 }
                 // 如果是圖片，確認圖片是否是免費圖片
@@ -302,9 +302,6 @@ class OrderController extends AbstractController
             $order->pay_amount = $pay_amount;
             $order->status = Order::ORDER_STATUS['finish'];
             $order->save();
-            // 刪除會員快取
-            $service -> delMemberRedis($data['user_id']);
-
             return $this->success($pay_res['data'], trans('api.order_control.buy_success'));
         }
         return $this->error(trans('api.order_control.buy_failed'), ErrorCode::BAD_REQUEST);

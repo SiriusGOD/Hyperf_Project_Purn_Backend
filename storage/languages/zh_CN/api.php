@@ -47,4 +47,7 @@ return [
     'stage_video_control' => [
         'failed' => '已储存过或是参数有误'
     ],
+    'product_control' => [
+        'pay_coin' => '现金余额支付'
+    ]
 ];

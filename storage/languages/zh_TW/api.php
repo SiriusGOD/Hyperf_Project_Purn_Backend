@@ -47,4 +47,7 @@ return [
     'stage_video_control' => [
         'failed' => '已儲存過或是參數有誤'
     ],
+    'product_control' => [
+        'pay_coin' => '現金餘額支付'
+    ]
 ];

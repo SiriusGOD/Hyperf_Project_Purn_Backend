@@ -25,7 +25,7 @@ use App\Middleware\ApiEncryptMiddleware;
 class ProductController extends AbstractController
 {
     /**
-     * 獲取上架中的商品列表.
+     * 獲取上架中的商品列表.(點數、鑽石)
      */
     #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, ProductService $service)
