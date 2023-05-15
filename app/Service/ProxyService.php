@@ -136,7 +136,7 @@ class ProxyService extends BaseService
     public function myIncome(int $memberId, int $page)
     {
         $limit = self::LIMIT;
-        $where['invite_by'] = $memberId;
+        $where['member_id'] = $memberId;
         $model = $this->memberInviteReceiveLog->with(['member' => function ($query) {
             $query->select('id', 'name');
         }]);

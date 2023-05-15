@@ -61,7 +61,7 @@ class RedeemApiTest extends HttpTestCase
       $this->token = $token; 
       make(MemberService::class)->saveToken($user->id, $token);
       $r=Redeem::first();
-      $json["code"] = $r->code;//'qweqweq';
+      $json["code"] = $r->code;
       $data = $this->client->post('/api/redeem/check_redeem',$json , [
           'Authorization' => 'Bearer ' . $token,
       ]);

@@ -35,12 +35,20 @@ class RedeemController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'check_redeem')]
     public function checkRedeem(RequestInterface $request, RedeemService $redeemService)
     {
+        $memberId = auth('jwt')->user()->getId();
         $code = $request->input('code');
-        $result = $redeemService->checkRedeem($code);
-        if($result){
-          return $this->success(['msg' =>trans('default.redeem.can')]);
+        $result = $redeemService->checkRedeem($code, $memberId);
+        if($result['status']==0){
+          return $this->success(['product_name'=>$result['model']->title ,'is_used'=>0]);
         }
-        return $this->error(trans('default.redeem.faild') , RedeemCode::EXPIRED_CODE);
+        if($result['status']==1){
+          //不存在
+          $trans=trans('default.redeem.not_exists');
+        }else{
+          //status =2己使用過
+          $trans=trans('default.redeem.is_used');
+        } 
+        return $this->error($trans , RedeemCode::EXPIRED_CODE);
     }
 
     // 兌換影片

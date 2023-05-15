@@ -49,7 +49,7 @@ class ProxyApiTest extends HttpTestCase
     //我的收益
     public function testMyIncome()
     {
-        $member = Member::where('id' ,50)->first();
+        $member = Member::where('id' ,36)->first();
         $token = auth()->login($member);
         make(MemberService::class)->saveToken($member->id, $token);
         $data = $this->client->post('/api/proxy/myIncome', [], [
