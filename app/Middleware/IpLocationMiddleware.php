@@ -81,7 +81,11 @@ class IpLocationMiddleware implements MiddlewareInterface
         } elseif (! empty($params['http_x_forwarded_for'])) {
             $ip = $params['http_x_forwarded_for'];
         } else {
-            $ip = $params['remote_addr'];
+            if(isset($params['remote_addr']) ){
+              $ip = $params['remote_addr'];
+            }else{
+              return '127.0.0.1';
+            }
         }
 
         return $ip;
