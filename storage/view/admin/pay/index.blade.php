@@ -34,6 +34,10 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.pay_control.pay_type') ?? '支付類型'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.expire') ?? '狀態'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
@@ -48,6 +52,7 @@
                                             <td class="sorting_1 dtr-control">{{ $model->id }}</td>
                                             <td class="sorting_1 dtr-control">{{ $model->name }}</td>
                                             <td>{{ $model->pronoun }}</td>
+                                            <td>{{ trans('default.pay_control.pay_proxy')[$model->proxy] }}</td>
                                             <td>{{ $model->expire == 0 ? trans('default.pay_control.pay_open') : trans('default.pay_control.pay_close')}}</td>
                                             <td>
                                             @if(authPermission('pay-edit'))
@@ -64,6 +69,7 @@
                                         <th rowspan="1" colspan="1">{{trans('default.id') ?? '序號'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.name') ?? '名稱'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.pay_control.pay_pronoun') ?? '代稱'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.pay_control.pay_type') ?? '支付類型'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.expire') ?? '狀態'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>

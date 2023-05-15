@@ -83,6 +83,7 @@ class PayController extends AbstractController
         $userId = auth('session')->user()->getId();
         $id = $request->input('id', 0);
         $pronoun = $request->input('pronoun');
+        $proxy = $request->input('proxy');
         $name = $request->input('name');
         $expire = $request->input('expire');
         $service->store([
@@ -91,6 +92,7 @@ class PayController extends AbstractController
             'pronoun' => $pronoun,
             'name' => $name,
             'expire' => $expire,
+            'proxy' => $proxy
         ]);
         return $response->redirect('/admin/pay/index');
     }

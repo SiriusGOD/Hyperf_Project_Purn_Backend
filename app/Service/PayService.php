@@ -365,6 +365,7 @@ class PayService
         }
         $model->user_id = $params['user_id'];
         $model->pronoun = $params['pronoun'];
+        $model->proxy = $params['proxy'];
         $model->name = $params['name'];
         $model->expire = $params['expire'];
         $model->save();

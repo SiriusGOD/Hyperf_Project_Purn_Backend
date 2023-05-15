@@ -589,6 +589,13 @@ return [
         'pay_open' => '开启',
         'pay_close' => '关闭',
         'pay_method' => '支付方式',
+        'pay_proxy_online' => '线上支付',
+        'pay_proxy_agent' => '代理支付',
+        'pay_type' => '支付类型',
+        'pay_proxy' => [
+            'online' => '线上支付',
+            'agent' => '代理支付',
+        ]
     ],
     // -------------------------------------------------------------------
     // NavigationController

@@ -26,6 +26,8 @@ class Pay extends Model
 
     public const EXPIRE = ['no' => 0, 'yes' => 1];
 
+    public const PROXY = ['online', 'agent'];
+
     /**
      * The table associated with the model.
      *
