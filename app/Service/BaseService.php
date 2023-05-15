@@ -115,14 +115,16 @@ class BaseService
             return true;
         }
         foreach ($where as $key => $val) {
-            $model->where($key,$val);
+            $model = $model->where($key,$val);
         }
-        $res = $model->exists();
-        if ($res) {
+        $model = $model->first();
+        if ($model) {
             $redis->set($key, true);
             $redis->expire($key, 3600);
+            return true;
+        }else{
+            return false;
         }
-        return $res;
     }
 
     // 共用取得
