@@ -30,6 +30,7 @@
         "hyperf/crontab": "3.0.*",
         "hyperf/database": "3.0.*",
         "hyperf/db-connection": "3.0.*",
+        "hyperf/elasticsearch": "*",
         "hyperf/event": "^3.0",
         "hyperf/framework": "3.0.*",
         "hyperf/guzzle": "3.0.*",
