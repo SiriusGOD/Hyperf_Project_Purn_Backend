@@ -59,7 +59,7 @@ class WithdrawTest extends HttpTestCase
         $data = $this->client->post('/api/member_cash/withdrawList',$json, [
             'Authorization' => 'Bearer ' . $token,
         ]);
-        print_r([ json_encode($data) ]);
+        print_r([ json_encode($data) ,$data ]);
         $this->assertSame( $limit, count($data['data']['models']) );
     }
 }

@@ -47,7 +47,7 @@ class WithdrawService extends BaseService
     }
     //會員提現列表
     public function myWithdrawList(int $page, int $limit, int $member_id){
-      return MemberWithdraw::where('member_id',$member_id)
+      return MemberWithdraw::select("type","amount","payed_at","account","status")->where('member_id',$member_id)
                     ->offset(($page - 1) * $limit)
                     ->limit($limit)->get();
     }
