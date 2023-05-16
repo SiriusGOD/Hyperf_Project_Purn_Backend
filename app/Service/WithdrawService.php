@@ -54,7 +54,7 @@ class WithdrawService extends BaseService
            ELSE ''
        END AS `bank_type`";
 
-      $payDate = " DATE_FORMAT(payed_at, '%Y-%m-%d') AS formatted_date";
+      $payDate = " DATE_FORMAT(payed_at, '%Y-%m-%d') AS pay_day";
       $case = "CASE `status`
            WHEN 0 THEN '".trans("default.withdraw.default")."'
            WHEN 1 THEN '".trans("default.withdraw.pass")."'

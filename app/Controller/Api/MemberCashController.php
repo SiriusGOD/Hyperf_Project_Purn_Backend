@@ -16,6 +16,7 @@ use App\Controller\AbstractController;
 use App\Service\ActorClassificationService;
 use App\Service\MemberCashAccountService;
 use App\Service\WithdrawService;
+use App\Service\MemberService;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -75,36 +76,38 @@ class MemberCashController extends AbstractController
      *  提现 视频 、推广
      */
     #[RequestMapping(methods: ['POST'], path: 'withdraw')]
-    public function withdraw(RequestInterface $request,WithdrawService $withdrawService)
+    public function withdraw(RequestInterface $request,WithdrawService $withdrawService, MemberService $memberService)
     {
         /** @var MemberModel $member */
         $data = $request->all();
-        $data['member_id'] = auth('jwt')->user()->getId();
-        if (false) {
-           // if ($member->expired_at < time()) {
-                return $this->error(trans('api.member_cash_control.membership_expires'), 422);
-            //} elseif ($member->vip_level < MemberModel::VIP_LEVEL_YEAR) {
-                return $this->error(trans('api.member_cash_control.buy_membership_expires'), 422);
-            //}
-        }
-        $requires  = ['name','account','channel','account_name','withdraw_type','withdraw_amount'] ; 
-        $inputs = $request->all();
-        $check=Check::require($inputs , $requires);
+        $member_id = auth('jwt')->user()->getId();
+        $data['member_id'] = $member_id;
+        $member = $memberService->getMember($member_id);
+        $requires  = ['name','account','bank_type','withdraw_amount',"password"] ; 
+        $check = Check::require($request->all() , $requires);
         if($check){
           return $this->error( trans('default.withdraw.empty_error', ["key" => $check]), WithdrawCode::EMPTY_ERROR);  
         }
-        $withdraw_type = 1;//收款方式 银行卡
+        $withdraw_type = $request->input('bank_type');//收款方式 1:paypel, 2:银行卡
+        $amount = $request->input('amount');//收款方式 1:paypel, 2:银行卡
+        if((int)$amount > $member["coins"]){
+            return $this->error(trans('default.withdraw.no_money'),WithdrawCode::NO_MONEY);
+        } 
+        $check = $memberService->checkPassword($request->input('password', ''), $member["password"]);
+        if (! $check and ! empty($member->password)) {
+            return $this->error(trans('validation.password_error'), 401);
+        }
         $withdraw_from = 3;  //2代理 3 视频收益
         $withdraw_amount= $request->input("withdraw_amount"); 
         $rate = 1;
         $withdraw_amount_money= 0;
-
+        $account_name = WithdrawCode::WITHDRAW_TYPE[$request->input("bank_type" ,1)];
         $insert_data = [
                 'id'            => null,
                 'member_id'     => auth('jwt')->user()->getId(),
                 'uuid'          => auth('jwt')->user()->getId(),
-                'type'          => $request->input("withdraw_type"),
-                'account_name'  => $request->input("account_name"),//开户行
+                'type'          => $request->input("bank_type"),
+                'account_name'  => $account_name,//开户行
                 'account'       => $request->input("account") ,//账号
                 'name'          => $request->input("name"),//开户姓名
                 'amount'        => $withdraw_amount,//扣费到账
@@ -124,57 +127,8 @@ class MemberCashController extends AbstractController
                 'address'       => '127.0.0.1' 
                 //'address'       => \UserWithdrawModel::convertIPToAddress(USER_IP)
             ];
+        print_r(["asdas" ,$insert_data ,'']);
         $withdrawService->store($insert_data);
-        //$redisKey = UserWithdrawModel::REDIS_USER_WITH_DRAW . "{$member->uid}";
-        //$res = redis()->get($redisKey);
-        //if ($res) {
-        //    if (env('APP_ENV')== 'product') {
-        //        return $this->error('10分钟内只能发起一次提现请求~');
-        //    }
-        //}
-
-        /*if (!array_key_exists($withdraw_from, UserWithdrawModel::DRAW_TYPE)) {
-            return $this->errorJson('无效提现类型~', 422);
-        }*/
-        //if ($withdraw_amount <= 0 || $withdraw_amount % 100 != 0) {
-        //    return $this->errorJson('提现额度必须是100整数倍~', 422);
-        //}
-        //$result = null;
-        ///** @var MemberModel $member */
-        //$member = MemberModel::onWriteConnection()->find($member->aff);
-        //if (is_null($member)) {
-        //    return $this->errorJson('用户信息走丢了');
-        //}
-
-        //if ($withdraw_amount > $member->coins) {
-        //    return $this->errorJson('提现账户余额不足~', 422);
-        //}
-        //$rate = UserWithdrawModel::USER_WITHDRAW_CHANNEL_RATE;
-        //$withdraw_amount_money = $withdraw_amount * (1 - $rate);
-
-        //if ($withdraw_amount_money < 100) {
-        //    return $this->errorJson('到账金额须大等于100元可申请提现~', 422);
-        //}
-        //try {
-        //    \DB::beginTransaction();
-        //    // 提现记录
-       //    if (MemberModel::where([
-        //        ['uid', '=', $member->uid],
-        //        ['coins', '>=', $withdraw_amount]
-
-        //    ])->decrement('coins', $withdraw_amount)) {
-        //        UserWithdrawModel::create($insert_data);
-        //    } else {
-        //        throw new \Yaf\Exception('申请提现失败.~', 422);
-        //    }
-        //    \DB::commit();
-        //} catch (Exception $exception) {
-        //    \DB::rollBack();
-        //    error_log("withdraw:{$exception->getMessage()}");
-        //    throw new \Yaf\Exception('申请失败，请稍后再试', 422);
-        //}
-        //MemberModel::clearFor($this->member);
-        //redis()->setex($redisKey, 600, 1);
         return $this->success(['success' => true, 'msg' => trans('api.member_cash_control.success')]);
     }
 }

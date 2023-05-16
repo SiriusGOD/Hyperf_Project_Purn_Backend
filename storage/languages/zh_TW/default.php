@@ -161,6 +161,7 @@ return [
         'hot_order_desc' => '0 不排序，越小越前面',
     ],
     'withdraw'=>[
+      'no_money' =>'你的餘額不足',
       'no_data' => '查無資料',
       'empty_error' =>'缺少參數 :key',
       'detail' => '提現詳細資料',
