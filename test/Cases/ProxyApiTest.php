@@ -36,9 +36,9 @@ class ProxyApiTest extends HttpTestCase
     }
 
     //我的收益
-    public function ttMyIncome()
+    public function testMyIncome()
     {
-        $member = Member::where('id' ,54)->first();
+        $member = Member::where('id' ,83)->first();
         $token = auth()->login($member);
         make(MemberService::class)->saveToken($member->id, $token);
         $data = $this->client->post('/api/proxy/myIncome', [], [
@@ -49,7 +49,7 @@ class ProxyApiTest extends HttpTestCase
     }
 
     //下線
-    public function testWallet()
+    public function ttWallet()
     {
         $member = Member::where('id' ,81)->first();
         $token = auth()->login($member);

@@ -46,6 +46,7 @@ class ProxyService extends BaseService
     protected $memberInviteLog;
 
     protected $memberRedeemVideoService;
+    protected $memberService;
 
     public function __construct(
         Redis $redis,
@@ -166,11 +167,13 @@ class ProxyService extends BaseService
     {
         $limit = self::LIMIT;
         $where['member_id'] = $memberId;
-        $model = $this->memberInviteReceiveLog->select("id",'product_name','reach_amount','level',"member_id","created_at")->with(
-          ['member' => function ($query) {
-            $query->select('id', 'name');
-        }]);
-        return $this->list($model, $where, $page, $limit);
+        $result = $this->memberInviteReceiveLog
+            ->select( 'member_invite_receive_log.product_name', 'member_invite_receive_log.reach_amount', 'member_invite_receive_log.level', "member_invite_receive_log.member_id", "member_invite_receive_log.created_at", 'members.name as member_name')
+            ->leftJoin('members', 'member_invite_receive_log.member_id', '=', 'members.id')
+            ->offset(($page - 1) * $limit)
+            ->limit($limit)
+            ->get();
+        return $result; 
     }
 
     // 返傭
@@ -194,6 +197,8 @@ class ProxyService extends BaseService
                 $uRate = ProxyCode::LEVEL[$userLevel]['rate'];
                 $amount = number_format($money * $uRate * $rate, 2);
                 // print_r(['amount'=>$amount]);
+                $imem = $this->memberService->getMember($proxy->invited_by);
+                $return['member_name'] = $imem->name;
                 $return['member_id'] = $proxy->invited_by;
                 $return['invite_by'] = $proxy->member_id;
                 $return['order_sn'] = $order->order_number;
