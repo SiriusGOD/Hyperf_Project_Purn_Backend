@@ -22,7 +22,6 @@ class General
 
         $manager = new ImageManager(['driver' => 'gd']);
         $manager = $manager->make($path);
-        var_dump($manager->filesize());
         if ($manager->filesize() >= self::UPLOAD_LIMIT) {
             $manager->resize(intval($manager->width() * 0.5), intval($manager->height() * 0.5))->save($path, 50);
         }
