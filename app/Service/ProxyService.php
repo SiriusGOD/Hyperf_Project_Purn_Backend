@@ -142,6 +142,11 @@ class ProxyService extends BaseService
             $level = $result->level;
             $r[$level] =$result->count;
         }
+        if( count($r)!=4){
+          for($i = count($r)+1 ; $i<= 4 ; $i++){
+            $r[$i] = 0;
+          }
+        }
         return $r;
     }
     // 我的下線
