@@ -35,6 +35,11 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
+                                            aria-label="Engine version: activate to sort column ascending">
+                                            {{trans('default.image') ?? '圖片'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.tag_control.tag_hot_order') ?? '熱門標籤排序'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
@@ -53,6 +58,11 @@
                                             <td class="sorting_1 dtr-control">{{ $model->id }}</td>
                                             <td class="sorting_1 dtr-control">{{ $model->user->name }}</td>
                                             <td>{{ $model->name }}</td>
+                                            <td>
+                                                @if(!empty($model->img))
+                                                    <img src="{{\Hyperf\Support\env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live') . $model->img}}" alt="image" style="width:100px">
+                                                @endif
+                                            </td>
                                             <td>{{ $model->hot_order }}</td>
                                             <td>{{ $model->group_name }}</td>
                                             <td>
@@ -69,7 +79,9 @@
                                     <tr>
                                         <th rowspan="1" colspan="1">{{trans('default.id') ?? '序號'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.user_name') ?? '使用者名稱'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.tag_control.tag_name') ?? '標籤名稱'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.tag_control.tag_name') ?? '標籤名稱'}}
+                                        <th rowspan="1" colspan="1">{{trans('default.image') ?? '圖片'}}</th>
+                                        </th>
                                         <th rowspan="1" colspan="1">{{trans('default.tag_control.tag_hot_order') ?? '熱門標籤排序'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.tag_group_control.tag_group_name') ?? '標籤群組名稱'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>

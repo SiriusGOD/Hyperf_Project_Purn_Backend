@@ -83,7 +83,6 @@ class AdvertisementController extends AbstractController
             $imageUrl = $dataArr['url'];
             $data['height'] = $dataArr['height'];
             $data['weight'] = $dataArr['weight'];
-
         }
         $data['id'] = $request->input('id') ? $request->input('id') : null;
         $data['user_id'] = auth('session')->user()->id;

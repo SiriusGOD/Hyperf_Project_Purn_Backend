@@ -49,6 +49,11 @@ class TagService
         if (! empty($params['id'])) {
             $model = Tag::find($params['id']);
         }
+        if (! empty($params['image_url'])) {
+            $model->img = $params['image_url'];
+            // $model->height = $data['height'];
+            // $model->weight = $data['weight'];
+        }
         $model->name = $params['name'];
         $model->user_id = $params['user_id'];
         $model->hot_order = $params['hot_order'];
@@ -56,7 +61,7 @@ class TagService
 
         if (count($params['groups']) > 0) {
             $id = $model->id;
-            $this->createTagGroupRelationship($params['group_id'], $id);
+            $this->createTagGroupRelationship($params['groups'], $id);
         }
 
         $this->redis->del(self::POPULAR_TAG_CACHE_KEY);
