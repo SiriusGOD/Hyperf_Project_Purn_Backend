@@ -38,8 +38,8 @@ class SystemController extends AbstractController
     {
         $data = $service->memberWithdrawtype();
         foreach ($data[0] as $key => $item) {
-            if (is_numeric($item)) {
-                $data[$key] = intval($item);
+            if ($key == "id") {
+                $data["id"] = (int)$item;
             }
         }
         if(isset($data['id'])){
