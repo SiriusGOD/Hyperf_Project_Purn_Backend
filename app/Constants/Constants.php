@@ -11,6 +11,10 @@ declare(strict_types=1);
  */
 namespace App\Constants;
 
+use App\Model\Image;
+use App\Model\ImageGroup;
+use App\Model\Video;
+
 class Constants
 {
     public const TOKEN = 'token';
@@ -38,5 +42,10 @@ class Constants
         'avatar' => "",
         'created_at' => "2023-03-29 10:50:04",
         'updated_at' => "2023-03-29 10:50:04",
+    ];
+
+    public const FEED_TYPES = [
+        'video' => Video::class,
+        'image_group' => ImageGroup::class,
     ];
 }

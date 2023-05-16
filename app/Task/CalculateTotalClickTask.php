@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Task;
 
+use App\Model\ActorCorrespond;
 use App\Model\Click;
 use App\Model\ImageGroup;
 use App\Model\MemberCategorizationDetail;
@@ -55,6 +56,12 @@ class CalculateTotalClickTask
                 ->update([
                     'total_click' => $model->total
                 ]);
+
+            ActorCorrespond::where('type', Video::class)
+                ->where('type_id', $model->id)
+                ->update([
+                    'total_click' => $model->total
+                ]);
         }
 
         $models = Click::whereBetween('statistical_date', [$last->toDateString(), $now->toDateString()])
@@ -69,6 +76,12 @@ class CalculateTotalClickTask
             $imageGroup->save();
 
             MemberCategorizationDetail::where('type', ImageGroup::class)
+                ->where('type_id', $model->id)
+                ->update([
+                    'total_click' => $model->total
+                ]);
+
+            ActorCorrespond::where('type', ImageGroup::class)
                 ->where('type_id', $model->id)
                 ->update([
                     'total_click' => $model->total

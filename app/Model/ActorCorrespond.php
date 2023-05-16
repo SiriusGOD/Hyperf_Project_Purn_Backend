@@ -14,12 +14,13 @@ namespace App\Model;
 use Carbon\Carbon;
 
 /**
- * @property int $id
- * @property string $type
- * @property int $correspond_id
- * @property int $actor_id
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property int $id 
+ * @property string $correspond_type 
+ * @property int $correspond_id 
+ * @property int $actor_id 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property int $total_click 
  */
 class ActorCorrespond extends Model
 {
@@ -38,5 +39,5 @@ class ActorCorrespond extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'correspond_id' => 'integer', 'actor_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'correspond_id' => 'integer', 'actor_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'total_click' => 'integer'];
 }

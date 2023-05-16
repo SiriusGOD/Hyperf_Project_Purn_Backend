@@ -88,4 +88,30 @@ class ActorController extends AbstractController
             'is_follow' => $exist,
         ]);
     }
+
+    #[RequestMapping(methods: ['POST'], path: 'search')]
+    public function search(RequestInterface $request, ActorService $service)
+    {
+        $id = $request->input('actor_id', 0);
+        $page = $request->input('page', 0);
+        $limit = $request->input('limit', Constants::DEFAULT_PAGE_PER);
+        $filter = Constants::FEED_TYPES[$request->input('filter')] ?? null;
+        $result = $service->searchByActorId([
+            'id' => $id,
+            'page' => $page,
+            'limit' => $limit,
+            'sort_by' => $request->input('sort_by'),
+            'is_asc' => $request->input('is_asc'),
+            'filter' => $filter,
+        ]);
+
+        $data = [
+            'models' => $result,
+        ];
+
+        $path = '/api/actor/search';
+        $simplePaginator = new SimplePaginator($page, $limit, $path);
+        $data = array_merge($data, $simplePaginator->render());
+        return $this->success($data);
+    }
 }

@@ -11,7 +11,7 @@ class General
     public static function uploadImage(UploadedFile $file, string $directory = '') : array
     {
         $extension = $file->getExtension();
-        $filename = sha1(Carbon::now()->toDateTimeString());
+        $filename = sha1(Carbon::now()->timestamp . $file->getRealPath());
         if (! file_exists(BASE_PATH . '/public/tmp')) {
             mkdir(BASE_PATH . '/public/tmp', 0755);
         }

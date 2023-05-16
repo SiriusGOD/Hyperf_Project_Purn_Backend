@@ -29,7 +29,7 @@ class GenerateService
                 $result[] = $imageGroup;
                 continue;
             }
-            $imageGroup['actors'] = $this->getActors(ImageGroup::class, $imageGroup['id']);
+            $imageGroup['actors'] = $this->getActorsByType(ImageGroup::class, $imageGroup['id']);
             foreach ($imageGroup['images_limit'] as $key => $image) {
                 $imageGroup['images_limit'][$key]['thumbnail'] = $url . $imageGroup['images_limit'][$key]['thumbnail'];
                 $imageGroup['images_limit'][$key]['url'] = $url . $imageGroup['images_limit'][$key]['url'];
@@ -41,7 +41,7 @@ class GenerateService
         return $result;
     }
 
-    public function getActors(string $type, int $id): array
+    public function getActorsByType(string $type, int $id): array
     {
         $actorIds = ActorCorrespond::where('correspond_type', $type)
             ->where('correspond_id', $id)
@@ -74,7 +74,7 @@ class GenerateService
             $video['full_m3u8'] = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $video['full_m3u8'];
             $video['m3u8'] = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $video['m3u8'];
             $video['source'] = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $video['source'];
-            $video['actors'] = $this->getActors(Video::class, $video['id']);
+            $video['actors'] = $this->getActorsByType(Video::class, $video['id']);
             unset($video['coins']);
 
             $result[] = $video;

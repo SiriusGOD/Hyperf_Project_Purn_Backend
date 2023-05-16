@@ -11,17 +11,17 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Constants\Constants;
 use App\Model\Actor;
 use App\Model\ActorCorrespond;
 use App\Model\ActorHasClassification;
-use App\Model\Image;
 use App\Model\ImageGroup;
 use App\Model\MemberFollow;
 use App\Model\Video;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
 
-class ActorService
+class ActorService extends GenerateService
 {
     public const CACHE_KEY = 'actor';
 
@@ -76,7 +76,6 @@ class ActorService
                     case Video::class:
                         $query[$key]['video_count'] = $value2['count'];
                         break;
-                        //TODO 修改計算成套圖數量
                     case ImageGroup::class:
                         $query[$key]['image_count'] = $value2['count'];
                         break;
@@ -91,14 +90,16 @@ class ActorService
             }
 
             // 確認該演員是否有被使用者追蹤
-            if(MemberFollow::where('member_id', $userId)->where('correspond_type', Actor::class)->where('correspond_id', $actor_id)->whereNull('deleted_at')->exists()){
+            if (MemberFollow::where('member_id', $userId)->where('correspond_type', Actor::class)->where('correspond_id', $actor_id)->whereNull('deleted_at')->exists()) {
                 $query[$key]['is_follow'] = 1;
-            }else{
+            } else {
                 $query[$key]['is_follow'] = 0;
             }
 
             // avatar加上網域
-            if(!empty($value['avatar']))$query[$key]['avatar'] = env('VIDEO_THUMB_URL') . $value['avatar'];
+            if (! empty($value['avatar'])) {
+                $query[$key]['avatar'] = env('VIDEO_THUMB_URL') . $value['avatar'];
+            }
         }
         return $query;
     }
@@ -156,12 +157,11 @@ class ActorService
         $model = Actor::where('name', $data['name'])->first();
         $arr_classify = $data['classifications'] ?? [];
         $this->createActorClassificationRelationship($arr_classify, $model->id);
-        $this -> delFrontCache();
+        $this->delFrontCache();
 
         return $model;
     }
 
-    // 
     public function findActor(string $name)
     {
         if (Actor::where('name', $name)->exists()) {
@@ -201,8 +201,8 @@ class ActorService
                 $model->save();
             }
         }
-        
-        $this -> delFrontCache();
+
+        $this->delFrontCache();
     }
 
     // 獲取演員詳細資料
@@ -213,42 +213,47 @@ class ActorService
         $actor = Actor::select('name', 'avatar')->where('id', $actor_id)->first()->toArray();
         $data['name'] = $actor['name'];
         $data['avatar'] = $actor['avatar'];
-        if(!empty($actor['avatar']))$data['avatar'] = env('IMG_DOMAIN').$actor['avatar'];
+        if (! empty($actor['avatar'])) {
+            $data['avatar'] = env('IMG_DOMAIN') . $actor['avatar'];
+        }
         // 撈取作品數
         $works = ActorCorrespond::selectRaw('correspond_type, count(*) as count')->where('actor_id', $actor_id)->groupBy('correspond_type')->get();
         foreach ($works as $key => $value) {
-            if($value -> correspond_type == Video::class)$data['video_num'] = $value->count;
-            if($value -> correspond_type == ImageGroup::class)$data['image_num'] = $value->count;
+            if ($value->correspond_type == Video::class) {
+                $data['video_num'] = $value->count;
+            }
+            if ($value->correspond_type == ImageGroup::class) {
+                $data['image_num'] = $value->count;
+            }
         }
-        if(empty($data['video_num']))$data['video_num'] = 0;
-        if(empty($data['image_num']))$data['image_num'] = 0;
+        if (empty($data['video_num'])) {
+            $data['video_num'] = 0;
+        }
+        if (empty($data['image_num'])) {
+            $data['image_num'] = 0;
+        }
 
         // 查詢是否追隨
-        if(MemberFollow::where('member_id', $userId)->where('correspond_type', Actor::class)->where('correspond_id', $actor_id)->whereNull('deleted_at')->exists()){
+        if (MemberFollow::where('member_id', $userId)->where('correspond_type', Actor::class)->where('correspond_id', $actor_id)->whereNull('deleted_at')->exists()) {
             $data['is_follow'] = 1;
-        }else{
+        } else {
             $data['is_follow'] = 0;
         }
 
         return $data;
     }
 
-    // 刪除前台演員分類的快取
-    protected function delFrontCache()
-    {
-        $service = make(ActorClassificationService::class);
-        $service->delRedis();
-    }
-
     // 判斷演員是否有追蹤
     public function isFollow($memberId, $id)
     {
-        $redisKey = self::CACHE_KEY.':isExist:'.$memberId;
+        $redisKey = self::CACHE_KEY . ':isExist:' . $memberId;
         if ($this->redis->exists($redisKey)) {
             $arr = json_decode($this->redis->get($redisKey), true);
-        }else{
+        } else {
             $follows = MemberFollow::where('member_id', $memberId)->where('correspond_type', Actor::class)->whereNull('deleted_at')->select('correspond_id')->get()->toArray();
-            if(empty($follows)) return 0;
+            if (empty($follows)) {
+                return 0;
+            }
 
             $arr = [];
             foreach ($follows as $key => $value) {
@@ -259,19 +264,18 @@ class ActorService
             $this->redis->expire($redisKey, self::TTL_ONE_DAY);
         }
         // 是否追蹤
-        if(in_array($id, $arr)){
+        if (in_array($id, $arr)) {
             // 是
             return 1;
-        }else{
-            // 否
-            return 0;
         }
+        // 否
+        return 0;
     }
 
     // 更新會員的演員追蹤快取
     public function updateIsExistCache($memberId): void
     {
-        $redisKey = self::CACHE_KEY.':isExist:'.$memberId;
+        $redisKey = self::CACHE_KEY . ':isExist:' . $memberId;
         $follows = MemberFollow::where('member_id', $memberId)->where('correspond_type', Actor::class)->whereNull('deleted_at')->select('correspond_id')->get()->toArray();
 
         $arr = [];
@@ -280,5 +284,115 @@ class ActorService
         }
         $this->redis->set($redisKey, json_encode($arr));
         $this->redis->expire($redisKey, self::TTL_ONE_DAY);
+    }
+
+    public function searchByActorId(array $params): array
+    {
+        $query = ActorCorrespond::where('actor_id', $params['id'])
+            ->offset($params['page'] * $params['limit'])
+            ->limit($params['limit']);
+
+        if (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['click']) {
+            if ($params['is_asc'] == 1) {
+                $query = $query->orderBy('total_click');
+            } else {
+                $query = $query->orderByDesc('total_click');
+            }
+        } elseif (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['created_time']) {
+            if ($params['is_asc'] == 1) {
+                $query = $query->orderBy('id');
+            } else {
+                $query = $query->orderByDesc('id');
+            }
+        }
+
+        if (! empty($params['filter'])) {
+            $query = $query->where('correspond_type', $params['filter']);
+        }
+
+        $models = $query->get();
+        if (empty($models)) {
+            return [];
+        }
+        $models = $models->toArray();
+        $result = [];
+
+        $result = $this->getVideoDetail($models, $result);
+
+        $collect = \Hyperf\Collection\collect($this->getImageGroupsDetail($models, $result));
+
+        if (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['click']) {
+            if ($params['is_asc'] == 1) {
+                $collect = $collect->sortBy('total_click');
+            } else {
+                $collect = $collect->sortByDesc('total_click');
+            }
+        } elseif (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['created_time']) {
+            if ($params['is_asc'] == 1) {
+                $collect = $collect->sortBy('created_at');
+            } else {
+                $collect = $collect->sortByDesc('created_at');
+            }
+        }
+
+        $rows = [];
+        foreach ($collect->toArray() as $row) {
+            $rows[] = $row;
+        }
+
+        return $rows;
+    }
+
+    // 刪除前台演員分類的快取
+    protected function delFrontCache()
+    {
+        $service = make(ActorClassificationService::class);
+        $service->delRedis();
+    }
+
+    protected function getVideoDetail(array $models, array $data): array
+    {
+        $ids = [];
+        foreach ($models as $model) {
+            if ($model['correspond_type'] == Video::class) {
+                $ids[] = $model['correspond_id'];
+            }
+        }
+
+        $videos = Video::with('tags')->whereIn('id', $ids)->get()->toArray();
+
+        $result = [];
+        foreach ($videos as $video) {
+            foreach ($models as $model) {
+                if ($model['correspond_id'] == $video['id'] and $model['correspond_type'] == Video::class) {
+                    $result[] = $video;
+                }
+            }
+        }
+
+        return $this->generateVideos($data, $result);
+    }
+
+    protected function getImageGroupsDetail(array $models, array $data): array
+    {
+        $ids = [];
+        foreach ($models as $model) {
+            if ($model['correspond_type'] == ImageGroup::class) {
+                $ids[] = $model['correspond_id'];
+            }
+        }
+
+        $imageGroups = ImageGroup::with(['imagesLimit', 'tags'])->whereIn('id', $ids)->get()->toArray();
+
+        $result = [];
+        foreach ($imageGroups as $imageGroup) {
+            foreach ($models as $model) {
+                if ($model['correspond_id'] == $imageGroup['id'] and $model['correspond_type'] == ImageGroup::class) {
+                    $result[] = $imageGroup;
+                }
+            }
+        }
+
+        return $this->generateImageGroups($data, $result);
     }
 }

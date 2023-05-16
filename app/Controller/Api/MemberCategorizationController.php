@@ -135,7 +135,7 @@ class MemberCategorizationController extends AbstractController
             return $this->error(trans('validation.authorize'), 401);
         }
 
-        $type = MemberCategorizationDetail::TYPES[$request->input('type')];
+        $type = Constants::FEED_TYPES[$request->input('type')];
         $service->createMemberCategorizationDetail([
             'member_categorization_id' => $id,
             'type' => $type,
@@ -191,7 +191,7 @@ class MemberCategorizationController extends AbstractController
 
         $page = $request->input('page', 0);
         $limit = $request->input('limit', Constants::DEFAULT_PAGE_PER);
-        $filter = MemberCategorizationDetail::TYPES[$request->input('filter')] ?? null;
+        $filter = Constants::FEED_TYPES[$request->input('filter')] ?? null;
 
         if ($id == 0) {
             $data = [
@@ -274,7 +274,7 @@ class MemberCategorizationController extends AbstractController
     public function updateDetailWithType(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
-        $type = MemberCategorizationDetail::TYPES[$request->input('type')] ?? null;
+        $type = Constants::FEED_TYPES[$request->input('type')] ?? null;
         $typeId = $request->input('type_id');
 
         if (empty($type) or empty($typeId)) {
@@ -340,7 +340,7 @@ class MemberCategorizationController extends AbstractController
     {
         $memberId = auth()->user()->getId();
         $id = $request->input('type_id');
-        $type = MemberCategorizationDetail::TYPES[$request->input('type')] ?? null;
+        $type = Constants::FEED_TYPES[$request->input('type')] ?? null;
 
         if (empty($id) or empty($type)) {
             return $this->error(trans('validation.required', ['attribute' => 'id']), 400);
@@ -388,7 +388,7 @@ class MemberCategorizationController extends AbstractController
     public function isExist(RequestInterface $request, MemberCategorizationService $service)
     {
         $memberId = auth()->user()->getId();
-        $type = MemberCategorizationDetail::TYPES[$request->input('type')];
+        $type = Constants::FEED_TYPES[$request->input('type')];
         $ids = MemberCategorization::where('member_id', $memberId)->get()->pluck('id')->toArray();
         $count = MemberCategorizationDetail::whereIn('member_categorization_id', $ids)
             ->where('type', $type)
