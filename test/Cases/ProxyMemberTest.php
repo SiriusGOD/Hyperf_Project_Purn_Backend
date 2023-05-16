@@ -95,7 +95,8 @@ class ProxyMemberTest extends HttpTestCase
     //更新會員
     public function testLoginMember()
     {
-        $insertArray["account"] = "a974866";
+        $user = Member::orderBy('id','desc')->first();
+        $insertArray["account"] = $user->account;
         $insertArray["device"] = "web";
         $insertArray["device_id"] = rand(111111111,9999999999)."web";
         $insertArray["password"] ='a123456';
