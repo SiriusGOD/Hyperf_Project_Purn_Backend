@@ -37,7 +37,7 @@ class TagService
         $list = Tag::all();
         foreach ($list as $key => $value) {
             if (! empty($value->img)) {
-                $list[$key]->img = env('TEST_IMG_URL') . $value->img;
+                $list[$key]->img = env('VIDEO_THUMB_URL') . $value->img;
             }
         }
         return $list;
