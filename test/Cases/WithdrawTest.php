@@ -35,7 +35,7 @@ class WithdrawTest extends HttpTestCase
     //測試提現 
     public function testWithdraw()
     {
-        $user = Member::orderBy("id",'desc')->first();
+        $user = Member::find(87);
         $token = auth()->login($user);
         make(MemberService::class)->saveToken($user->id, $token);
         $str = '{"name":"玉莲","account":"6217003370004076152","bank_type":1,"withdraw_amount": 500.00,"password":"a123456"}';
@@ -59,7 +59,6 @@ class WithdrawTest extends HttpTestCase
         $data = $this->client->post('/api/member_cash/withdrawList',$json, [
             'Authorization' => 'Bearer ' . $token,
         ]);
-        print_r([ json_encode($data) ,$data ]);
         $this->assertSame( $limit, count($data['data']['models']) );
     }
 }

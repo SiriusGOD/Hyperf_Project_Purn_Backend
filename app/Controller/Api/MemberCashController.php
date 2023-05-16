@@ -82,19 +82,18 @@ class MemberCashController extends AbstractController
         $data = $request->all();
         $member_id = auth('jwt')->user()->getId();
         $data['member_id'] = $member_id;
-        $member = $memberService->getMember($member_id);
         $requires  = ['name','account','bank_type','withdraw_amount',"password"] ; 
         $check = Check::require($request->all() , $requires);
         if($check){
           return $this->error( trans('default.withdraw.empty_error', ["key" => $check]), WithdrawCode::EMPTY_ERROR);  
         }
         $withdraw_type = $request->input('bank_type');//收款方式 1:paypel, 2:银行卡
-        $amount = $request->input('amount');//收款方式 1:paypel, 2:银行卡
-        if((int)$amount > $member["coins"]){
+        $amount = $request->input('withdraw_amount');//收款方式 1:paypel, 2:银行卡
+        if((int)$amount > auth('jwt')->user()->coins){
             return $this->error(trans('default.withdraw.no_money'),WithdrawCode::NO_MONEY);
         } 
-        $check = $memberService->checkPassword($request->input('password', ''), $member["password"]);
-        if (! $check and ! empty($member->password)) {
+        $check = $memberService->checkPassword($request->input('password', ''), auth('jwt')->user()->password);
+        if (! $check ) {
             return $this->error(trans('validation.password_error'), 401);
         }
         $withdraw_from = 3;  //2代理 3 视频收益
@@ -127,7 +126,6 @@ class MemberCashController extends AbstractController
                 'address'       => '127.0.0.1' 
                 //'address'       => \UserWithdrawModel::convertIPToAddress(USER_IP)
             ];
-        print_r(["asdas" ,$insert_data ,'']);
         $withdrawService->store($insert_data);
         return $this->success(['success' => true, 'msg' => trans('api.member_cash_control.success')]);
     }
