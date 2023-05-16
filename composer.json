@@ -48,6 +48,7 @@
         "hyperf/view-engine": "3.0.*",
         "intervention/image": "^2.7",
         "nesbot/carbon": "^2.62",
+        "phpmailer/phpmailer": "^6.8",
         "pragmarx/google2fa": "^8.0",
         "zoujingli/ip2region": "^2.0"
     },

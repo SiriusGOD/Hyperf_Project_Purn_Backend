@@ -47,7 +47,14 @@ class WithdrawService extends BaseService
     }
     //會員提現列表
     public function myWithdrawList(int $page, int $limit, int $member_id){
-      return MemberWithdraw::select("type","amount","payed_at","account","status")->where('member_id',$member_id)
+    //statusColor
+      $case = "CASE `status`
+           WHEN 1 THEN 'black'
+           WHEN 2 THEN 'red'
+           WHEN 0 THEN 'orange'
+           ELSE ''
+       END AS `statusColor`";
+      return MemberWithdraw::select("type","amount","payed_at","account","status" , DB::raw($case))->where('member_id',$member_id)
                     ->offset(($page - 1) * $limit)
                     ->limit($limit)->get();
     }
