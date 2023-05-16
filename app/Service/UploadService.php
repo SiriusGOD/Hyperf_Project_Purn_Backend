@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
 class UploadService
@@ -19,11 +20,14 @@ class UploadService
 
     public Redis $redis;
 
+    public $log;
+
     protected $curlVerbose = false;
 
-    public function __construct(Redis $redis)
+    public function __construct(Redis $redis, LoggerFactory $factory)
     {
         $this->redis = $redis;
+        $this->log = $factory->get('default');
     }
 
     public function postJson($url = '', array $data = [], $timeout = 30)
@@ -185,7 +189,10 @@ class UploadService
         $sign = $this->make_sign($data, $img_key);
         $data['cover'] = $cover;
         $data['sign'] = $sign;
-        return self::post($remoteUrl, $data);
+        $result = self::post($remoteUrl, $data);
+        $this->log->info('upload image result : ' . json_encode($result));
+
+        return $result;
     }
 
     # 签名
