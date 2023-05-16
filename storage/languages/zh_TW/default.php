@@ -171,6 +171,10 @@ return [
       'pass_usdt' => 'USDT提領',
       'title'=>'提現列表',
       'pass'=>'審核通過',
+      'reject'=>'未通過',
+      'default'=>'審核中',
+      'bankcard' => '銀行卡',
+      'paypel' => 'Paypel',
       'cancel'=>'取消申請',
       'money'=>'提現金額'
     ],
