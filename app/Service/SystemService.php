@@ -25,14 +25,33 @@ class SystemService
         $this->redis = $redis;
     }
 
-     //使用者提現費率 
-     public function memberWithdraw()
+     //使用者提現方式
+     public function memberWithdrawType()
      {
+        $key = self::CACHE_KEY."member_withdraw_type";
+        if($this->redis->exists() ){
+          $res = $this->redis->get($key);
+          //return json_decode($res ,true);
+        }
+        $result = SystemParam::select("param")
+                                ->where('description', 'withdraw_type')
+                                ->first();
+        $this->redis->set($key, $result->param);
+        $this->redis->expire($key, self::TTL_ONE_DAY);
+        return json_decode($result->param ,true);
+     }
+     //使用者提現費率 
+     public function memberWithdrawRate()
+     {
+        $key = self::CACHE_KEY."member_withdraw_rate";
+        if($this->redis->exists() ){
+          //return $this->redis->get($key);
+        }
         $result = SystemParam::select("param")
                                 ->where('description', 'member_withdraw')
                                 ->first();
-        $this->redis->set(self::CACHE_KEY."member_withdraw", $result->param);
-        $this->redis->expire(self::CACHE_KEY, self::TTL_ONE_DAY);
+        $this->redis->set($key, $result->param);
+        $this->redis->expire($key, self::TTL_ONE_DAY);
         return $result->param;
      }
 

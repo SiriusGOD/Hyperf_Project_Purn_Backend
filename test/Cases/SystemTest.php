@@ -22,14 +22,31 @@ use App\Util\URand;
  */
 class SystemTest extends HttpTestCase
 {
-    //測試user suggest TAG 假資料 
+    //測試withdraw type 
+    public function testWtihdrawType()
+    {
+        $user = Member::first();
+        $token = auth()->login($user);
+        make(MemberService::class)->saveToken($user->id, $token);
+
+        $data = $this->client->post('/api/system/withdraw_type', [
+            'name' => str_random(),
+        ], [
+            'Authorization' => 'Bearer ' . $token,
+        ]);
+
+        print_r([$data, 'ss' ]);
+
+        $this->assertSame(200, (int) $data['code']);
+    }
+    //測試withdraw rate 
     public function testSuggestByUser()
     {
         $user = Member::first();
         $token = auth()->login($user);
         make(MemberService::class)->saveToken($user->id, $token);
 
-        $data = $this->client->post('/api/system/withdraw', [
+        $data = $this->client->post('/api/system/withdraw_rate', [
             'name' => str_random(),
         ], [
             'Authorization' => 'Bearer ' . $token,

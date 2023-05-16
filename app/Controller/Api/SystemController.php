@@ -23,11 +23,19 @@ use App\Middleware\ApiEncryptMiddleware;
 #[Middleware(ApiEncryptMiddleware::class)]
 class SystemController extends AbstractController
 {
-    #[RequestMapping(methods: ['POST'], path: 'withdraw')]
-    public function withdraw(SystemService $service)
+    //手續費
+    #[RequestMapping(methods: ['POST'], path: 'withdraw_rate')]
+    public function withdraw_rate(SystemService $service)
     {
-        $data = $service->memberWithdraw();
-        return $this->success(["rate"=>$data]);
+        $data = $service->memberWithdrawRate();
+        return $this->success(["models"=> ["rate"=>$data] ]);
     }
 
+    //提領方式
+    #[RequestMapping(methods: ['POST'], path: 'withdraw_type')]
+    public function withdrawType(SystemService $service)
+    {
+        $data = $service->memberWithdrawtype();
+        return $this->success(["models"=> $data ]);
+    }
 }
