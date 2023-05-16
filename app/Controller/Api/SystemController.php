@@ -28,6 +28,7 @@ class SystemController extends AbstractController
     public function withdraw_rate(SystemService $service)
     {
         $data = $service->memberWithdrawRate();
+        
         return $this->success(["models"=> ["rate"=>$data] ]);
     }
 
@@ -36,6 +37,11 @@ class SystemController extends AbstractController
     public function withdrawType(SystemService $service)
     {
         $data = $service->memberWithdrawtype();
+        foreach ($data as &$item) {
+            if (is_numeric($item)) {
+                $item = intval($item);
+            }
+        }
         return $this->success(["models"=> $data ]);
     }
 }

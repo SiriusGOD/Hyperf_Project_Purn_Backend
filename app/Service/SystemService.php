@@ -31,7 +31,7 @@ class SystemService
         $key = self::CACHE_KEY."member_withdraw_type";
         if($this->redis->exists() ){
           $res = $this->redis->get($key);
-          //return json_decode($res ,true);
+          return json_decode($res ,true);
         }
         $result = SystemParam::select("param")
                                 ->where('description', 'withdraw_type')
@@ -45,7 +45,7 @@ class SystemService
      {
         $key = self::CACHE_KEY."member_withdraw_rate";
         if($this->redis->exists() ){
-          //return $this->redis->get($key);
+          return $this->redis->get($key);
         }
         $result = SystemParam::select("param")
                                 ->where('description', 'member_withdraw')
