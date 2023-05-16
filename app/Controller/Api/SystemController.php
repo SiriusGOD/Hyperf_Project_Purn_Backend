@@ -37,9 +37,9 @@ class SystemController extends AbstractController
     public function withdrawType(SystemService $service)
     {
         $data = $service->memberWithdrawtype();
-        foreach ($data as &$item) {
+        foreach ($data as $key => $item) {
             if (is_numeric($item)) {
-                $item = intval($item);
+                $data[$key] = intval($item);
             }
         }
         return $this->success(["models"=> $data ]);
