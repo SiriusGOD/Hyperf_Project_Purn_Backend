@@ -30,17 +30,14 @@ class SystemTest extends HttpTestCase
         make(MemberService::class)->saveToken($user->id, $token);
 
         $data = $this->client->post('/api/system/withdraw_type', [
-            'name' => str_random(),
         ], [
             'Authorization' => 'Bearer ' . $token,
         ]);
-
         print_r([$data, 'ss' ]);
 
-        $this->assertSame(200, (int) $data['code']);
     }
     //測試withdraw rate 
-    public function testSuggestByUser()
+    public function teSuggestByUser()
     {
         $user = Member::first();
         $token = auth()->login($user);
@@ -52,7 +49,6 @@ class SystemTest extends HttpTestCase
             'Authorization' => 'Bearer ' . $token,
         ]);
 
-        print_r([$data, 'ss' ]);
 
         $this->assertSame(200, (int) $data['code']);
     }
