@@ -182,5 +182,6 @@ return [
     'chinese_word' => ':attribute 必須包含以下有效字符 (中文/英文，數字, 下劃線)',
     'sequential_array' => ':attribute 必須是一個有序數組',
 
-    'password_error' => '密碼錯誤'
+    'password_error' => '密碼錯誤',
+    'image_upload_error' => '圖片上傳錯誤',
 ];

@@ -83,30 +83,45 @@ class CustomerServiceController extends AbstractController
             'title' => $request->input('title'),
         ]);
 
+        $models = [];
         if ($request->hasFile('cover_one')) {
             $file = $request->file('cover_one');
 
             $result = General::uploadImage($file);
+            if ($result['code'] != 1) {
+                $customServiceModel->delete();
+                return $this->error(trans('validation.image_upload_error'), 400);
+            }
             $model = new CustomerServiceCover();
             $model->customer_service_id = $customServiceModel->id;
             $model->url = $result['url'];
             $model->save();
+            $models[] = $model;
         }
 
         if ($request->hasFile('cover_two')) {
             $file = $request->file('cover_two');
-
             $result = General::uploadImage($file);
+            if ($result['code'] != 1) {
+                $service->deleteCovers($models);
+                $customServiceModel->delete();
+                return $this->error(trans('validation.image_upload_error'), 400);
+            }
             $model = new CustomerServiceCover();
             $model->customer_service_id = $customServiceModel->id;
             $model->url = $result['url'];
             $model->save();
+            $models[] = $model;
         }
 
         if ($request->hasFile('cover_three')) {
             $file = $request->file('cover_three');
-
             $result = General::uploadImage($file);
+            if ($result['code'] != 1) {
+                $service->deleteCovers($models);
+                $customServiceModel->delete();
+                return $this->error(trans('validation.image_upload_error'), 400);
+            }
             $model = new CustomerServiceCover();
             $model->customer_service_id = $customServiceModel->id;
             $model->url = $result['url'];

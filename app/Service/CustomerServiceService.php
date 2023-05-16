@@ -79,4 +79,11 @@ class CustomerServiceService
 
         return $result;
     }
+
+    public function deleteCovers(array $models): void
+    {
+        foreach ($models as $model) {
+            $model->delete();
+        }
+    }
 }
