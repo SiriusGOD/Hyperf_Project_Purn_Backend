@@ -15,6 +15,7 @@ return [
         'diamond_level' => '钻石卡',
         'cash_coin' => '现金点数',
         'diamond_coin' => '钻石点数',
+        'coin_pay' => '现金余额支付'
     ],
     'order_control' =>[
         'no_product_data' => '查无商品资料',
@@ -53,5 +54,8 @@ return [
     ],
     'product_control' => [
         'pay_coin' => '现金余额支付'
-    ]
+    ],
+    'tag_control' => [
+        'all' => '全部'
+    ],
 ];

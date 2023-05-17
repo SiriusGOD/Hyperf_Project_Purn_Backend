@@ -11,16 +11,21 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\ImageGroup;
 use App\Model\TagGroup;
 use App\Model\Video;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
 
+use function Hyperf\Support\env;
+
 class TagGroupService
 {
     public const CACHE_KEY = 'tag_group';
+    public const TAG_GROUP_KEY = 'tag_group_search';
 
     public const TTL_ONE_DAY = 86400;
+    public const TTL_30_MIN = 1800;
 
     public Redis $redis;
 
@@ -66,14 +71,41 @@ class TagGroupService
 
     public function searchGroupTags(int $group_id)
     {
-        // 還缺image計算
-        return TagGroup::join('tag_has_groups', 'tag_groups.id', 'tag_has_groups.tag_group_id')
-            ->join('tags', 'tag_has_groups.tag_id', 'tags.id')
-            ->join('tag_corresponds', 'tags.id', 'tag_corresponds.tag_id')
-            ->select('tag_groups.id as group_id', 'tag_groups.name as group_name', 'tag_corresponds.tag_id', 'tags.name as tag_name', DB::raw('count(*) as product_num'))
-            ->where('tag_groups.id', $group_id)
-            ->where('tag_corresponds.correspond_type', Video::class)
-            ->groupBy('tag_corresponds.tag_id')
-            ->get()->toArray();
+        $checkRedisKey = self::TAG_GROUP_KEY.':'.$group_id;
+
+        if ($this->redis->exists($checkRedisKey)) {
+            $jsonResult = $this->redis->get($checkRedisKey);
+            return json_decode($jsonResult, true);
+        }
+
+        $tags = TagGroup::join('tag_has_groups', 'tag_groups.id', 'tag_has_groups.tag_group_id')
+                         ->join('tags', 'tag_has_groups.tag_id', 'tags.id')
+                         ->join('tag_corresponds', 'tags.id', 'tag_corresponds.tag_id')
+                         ->select('tag_corresponds.tag_id', 'tags.name as tag_name', 'tags.img', DB::raw('count(*) as product_num'))
+                         ->where('tag_groups.id', $group_id)
+                         ->whereIn('tag_corresponds.correspond_type', [Video::class,ImageGroup::class])
+                         ->groupBy('tag_corresponds.tag_id')
+                         ->get()->toArray();
+        $result = [];
+        foreach ($tags as $key => $value) {
+            if(!empty($value['img'])){
+                $tags[$key]['img'] = env('VIDEO_THUMB_URL') . $value['img'];
+            }
+            // 作品數大於０才顯示 
+            if($value['product_num'] > 0){
+                array_push($result, array(
+                    'tag_id' => $tags[$key]['tag_id'],
+                    'tag_name' => $tags[$key]['tag_name'],
+                    'img' => $tags[$key]['img'],
+                    'product_num' => $tags[$key]['product_num']
+                ));
+            }
+        }
+        
+
+        $this->redis->set($checkRedisKey, json_encode($result));
+        $this->redis->expire($checkRedisKey, self::TTL_30_MIN);
+
+        return $result;
     }
 }

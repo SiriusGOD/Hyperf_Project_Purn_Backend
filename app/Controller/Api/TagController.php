@@ -29,21 +29,21 @@ class TagController extends AbstractController
     public function list(RequestInterface $request, TagService $service)
     {
         $data = $service->getTags();
-        return $this->success($data->toArray());
+        return $this->success(['models' => $data->toArray()]);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'popular')]
     public function popular(RequestInterface $request, TagService $service)
     {
         $data = $service->getPopularTag();
-        return $this->success($data);
+        return $this->success(['models' => $data]);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'groupList')]
     public function groupList(RequestInterface $request, TagGroupService $service)
     {
         $data = $service->getTags();
-        return $this->success($data);
+        return $this->success(['models' => $data]);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'searchGroupTags')]
@@ -51,6 +51,20 @@ class TagController extends AbstractController
     {
         $group_id = $request->input('group_id');
         $data = $service->searchGroupTags($group_id);
-        return $this->success($data);
+        return $this->success(['models' => $data]);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'getTagDetail')]
+    public function getTagDetail(RequestInterface $request, TagService $service)
+    {
+        $tag_id = $request->input('tag_id');
+        $data = $service->getTagDetail($tag_id);
+        return $this->success(['models' => $data]);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'test')]
+    public function test(RequestInterface $request, TagService $service)
+    {
+        $data = $service->calculateTop6Tag();
     }
 }

@@ -25,13 +25,16 @@ class TagRequest extends AuthBaseRequest
             $id = $this->input('id');
         }
 
-        return [
-            'name' => 'required|string|between:1,50',
-            'hot_order' => [
+        $rule['name'] = 'required|string|between:1,50';
+        
+        if(! empty($this->input('hot_order'))){
+            $rule['hot_order'] = [
                 'required',
                 'numeric',
                 Rule::unique('tags')->ignore($id),
-            ],
-        ];
+            ];
+        }
+
+        return $rule;
     }
 }

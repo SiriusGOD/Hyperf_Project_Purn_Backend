@@ -627,7 +627,7 @@ class MemberService extends BaseService
     public function getMemberOrderList($user_id, $page, $limit)
     {
         // redis
-        $checkRedisKey = self::KEY.":MemberOrderList:".$user_id.":".Carbon::now()->toDateString().":".$page.":".$limit;
+        $checkRedisKey = self::KEY.":MemberOrderList:".$user_id.":".$page.":".$limit;
         if ($this->redis->exists($checkRedisKey)) {
             $jsonResult = $this->redis->get($checkRedisKey);
             return json_decode($jsonResult, true);
@@ -640,7 +640,7 @@ class MemberService extends BaseService
         $products_type = [Product::TYPE_CORRESPOND_LIST['member'], Product::TYPE_CORRESPOND_LIST['points']];
         $query = Order::join('order_details', 'orders.id', 'order_details.order_id')
                         ->join('products', 'order_details.product_id', 'products.id')
-                        ->join('pays', 'orders.payment_type', 'pays.id')
+                        ->leftJoin('pays', 'orders.payment_type', 'pays.id')
                         ->selectRaw('products.name as product_name, orders.created_at, orders.status, orders.currency, orders.total_price, pays.name as pay_name, products.type, products.correspond_id')
                         ->where('orders.user_id', $user_id)
                         ->whereIn('products.type', $products_type)
@@ -699,7 +699,7 @@ class MemberService extends BaseService
             // }else if($order -> currency == Product::CURRENCY[1]){
             //     $data[$key]['price'] .= " " . trans('api.member_control.point');
             // }
-            $data[$key]['pay_method'] =  $order -> pay_name;
+            $data[$key]['pay_method'] =  $order -> pay_name ?? trans('api.member_control.coin_pay');
         }
 
         $this->redis->set($checkRedisKey, json_encode($data));
@@ -830,7 +830,7 @@ class MemberService extends BaseService
 
     // 刪除 會員購買紀錄 Redis
     public function delMemberListRedis($user_id){
-        $checkRedisKey = self::KEY.":MemberOrderList:".$user_id.":".Carbon::now()->toDateString();
+        $checkRedisKey = self::KEY.":MemberOrderList:".$user_id.":";
         $keys = $this->redis->keys( $checkRedisKey.'*');
         foreach ($keys as $key) {
             $this->redis->del($key);

@@ -13,10 +13,12 @@ namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Model\Tag;
+use App\Model\TagHasGroup;
 use App\Request\TagRequest;
 use App\Service\TagService;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
+use App\Util\General;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
@@ -75,18 +77,22 @@ class TagController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'store')]
     public function store(TagRequest $request, ResponseInterface $response, TagService $service): PsrResponseInterface
     {
-        $userId = auth('session')->user()->getId();
-        $id = $request->input('id');
-        $name = $request->input('name');
-        $groups = $request->input('groups', []);
-        $hotOrder = $request->input('hot_order');
-        $service->createTag([
-            'id' => $id,
-            'user_id' => $userId,
-            'name' => $name,
-            'groups' => $groups,
-            'hot_order' => $hotOrder,
-        ]);
+        $data['user_id'] = auth('session')->user()->getId();
+        $data['id'] = $request->input('id');
+        $data['name'] = $request->input('name');
+        $data['groups'] = $request->input('groups', []);
+        $data['hot_order'] = $request->input('hot_order');
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $dataArr = General::uploadImage($file, 'tag');
+            $imageUrl = $dataArr['url'];
+            // $data['height'] = $dataArr['height'];
+            // $data['weight'] = $dataArr['weight'];
+        }
+        if (! empty($imageUrl)) {
+            $data['image_url'] = $imageUrl;
+        }
+        $service->createTag($data);
         return $response->redirect('/admin/tag/index');
     }
 
@@ -102,10 +108,11 @@ class TagController extends AbstractController
     #[RequestMapping(methods: ['GET'], path: 'edit')]
     public function edit(RequestInterface $request)
     {
+        $id = $request->input('id');
         $data['navbar'] = trans('default.tag_control.tag_edit');
         $data['tag_active'] = 'active';
-        $data['tag_group_ids'] = '';
-        $data['model'] = Tag::find($request->input('id'));
+        $data['tag_group_ids'] = TagHasGroup::where('tag_id', $id)->get()->pluck('tag_group_id');;
+        $data['model'] = Tag::find($id);
         return $this->render->render('admin.tag.form', $data);
     }
 }
