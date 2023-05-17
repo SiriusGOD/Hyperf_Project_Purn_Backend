@@ -28,6 +28,8 @@ class TagService
 {
     public const POPULAR_TAG_CACHE_KEY = 'popular_tag';
 
+    public const POPULAR_DEFAULT_LIMIT = 10;
+
     public Redis $redis;
 
     public function __construct(Redis $redis)
@@ -121,16 +123,29 @@ class TagService
     public function getPopularTag()
     {
         if ($this->redis->exists(self::POPULAR_TAG_CACHE_KEY)) {
-            return json_decode($this->redis->get(self::POPULAR_TAG_CACHE_KEY), true);
+//            return json_decode($this->redis->get(self::POPULAR_TAG_CACHE_KEY), true);
         }
 
         $tags = Tag::where('hot_order', '>=', 1)
             ->orderBy('hot_order')
+            ->orderBy('id')
+            ->limit(self::POPULAR_DEFAULT_LIMIT)
             ->get();
+        $count = $tags->count();
 
-        $collect = $this->calculatePopularTag($tags->pluck('id')->toArray());
+        $collect = $this->calculatePopularTag($tags->pluck('id')->toArray(), $count);
 
-        $result = $this->generatePopularTags($tags->toArray(), $collect->toArray());
+        $result = $this->generatePopularTags($tags->toArray());
+        $ids = \Hyperf\Collection\collect(array_merge($result, $collect->toArray()))->pluck('tag_id')->toArray();
+
+        $addTagsResult = [];
+        if($collect->count() + $count < self::POPULAR_DEFAULT_LIMIT) {
+            $limit = self::POPULAR_DEFAULT_LIMIT - ($collect->count() + $count);
+            $addTags = Tag::whereNotIn('id', $ids)->orderBy('id')->limit($limit)->get();
+            $addTagsResult = $this->generatePopularTags($addTags->toArray());
+        }
+
+        $result = array_merge($result, $collect->toArray(), $addTagsResult);
 
         if (! empty($result)) {
             $this->redis->set(self::POPULAR_TAG_CACHE_KEY, json_encode($result));
@@ -139,14 +154,14 @@ class TagService
         return $result;
     }
 
-    public function calculatePopularTag(array $hotTagIds)
+    public function calculatePopularTag(array $hotTagIds, int $count)
     {
         return MemberTag::groupBy('tag_id')
             ->select('tag_id', Db::raw('sum(count) as total'), 'tags.name')
             ->join('tags', 'tags.id', '=', 'member_tags.tag_id')
             ->orderByDesc('total')
             ->whereNotIn('tag_id', $hotTagIds)
-            ->limit(10)
+            ->limit(self::POPULAR_DEFAULT_LIMIT - $count)
             ->get();
     }
 
@@ -204,7 +219,7 @@ class TagService
             ->toArray();
     }
 
-    protected function generatePopularTags(array $tags, array $popularTag)
+    protected function generatePopularTags(array $tags)
     {
         $result = [];
         foreach ($tags as $tag) {
@@ -215,7 +230,7 @@ class TagService
             ];
         }
 
-        return array_merge($result, $popularTag);
+        return $result;
     }
 
     // 獲取標籤詳細資料
