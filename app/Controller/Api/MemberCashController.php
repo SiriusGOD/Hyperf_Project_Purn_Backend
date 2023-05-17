@@ -85,7 +85,8 @@ class MemberCashController extends AbstractController
         $requires  = ['name','account','bank_type','withdraw_amount',"password"] ; 
         $check = Check::require($request->all() , $requires);
         if($check){
-          return $this->error( trans('default.withdraw.empty_error', ["key" => $check]), WithdrawCode::EMPTY_ERROR);  
+          $title = trans("default.withdraw.$check");
+          return $this->error( trans('default.withdraw.empty_error', ["key" => $title]), WithdrawCode::EMPTY_ERROR);  
         }
         $withdraw_type = $request->input('bank_type');//收款方式 1:paypel, 2:银行卡
         $amount = $request->input('withdraw_amount');//收款方式 1:paypel, 2:银行卡

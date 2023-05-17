@@ -162,8 +162,13 @@ return [
     ],
 
     'withdraw'=>[
+      'name'=>"錢包姓名",
+      'account'=>"銀行卡帳號",,
+      'bank_type'=>"提現方式",
+      'withdraw_amount'=>"提現金額",
+      "password" =>"用戶密碼",
       'no_money' =>'你的餘額不足',
-      'empty_error' =>'缺少參數 :key',
+      'empty_error' =>':key 必填',
       'detail' => '提現詳細資料',
       'no_data' => '查無資料',
       'withdraw_reject' => '提现拒绝操作成功',
