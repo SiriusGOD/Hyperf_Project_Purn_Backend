@@ -7,40 +7,60 @@
                 <div class="card-body">
                     <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                         <div class="row">
-                            <form action="/admin/manager/store" method="post" class="col-md-12">
-                                @if($user->id)
-                                    <input type="hidden" name="id" value="{{$user->id}}">
-                                @endif
+                            <form action="" method="post" class="col-md-12">
+                                 
+                                    <input type="hidden" name="id" value="{{$data->id}}">
+                                 
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.manager_control.manager_acc') ?? '管理者帳號'}}</label>
-                                    <input type="text" class="form-control" name="name" id="name"
-                                           @if(!empty($user->name)) disabled="true" @endif
-                                           placeholder="{{trans('default.account_def') ?? 'name'}}"
-                                           value="{{$user->name}}">
+                                    <label for="exampleInputEmail1">{{trans('default.withdraw.member') ?? '使用者 '}}</label>
+                                    <input type="text" class="form-control" name="account" id="account"
+                                           value="{{$data->member->name}}">
                                 </div>
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.manager_control.manager_pass') ?? '密碼'}}</label>
-                                    <input type="password" class="form-control" name="password" id="password"
-                                           placeholder="{{trans('default.pass_def') ?? 'password'}}" value="">
-                                </div>
-                                @if($qrcode_image && env('GOOGLE_AUTH_VALID') && env('GOOGLE_AUTH_VALID'))
-                                    <div class="form-group">
-                                        <label for="exampleInputEmail1">{{trans('default.manager_control.GoogleAtuh') ?? 'Google Auth'}}</label>
-                                        <img src="data:image/png;base64, {{$qrcode_image}} "/>
-                                    </div>
-                                @endif
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.role_control.role') ?? '角色'}}</label>
-                                    <select class="form-control" name="role_id">
-                                        <option value="0"></option>
-                                        @foreach($roles as $role)
-                                            <option value="{{$role->id}}" @if(isset($user))
-                                                {{($user->role_id==$role->id)?"selected=true":"" }}
-                                                    @endif >{{$role->name}}</option>
-                                        @endforeach
-                                    </select>
 
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.withdraw.name') ?? '提款人'}}</label>
+                                    <input type="text" class="form-control" name="account" id="account"
+                                            
+                                           value="{{$data->name}}">
                                 </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.withdraw.bank_type') ?? '銀行類型'}}</label>
+                                    <input type="text" class="form-control" name="account" id="account"
+                                        
+                                           value="{{$BANK[$data->type]}}">
+                                </div>
+
+                                
+
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.withdraw.date') ?? '日期'}}</label>
+                                    <input type="text" class="form-control" name="account" id="account"
+                                           value="{{$data->payed_at}}">
+                                </div>
+
+                                 
+
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.withdraw.account') ?? '銀行帳號'}}</label>
+                                    <input type="text" class="form-control" name="account" id="account"
+                                           @if(!empty($data->account)) disabled="true" @endif
+                                           
+                                           value="{{$data->account}}">
+                                </div>
+
+                                
+
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.withdraw.status') ?? '銀行帳號'}}</label>
+                                    <input type="text" class="form-control" name="account" id="account"
+                                            disabled="true"  
+                                           
+                                           value="{{$STATUS[$data->status]}}">
+                                </div>
+                                 
+                                 
+                                 
                                 <button type="submit"
                                         class="btn btn-primary">{{trans('default.submit') ?? '送出'}}</button>
                             </form>

@@ -57,13 +57,13 @@
                                                 @endif
 
                                                 @if(authPermission('withdraw-pass'))
-                                                    <a href="/admin/withdraw/set?id={{$withdraw->id}}&flag=pass"
-                                                       class="btn btn-primary">{{trans('default.withdraw.pass') ?? '審核通過'}}</a>
+              <button  onclick="confirm_user('/admin/withdraw/set?id={{$withdraw->id}}&flag=pass' ,'{{trans('default.withdraw.is_pass') ?? '審核通過'}}')" 
+                                                       class="btn btn-primary">{{trans('default.withdraw.pass') ?? '審核通過'}}</button>
                                                 @endif
 
                                                 @if(authPermission('withdraw-cancel'))
-                                                    <a href="/admin/withdraw/set?id={{$withdraw->id}}&flag=refuse"
-                                                       class="btn btn-danger">{{trans('default.withdraw.cancel') ?? '取消申請'}}</a>
+              <button    onclick="confirm_user('/admin/withdraw/set?id={{$withdraw->id}}&flag=refuse' ,'{{trans('default.withdraw.is_cancel') ?? '取消申請'}}')" 
+                                                       class="btn btn-danger">{{trans('default.withdraw.cancel') ?? '取消申請'}}</button>
                                                 @endif
 
                                             </td>
@@ -144,4 +144,5 @@
         <!-- /.col -->
     </div>
 
+    <script src="/js/main.js"></script>
 @endsection
