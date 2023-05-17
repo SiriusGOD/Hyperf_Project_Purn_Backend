@@ -123,7 +123,7 @@ class TagService
     public function getPopularTag()
     {
         if ($this->redis->exists(self::POPULAR_TAG_CACHE_KEY)) {
-//            return json_decode($this->redis->get(self::POPULAR_TAG_CACHE_KEY), true);
+            return json_decode($this->redis->get(self::POPULAR_TAG_CACHE_KEY), true);
         }
 
         $tags = Tag::where('hot_order', '>=', 1)
