@@ -86,15 +86,26 @@ class TagGroupService
                          ->whereIn('tag_corresponds.correspond_type', [Video::class,ImageGroup::class])
                          ->groupBy('tag_corresponds.tag_id')
                          ->get()->toArray();
+        $result = [];
         foreach ($tags as $key => $value) {
             if(!empty($value['img'])){
                 $tags[$key]['img'] = env('VIDEO_THUMB_URL') . $value['img'];
             }
+            // 作品數大於０才顯示 
+            if($value['product_num'] > 0){
+                array_push($result, array(
+                    'tag_id' => $tags[$key]['tag_id'],
+                    'tag_name' => $tags[$key]['tag_name'],
+                    'img' => $tags[$key]['img'],
+                    'product_num' => $tags[$key]['product_num']
+                ));
+            }
         }
+        
 
-        $this->redis->set($checkRedisKey, json_encode($tags));
+        $this->redis->set($checkRedisKey, json_encode($result));
         $this->redis->expire($checkRedisKey, self::TTL_30_MIN);
 
-        return $tags;
+        return $result;
     }
 }
