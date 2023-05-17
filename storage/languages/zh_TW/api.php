@@ -15,6 +15,7 @@ return [
         'diamond_level' => '鑽石卡',
         'cash_coin' => '現金點數',
         'diamond_coin' => '鑽石點數',
+        'coin_pay' => '現金餘額支付'
     ],
     'order_control' =>[
         'no_product_data' => '查無商品資料',
