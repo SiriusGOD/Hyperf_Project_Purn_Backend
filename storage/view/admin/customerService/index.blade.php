@@ -31,6 +31,10 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.customer_service_control.customer_service_cover') ?? '圖片'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.customer_service_control.customer_service_updated_at') ?? '更新時間'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
@@ -46,6 +50,11 @@
                                             <td class="sorting_1 dtr-control">{{ $model->member->name }}</td>
                                             <td>{{ trans('default.customer_service_control.customer_service_type_array')[$model->type] }}</td>
                                             <td>{{ $model->title }}</td>
+                                            <td>
+                                                @if(!empty($model->customerServiceCovers()->count()))
+                                                    <a class="btn btn-primary" href="/admin/customer_service/image?id={{$model->id}}" target="_blank">detail
+                                                @endif
+                                            </td>
                                             <td>{{ $model->lastUpdatedAt() }}</td>
                                             <td>
                                                 @if(authPermission('customer-service-detail'))
@@ -63,6 +72,7 @@
                                         <th rowspan="1" colspan="1">{{trans('default.user_name') ?? '使用者名稱'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.customer_service_control.customer_service_type') ?? '種類'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.customer_service_control.customer_service_title') ?? '標題'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.customer_service_control.customer_service_cover') ?? '圖片'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.customer_service_control.customer_service_updated_at') ?? '更新時間'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
                                     </tr>

@@ -581,6 +581,7 @@ return [
         'customer_service_type' => '问题种类',
         'customer_service_title' => '标题',
         'customer_service_updated_at' => '更新时间',
+        'customer_service_cover' => '客服图片',
         'customer_service_type_array' => [
             1 => '储值问题',
             2 => '推广问题',

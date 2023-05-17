@@ -439,7 +439,6 @@ return [
         'order_status' => '訂單狀態',
         'order_create_time' => '訂單成立時間',
         'order_edit' => '編輯訂單',
-        'order_buyer_email' => 'email',
         'order_buyer_telephone' => '手機',
         'order_status_create' => '訂單成立',
         'order_status_delete' => '訂單取消',
@@ -580,6 +579,7 @@ return [
         'customer_service_type' => '問題種類',
         'customer_service_title' => '標題',
         'customer_service_updated_at' => '更新時間',
+        'customer_service_cover' => '客服圖片',
         'customer_service_type_array' => [
             1 => '儲值問題',
             2 => '推廣問題',

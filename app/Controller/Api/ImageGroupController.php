@@ -12,14 +12,12 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
+use App\Middleware\ApiEncryptMiddleware;
 use App\Model\CustomerService;
 use App\Model\Image;
 use App\Model\ImageGroup;
-use App\Request\ClickRequest;
-use App\Request\GetPayImageRequest;
-use App\Request\ImageApiListRequest;
-use App\Request\ImageApiSearchRequest;
-use App\Request\ImageApiSuggestRequest;
+use App\Model\Product;
+use App\Model\Video;
 use App\Service\ClickService;
 use App\Service\GenerateService;
 use App\Service\ImageGroupService;
@@ -29,10 +27,9 @@ use App\Service\SearchService;
 use App\Service\SuggestService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
-use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Annotation\Middleware;
+use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
@@ -117,12 +114,26 @@ class ImageGroupController extends AbstractController
         $id = (int) $request->input('id');
         $memberId = auth()->user()->getId();
 
-        if (! $service->isPay($id, $memberId)) {
-            return $this->error(trans('validation.is_not_pay'), 400);
+        $product = Product::where('expire', Product::EXPIRE['no'])
+            ->where('type', Video::class)
+            ->where('correspond_id', $id)
+            ->first();
+
+        $isPay = $service->isPay($id, $memberId);
+
+        if (empty($product) and ! $isPay) {
+            return $this->error(trans('validation.product_is_expire'), 400);
+        }
+        if (! $isPay) {
+            return $this->success([
+                'is_pay' => 0,
+                'product_id' => $product->id,
+            ]);
         }
 
         return $this->success([
             'is_pay' => 1,
+            'product_id' => $product->id,
         ]);
     }
 }

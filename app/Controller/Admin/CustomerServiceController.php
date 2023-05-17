@@ -13,7 +13,9 @@ namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Model\CustomerService;
+use App\Model\CustomerServiceCover;
 use App\Model\CustomerServiceDetail;
+use App\Model\ImageGroup;
 use App\Request\CustomerServiceReplyRequest;
 use App\Service\CustomerServiceService;
 use Hyperf\Di\Annotation\Inject;
@@ -112,5 +114,18 @@ class CustomerServiceController extends AbstractController
         $data['paginator'] = $paginator->toArray();
         $data['customer_service_id'] = $id;
         return $this->render->render('admin.customerService.detail', $data);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'image')]
+    public function image(RequestInterface $request, ResponseInterface $response)
+    {
+        $id = $request->input('id');
+        $model = CustomerServiceCover::where('customer_service_id', $id)
+            ->get()
+            ->toArray();
+
+        return $this->render->render('admin.customerService.image', [
+            'model' => $model,
+        ]);
     }
 }

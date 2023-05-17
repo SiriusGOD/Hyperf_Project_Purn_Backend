@@ -14,11 +14,10 @@ namespace App\Controller\Api;
 use App\Constants\Apicode;
 use App\Constants\Constants;
 use App\Controller\AbstractController;
+use App\Middleware\ApiEncryptMiddleware;
+use App\Model\Product;
 use App\Model\Video;
-use App\Request\ClickRequest;
-use App\Request\GetPayImageRequest;
 use App\Request\VideoApiSearchRequest;
-use App\Request\VideoApiSuggestRequest;
 use App\Service\ActorService;
 use App\Service\ClickService;
 use App\Service\GenerateService;
@@ -29,13 +28,11 @@ use App\Service\TagService;
 use App\Service\VideoService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\Logger\LoggerFactory;
 use Psr\Log\LoggerInterface;
-
-use Hyperf\HttpServer\Annotation\Middleware;
-use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
@@ -172,16 +169,29 @@ class VideoController extends AbstractController
         $id = (int) $request->input('id');
         $memberId = auth()->user()->getId();
 
-        if (! $service->isPay($id, $memberId)) {
-            return $this->error(trans('validation.is_not_pay'));
+        $product = Product::where('expire', Product::EXPIRE['no'])
+            ->where('type', Video::class)
+            ->where('correspond_id', $id)
+            ->first();
+
+        $isPay = $service->isPay($id, $memberId);
+        if (empty($product) and ! $isPay) {
+            return $this->error(trans('validation.product_is_expire'), 400);
+        }
+
+        if (! $isPay) {
+            return $this->success([
+                'url' => '',
+                'product_id' => $product->id,
+            ]);
         }
 
         $model = $service->getPayVideo($id)->toArray();
         $url = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $model['m3u8'];
 
-
         return $this->success([
             'url' => $url,
+            'product_id' => $product->id,
         ]);
     }
 }
