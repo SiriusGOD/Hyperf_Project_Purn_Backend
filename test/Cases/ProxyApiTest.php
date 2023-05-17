@@ -44,6 +44,7 @@ class ProxyApiTest extends HttpTestCase
         $data = $this->client->post('/api/proxy/myIncome', [], [
             'Authorization' => 'Bearer ' . $token,
         ]);
+        print_r($data);
         $this->assertSame(200, (int)$data['code']);
     }
 
