@@ -162,7 +162,7 @@ return [
     ],
     'withdraw'=>[
       'name'=>"錢包姓名",
-      'account'=>"銀行卡帳號",,
+      'account'=>"銀行卡帳號",
       'bank_type'=>"提現方式",
       'withdraw_amount'=>"提現金額",
       "password" =>"用戶密碼",
