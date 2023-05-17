@@ -174,7 +174,7 @@ class ProxyService extends BaseService
            WHEN 4 THEN '".trans("default.proxy.lv4")."'
            ELSE ''
        END AS proxy_level ";
-        $payDate = " DATE_FORMAT(member_invite_receive_log.created_at, '%Y-%m-%d') AS date ";
+        $payDate = " DATE_FORMAT(member_invite_receive_log.created_at, '%Y.%m.%d') AS date ";
         $result = $this->memberInviteReceiveLog
             ->select( 'member_invite_receive_log.product_name',DB::raw($payDate),DB::raw($levelSql), 'member_invite_receive_log.reach_amount',  'members.name as member_name')
             ->leftJoin('members', 'member_invite_receive_log.member_id', '=', 'members.id')
