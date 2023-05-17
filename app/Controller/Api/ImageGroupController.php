@@ -115,7 +115,7 @@ class ImageGroupController extends AbstractController
         $memberId = auth()->user()->getId();
 
         $product = Product::where('expire', Product::EXPIRE['no'])
-            ->where('type', Video::class)
+            ->where('type', ImageGroup::class)
             ->where('correspond_id', $id)
             ->first();
 
