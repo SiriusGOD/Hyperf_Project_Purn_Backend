@@ -12,26 +12,27 @@ declare(strict_types=1);
 namespace App\Service;
 use App\Constants\WithdrawCode;
 use App\Model\MemberWithdraw;
-use App\Model\Order;
 use Hyperf\DbConnection\Db;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
+
 //提現
 class WithdrawService extends BaseService
 {
     protected Redis $redis;
-
+    protected $memberWithdraw;
     protected \Psr\Log\LoggerInterface $logger;
 
-    public function __construct(Redis $redis, LoggerFactory $loggerFactory)
+    public function __construct(Redis $redis, LoggerFactory $loggerFactory,MemberWithdraw $memberWithdraw)
     {
+        $this->memberWithdraw =$memberWithdraw;
         $this->redis = $redis;
         $this->logger = $loggerFactory->get('withdraw');
     }
 
     //提現取得
-    public function fetch(int $id){
-      return $this->get(MemberWithdraw::class , $id);
+    public function detail(int $id){
+      return $this->memberWithdraw->where('id',$id)->first();
     }
 
     //提現數量
@@ -160,17 +161,26 @@ class WithdrawService extends BaseService
             foreach ($data as $row) {
                 $str .= $row;
             }
-            $user_withdraw_key = env('pay.user_withraw_key');
-            $user_withdraw_url = env('pay.user_withraw_url');
-            env("APP_ENV") != 'product' && $user_withdraw_url = '';
-            $data['sign'] = md5($str . $user_withdraw_key);
-            errLog('proxy:'.var_export($data,true));
-            $re = di(\App\Service\UploadService::class)->deleteMp4($user_withdraw_url, $data);
-            errLog('proxy-result:' . var_export([$data, $re], true));
-            $re = json_decode($re, true);
+            if(env("APP_ENV")=="local"){
+              //在本機或是測試
+              $re['success'] = true;
+              $re['data']['code'] = 200;
+              $re['data']['channel'] ='example.com';
+              $re['data']['order_id'] = 'qwe123420948weroiu';
+              //在本機或是測試
+            }else{
+              $user_withdraw_key = env('pay.user_withraw_key');
+              $user_withdraw_url = env('pay.user_withraw_url');
+              env("APP_ENV") != 'product' && $user_withdraw_url = '';
+              $data['sign'] = md5($str . $user_withdraw_key);
+              errLog('proxy:'.var_export($data,true));
+              $re = di(\App\Service\UploadService::class)->deleteMp4($user_withdraw_url, $data);
+              errLog('proxy-result:' . var_export([$data, $re], true));
+              $re = json_decode($re, true);
+            }
             if (isset($re['success']) && $re['success'] == true && $re['data']['code'] == 200) {
                 $data = [
-                    'updated_at' => time(),
+                    'updated_at' => date("Y-m-d H:i:s"),
                     'status'     => WithdrawCode::STATUS_SUCCESS,
                     'channel'    => $re['data']['channel'],
                     'cash_id'    => $re['data']['order_id'],

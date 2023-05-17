@@ -161,6 +161,11 @@ return [
         'hot_order_desc' => '0 不排序，越小越前面',
     ],
     'withdraw'=>[
+      'status'=>'申請裝態', 
+      'is_pass'=>'是否通過?', 
+      'member'=>'會員名稱', 
+      'date'=>'日期', 
+      'is_cancel'=>'是否取消?', 
       'is_not_number_error'=>'金額請輸入數字',
       'name'=>"錢包姓名",
       'account'=>"銀行卡帳號",

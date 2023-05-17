@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
     <!-- iCheck -->
     <link rel="stylesheet" href="/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-    <!-- JQVMap -->
+    <!--
     <link rel="stylesheet" href="/plugins/jqvmap/jqvmap.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="/dist/css/adminlte.min.css">
@@ -39,8 +39,10 @@
     <!-- ChartJS -->
     <script src="/plugins/chart.js/Chart.min.js"></script>
     <!-- Sparkline -->
+    <!--
     <script src="/plugins/sparklines/sparkline.js"></script>
     <!-- JQVMap -->
+    <!--
     <script src="/plugins/jqvmap/jquery.vmap.min.js"></script>
     <script src="/plugins/jqvmap/maps/jquery.vmap.usa.js"></script>
     <!-- jQuery Knob Chart -->
@@ -110,6 +112,7 @@
     <!-- /.control-sidebar -->
 </div>
 <!-- ./wrapper -->
+    <script src="/dist/js/main.js"></script>
 </body>
 </html>
 

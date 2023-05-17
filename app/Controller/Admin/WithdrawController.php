@@ -70,22 +70,15 @@ class WithdrawController extends AbstractController
     }
 
     #[RequestMapping(methods: ['GET'], path: 'detail')]
-    public function detail(UserUpdateRequest $request): PsrResponseInterface
+    public function detail(RequestInterface $request): PsrResponseInterface
     {
         $id = $request->input('id');
-        $users = $this->withdrawService->get($id);
-        $data['last_page'] = ceil($total / WithdrawCode::PAGE_PER);
-        if ($total == 0) {
-            $data['last_page'] = 1;
-        }
-        $data['status'] = WithdrawCode::STATUS;
-        $data['total'] = $total;
-        $data['datas'] = $users;
-        $data['page'] = $page;
-        $data['step'] = WithdrawCode::PAGE_PER;
+        $data['data'] = $this->withdrawService->detail((int)$id);
         $data['navbar'] = trans('default.withdraw.detail');
         $data['withdraw_active'] = 'active';
-        return $this->render->render('admin.withdraw.index', $data);
+        $data['BANK'] = WithdrawCode::TYPE;
+        $data['STATUS'] = WithdrawCode::STATUS;
+        return $this->render->render('admin.withdraw.form', $data);
     }
 
 
