@@ -167,8 +167,16 @@ class ProxyService extends BaseService
     {
         $limit = self::LIMIT;
         $where['member_id'] = $memberId;
+        $levelSql = "CASE member_invite_receive_log.level
+           WHEN 1 THEN '".trans("default.proxy.lv1")."'
+           WHEN 2 THEN '".trans("default.proxy.lv2")."'
+           WHEN 3 THEN '".trans("default.proxy.lv3")."'
+           WHEN 4 THEN '".trans("default.proxy.lv4")."'
+           ELSE ''
+       END AS proxy_level ";
+        $payDate = " DATE_FORMAT(member_invite_receive_log.created_at, '%Y-%m-%d') AS date ";
         $result = $this->memberInviteReceiveLog
-            ->select( 'member_invite_receive_log.product_name', 'member_invite_receive_log.reach_amount', 'member_invite_receive_log.level', "member_invite_receive_log.member_id", "member_invite_receive_log.created_at", 'members.name as member_name')
+            ->select( 'member_invite_receive_log.product_name',DB::raw($payDate),DB::raw($levelSql), 'member_invite_receive_log.reach_amount',  'members.name as member_name')
             ->leftJoin('members', 'member_invite_receive_log.member_id', '=', 'members.id')
             ->offset(($page - 1) * $limit)
             ->limit($limit)

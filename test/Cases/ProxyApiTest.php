@@ -45,6 +45,7 @@ class ProxyApiTest extends HttpTestCase
             'Authorization' => 'Bearer ' . $token,
         ]);
         print_r($data);
+        var_dump($data);
         $this->assertSame(200, (int)$data['code']);
     }
 
