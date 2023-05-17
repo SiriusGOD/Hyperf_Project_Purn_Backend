@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Carbon\Carbon;
+use Hyperf\Database\Model\SoftDeletes;
 
 /**
  * @property int $id 
@@ -24,6 +25,7 @@ use Carbon\Carbon;
  */
 class ActorCorrespond extends Model
 {
+    use SoftDeletes;
     /**
      * The table associated with the model.
      *

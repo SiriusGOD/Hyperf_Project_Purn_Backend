@@ -11,10 +11,10 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\ActorCorrespond;
 use App\Model\ImageGroup;
 use App\Model\Report;
 use App\Model\Video;
-use App\Util\General;
 use Hyperf\Redis\Redis;
 
 class ReportService
@@ -60,20 +60,20 @@ class ReportService
         $this->redis->set($videoKey, json_encode($videoIds));
     }
 
-    public static function getHideIds(string $type) : array
+    public static function getHideIds(string $type): array
     {
         $memberId = auth()->user()->getId();
         $types = array_flip(Report::MODEL_TYPE);
         $redis = make(Redis::class);
         $key = ReportService::CACHE_KEY . $types[$type] . ':' . $memberId;
-        if($redis->exists($key)){
+        if ($redis->exists($key)) {
             return json_decode($redis->get($key), true);
         }
 
         return [];
     }
 
-    public function generateReport(array $models) : array
+    public function generateReport(array $models): array
     {
         $result = [];
         foreach ($models as $model) {
@@ -85,5 +85,11 @@ class ReportService
         }
 
         return $result;
+    }
+
+    public function reportSuccess(\Hyperf\Database\Model\Model $model): void
+    {
+        ActorCorrespond::where('correspond_type', get_class($model))->where('correspond_id', $model->id)->delete();
+        $model->delete();
     }
 }

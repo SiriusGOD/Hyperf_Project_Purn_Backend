@@ -75,7 +75,7 @@ class ReportController extends AbstractController
     }
 
     #[RequestMapping(methods: ['GET'], path: 'status')]
-    public function status(RequestInterface $request, ResponseInterface $response)
+    public function status(RequestInterface $request, ResponseInterface $response, ReportService $service)
     {
         $id = $request->input('id');
         $status = $request->input('status');
@@ -83,10 +83,12 @@ class ReportController extends AbstractController
         $report = Report::find($id);
 
         if ($status == Report::STATUS['pass']) {
-            match ($report->model_type) {
-                ImageGroup::class => ImageGroup::where('id', $report->model_id)->delete(),
-                Video::class => Video::where('id', $report->model_id)->delete()
+            $model = match ($report->model_type) {
+                ImageGroup::class => ImageGroup::where('id', $report->model_id)->first(),
+                Video::class => Video::where('id', $report->model_id)->first()
             };
+
+            $service->reportSuccess($model);
         }
 
         Report::where('model_type', $report->model_type)

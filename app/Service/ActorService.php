@@ -308,6 +308,23 @@ class ActorService extends GenerateService
 
         if (! empty($params['filter'])) {
             $query = $query->where('correspond_type', $params['filter']);
+            $hideIds = ReportService::getHideIds($params['filter']);
+            $query = $query->whereNotIn('correspond_id', $hideIds);
+        } else {
+            $videoHideIds = ReportService::getHideIds(Video::class);
+            $imageGroupHideIds = ReportService::getHideIds(ImageGroup::class);
+            $actorVideoHideIds = ActorCorrespond::where('correspond_type', Video::class)
+                ->whereIn('correspond_id', $videoHideIds)
+                ->get()
+                ->pluck('id')
+                ->toArray();
+            $actorImageGroupHideIds = ActorCorrespond::where('correspond_type', ImageGroup::class)
+                ->whereIn('correspond_id', $imageGroupHideIds)
+                ->get()
+                ->pluck('id')
+                ->toArray();
+
+            $query = $query->whereNotIn('id', array_merge($actorImageGroupHideIds, $actorVideoHideIds));
         }
 
         $models = $query->get();
