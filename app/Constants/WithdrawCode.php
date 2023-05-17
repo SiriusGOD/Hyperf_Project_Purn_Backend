@@ -35,6 +35,10 @@ class WithdrawCode
   
     //你餘額不足~
     public const NO_MONEY = 11008;
+    
+    //請輸入數字
+    public const NOT_NUMBER_EMPTY_ERROR = 11009;
+
     // 提现状态 0:审核中;1:已完成;2:未通过
     public const STATUS = [self::DEFAULT => '审核中', self::SUCCESS => '已完成', self::FAILD => '未通过'];
 

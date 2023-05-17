@@ -84,6 +84,9 @@ class MemberCashController extends AbstractController
         $data['member_id'] = $member_id;
         $requires  = ['name','account','bank_type','withdraw_amount',"password"] ; 
         $check = Check::require($request->all() , $requires);
+        if( !is_numeric($request->input('withdraw_amount')) ){
+          return $this->error( trans('default.withdraw.is_not_number_error'), WithdrawCode::NOT_NUMBER_EMPTY_ERROR);  
+        }
         if($check){
           $title = trans("default.withdraw.$check");
           return $this->error( trans('default.withdraw.empty_error', ["key" => $title]), WithdrawCode::EMPTY_ERROR);  

@@ -162,6 +162,7 @@ return [
     ],
 
     'withdraw'=>[
+      'is_not_number_error'=>'金額請輸入數字',
       'name'=>"錢包姓名",
       'account'=>"銀行卡帳號",
       'bank_type'=>"提現方式",

@@ -161,6 +161,7 @@ return [
         'hot_order_desc' => '0 不排序，越小越前面',
     ],
     'withdraw'=>[
+      'is_not_number_error'=>'金額請輸入數字',
       'name'=>"錢包姓名",
       'account'=>"銀行卡帳號",
       'bank_type'=>"提現方式",
