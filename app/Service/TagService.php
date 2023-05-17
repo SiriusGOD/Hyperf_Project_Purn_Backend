@@ -16,10 +16,13 @@ use App\Model\MemberTag;
 use App\Model\Tag;
 use App\Model\TagCorrespond;
 use App\Model\TagHasGroup;
+use App\Model\TagPopular;
 use App\Model\Video;
 use Hyperf\Database\Model\Collection;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
+
+use function Hyperf\Support\env;
 
 class TagService
 {
@@ -213,5 +216,134 @@ class TagService
         }
 
         return array_merge($result, $popularTag);
+    }
+
+    // 獲取標籤詳細資料
+    public function getTagDetail(int $tag_id)
+    {
+        // 撈取標籤基礎資料
+        $tag = Tag::select('id', 'name', 'img')->where('id', $tag_id)->first()->toArray();
+        if(!empty($tag['img'])){
+            $tag['img'] = env('VIDEO_THUMB_URL') . $tag['img'];
+        }
+        // 撈取影片作品數
+        $video_num = TagCorrespond::where('tag_id', $tag_id)->where('tag_corresponds.correspond_type', Video::class)->get()->count();
+        // 撈取套圖作品數
+        $image_num = TagCorrespond::where('tag_id', $tag_id)->where('tag_corresponds.correspond_type', ImageGroup::class)->get()->count();
+        // 撈取熱門標籤
+        $popular_tags = TagPopular::selectRaw('popular_tag_id as tag_id, popular_tag_name as tag_name')->where('tag_id', $tag_id)->get()->toArray();
+        foreach ($popular_tags as $key => $popular_tag) {
+            if(trim($popular_tag['tag_name']) == trim($tag['name'])){
+                $popular_tags[$key]['tag_name'] = trans('api.tag_control.all');
+            }
+        }
+        $result['tag'] = $tag;
+        $result['video_num'] = $video_num;
+        $result['image_num'] = $image_num;
+        $result['popular_tags'] = $popular_tags;
+        return $result;
+    }
+
+    // 計算各標籤下的作品集內的top6標籤
+    public function calculateTop6Tag()
+    {
+        // 清空 tag_populars
+        TagPopular::truncate();
+
+        // 獲取所有標籤id
+        $tags = Tag::select('id', 'name')->get();
+
+        // 計算各標籤下的作品集內的top6標籤
+        foreach ($tags as $key => $tag) {
+            // video
+            $video_ids = TagCorrespond::where('correspond_type', Video::class)
+                    ->where('tag_id', $tag->id)->pluck('correspond_id')->toArray();
+            // 撈出該影片下所有標籤id與次數
+            $video_all_ids = TagCorrespond::selectRaw('tag_corresponds.tag_id, tags.name, count(*) as count')
+                    ->join('tags', 'tags.id', 'tag_corresponds.tag_id')
+                    ->where('tag_corresponds.correspond_type', Video::class)
+                    ->whereIn('tag_corresponds.correspond_id', $video_ids)
+                    ->groupBy('tag_corresponds.tag_id')
+                    ->get()
+                    ->toArray();
+            //----------------------------------------------------------------------
+            // image
+            $image_ids = TagCorrespond::where('correspond_type', ImageGroup::class)
+                    ->where('tag_id', $tag->id)->pluck('correspond_id')->toArray();
+            // 撈出該圖片下所有標籤id與次數
+            $image_all_ids = TagCorrespond::selectRaw('tag_corresponds.tag_id, tags.name, count(*) as count')
+                    ->join('tags', 'tags.id', 'tag_corresponds.tag_id')
+                    ->where('tag_corresponds.correspond_type', ImageGroup::class)
+                    ->whereIn('tag_corresponds.correspond_id', $image_ids)
+                    ->groupBy('tag_corresponds.tag_id')
+                    ->get()
+                    ->toArray();
+            
+            $merge_arr = $this -> mergeArray($video_all_ids, $image_all_ids);
+
+            // 按照 count 值進行排序
+            usort($merge_arr, function($a, $b) {
+                return $b['count'] - $a['count'];
+            });
+
+            // 取得前 6 個元素
+            if(count($merge_arr) < 6){
+                $top6_tags = $merge_arr;
+            }else{
+                $top6_tags = array_slice($merge_arr, 0, 6);
+            }
+
+            // insert DB
+            foreach ($top6_tags as $key2 => $top6_tag) {
+                $model = new TagPopular();
+                $model -> tag_id = $tag -> id;
+                $model -> popular_tag_id = $top6_tag['tag_id'];
+                $model -> popular_tag_name = $top6_tag['name'];
+                $model -> popular_tag_count = $top6_tag['count'];
+                $model -> save();
+            }
+        }          
+    }
+
+    protected function mergeArray($array1, $array2){
+        // 建立用於儲存結果的陣列
+        $result = [];
+
+        // 將$array1的元素加入$result
+        foreach ($array1 as $item) {
+            $tagId = $item['tag_id'];
+            $count = $item['count'];
+
+            if (isset($result[$tagId])) {
+                $result[$tagId]['count'] += $count;
+            } else {
+                $result[$tagId] = [
+                    'tag_id' => $tagId, 
+                    'name' => trim($item['name']),
+                    'count' => $count
+                ];
+            }
+        }
+
+        // 將$array2的元素加入$result
+        foreach ($array2 as $item) {
+            $tagId = $item['tag_id'];
+            $count = $item['count'];
+
+            if (isset($result[$tagId])) {
+                $result[$tagId]['count'] += $count;
+            } else {
+                $result[$tagId] = [
+                    'tag_id' => $tagId, 
+                    'name' => trim($item['name']),
+                    'count' => $count
+                ];
+            }
+        }
+
+        // 將$result的值轉為索引陣列
+        $result = array_values($result);
+
+        return $result;
     }
 }

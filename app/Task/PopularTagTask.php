@@ -15,7 +15,7 @@ use App\Service\TagService;
 use Hyperf\Crontab\Annotation\Crontab;
 use Hyperf\Logger\LoggerFactory;
 
-#[Crontab(name: 'PopularTagTask', rule: '0 0 * * *', callback: 'execute', memo: '熱門標籤定時任務')]
+#[Crontab(name: 'PopularTagTask', rule: '0 6 * * *', callback: 'execute', memo: '熱門標籤計算定時任務')]
 class PopularTagTask
 {
     protected $service;
@@ -31,7 +31,7 @@ class PopularTagTask
     public function execute()
     {
         $this->logger->info('開始執行熱門標籤定時任務');
-        $this->service->calculatePopularTag();
+        $this->service->calculateTop6Tag();
         $this->logger->info('結束執行熱門標籤定時任務');
     }
 }

@@ -53,4 +53,18 @@ class TagController extends AbstractController
         $data = $service->searchGroupTags($group_id);
         return $this->success(['models' => $data]);
     }
+
+    #[RequestMapping(methods: ['POST'], path: 'getTagDetail')]
+    public function getTagDetail(RequestInterface $request, TagService $service)
+    {
+        $tag_id = $request->input('tag_id');
+        $data = $service->getTagDetail($tag_id);
+        return $this->success(['models' => $data]);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'test')]
+    public function test(RequestInterface $request, TagService $service)
+    {
+        $data = $service->calculateTop6Tag();
+    }
 }

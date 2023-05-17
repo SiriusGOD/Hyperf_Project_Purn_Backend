@@ -54,5 +54,8 @@ return [
     ],
     'product_control' => [
         'pay_coin' => '现金余额支付'
-    ]
+    ],
+    'tag_control' => [
+        'all' => '全部'
+    ],
 ];
