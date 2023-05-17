@@ -44,15 +44,13 @@ class ProxyApiTest extends HttpTestCase
         $data = $this->client->post('/api/proxy/myIncome', [], [
             'Authorization' => 'Bearer ' . $token,
         ]);
-        print_r($data);
-        var_dump($data);
         $this->assertSame(200, (int)$data['code']);
     }
 
     //下線
-    public function ttWallet()
+    public function testtWallet()
     {
-        $member = Member::where('id' ,81)->first();
+        $member = Member::where('id' ,1)->first();
         $token = auth()->login($member);
         make(MemberService::class)->saveToken($member->id, $token);
         $data = $this->client->post('/api/proxy/wallet', [], [

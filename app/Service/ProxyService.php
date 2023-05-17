@@ -138,7 +138,7 @@ class ProxyService extends BaseService
                 ->whereIn('level', [1, 2, 3, 4])
                 ->groupBy('level');        
         $results = $query->get();
-
+        $r=[];
         foreach ($results as $result) {
             $level = $result->level;
             $r[$level] =$result->count;
