@@ -89,7 +89,7 @@ class TagGroupService
         $result = [];
         foreach ($tags as $key => $value) {
             if(!empty($value['img'])){
-                $tags[$key]['img'] = env('VIDEO_THUMB_URL') . $value['img'];
+                $tags[$key]['img'] = env('IMAGE_GROUP_ENCRYPT_URL') . $value['img'];
             }
             // 作品數大於０才顯示 
             if($value['product_num'] > 0){

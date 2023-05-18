@@ -47,7 +47,7 @@ class TagService extends GenerateService
         $list = Tag::all();
         foreach ($list as $key => $value) {
             if (! empty($value->img)) {
-                $list[$key]->img = env('VIDEO_THUMB_URL') . $value->img;
+                $list[$key]->img = env('IMAGE_GROUP_ENCRYPT_URL') . $value->img;
             }
         }
         return $list;
@@ -244,7 +244,7 @@ class TagService extends GenerateService
         // 撈取標籤基礎資料
         $tag = Tag::select('id', 'name', 'img')->where('id', $tag_id)->first()->toArray();
         if(!empty($tag['img'])){
-            $tag['img'] = env('VIDEO_THUMB_URL') . $tag['img'];
+            $tag['img'] = env('IMAGE_GROUP_ENCRYPT_URL') . $tag['img'];
         }
         // 撈取影片作品數
         $video_num = TagCorrespond::where('tag_id', $tag_id)->where('tag_corresponds.correspond_type', Video::class)->get()->count();
