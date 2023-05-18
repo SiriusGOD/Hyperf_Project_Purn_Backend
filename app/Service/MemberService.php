@@ -860,4 +860,13 @@ class MemberService extends BaseService
         $key = $this->defaultKey($user_id);
         $this->redis->del($key);
     }
+
+    // 判斷該帳號是否重複
+    public function checkAccount($account)
+    {
+        if(Member::where('account', $account)->exists()){
+            return false;
+        }
+        return true;
+    }
 }

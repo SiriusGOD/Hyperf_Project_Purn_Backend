@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Controller\Api;
 
+use App\Constants\ApiCode;
 use App\Constants\ErrorCode;
 use App\Constants\MemberCode;
 use App\Controller\AbstractController;
@@ -160,6 +161,14 @@ class MemberController extends AbstractController
         $path = '';
         if ($request->hasFile('avatar')) {
             $path = $service->moveUserAvatar($request->file('avatar'));
+        }
+
+        // 判斷該帳號是否重複
+        if(!empty($request->input('account'))){
+            $res = $service->checkAccount($request->input('account'));
+            if(!$res){
+                return $this->error(trans('api.member_control.account_is_exist'), ApiCode::BAD_REQUEST);
+            }
         }
 
         $service->updateUser($userId, [

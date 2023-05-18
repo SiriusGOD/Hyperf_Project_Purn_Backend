@@ -15,7 +15,8 @@ return [
         'diamond_level' => '钻石卡',
         'cash_coin' => '现金点数',
         'diamond_coin' => '钻石点数',
-        'coin_pay' => '现金余额支付'
+        'coin_pay' => '现金余额支付',
+        'account_is_exist' => '帐号重复'
     ],
     'order_control' =>[
         'no_product_data' => '查无商品资料',
