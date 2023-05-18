@@ -98,7 +98,7 @@ class ActorService extends GenerateService
 
             // avatar加上網域
             if (! empty($value['avatar'])) {
-                $query[$key]['avatar'] = env('VIDEO_THUMB_URL') . $value['avatar'];
+                $query[$key]['avatar'] = \Hyperf\Support\env('IMAGE_GROUP_ENCRYPT_URL', 'https://new.eewwwn.cn') . $value['avatar'];
             }
         }
         return $query;

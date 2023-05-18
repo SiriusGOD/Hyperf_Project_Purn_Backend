@@ -39,7 +39,7 @@ class CustomerServiceController extends AbstractController
         $limit = (int) $request->input('limit', CustomerService::PAGE_PER);
         $memberId = auth()->user()->getId();
         $data = [];
-        $data['models'] = $service->list($memberId, $page, $limit, \Hyperf\Support\env('VIDEO_THUMB_URL', 'https://new.cnzuqiu.mobi'));
+        $data['models'] = $service->list($memberId, $page, $limit, \Hyperf\Support\env('IMAGE_GROUP_ENCRYPT_URL', 'https://new.eewwwn.cn'));
         $path = '/api/customer_service/list';
         $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
@@ -60,7 +60,7 @@ class CustomerServiceController extends AbstractController
             ->toArray();
 
         $result = [];
-        $url = \Hyperf\Support\env('VIDEO_THUMB_URL', 'https://new.cnzuqiu.mobi');
+        $url = \Hyperf\Support\env('IMAGE_GROUP_ENCRYPT_URL', 'https://new.eewwwn.cn');
         foreach ($models as $model) {
             $model['image_url'] = $url . $model['image_url'];
             $result[] = $model;

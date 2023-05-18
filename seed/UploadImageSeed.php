@@ -20,6 +20,7 @@ class UploadImageSeed implements BaseInterface
 
         foreach ($models as $model) {
             $fullPath = BASE_PATH . '/public' . $model->image_url;
+            var_dump($fullPath);
             if(!is_file($fullPath)) {
                 continue;
             }

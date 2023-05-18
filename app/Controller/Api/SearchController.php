@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Controller\Api;
 
+use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Request\ImageApiListRequest;
 use App\Request\ImageApiSearchRequest;
@@ -56,7 +57,8 @@ class SearchController extends AbstractController
         $limit = (int) $request->input('limit', 10);
         $sortBy = (int) $request->input('sort_by');
         $isAsc = (int) $request->input('is_asc');
-        $models = $service->keyword($keyword, $page, $limit, $sortBy, $isAsc);
+        $filter = Constants::FEED_TYPES[$request->input('filter')] ?? null;
+        $models = $service->keyword($keyword, $page, $limit, $sortBy, $isAsc, $filter);
         $data = [];
         $data['models'] = $models;
         $path = '/api/search/keyword';

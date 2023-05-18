@@ -70,16 +70,22 @@ class SearchService extends GenerateService
         return $this->generateAdvertisements($result, $advertisements);
     }
 
-    public function keyword(string $keyword, int $page, int $limit, ?int $sortBy, ?int $isAsc): array
+    public function keyword(string $keyword, int $page, int $limit, ?int $sortBy, ?int $isAsc, ?string $filter): array
     {
-        $imageGroupLimit = $this->getPerLimit(ImageGroup::class, $limit);
-        $imageGroups = $this->imageGroupService->getImageGroupsByKeyword($keyword, $page, $imageGroupLimit, $sortBy, $isAsc)->toArray();
-        $videos = $this->videoService->searchVideo($keyword, 0, 0, $page, $limit - $imageGroupLimit, $sortBy, $isAsc)->toArray();
-
-        $result = [];
-
-        $result = $this->generateImageGroups($result, $imageGroups);
-        return $this->generateVideos($result, $videos);
+        switch ($filter) {
+            case Video::class:
+                $videos = $this->videoService->searchVideo($keyword, 0, 0, $page, $limit, $sortBy, $isAsc)->toArray();
+                return $this->generateVideos([], $videos);
+            case ImageGroup::class:
+                $imageGroups = $this->imageGroupService->getImageGroupsByKeyword($keyword, $page, $limit, $sortBy, $isAsc)->toArray();
+                return $this->generateImageGroups([], $imageGroups);
+            default:
+                $imageGroupLimit = $this->getPerLimit(ImageGroup::class, $limit);
+                $imageGroups = $this->imageGroupService->getImageGroupsByKeyword($keyword, $page, $imageGroupLimit, $sortBy, $isAsc)->toArray();
+                $videos = $this->videoService->searchVideo($keyword, 0, 0, $page, $limit - $imageGroupLimit, $sortBy, $isAsc)->toArray();
+                $result = $this->generateImageGroups([], $imageGroups);
+                return $this->generateVideos($result, $videos);
+        }
     }
 
     // TODO 可以做快取去優化，但是需要增加非同步 task 去處理

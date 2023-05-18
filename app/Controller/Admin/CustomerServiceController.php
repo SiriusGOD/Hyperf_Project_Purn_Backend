@@ -51,6 +51,7 @@ class CustomerServiceController extends AbstractController
         $step = CustomerService::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
         $models = CustomerService::with('member')
+            ->orderByDesc('id')
             ->offset(($page - 1) * $step)->limit($step)->get();
         $total = CustomerService::count();
         $data['last_page'] = ceil($total / $step);

@@ -27,7 +27,7 @@ class AdvertisementController extends AbstractController
         $data = $service->getAdvertisements();
         $result = [];
         // 取得網址前綴
-        $host = \Hyperf\Support\env('VIDEO_THUMB_URL', 'https://new.cnzuqiu.mobi');
+        $host = \Hyperf\Support\env('IMAGE_GROUP_ENCRYPT_URL', 'https://new.cnzuqiu.mobi');
         foreach ($data as $item) {
             $item['image_url'] = $host . $item['image_url'];
             $result[] = $item;
