@@ -377,8 +377,8 @@ class TagService extends GenerateService
         $query = TagCorrespond::leftJoin('videos', function ($join) {
                 $join->on('tag_corresponds.correspond_id', '=', 'videos.id')
                     ->where('tag_corresponds.correspond_type', Video::class)
-                    ->where('thumb_width', '>', 0)
-                    ->where('thumb_height', '>', 0);
+                    ->where('cover_witdh', '>', 0)
+                    ->where('cover_height', '>', 0);
             })
             ->leftJoin('image_groups', function ($join) {
                 $join->on('tag_corresponds.correspond_id', '=', 'image_groups.id')
@@ -388,7 +388,7 @@ class TagService extends GenerateService
             })
             ->where('tag_corresponds.tag_id', $params['id'])
             ->where(function ($query) {
-                $query->whereNotNull('videos.thumb_height')
+                $query->whereNotNull('videos.cover_height')
                     ->orWhereNotNull('image_groups.height');
             })
             ->offset($params['page'] * $params['limit'])
@@ -466,7 +466,7 @@ class TagService extends GenerateService
                 'description' => $value['description'],
                 'type' => $value['model_type'],
                 'thumbnail' => $value['cover_thumb'] ?? $value['thumbnail'],
-                'height' => $value['thumb_height'] ?? ($value['height'] ?? 0),
+                'height' => $value['cover_height'] ?? ($value['height'] ?? 0),
                 'width' => $value['cover_witdh'] ?? ($value['weight'] ?? 0),
                 'price' => $value['point'],
                 'image_count' => $value['image_count'] ?? 0
