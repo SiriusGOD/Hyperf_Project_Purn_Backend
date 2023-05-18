@@ -626,6 +626,7 @@ class ProductController extends AbstractController
         $data['model'] = $model;
         $data['origin'] = $origin;
         $data['product_type'] = $type;
+        $data['class_type'] = $model->type;
         $data['product_id_arr'] = json_encode($product_id_arr);
         $data['navbar'] = trans('default.product_control.product_multiple_edit');
         $data['product_active'] = 'active';

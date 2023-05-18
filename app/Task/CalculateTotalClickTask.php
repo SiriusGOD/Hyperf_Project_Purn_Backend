@@ -15,6 +15,7 @@ use App\Model\ActorCorrespond;
 use App\Model\Click;
 use App\Model\ImageGroup;
 use App\Model\MemberCategorizationDetail;
+use App\Model\TagCorrespond;
 use App\Model\Video;
 use App\Service\TagService;
 use Carbon\Carbon;
@@ -62,6 +63,12 @@ class CalculateTotalClickTask
                 ->update([
                     'total_click' => $model->total
                 ]);
+
+            TagCorrespond::where('type', Video::class)
+                ->where('type_id', $model->id)
+                ->update([
+                    'total_click' => $model->total
+                ]);
         }
 
         $models = Click::whereBetween('statistical_date', [$last->toDateString(), $now->toDateString()])
@@ -82,6 +89,12 @@ class CalculateTotalClickTask
                 ]);
 
             ActorCorrespond::where('type', ImageGroup::class)
+                ->where('type_id', $model->id)
+                ->update([
+                    'total_click' => $model->total
+                ]);
+
+            TagCorrespond::where('type', Video::class)
                 ->where('type_id', $model->id)
                 ->update([
                     'total_click' => $model->total
