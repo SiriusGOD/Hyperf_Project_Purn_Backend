@@ -108,6 +108,12 @@ class VideoService
 
         $hideIds = ReportService::getHideIds(Video::class);
 
+        $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(Video::class);
+
+        if (!empty($enableIds)) {
+            $query = $query->whereIn('id', $enableIds);
+        }
+
         if (! empty($hideIds)) {
             $withoutIds = array_merge($withoutIds, $hideIds);
         }
@@ -166,11 +172,11 @@ class VideoService
             $model->deleted_at = !empty($data['deleted_at']) ? $data['deleted_at'] : null;
             if ($model->save()) {
                 $data['id'] = null;
-                $data['type'] = Product::TYPE_LIST[1];
+                $data['type'] = Product::TYPE_CORRESPOND_LIST['video'];
                 $data['correspond_id'] = $model->id;
                 $data['name'] = $model->title;
                 $data['user_id'] = 1;
-                $data['expire'] = 0;
+                $data['expire'] = Product::EXPIRE['no'];
                 $data['start_time'] = date('Y-m-d H:i:s');
                 $data['end_time'] = date('Y-m-d H:i:s', strtotime('+10 years'));
                 $data['currency'] = 'COIN';
@@ -248,22 +254,15 @@ class VideoService
             $ids = array_merge($ids, $result);
         }
         $model = Video::where('title', 'like', "%{$title}%")->where('cover_height', '>', 0)
-            ->where('release_time', '<=', Carbon::now()->toDateTimeString());
+            ->where('release_time', '<=', Carbon::now()->toDateTimeString())
+            ->offset($page * $limit)
+            ->limit($limit);
         if ($compare > 0 && $length > 0) {
             if ($compare == 1) {
                 $model = $model->where('duration', '>=', $length);
             } else {
                 $model = $model->where('duration', '<=', $length);
             }
-        }
-
-        if (! empty($ids)) {
-            $model = $model->whereIn('id', $ids);
-        }
-
-        $hideIds = ReportService::getHideIds(Video::class);
-        if(! empty($hideIds)) {
-            $model = $model->whereNotIn('id', $hideIds);
         }
 
         if (! empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
@@ -280,7 +279,40 @@ class VideoService
             }
         }
 
-        return $model->offset($limit * $page)->limit($limit)->get();
+        $models = $model->offset($limit * $page)->limit($limit)->get();
+        $ids = array_merge($ids, $models->pluck('id')->toArray());
+
+        $model = Video::where('cover_height', '>', 0)
+            ->where('release_time', '<=', Carbon::now()->toDateTimeString());
+
+        $hideIds = ReportService::getHideIds(Video::class);
+        if(! empty($hideIds)) {
+            $model = $model->whereNotIn('id', $hideIds);
+        }
+
+        $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(Video::class);
+        if (! empty($enableIds)) {
+            $enableIds = \Hyperf\Collection\collect($ids)->diff(\Hyperf\Collection\collect($enableIds));
+            $model = $model->whereIn('id', $enableIds->toArray());
+        } else {
+            $model = $model->whereIn('id', $ids);
+        }
+
+        if (! empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
+            if ($isAsc == 1) {
+                $model = $model->orderBy('total_click');
+            } else {
+                $model = $model->orderByDesc('total_click');
+            }
+        } elseif(! empty($sortBy) and $sortBy == Constants::SORT_BY['created_time']) {
+            if ($isAsc == 1) {
+                $model = $model->orderBy('id');
+            } else {
+                $model = $model->orderByDesc('id');
+            }
+        }
+
+        return $model->with('tags')->get();
     }
 
     // 共用自取
@@ -305,6 +337,7 @@ class VideoService
         $useIds = [];
         $hideIds = ReportService::getHideIds(Video::class);
         $hideIds = array_merge($hideIds, $withoutIds);
+        $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(Video::class);
         foreach ($suggest as $value) {
             $limit = $value['proportion'] * $inputLimit;
             if ($limit < 1) {
@@ -331,6 +364,10 @@ class VideoService
 
             if(! empty($hideIds)) {
                 $query = $query->whereNotIn('id', $hideIds);
+            }
+
+            if (! empty($enableIds)) {
+                $query = $query->whereIn('id', $enableIds);
             }
 
             $models = $query->get()->toArray();
@@ -423,6 +460,11 @@ class VideoService
 
         if (! empty($hideIds)) {
             $query = $query->whereNotIn('id', $hideIds);
+        }
+
+        $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(Video::class);
+        if (!empty($enableIds)) {
+            $query = $query->whereIn('id', $enableIds);
         }
 
         return $query->get()->toArray();

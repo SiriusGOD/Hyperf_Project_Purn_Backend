@@ -200,6 +200,12 @@ class NavigationService extends GenerateService
             $query = $query->whereNotIn('id', $hideIds);
         }
 
+        $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(ImageGroup::class);
+
+        if (! empty($enableIds)) {
+            $query = $query->whereIn('id', $hideIds);
+        }
+
         $imageGroups = $query
             ->get()
             ->toArray();
@@ -235,6 +241,11 @@ class NavigationService extends GenerateService
 
         if (! empty($hideIds)) {
             $query = $query->whereNotIn('id', $hideIds);
+        }
+
+        $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(Video::class);
+        if (! empty($enableIds)) {
+            $query = $query->whereIn('id', $enableIds);
         }
 
         $videos = $query->get()
@@ -340,13 +351,24 @@ class NavigationService extends GenerateService
 
     protected function navigationSuggestVideos(array $suggest, int $page, int $limit): array
     {
+        $hotOrderLimit = $this->getHotOrderPerLimit(Video::class, $limit);
+        $hotOrderModels = $this->videoService->getVideosByHotOrder($page, $hotOrderLimit);
+        $otherLimit = self::OTHER_LIMIT;
+        $suggestLimit = $limit - $hotOrderLimit - $otherLimit;
+        if ($suggestLimit <= 0) {
+            return $hotOrderModels;
+        }
+
         $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $limit);
 
-        $remain = $limit - count($suggestModels);
+        $remain = $suggestLimit - count($suggestModels);
+        if ($remain >= 1) {
+            $otherLimit += $remain;
+        }
 
-        $models = $this->videoService->getVideos(null, $page, 9, $remain)->toArray();
+        $models = $this->videoService->getVideos(null, $page, 9, $otherLimit)->toArray();
 
-        return array_merge($suggestModels, $models);
+        return array_merge($hotOrderModels, $suggestModels, $models);
     }
 
     protected function navigationSuggestVideosWithMemberCategorization(array $suggest, int $page, int $limit, array $hideIds): array

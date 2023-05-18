@@ -99,7 +99,7 @@ class GenerateService
 
     protected function getBaseUrl()
     {
-        return env('TEST_IMG_URL');
+        return env('IMAGE_GROUP_ENCRYPT_URL');
     }
 
     protected function generateAdvertisements(array $result, array $advertisements): array

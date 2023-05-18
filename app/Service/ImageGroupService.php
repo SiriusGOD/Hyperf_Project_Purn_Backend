@@ -21,11 +21,11 @@ use App\Model\MemberLevel;
 use App\Model\Order;
 use App\Model\Tag;
 use App\Model\TagCorrespond;
+use App\Model\Video;
 use Carbon\Carbon;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Database\Model\Collection;
 use Hyperf\DbConnection\Db;
-use function Swoole\Coroutine\Http\get;
 
 class ImageGroupService
 {
@@ -58,6 +58,7 @@ class ImageGroupService
         }
 
         $hideIds = ReportService::getHideIds(ImageGroup::class);
+        $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(ImageGroup::class);
 
         $query = ImageGroup::with([
             'tags', 'imagesLimit',
@@ -75,6 +76,10 @@ class ImageGroupService
 
         if (! empty($withoutIds)) {
             $query = $query->whereNotIn('id', $withoutIds);
+        }
+
+        if (! empty($enableIds)) {
+            $query = $query->whereIn('id', $enableIds);
         }
 
         return $query->where('height', '>', 0)->orderByDesc('id')->get();
@@ -102,20 +107,44 @@ class ImageGroupService
             $imageIds = array_merge($imageIds, $result);
         }
 
-        $query = ImageGroup::with([
-            'tags', 'imagesLimit',
-        ])
-            ->orWhere('title', 'like', '%' . $keyword . '%')
+        $query = ImageGroup::where('title', 'like', '%' . $keyword . '%')
             ->where('height', '>', 0)
             ->offset($limit * $page)
             ->limit($limit);
 
-        if (! empty($imageIds)) {
-            $query = $query->orWhereIn('id', $imageIds);
+        if (! empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
+            if ($isAsc == 1) {
+                $query = $query->orderBy('total_click');
+            } else {
+                $query = $query->orderByDesc('total_click');
+            }
+        } elseif (! empty($sortBy) and $sortBy == Constants::SORT_BY['created_time']) {
+            if ($isAsc == 1) {
+                $query = $query->orderBy('id');
+            } else {
+                $query = $query->orderByDesc('id');
+            }
         }
 
-        $hideIds = ReportService::getHideIds(ImageGroup::class);
-        if(! empty($hideIds)) {
+        $models = $query->get();
+        $imageIds = array_merge($models->pluck('id')->toArray(), $imageIds);
+
+        $query = ImageGroup::with([
+            'tags', 'imagesLimit',
+        ])
+            ->where('height', '>', 0)
+            ->offset($limit * $page)
+            ->limit($limit);
+
+        $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(ImageGroup::class);
+        if (! empty($enableIds)) {
+            $enableIds = \Hyperf\Collection\collect($imageIds)->diff(\Hyperf\Collection\collect($enableIds));
+            $query = $query->whereIn('id', $enableIds->toArray());
+        } else {
+            $query = $query->whereIn('id', $imageIds);
+        }
+
+        if (! empty($hideIds)) {
             $query = $query->whereNotIn('id', $hideIds);
         }
 
@@ -140,6 +169,7 @@ class ImageGroupService
     {
         $result = [];
         $useImageIds = [];
+        $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(ImageGroup::class);
         $reportHideIds = ReportService::getHideIds(ImageGroup::class);
         $hideIds = array_merge($reportHideIds, $withoutIds);
         foreach ($suggest as $value) {
@@ -168,6 +198,10 @@ class ImageGroupService
 
             if (! empty($hideIds)) {
                 $query = $query->whereNotIn('id', $hideIds);
+            }
+
+            if (! empty($enableIds)) {
+                $query->whereIn('id', $enableIds);
             }
 
             $models = $query->get()->toArray();
@@ -247,6 +281,12 @@ class ImageGroupService
 
         if (! empty($hideIds)) {
             $query = $query->whereNotIn('id', $hideIds);
+        }
+
+        $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(ImageGroup::class);
+
+        if (! empty($enableIds)) {
+            $query = $query->whereIn('id', $enableIds);
         }
 
         return $query->get()->toArray();

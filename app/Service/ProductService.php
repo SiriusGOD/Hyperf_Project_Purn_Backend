@@ -17,6 +17,7 @@ use App\Model\MemberLevel;
 use App\Model\Pay;
 use App\Model\PayCorrespond;
 use App\Model\Product;
+use App\Model\Report;
 use App\Model\Tag;
 use App\Model\Video;
 use Carbon\Carbon;
@@ -304,5 +305,24 @@ class ProductService
             $video->is_free = $data['origin_type'];
             $video->save();
         }
+    }
+
+    public function getEnableIds(string $type)
+    {
+        $redis = make(Redis::class);
+        $key = self::CACHE_KEY;
+        $result = [];
+        if (!$redis->exists($key)) {
+            $this->updateCache();
+        }
+
+        $models = json_decode($redis->get($key), true);
+        foreach ($models as $model) {
+            if($model['type'] == $type) {
+                $result[] = $model['correspond_id'];
+            }
+        }
+
+        return $result;
     }
 }

@@ -13,9 +13,11 @@ namespace App\Task;
 
 use App\Model\Image;
 use App\Model\ImageGroup;
+use App\Model\Product;
 use App\Model\SystemParam;
 use App\Model\Tag;
 use App\Service\ImageGroupService;
+use App\Service\ProductService;
 use App\Service\TagService;
 use Hyperf\Crontab\Annotation\Crontab;
 use Hyperf\Logger\LoggerFactory;
@@ -39,14 +41,16 @@ class ImageGroupSyncTask
     protected string $syncUrl;
 
     private \Psr\Log\LoggerInterface $logger;
+    private ProductService $productService;
 
-    public function __construct(ImageGroupService $service, LoggerFactory $loggerFactory, Redis $redis, TagService $tagService)
+    public function __construct(ImageGroupService $service, LoggerFactory $loggerFactory, Redis $redis, TagService $tagService, ProductService $productService)
     {
         $this->logger = $loggerFactory->get('crontab', 'crontab');
         $this->service = $service;
         $this->redis = $redis;
         $this->syncUrl = env('IMAGE_GROUP_SYNC_URL');
         $this->tagService = $tagService;
+        $this->productService = $productService;
     }
 
     public function execute()
@@ -76,12 +80,17 @@ class ImageGroupSyncTask
                 $forever = false;
             }
 
-            if (ImageGroup::where('sync_id', $result['data']['id'])->exists()) {
+            if (ImageGroup::where('sync_id', $result['data']['id'])->exists() or count($result['data']['resources']) < 8) {
                 $count++;
                 sleep(1);
                 continue;
             }
+
             $id = $this->createImageGroup($result['data']);
+            $this->createProductGroup([
+                'id' => $id,
+                'title' => $result['data']['title'],
+            ]);
             $tagsIds = $this->getTags($result['data']['tags']);
             if (! empty($tagsIds)) {
                 $this->tagService->createTagRelationshipArr(ImageGroup::class, $id, $tagsIds);
@@ -124,6 +133,22 @@ class ImageGroupSyncTask
         $model->save();
 
         return $model->id;
+    }
+
+    protected function createProductGroup(array $params) : void
+    {
+        $data['id'] = null;
+        $data['type'] = Product::TYPE_CORRESPOND_LIST['image'];
+        $data['correspond_id'] = $params['id'];
+        $data['name'] = $params['title'];
+        $data['user_id'] = 1;
+        $data['expire'] = 0;
+        $data['start_time'] = date('Y-m-d H:i:s');
+        $data['end_time'] = date('Y-m-d H:i:s', strtotime('+10 years'));
+        $data['currency'] = 'COIN';
+        $data['diamond_price'] = 1;
+        $data['selling_price'] = 0;
+        $this->productService->store($data);
     }
 
     protected function getTags(string $tagsStr): array
