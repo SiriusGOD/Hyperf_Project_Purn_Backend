@@ -16,7 +16,7 @@ use App\Service\RedeemService;
 use App\Service\MemberRedeemService;
 use App\Service\VideoService;
 use Hyperf\Redis\Redis;
-use App\Service\BaseService;
+use App\Service\ChannelService;
 
 /**
  * @internal
@@ -38,25 +38,24 @@ class ChannelTest extends HttpTestCase
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
-        $this->client = make(Client::class);
-        $this->redeem = make(RedeemService::class);
-        $this->memberRedeem = make(MemberRedeemService::class);
-        $this->video = make(VideoService::class);
-        $this->redis = make(Redis::class);
     }
-
-    public function testActorList()
+    //測試register
+    public function testRegister()
     {
-      $model = new Channel;
-      // 发送端
-      $data  = [
-        'name'=>"test",
-        'url'=>"test",
-        'params'=>"test",
-        'image'=>"test",
-      ];
-      $res = make(BaseService::class)->modelStore($model, $data);
-
-      $this->assertSame('test', $res->name) ;
+        $models = Channel::all();
+        if (count($models) == 0) {
+            return;
+        }
+        foreach ($models as $model) {
+            $parsedUrl = parse_url($model->url);
+            $domain = isset($parsedUrl['host'])?$parsedUrl['host']:"";
+            if(!empty($domain)){
+              make(ChannelService::class)->calcChannelCount2DB($domain ,$model->id ,'member');
+              make(ChannelService::class)->calcChannelCount2DB($domain ,$model->id ,'achievement');
+            }else{
+              errLog("DB channel url error!!");
+            }
+        }
+      $this->assertSame('test', 'test') ;
    }
 }

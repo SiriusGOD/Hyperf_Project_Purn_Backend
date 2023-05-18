@@ -41,18 +41,22 @@ class MemberService extends BaseService
     public const EXPIRE_VERIFICATION_MINUTE = 10;
     public const LOGIN_LIMIT_CACHE_KEY = 'login_limit:';
     public const DAY = 86400;
+    public const HOUR = 3720;
     protected Redis $redis;
     protected $memberInviteLogService;
+    protected $channelService;
 
     protected \Psr\Log\LoggerInterface $logger;
 
     public function __construct(
         Redis $redis,
         MemberInviteLogService $memberInviteLogService,
+        ChannelService $channelService,
         LoggerFactory $loggerFactory
     ) {
         $this->redis = $redis;
         $this->memberInviteLogService = $memberInviteLogService;
+        $this->channelService = $channelService;
         $this->logger = $loggerFactory->get('reply');
     }
 
@@ -116,6 +120,7 @@ class MemberService extends BaseService
         if (! empty($data['phone'])) {
             $model->phone = $data['phone'];
         }
+
         // $model->email = $data['email'];
         // $model->phone = $data['phone'];
         $model->status = Member::STATUS['VISITORS'];
@@ -124,10 +129,15 @@ class MemberService extends BaseService
         $model->device = $data['device'];
         $model->register_ip = $data['register_ip'];
         $model->aff = Str::random(5);
-        $model->aff_url = $data['aff_url'];;
+        $model->aff_url = $data['aff_url'];
         try {
           // code that may throw an exception
           if($model->save()){
+            if(!empty($data['aff_url'])){
+              //渠道用計數註冊人數 - 先存作redis  
+              //再用TASK寫入DB
+              $this->channelService->setChannelRedis($data['aff_url'] , "member");
+            }
             self::afterRegister($model, $data);
             return $model;
           }else{

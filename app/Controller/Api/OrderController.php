@@ -106,6 +106,7 @@ class OrderController extends AbstractController
         $user = $data['user'];
         $data['oauth_type'] = $user['device'];
 
+        errLog(var_export($data,true));
 
         switch ($data['pay_method']) {
             case 'cash':
