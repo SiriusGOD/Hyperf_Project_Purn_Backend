@@ -54,7 +54,7 @@ class VideoService
     public function __construct(ProductService $productService, Video $video, Redis $redis, LoggerFactory $loggerFactory, MemberHasVideo $memberHasVideo)
     {
         $this->redis = $redis;
-        $this->logger = $loggerFactory->get('reply');
+        $this->logger = $loggerFactory->get('video');
         $this->model = $video;
         $this->memberHasVideo = $memberHasVideo;
         $this->productService = $productService;
@@ -156,6 +156,7 @@ class VideoService
             $imgSize = Calc::imgSize($cover); 
             $data['cover_witdh'] = isset($imgSize['width']) ?$imgSize['width'] :0;
             $data['cover_height'] = isset($imgSize['heigh']) ?$imgSize['heigh'] :0;
+            $this->logger->info("video_info ". var_export($data, true));
             foreach ($data as $key => $val) {
                 $model->{$key} = "{$val}";
             }

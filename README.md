@@ -60,3 +60,10 @@ https://video.iwanna.tv/
 docker run --name kib-01 --link elasticsearch -p 5601:5601 kibana:7.4.2
 docker run --link elasticsearch -p 5601:5601 docker.elastic.co/kibana/kibana:<欲安裝的版本號>
 教學:https://myapollo.com.tw/blog/docker-elasticsearch/
+
+
+https://repo.huaweicloud.com/kibana/7.14.2/
+
+https://repo.huaweicloud.com/logstash/7.14.2/
+
+https://repo.huaweicloud.com/elasticsearch/7.14.2/

@@ -32,12 +32,14 @@ class PayService
     protected Redis $redis;
 
     protected $proxyService;
+    protected $channelService;
 
     protected \Psr\Log\LoggerInterface $logger;
 
-    public function __construct(Redis $redis, LoggerFactory $loggerFactory, ProxyService $proxyService)
+    public function __construct(Redis $redis, LoggerFactory $loggerFactory, ChannelService $channelService, ProxyService $proxyService)
     {
         $this->redis = $redis;
+        $this->channelService = $channelService;
         $this->logger = $loggerFactory->get('Pay');
         $this->proxyService = $proxyService;
     }
@@ -144,6 +146,7 @@ class PayService
     // 支付 回調函式
     public function notifyPayAction($data)
     {
+        errLog(var_export($data,true));
         $this->logger->info('呼叫回調函式', $data);
         $signdata = $data;
         if (isset($data['success']) && $data['success'] == 200) { // 付款成功
@@ -317,6 +320,7 @@ class PayService
                             $member->diamond_coins = (float) $member->diamond_coins + $coin->points + $coin->bonus;
                         }
                         $member->save();
+                        $this->channelService->setChannelRedis($member->aff_url , "archievement" ,$order_amount);
                         var_dump('儲值現金點數成功');
                     }
                 }

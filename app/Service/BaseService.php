@@ -90,6 +90,34 @@ class BaseService
         return '';
     }
 
+    // 共用更新
+    public function modelUpdate($model, array $keys, array $datas)
+    {
+        // 提取键的值
+        $values = array_values($keys);
+
+        // 构建 WHERE 条件
+        $whereConditions = [];
+        foreach ($keys as $key => $val) {
+            $whereConditions[] = "$key = ?";
+        }
+        $whereClause = implode(' AND ', $whereConditions);
+
+        // 组装更新语句
+        $updateData = [];
+        foreach ($datas as $column => $value) {
+            $updateData[] = "$column = ?";
+        }
+        $updateClause = implode(', ', $updateData);
+
+        // 构建参数数组
+        $params = array_merge(array_values($datas), $values);
+
+        // 执行更新
+        $model->whereRaw($whereClause, $params)->update([$updateClause]);
+
+        return $model;
+    }
     // 共用儲存
     public function modelStore($model, array $datas)
     {
