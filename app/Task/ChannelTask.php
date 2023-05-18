@@ -16,7 +16,7 @@ use App\Service\ChannelService;
 use Hyperf\Crontab\Annotation\Crontab;
 use Hyperf\Logger\LoggerFactory;
 
-#[Crontab(name: 'ChannelTask', rule: '* * * * *', callback: 'execute', memo: '渠道註冊計算任務')]
+#[Crontab(name: 'ChannelTask', rule: '* 1 * * *', callback: 'execute', memo: '渠道註冊計算任務')]
 class ChannelTask
 {
     protected $channelService;

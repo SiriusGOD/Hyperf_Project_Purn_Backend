@@ -13,6 +13,7 @@ namespace App\Service;
 use Hyperf\DbConnection\Db;
 use App\Model\ChannelAchievement;
 use App\Model\ChannelRegister;
+use Carbon\Carbon;
 use Hyperf\Redis\Redis;
 class ChannelService extends BaseService
 {
@@ -35,7 +36,12 @@ class ChannelService extends BaseService
     public function calcChannelCount2DB(string $channel, int $channel_id ,$category)
     {
       $date = date("Ymd");
-      $h = date("H");
+      // 获取当前时间
+      $currentDateTime = Carbon::now();
+      // 减一小时
+      $oneHourEarlier = $currentDateTime->subHour();
+      // 获取小时（24小时制）
+      $h = $oneHourEarlier->format('H');
       if($category=="member"){
         $mainKey = self::MEMBER_KEY;
         $field = "register_total";
