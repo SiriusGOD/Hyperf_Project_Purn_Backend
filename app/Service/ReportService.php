@@ -14,6 +14,7 @@ namespace App\Service;
 use App\Model\ActorCorrespond;
 use App\Model\ImageGroup;
 use App\Model\Report;
+use App\Model\TagCorrespond;
 use App\Model\Video;
 use Hyperf\Redis\Redis;
 
@@ -90,6 +91,9 @@ class ReportService
     public function reportSuccess(\Hyperf\Database\Model\Model $model): void
     {
         ActorCorrespond::where('correspond_type', get_class($model))->where('correspond_id', $model->id)->delete();
+        $model->delete();
+
+        TagCorrespond::where('correspond_type', get_class($model))->where('correspond_id', $model->id)->delete();
         $model->delete();
     }
 }

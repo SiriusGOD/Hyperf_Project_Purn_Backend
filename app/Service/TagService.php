@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Constants\Constants;
 use App\Model\ImageGroup;
 use App\Model\MemberTag;
 use App\Model\Tag;
@@ -24,9 +25,13 @@ use Hyperf\Redis\Redis;
 
 use function Hyperf\Support\env;
 
-class TagService
+class TagService extends GenerateService
 {
     public const POPULAR_TAG_CACHE_KEY = 'popular_tag';
+
+    public const CACHE_KEY = 'tag';
+
+    public const TTL_ONE_DAY = 86400;
 
     public Redis $redis;
 
@@ -345,5 +350,179 @@ class TagService
         $result = array_values($result);
 
         return $result;
+    }
+
+    public function searchByTagId(array $params): array
+    {   
+        $cacheKeys = self::CACHE_KEY.":".$params['id'].":".$params['page'].":".$params['limit'].":".$params['limit'].":".$params['sort_by'].":".$params['is_asc'];
+        if ($this->redis->exists($cacheKeys)) {
+            return json_decode($this->redis->get($cacheKeys), true);
+        }
+
+        $query = TagCorrespond::leftJoin('videos', function ($join) {
+                $join->on('tag_corresponds.correspond_id', '=', 'videos.id')
+                    ->where('tag_corresponds.correspond_type', Video::class)
+                    ->where('thumb_width', '>', 0)
+                    ->where('thumb_height', '>', 0);
+            })
+            ->leftJoin('image_groups', function ($join) {
+                $join->on('tag_corresponds.correspond_id', '=', 'image_groups.id')
+                    ->where('tag_corresponds.correspond_type', ImageGroup::class)
+                    ->where('height', '>', 0)
+                    ->where('weight', '>', 0);
+            })
+            ->where('tag_corresponds.tag_id', $params['id'])
+            ->where(function ($query) {
+                $query->whereNotNull('videos.thumb_height')
+                    ->orWhereNotNull('image_groups.height');
+            })
+            ->offset($params['page'] * $params['limit'])
+            ->limit($params['limit']);
+
+        // $query = TagCorrespond::where('tag_id', $params['id'])
+        //     ->offset($params['page'] * $params['limit'])
+        //     ->limit($params['limit']);
+
+        if (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['click']) {
+            if ($params['is_asc'] == 1) {
+                $query = $query->orderBy('tag_corresponds.total_click');
+            } else {
+                $query = $query->orderByDesc('tag_corresponds.total_click');
+            }
+        } elseif (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['created_time']) {
+            if ($params['is_asc'] == 1) {
+                $query = $query->orderBy('tag_corresponds.id');
+            } else {
+                $query = $query->orderByDesc('tag_corresponds.id');
+            }
+        }
+
+        if (! empty($params['filter'])) {
+            $query = $query->where('correspond_type', $params['filter']);
+            $hideIds = ReportService::getHideIds($params['filter']);
+            $query = $query->whereNotIn('correspond_id', $hideIds);
+        } else {
+            $videoHideIds = ReportService::getHideIds(Video::class);
+            $imageGroupHideIds = ReportService::getHideIds(ImageGroup::class);
+            $actorVideoHideIds = TagCorrespond::where('correspond_type', Video::class)
+                ->whereIn('correspond_id', $videoHideIds)
+                ->get()
+                ->pluck('id')
+                ->toArray();
+            $actorImageGroupHideIds = TagCorrespond::where('correspond_type', ImageGroup::class)
+                ->whereIn('correspond_id', $imageGroupHideIds)
+                ->get()
+                ->pluck('id')
+                ->toArray();
+
+            $query = $query->whereNotIn('id', array_merge($actorImageGroupHideIds, $actorVideoHideIds));
+        }
+
+        $models = $query->get();
+        if (empty($models)) {
+            return [];
+        }
+        $models = $models->toArray();
+        $result = [];
+
+        $result = $this->getVideoDetail($models, $result);
+
+        $collect = \Hyperf\Collection\collect($this->getImageGroupsDetail($models, $result));
+
+        if (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['click']) {
+            if ($params['is_asc'] == 1) {
+                $collect = $collect->sortBy('total_click');
+            } else {
+                $collect = $collect->sortByDesc('total_click');
+            }
+        } elseif (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['created_time']) {
+            if ($params['is_asc'] == 1) {
+                $collect = $collect->sortBy('created_at');
+            } else {
+                $collect = $collect->sortByDesc('created_at');
+            }
+        }
+
+        $arr = [];
+        foreach ($collect->toArray() as $key => $value) {
+            $res = array(
+                'id' => $value['id'],
+                'name' => $value['title'],
+                'description' => $value['description'],
+                'type' => $value['model_type'],
+                'thumbnail' => $value['cover_thumb'] ?? $value['thumbnail'],
+                'height' => $value['thumb_height'] ?? ($value['height'] ?? 0),
+                'width' => $value['cover_witdh'] ?? ($value['weight'] ?? 0),
+                'price' => $value['point'],
+                'image_count' => $value['image_count'] ?? 0
+            );
+            if(!empty($value['duration'])){
+                // 將秒數轉換為分鐘和秒
+                $minutes = floor($value['duration'] / 60);
+                $seconds = $value['duration'] % 60;
+                $res['video_duration'] = sprintf('%02d:%02d', $minutes, $seconds);   
+            }else{
+                $res['video_duration'] = null;
+            }
+
+            if($value['model_type'] == 'video'){
+                $res['pay_type'] = $value['is_free'];
+            }else{
+                $res['pay_type'] = $value['pay_type'];
+            }
+           
+            array_push($arr, $res);
+        }
+
+        $this->redis->set($cacheKeys, json_encode($arr));
+        $this->redis->expire($cacheKeys, self::TTL_ONE_DAY);
+
+        return $arr;
+    }
+
+    protected function getVideoDetail(array $models, array $data): array
+    {
+        $ids = [];
+        foreach ($models as $model) {
+            if ($model['correspond_type'] == Video::class) {
+                $ids[] = $model['correspond_id'];
+            }
+        }
+
+        $videos = Video::with('tags')->whereIn('id', $ids)->get()->toArray();
+
+        $result = [];
+        foreach ($videos as $video) {
+            foreach ($models as $model) {
+                if ($model['correspond_id'] == $video['id'] and $model['correspond_type'] == Video::class) {
+                    $result[] = $video;
+                }
+            }
+        }
+
+        return $this->generateVideos($data, $result);
+    }
+
+    protected function getImageGroupsDetail(array $models, array $data): array
+    {
+        $ids = [];
+        foreach ($models as $model) {
+            if ($model['correspond_type'] == ImageGroup::class) {
+                $ids[] = $model['correspond_id'];
+            }
+        }
+
+        $imageGroups = ImageGroup::with(['imagesLimit', 'tags'])->whereIn('id', $ids)->get()->toArray();
+
+        $result = [];
+        foreach ($imageGroups as $imageGroup) {
+            foreach ($models as $model) {
+                if ($model['correspond_id'] == $imageGroup['id'] and $model['correspond_type'] == ImageGroup::class) {
+                    $result[] = $imageGroup;
+                }
+            }
+        }
+
+        return $this->generateImageGroups($data, $result);
     }
 }
