@@ -244,7 +244,9 @@ class TagService extends GenerateService
                 $popular_tags[$key]['tag_name'] = trans('api.tag_control.all');
             }
         }
-        $result['tag'] = $tag;
+        $result['id'] = $tag['id'];
+        $result['name'] = $tag['name'];
+        $result['img'] = $tag['img'];
         $result['video_num'] = $video_num;
         $result['image_num'] = $image_num;
         $result['popular_tags'] = $popular_tags;
