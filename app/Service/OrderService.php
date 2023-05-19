@@ -433,8 +433,7 @@ class OrderService
                     ->where('member_level_type', MemberLevel::TYPE_LIST[1])
                     ->whereNull('deleted_at')
                     ->first();
-                $diamond->delete();
-
+                if(!empty($diamond))$diamond->delete();
                 break;
             case MemberLevel::TYPE_VALUE['vip']:
                 // 變更會員狀態
@@ -448,7 +447,7 @@ class OrderService
                     ->where('member_level_type', MemberLevel::TYPE_LIST[0])
                     ->whereNull('deleted_at')
                     ->first();
-                $vip->delete();
+                if(!empty($vip))$vip->delete();
                 break;
         }
     }

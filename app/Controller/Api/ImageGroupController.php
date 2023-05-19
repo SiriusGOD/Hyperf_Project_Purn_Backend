@@ -114,16 +114,19 @@ class ImageGroupController extends AbstractController
         $id = (int) $request->input('id');
         $memberId = auth()->user()->getId();
 
+        $base_service = di(\App\Service\BaseService::class);
+        $ip = $base_service->getIp($request->getHeaders(), $request->getServerParams());
+
         $product = Product::where('expire', Product::EXPIRE['no'])
             ->where('type', ImageGroup::class)
             ->where('correspond_id', $id)
             ->first();
 
-        $isPay = $service->isPay($id, $memberId);
-
-        if (empty($product) and ! $isPay) {
+        if (empty($product)) {
             return $this->error(trans('validation.product_is_expire'), 400);
         }
+        $isPay = $service->isPay($id, $memberId, $ip);
+
         if (! $isPay) {
             return $this->success([
                 'is_pay' => 0,

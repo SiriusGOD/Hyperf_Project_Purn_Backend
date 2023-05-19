@@ -418,29 +418,151 @@ class VideoService
         return $query;
     }
 
-    public function isPay(int $id, int $memberId): bool
+    public function isPay(int $id, int $memberId, $ip = '127.0.0.1'): bool
     {
         $member = Member::find($memberId);
         $video = Video::find($id);
+        $product = Product::where('expire', Product::EXPIRE['no'])
+                ->where('type', Video::class)
+                ->where('correspond_id', $id)
+                ->first();
 
-        if ($video->is_free <= $member->member_level_status or $member->member_level_status == MemberLevel::NO_MEMBER_LEVEL) {
+        // 判定影片等級與會員等級
+        if($video->is_free <= $member->member_level_status){
+            $data['user_id'] = $memberId;
+            $data['prod_id'] = $product -> id;
+            $data['payment_type'] = 0;
+            $data['pay_proxy'] = 'online';
+            $data['ip'] = $ip;
+            $data['product'] = $product->toArray();
+            $data['user'] = $member->toArray();
+            $data['oauth_type'] = $member -> device ?? '';
+
+            switch ($member->member_level_status) {
+                // 免費會員
+                case MemberLevel::NO_MEMBER_LEVEL:
+                    // 確認是否購買過
+                    $is_buy = $this->orderCheck($id, $memberId);
+                    if(!$is_buy){
+                        // 未購買過 -> 使用免費次數購買
+                        if($member->free_quota > 0){
+                            // 購買
+                            $data['pay_method'] = 'free_quota';
+                            $service = make(OrderService::class);
+                            // 建立訂單
+                            $result = $service->createOrder($data);
+                            if ($result) {
+                                // 扣免費觀看次數
+                                $quota = $member->free_quota - Product::QUOTA;
+                                $member->free_quota = $quota;
+                                $re = $member->save();
+                                $pay_amount = Product::QUOTA;
+
+                                // 變更訂單狀態為已完成
+                                if ($re) {
+                                    $order = Order::where('order_number', $result)->first();
+                                    $order->pay_amount = $pay_amount;
+                                    $order->status = Order::ORDER_STATUS['finish'];
+                                    $order->save();
+                                }
+                            }
+                        }else{
+                            // 次數不足
+                            return false;
+                        }
+                    }
+                    return true;
+                    break;
+                // Vip會員
+                case MemberLevel::TYPE_VALUE['vip']:
+                    // 確認是否購買過
+                    $is_buy = $this->orderCheck($id, $memberId);
+                    if(!$is_buy){
+                        // 未購買過 -> 使用Vip次數購買
+                        if($member->vip_quota > 0){
+                            // 購買
+                            $data['pay_method'] = 'vip_quota';
+                            $service = make(OrderService::class);
+                            // 建立訂單
+                            $result = $service->createOrder($data);
+                            if ($result) {
+                                // 扣Vip觀看次數
+                                $quota = $member->vip_quota - Product::QUOTA;
+                                $member->vip_quota = $quota;
+                                $re = $member->save();
+                                $pay_amount = Product::QUOTA;
+
+                                // Vip次數歸0時，判斷是否要降等!!!!
+                                if ($quota == 0) {
+                                    $service->memberLevelDown($memberId);
+                                }
+
+                                // 變更訂單狀態為已完成
+                                if ($re) {
+                                    $order = Order::where('order_number', $result)->first();
+                                    $order->pay_amount = $pay_amount;
+                                    $order->status = Order::ORDER_STATUS['finish'];
+                                    $order->save();
+                                }
+                            }
+                        }else if($member->vip_quota === 0){
+                            // 次數不足
+                            return false;
+                        }else{
+                            // 次數為Null -> 可以直接看
+                            return true;
+                        }
+                    }
+                    return true;
+                    break;
+
+                // 鑽石會員
+                case MemberLevel::TYPE_VALUE['diamond']:
+                    // 確認是否購買過
+                    $is_buy = $this->orderCheck($id, $memberId);
+                    if(!$is_buy){
+                        // 未購買過 -> 使用鑽石次數購買
+                        if($member->diamond_quota > 0){
+                            // 購買
+                            $data['pay_method'] = 'diamond_quota';
+                            $service = make(OrderService::class);
+                            // 建立訂單
+                            $result = $service->createOrder($data);
+                            if ($result) {
+                                // 扣鑽石觀看次數
+                                $quota = $member->diamond_quota - Product::QUOTA;
+                                $member->diamond_quota = $quota;
+                                $re = $member->save();
+                                $pay_amount = Product::QUOTA;
+
+                                // 鑽石次數歸0時，判斷是否要降等!!!!
+                                if ($quota == 0) {
+                                    $service->memberLevelDown($memberId);
+                                }
+
+                                // 變更訂單狀態為已完成
+                                if ($re) {
+                                    $order = Order::where('order_number', $result)->first();
+                                    $order->pay_amount = $pay_amount;
+                                    $order->status = Order::ORDER_STATUS['finish'];
+                                    $order->save();
+                                }
+                            }
+                        }else if($member->diamond_quota === 0){
+                            // 次數不足
+                            return false;
+                        }else{
+                            // 次數為Null -> 可以直接看
+                            return true;
+                        }
+                    }
+                    return true;
+                    break;
+            }
+        }else{
             return $this->orderCheck($id, $memberId);
         }
-        
-        $memberLevelType = array_flip(MemberLevel::TYPE_VALUE);
-        $buyMemberLevel = BuyMemberLevel::where('member_id', $memberId)->where('member_level_type', $memberLevelType[$member->member_level_status])->first();
-        if (empty($buyMemberLevel)) {
-            return false;
-        }
-        $endTime = Carbon::parse($buyMemberLevel->end_time);
-        $startTime = Carbon::parse($buyMemberLevel->start_time);
-        $diff = $endTime->diffInDays($startTime);
-        if (abs($diff) > 1) {
-            return true;
-        }
 
-        var_dump('all fail');
-        return $this->orderCheck($id, $memberId);
     }
 
     public function getPayVideo(int $id): Video|Collection|\Hyperf\Database\Model\Model|array|null
@@ -476,16 +598,16 @@ class VideoService
                 ->join('order_details', 'orders.id', '=', 'order_details.order_id')
                 ->join('products', 'order_details.product_id', '=', 'products.id')
                 ->where('products.type', Video::class)
-                ->where('products.id', $id)
-                ->where('orders.status', Order::ORDER_STATUS['finish'])->select('orders.currency', 'orders.created_at')->first();
+                ->where('products.correspond_id', $id)
+                ->where('orders.status', Order::ORDER_STATUS['finish'])->select('orders.currency', 'orders.created_at')->orderBy('orders.created_at', 'desc')->first();
         if(empty($order))return false;
         
         // 用免費次數購買的免費商品 過隔天就不顯示在已購買項目中
         if($order -> currency == Order::PAY_CURRENCY['free_quota']){
             $date1 = Carbon::parse($order -> created_at);
             $date2 = Carbon::now();
-            $diff = $date1->diff($date2);
-            if($diff > 0)return false;
+            $diff = $date1->diffInDays($date2);
+            if(abs($diff) > 0)return false;
         }
         return true;
     }

@@ -209,6 +209,7 @@ class OrderController extends AbstractController
                     $member->diamond_quota = $user['diamond_quota'] - Product::QUOTA;
                     $re = $member->save();
                     $pay_amount = Product::QUOTA;
+                    var_dump($user['diamond_quota'] - Product::QUOTA);
 
                     // 鑽石次數歸0時，判斷是否要降等!!!!
                     if ($user['diamond_quota'] - Product::QUOTA == 0) {
