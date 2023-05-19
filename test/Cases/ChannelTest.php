@@ -47,14 +47,8 @@ class ChannelTest extends HttpTestCase
             return;
         }
         foreach ($models as $model) {
-            $parsedUrl = parse_url($model->url);
-            $domain = isset($parsedUrl['host'])?$parsedUrl['host']:"";
-            if(!empty($domain)){
-              make(ChannelService::class)->calcChannelCount2DB($domain ,$model->id ,'member');
-              make(ChannelService::class)->calcChannelCount2DB($domain ,$model->id ,'achievement');
-            }else{
-              errLog("DB channel url error!!");
-            }
+              make(ChannelService::class)->calcChannelCount2DB($model->url ,$model->id ,'member');
+              make(ChannelService::class)->calcChannelCount2DB($model->url ,$model->id ,'achievement');
         }
       $this->assertSame('test', 'test') ;
    }

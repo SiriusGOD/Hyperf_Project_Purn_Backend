@@ -155,6 +155,12 @@ class BaseService
         }
     }
 
+    // 是否存在
+    public function isExists($model,  $key, $val)
+    {
+      return $model->where($key, $val)->first();
+    }
+
     // 共用取得
     public function get($model,  int $id)
     {

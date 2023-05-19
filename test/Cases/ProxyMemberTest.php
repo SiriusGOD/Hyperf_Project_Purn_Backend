@@ -62,7 +62,7 @@ class ProxyMemberTest extends HttpTestCase
     }
 
     public function memberExp(){
-        $domains = ["http://love.com","http://sex.com" , "http://sex8.com","http://xvideo.com"];
+        $domains = ["http://love.com/?aff_code=qwe", "http://sex.com/?aff_code=qwe" , "http://sex8.com/?aff_code=qwe", "http://xvideo.com/?aff_code=qwe"];
         return  [
             'name' => 'John',
             'password' => 'a123456',
