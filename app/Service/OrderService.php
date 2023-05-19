@@ -364,6 +364,16 @@ class OrderService
                             break;
                     }
                     $member->save();
+                }else if ($duration == 1){
+                    switch ($level) {
+                        case 'vip':
+                            $member->vip_quota = $member->vip_quota + MemberLevel::LIMIT_QUOTA;
+                            break;
+                        case 'diamond':
+                            $member->diamond_quota = $member->diamond_quota + MemberLevel::LIMIT_QUOTA;
+                            break;
+                    }
+                    $member->save();
                 }
                 var_dump('更新 -> 延長');
             }
@@ -417,6 +427,14 @@ class OrderService
                     $up_member->vip_quota = 0;
                 }
                 $up_member->save();
+
+                // 移除鑽石會員等級的持續時間
+                $diamond = BuyMemberLevel::where('member_id', $user_id)
+                    ->where('member_level_type', MemberLevel::TYPE_LIST[1])
+                    ->whereNull('deleted_at')
+                    ->first();
+                $diamond->delete();
+
                 break;
             case MemberLevel::TYPE_VALUE['vip']:
                 // 變更會員狀態
@@ -424,6 +442,13 @@ class OrderService
                 $up_member->member_level_status = MemberLevel::NO_MEMBER_LEVEL;
                 $up_member->vip_quota = 0;
                 $up_member->save();
+
+                // 移除VIP會員等級的持續時間
+                $vip = BuyMemberLevel::where('member_id', $user_id)
+                    ->where('member_level_type', MemberLevel::TYPE_LIST[0])
+                    ->whereNull('deleted_at')
+                    ->first();
+                $vip->delete();
                 break;
         }
     }
