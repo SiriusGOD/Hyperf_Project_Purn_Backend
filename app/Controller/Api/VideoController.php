@@ -15,6 +15,7 @@ use App\Constants\Apicode;
 use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Middleware\ApiEncryptMiddleware;
+use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\Product;
 use App\Model\Video;
 use App\Request\VideoApiSearchRequest;
@@ -36,6 +37,7 @@ use Psr\Log\LoggerInterface;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class VideoController extends AbstractController
 {
     protected LoggerInterface $logger;

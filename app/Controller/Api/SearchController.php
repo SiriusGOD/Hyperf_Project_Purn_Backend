@@ -13,6 +13,7 @@ namespace App\Controller\Api;
 
 use App\Constants\Constants;
 use App\Controller\AbstractController;
+use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Request\ImageApiListRequest;
 use App\Request\ImageApiSearchRequest;
 use App\Request\VideoApiSuggestRequest;
@@ -29,6 +30,7 @@ use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class SearchController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'list')]

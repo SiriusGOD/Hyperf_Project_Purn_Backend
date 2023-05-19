@@ -13,6 +13,7 @@ namespace App\Controller\Api;
 
 use App\Constants\Constants;
 use App\Controller\AbstractController;
+use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Service\TagGroupService;
 use App\Service\TagService;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -25,6 +26,7 @@ use Carbon\Carbon;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class TagController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'list')]
@@ -84,7 +86,7 @@ class TagController extends AbstractController
             'models' => $result,
         ];
 
-        $path = '/api/actor/search';
+        $path = '/api/tag/search';
         $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
         return $this->success($data);

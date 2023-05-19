@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
+use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Request\ProductApiRequest;
 use App\Service\ProductService;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -22,6 +23,7 @@ use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class ProductController extends AbstractController
 {
     /**

@@ -14,6 +14,7 @@ namespace App\Controller\Api;
 use App\Constants\ErrorCode;
 use App\Constants\RedeemCode;
 use App\Controller\AbstractController;
+use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\MemberRedeem;
 use App\Model\MemberRedeemVideo;
 use App\Service\MemberRedeemService;
@@ -29,6 +30,7 @@ use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class RedeemController extends AbstractController
 {
     // 檢查兌換碼

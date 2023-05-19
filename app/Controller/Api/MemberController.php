@@ -118,6 +118,7 @@ class MemberController extends AbstractController
         ]);
     }
 
+    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'logout')]
     public function logout()
     {
@@ -238,7 +239,6 @@ class MemberController extends AbstractController
         return $this->success();
     }
 
-    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'verification/register_check')]
     public function checkRegisterVerificationCode(RequestInterface $request)
     {
@@ -290,6 +290,7 @@ class MemberController extends AbstractController
     }
 
     // 追蹤多個標籤
+    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'addMemberIdsFollow')]
     public function addMemberIdsFollow(RequestInterface $request, MemberService $memberService, MemberFollowService $memberFollowService)
     {
@@ -305,6 +306,7 @@ class MemberController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'addFollow')]
+    #[Middleware(ApiAuthMiddleware::class)]
     public function addMemberFollow(RequestInterface $request, MemberService $service)
     {
         $follow_id = $request->input('id');
@@ -335,6 +337,7 @@ class MemberController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'deleteFollow')]
+    #[Middleware(ApiAuthMiddleware::class)]
     public function deleteMemberFollow(RequestInterface $request, MemberService $service)
     {
         $userId = auth('jwt')->user()->getId();
@@ -359,8 +362,8 @@ class MemberController extends AbstractController
         return $this->error(trans('api.member_control.no_follow_data'), ErrorCode::BAD_REQUEST);
     }
     //追蹤清單
-    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'getFollowList')]
+    #[Middleware(ApiAuthMiddleware::class)]
     public function getMemberFollowList(RequestInterface $request, MemberService $service)
     {
         $userId = auth('jwt')->user()->getId();
@@ -371,8 +374,8 @@ class MemberController extends AbstractController
         return $this->success(['models' => $result]);
     }
 
-    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'getMemberProductId')]
+    #[Middleware(ApiAuthMiddleware::class)]
     public function getMemberProductId(RequestInterface $request, MemberService $service)
     {
         $id = auth('jwt')->user()->getId();
@@ -386,8 +389,8 @@ class MemberController extends AbstractController
     /**
      * 獲取該使用者的購買清單
      */
-    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'getMemberOrderList')]
+    #[Middleware(ApiAuthMiddleware::class)]
     public function getMemberOrderList(RequestInterface $request, MemberService $service)
     {
         $user_id = auth('jwt')->user()->getId();
@@ -396,19 +399,4 @@ class MemberController extends AbstractController
         $result = $service->getMemberOrderList($user_id, $page, $limit);
         return $this->success(['models' => $result]);
     }
-
-    /*
-     * 獲取推薦列表
-     */
-    // #[RequestMapping(methods: ['POST'], path: 'getPersonalList')]
-    // public function getPersonalList(RequestInterface $request, MemberService $service)
-    // {
-    //     $user_id = auth('jwt')->user()->getId();
-    //     $method = $request->input('method', 'recommend');
-    //     $offset = $request->input('offset', 0);
-    //     $limit = $request->input('limit', 0);
-    //     $result = $service->getPersonalList($user_id, $method, $offset, $limit);
-
-    //     return $this->success(['models' => $result]);
-    // }
 }

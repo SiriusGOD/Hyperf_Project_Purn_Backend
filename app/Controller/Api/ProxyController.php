@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
+use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Service\MemberService;
 use App\Service\ProxyService;
 use App\Util\SimplePaginator;
@@ -24,6 +25,7 @@ use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class ProxyController extends AbstractController
 {
     // 分享/邀請碼

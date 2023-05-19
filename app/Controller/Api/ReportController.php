@@ -13,6 +13,7 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Job\MemberHideModelJob;
+use App\Middleware\ApiEncryptMiddleware;
 use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\ImageGroup;
 use App\Model\MemberCategorization;
@@ -27,6 +28,7 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
 #[Controller]
+#[Middleware(ApiEncryptMiddleware::class)]
 #[Middleware(ApiAuthMiddleware::class)]
 class ReportController extends AbstractController
 {

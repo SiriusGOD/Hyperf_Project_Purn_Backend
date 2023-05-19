@@ -13,6 +13,7 @@ namespace App\Controller\Api;
 
 use App\Constants\WithdrawCode;
 use App\Controller\AbstractController;
+use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Service\ActorClassificationService;
 use App\Service\MemberCashAccountService;
 use App\Service\WithdrawService;
@@ -26,6 +27,7 @@ use App\Util\Check;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class MemberCashController extends AbstractController
 {
   //create my account 

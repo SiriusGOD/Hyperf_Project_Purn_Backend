@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
+use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\MemberActivity;
 use App\Request\ActivityRequest;
 use App\Service\BaseService;
@@ -23,6 +24,7 @@ use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class ActivityController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'create')]

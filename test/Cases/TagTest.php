@@ -13,7 +13,7 @@ class TagTest extends HttpTestCase
 {
     public function testList()
     {
-        $data = $this->client->get('/api/tag/list');
+        $data = $this->client->post('/api/tag/list');
 
         $this->assertSame(200, (int) $data['code']);
     }

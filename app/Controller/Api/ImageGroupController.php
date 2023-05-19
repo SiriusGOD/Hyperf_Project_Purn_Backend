@@ -13,6 +13,7 @@ namespace App\Controller\Api;
 
 use App\Controller\AbstractController;
 use App\Middleware\ApiEncryptMiddleware;
+use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\CustomerService;
 use App\Model\Image;
 use App\Model\ImageGroup;
@@ -33,6 +34,7 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class ImageGroupController extends AbstractController
 {
     #[RequestMapping(methods: ['POST'], path: 'list')]

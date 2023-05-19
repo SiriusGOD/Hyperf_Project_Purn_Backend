@@ -56,7 +56,7 @@ class CentImgTest extends HttpTestCase
         
         // $baseUrl = 'https://images.91tv.tv/';
         // $baseUrl = "https://images.91tv.tv/img.actors/";
-        $baseUrl = env('VIDEO_THUMB_URL');
+        $baseUrl = env('IMAGE_GROUP_ENCRYPT_URL');
 
         var_dump($this->url_resource($res['msg'], $baseUrl));
         $this->assertSame(true,$res);

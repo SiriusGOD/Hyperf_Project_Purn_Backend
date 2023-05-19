@@ -14,6 +14,7 @@ namespace App\Controller\Api;
 use App\Constants\Apicode;
 use App\Constants\Constants;
 use App\Controller\AbstractController;
+use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Request\StageVideoRequest;
 use App\Service\StageVideoService;
 use App\Util\SimplePaginator;
@@ -26,6 +27,7 @@ use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class StageVideoController extends AbstractController
 {
     // 編輯儲存影片分類

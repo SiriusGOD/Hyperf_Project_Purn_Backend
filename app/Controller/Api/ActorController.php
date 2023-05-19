@@ -27,9 +27,9 @@ use App\Middleware\ApiEncryptMiddleware;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class ActorController extends AbstractController
 {
-    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, ActorService $service)
     {
@@ -57,7 +57,6 @@ class ActorController extends AbstractController
         return $this->success(['models' => $result]);
     }
 
-    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'getListByClassification')]
     public function getListByClassification(RequestInterface $request, ActorClassificationService $service)
     {
@@ -67,7 +66,6 @@ class ActorController extends AbstractController
         return $this->success(['models' => $result]);
     }
 
-    #[Middleware(ApiAuthMiddleware::class)]
     #[RequestMapping(methods: ['POST'], path: 'getActorDetail')]
     public function getActorDetail(RequestInterface $request, ActorService $service)
     {

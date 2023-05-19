@@ -13,6 +13,7 @@ namespace App\Controller\Api;
 
 use App\Constants\ErrorCode;
 use App\Controller\AbstractController;
+use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\Coin;
 use App\Model\ImageGroup;
 use App\Model\Member;
@@ -35,6 +36,7 @@ use App\Model\Pay;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
+#[Middleware(ApiAuthMiddleware::class)]
 class OrderController extends AbstractController
 {
     /**
