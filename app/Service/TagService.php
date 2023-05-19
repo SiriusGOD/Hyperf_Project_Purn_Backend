@@ -272,7 +272,7 @@ class TagService extends GenerateService
                 ->join('tags', 'tags.id', 'tag_corresponds.tag_id')
                 ->where('tag_corresponds.correspond_type', Video::class)
                 ->whereIn('tag_corresponds.correspond_id', $video_ids)
-                ->groupBy('tag_corresponds.tag_id')
+                ->groupBy('tag_corresponds.tag_id', 'tags.name')
                 ->get()
                 ->toArray();
             // ----------------------------------------------------------------------
@@ -284,7 +284,7 @@ class TagService extends GenerateService
                 ->join('tags', 'tags.id', 'tag_corresponds.tag_id')
                 ->where('tag_corresponds.correspond_type', ImageGroup::class)
                 ->whereIn('tag_corresponds.correspond_id', $image_ids)
-                ->groupBy('tag_corresponds.tag_id')
+                ->groupBy('tag_corresponds.tag_id', 'tags.name')
                 ->get()
                 ->toArray();
 
