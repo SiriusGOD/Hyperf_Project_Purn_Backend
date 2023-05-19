@@ -385,7 +385,8 @@ class MemberController extends AbstractController
         $type = $request->input('type', 'all');
         $page = $request->input('page', 0);
         $pageSize = $request->input('limit', 20);
-        $result = $service->getMemberProductId($id, $type, $page, $pageSize);
+        $is_asc = $request->input('is_asc', 0);
+        $result = $service->getMemberProductId($id, $type, $page, $pageSize, $is_asc);
         return $this->success(['models' => $result]);
     }
 

@@ -564,7 +564,7 @@ class MemberService extends BaseService
         }
     }
 
-    public function getMemberProductId($memberId, $type, $page, $pageSize = 0): array
+    public function getMemberProductId($memberId, $type, $page, $pageSize = 0, $is_asc): array
     {
         // 顯示幾筆
         $step = $pageSize ?? Order::FRONTED_PAGE_PER;
@@ -589,6 +589,12 @@ class MemberService extends BaseService
                 break;
         }
 
+        if ($is_asc == 1) {
+            $query = $query->orderBy('orders.created_at');
+        } else {
+            $query = $query->orderByDesc('orders.created_at');
+        }
+
         if (! empty($page) && $page > 0) {
             // $query = $query -> offset($offset);
             $query = $query->offset(($page - 1) * $step);
@@ -601,6 +607,7 @@ class MemberService extends BaseService
         if (! empty($model)) {
             $image_arr = [];
             $video_arr = [];
+            $arr = [];
             // ActorClassification::findOrFail($id);
             foreach ($model as $key => $value) {
                 // 用免費次數購買的免費商品 過隔天五點就不顯示在已購買項目中
@@ -615,11 +622,11 @@ class MemberService extends BaseService
                         ->groupBy('image_groups.id')
                         ->first();
 
-                    array_push($image_arr, [
+                    array_push($arr, [
                         'product_id' => $value->id,
                         'source_id' => $value->correspond_id,
                         'name' => $value->name,
-                        'thumbnail' => env('IMG_DOMAIN') . $image->thumbnail ?? '',
+                        'thumbnail' => env('IMAGE_GROUP_ENCRYPT_URL') . $image->thumbnail ?? '',
                         'expire' => $value->expire,
                         'num' => $image->count ?? 0,
                     ]);
@@ -628,21 +635,23 @@ class MemberService extends BaseService
                 if ($value->type == Product::TYPE_CORRESPOND_LIST['video']) {
                     
                     $video = Video::findOrFail($value->correspond_id);
-                    array_push($video_arr, [
+                    array_push($arr, [
                         'product_id' => $value->id,
                         'source_id' => $value->correspond_id,
                         'name' => $value->name,
-                        'thumbnail' => env('IMG_DOMAIN') . $video->cover_thumb ?? '',
+                        'thumbnail' => env('IMAGE_GROUP_ENCRYPT_URL') . $video->cover_thumb ?? '',
                         'expire' => $value->expire,
                         'duration' => $value->duration ?? 0,
                     ]);
                 }
             }
-            $data['image'] = $image_arr;
-            $data['video'] = $video_arr;
+            // $data['image'] = $image_arr;
+            // $data['video'] = $video_arr;
+            $data = $arr;
         } else {
-            $data['image'] = [];
-            $data['video'] = [];
+            // $data['image'] = [];
+            // $data['video'] = [];
+            $data = [];
         }
         return $data;
     }
