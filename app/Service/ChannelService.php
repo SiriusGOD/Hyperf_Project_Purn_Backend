@@ -146,4 +146,23 @@ class ChannelService extends BaseService
             $this->modelStore($this->channel, $insert);
         }
     }
+
+    //取得渠道
+    public function getChannel($id)
+    {
+        return $this->isExists(Channel::class , 'id',$id);
+    }
+
+    //渠道總數
+    public function thisCont()
+    {
+        return $this->getCount(Channel::class);
+    }
+
+    //渠道分頁
+    public function getChannels($page = 0, $limit = 0)
+    {
+        return $this->list(Channel::class ,[], $page, $limit);
+    }
+
 }

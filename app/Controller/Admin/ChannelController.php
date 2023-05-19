@@ -11,29 +11,60 @@ declare(strict_types=1);
  */
 namespace App\Controller\Admin;
 
+use App\Constants\RedeemCode;
+use App\Controller\AbstractController;
 use App\Model\Channel;
-use App\Service\BaseService;
+use App\Service\ChannelService;
 use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\Middleware;
+use Hyperf\HttpServer\Annotation\RequestMapping;
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\View\RenderInterface;
 
 #[Controller]
-class ChannelController extends TemplateController 
+#[Middleware(middleware: 'App\\Middleware\\PermissionMiddleware')]
+class ChannelController extends AbstractController
 {
-    public $main = 'channels';
-    public $entity;
-    public $fieldsSetting;
-    public $baseService;
-    public $redner;
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    function __construct(RenderInterface $render, Channel $channel, BaseService $baseService)
-    {       
+    protected RenderInterface $render;
+
+    public function __construct(RenderInterface $render)
+    {
+        parent::__construct();
         $this->render = $render;
-        $this->entity = $channel;
-        $this->fieldsSetting = $this->entity->tableFieldsSetting();
-        $this->baseService = $baseService;
     }
+    //列表頁
+    #[RequestMapping(methods: ['GET'], path: 'index')]
+    public function index(RequestInterface $request, ChannelService $channelService)
+    {
+        $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
+        $res = $channelService->getChannels($page , Channel::PAGE_PER);
+        $total = $channelService->thisCont();
+        $data['last_page'] = ceil($total / Channel::PAGE_PER);
+        if ($total == 0) {
+            $data['last_page'] = 1;
+        }
+        $data['total'] = $total;
+        $data['datas'] = $res;
+        $data['page'] = $page;
+        $data['step'] = 10;
+        $data['category'] = RedeemCode::CATEGORY;
+        $path = '/admin/channel/index';
+        $data['next'] = $path . '?page=' . ($page + 1);
+        $data['prev'] = $path . '?page=' . ($page - 1);
+        $data['navbar'] = trans('default.redeem.title');
+        $data['redeem_active'] = 'active';
+        return $this->render->render('admin.channel.index', $data);
+    }
+
+    //渠道詳細資料
+    #[RequestMapping(methods: ['GET'], path: 'detail')]
+    public function detail(RequestInterface $request, ChannelService $channelService)
+    {
+        $id = $request->input('id');
+        $data['model'] = $channelService->getChannel((int) $id);
+        $data['navbar'] = trans('default.channel.edit');
+        $data['redeem_active'] = 'active';
+        return $this->render->render('admin.channel.form', $data);
+    }
+
 }
