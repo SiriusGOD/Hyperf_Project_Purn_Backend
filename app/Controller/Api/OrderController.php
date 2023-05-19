@@ -69,6 +69,16 @@ class OrderController extends AbstractController
         if (empty($data['prod_id'])) {
             return $this->error(trans('validation.filled', ['attribute' => 'product id']), ErrorCode::BAD_REQUEST);
         }
+        // $data['id'] = $request->input('id', 0);
+        // if($request->input('type') == 'imageGroup'){
+        //     $type_class = ImageGroup::class;
+        // }else{
+        //     $type_class = Video::class;
+        // }
+        
+        // if (empty($data['id'])) {
+        //     return $this->error(trans('validation.filled', ['attribute' => 'product id']), ErrorCode::BAD_REQUEST);
+        // }
         $payment_type = $request->input('payment_type', 0);
         $data['payment_type'] = $payment_type;
         // $data['oauth_type'] = $request->input('oauth_type', 'web');
@@ -93,9 +103,14 @@ class OrderController extends AbstractController
 
         // 撈取商品資料
         $data['product'] = Product::where('id', $data['prod_id'])->where('expire', 0)->first();
+        // $data['product'] = Product::where('expire', Product::EXPIRE['no'])
+        //                 ->where('type', $type_class)
+        //                 ->where('correspond_id', $data['id'])
+        //                 ->first();
         if (empty($data['product'])) {
             return $this->error(trans('api.order_control.no_product_data'), ErrorCode::BAD_REQUEST);
         }
+        $data['prod_id'] = $data['product']->id;
         $data['product'] = $data['product']->toArray();
         $product = $data['product'];
         // 撈取會員資料
@@ -176,7 +191,7 @@ class OrderController extends AbstractController
                 if ($user['diamond_coins'] < $product['diamond_price']) {
                     return $this->error(trans('api.order_control.not_enough_diamond'), ErrorCode::BAD_REQUEST);
                 }
-
+                
                 // 建立訂單
                 $result = $service->createOrder($data);
                 if ($result) {
@@ -309,6 +324,19 @@ class OrderController extends AbstractController
             $pay_res['data']['pay_way'] = $pay->pronoun ?? 'local';
             $pay_res['data']['pay_proxy'] = 'online';
             $pay_res['data']['pay_order_id'] = '';
+            $pay_res['data']['order_num'] = $result;
+
+            // 如果是影片
+            if($product['type'] == Product::TYPE_CORRESPOND_LIST['video']){
+                $video_service = di(\App\Service\VideoService::class);
+                $model = $video_service->getPayVideo($product['correspond_id'])->toArray();
+                $url = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $model['m3u8'];
+                $pay_res['data']['url'] = $url;
+            }else{
+                $pay_res['data']['url'] = '';
+            }
+            
+
             $pay_res['data']['order_num'] = $result;
             $order = Order::where('order_number', $result)->first();
             $order->pay_amount = $pay_amount;

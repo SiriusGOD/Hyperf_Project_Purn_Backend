@@ -269,12 +269,12 @@ class ImageGroupService
                 case MemberLevel::NO_MEMBER_LEVEL:
                     // 確認是否購買過
                     $is_buy = $this->orderCheck($id, $memberId);
+                    $service = make(OrderService::class);
                     if(!$is_buy){
                         // 未購買過 -> 使用免費次數購買
                         if($member->free_quota > 0){
                             // 購買
                             $data['pay_method'] = 'free_quota';
-                            $service = make(OrderService::class);
                             // 建立訂單
                             $result = $service->createOrder($data);
                             if ($result) {
@@ -297,18 +297,20 @@ class ImageGroupService
                             return false;
                         }
                     }
+                    // 刪除會員快取
+                    $service -> delMemberRedis($memberId);
                     return true;
                     break;
                 // Vip會員
                 case MemberLevel::TYPE_VALUE['vip']:
                     // 確認是否購買過
                     $is_buy = $this->orderCheck($id, $memberId);
+                    $service = make(OrderService::class);
                     if(!$is_buy){
                         // 未購買過 -> 使用Vip次數購買
                         if($member->vip_quota > 0){
                             // 購買
                             $data['pay_method'] = 'vip_quota';
-                            $service = make(OrderService::class);
                             // 建立訂單
                             $result = $service->createOrder($data);
                             if ($result) {
@@ -339,6 +341,8 @@ class ImageGroupService
                             return true;
                         }
                     }
+                    // 刪除會員快取
+                    $service -> delMemberRedis($memberId);
                     return true;
                     break;
 
@@ -346,12 +350,12 @@ class ImageGroupService
                 case MemberLevel::TYPE_VALUE['diamond']:
                     // 確認是否購買過
                     $is_buy = $this->orderCheck($id, $memberId);
+                    $service = make(OrderService::class);
                     if(!$is_buy){
                         // 未購買過 -> 使用鑽石次數購買
                         if($member->diamond_quota > 0){
                             // 購買
                             $data['pay_method'] = 'diamond_quota';
-                            $service = make(OrderService::class);
                             // 建立訂單
                             $result = $service->createOrder($data);
                             if ($result) {
@@ -382,6 +386,8 @@ class ImageGroupService
                             return true;
                         }
                     }
+                    // 刪除會員快取
+                    $service -> delMemberRedis($memberId);
                     return true;
                     break;
             }
