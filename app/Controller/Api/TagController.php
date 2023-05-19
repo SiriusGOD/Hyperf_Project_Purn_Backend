@@ -80,37 +80,6 @@ class TagController extends AbstractController
             'filter' => $filter,
         ]);
 
-        // 整理
-        // $arr = [];
-        // foreach ($result as $key => $value) {
-        //     $res = array(
-        //         'id' => $value['id'],
-        //         'name' => $value['title'],
-        //         'description' => $value['description'],
-        //         'type' => $value['model_type'],
-        //         'thumbnail' => $value['cover_thumb'] ?? $value['thumbnail'],
-        //         'height' => $value['thumb_height'] ?? ($value['height'] ?? 0),
-        //         'width' => $value['thumb_width'] ?? ($value['width'] ?? 0),
-        //         'price' => $value['point'],
-        //         'image_count' => $value['image_count'] ?? 0
-        //     );
-        //     if(!empty($value['duration'])){
-        //         // 將秒數轉換為分鐘和秒
-        //         $minutes = floor($value['duration'] / 60);
-        //         $seconds = $value['duration'] % 60;
-        //         $res['video_duration'] = sprintf('%02d:%02d', $minutes, $seconds);   
-        //     }else{
-        //         $res['video_duration'] = null;
-        //     }
-
-        //     if($value['model_type'] == 'video'){
-        //         $res['pay_type'] = $value['is_free'];
-        //     }else{
-        //         $res['pay_type'] = $value['pay_type'];
-        //     }
-        //     array_push($arr, $res);
-        // }
-
         $data = [
             'models' => $result,
         ];

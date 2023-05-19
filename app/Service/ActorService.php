@@ -310,21 +310,38 @@ class ActorService extends GenerateService
             $query = $query->where('correspond_type', $params['filter']);
             $hideIds = ReportService::getHideIds($params['filter']);
             $query = $query->whereNotIn('correspond_id', $hideIds);
+            $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds($params['filter']);
+            $query = $query->whereIn('correspond_id', $enableIds);
         } else {
             $videoHideIds = ReportService::getHideIds(Video::class);
             $imageGroupHideIds = ReportService::getHideIds(ImageGroup::class);
+            $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(Video::class);
             $actorVideoHideIds = ActorCorrespond::where('correspond_type', Video::class)
                 ->whereIn('correspond_id', $videoHideIds)
                 ->get()
                 ->pluck('id')
                 ->toArray();
+            $actorVideoEnableIds = ActorCorrespond::where('correspond_type', Video::class)
+                ->whereIn('correspond_id', $enableIds)
+                ->get()
+                ->pluck('id')
+                ->toArray();
+
+            $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(ImageGroup::class);
             $actorImageGroupHideIds = ActorCorrespond::where('correspond_type', ImageGroup::class)
                 ->whereIn('correspond_id', $imageGroupHideIds)
                 ->get()
                 ->pluck('id')
                 ->toArray();
 
-            $query = $query->whereNotIn('id', array_merge($actorImageGroupHideIds, $actorVideoHideIds));
+            $actorImageGroupEnableIds = ActorCorrespond::where('correspond_type', ImageGroup::class)
+                ->whereIn('correspond_id', $enableIds)
+                ->get()
+                ->pluck('id')
+                ->toArray();
+
+            $query = $query->whereNotIn('id', array_merge($actorImageGroupHideIds, $actorVideoHideIds))
+            ->whereIn('id', array_merge($actorImageGroupEnableIds, $actorVideoEnableIds));
         }
 
         $models = $query->get();

@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Constants\Constants;
+use App\Model\ActorCorrespond;
 use App\Model\ImageGroup;
 use App\Model\MemberTag;
 use App\Model\Tag;
@@ -144,7 +145,7 @@ class TagService extends GenerateService
         $ids = \Hyperf\Collection\collect(array_merge($result, $collect->toArray()))->pluck('tag_id')->toArray();
 
         $addTagsResult = [];
-        if($collect->count() + $count < self::POPULAR_DEFAULT_LIMIT) {
+        if ($collect->count() + $count < self::POPULAR_DEFAULT_LIMIT) {
             $limit = self::POPULAR_DEFAULT_LIMIT - ($collect->count() + $count);
             $addTags = Tag::whereNotIn('id', $ids)->orderBy('id')->limit($limit)->get();
             $addTagsResult = $this->generatePopularTags($addTags->toArray());
@@ -224,26 +225,12 @@ class TagService extends GenerateService
             ->toArray();
     }
 
-    protected function generatePopularTags(array $tags)
-    {
-        $result = [];
-        foreach ($tags as $tag) {
-            $result[] = [
-                'tag_id' => $tag['id'],
-                'count' => PHP_INT_MAX,
-                'name' => $tag['name'],
-            ];
-        }
-
-        return $result;
-    }
-
     // 獲取標籤詳細資料
     public function getTagDetail(int $tag_id)
     {
         // 撈取標籤基礎資料
         $tag = Tag::select('id', 'name', 'img')->where('id', $tag_id)->first()->toArray();
-        if(!empty($tag['img'])){
+        if (! empty($tag['img'])) {
             $tag['img'] = env('IMAGE_GROUP_ENCRYPT_URL') . $tag['img'];
         }
         // 撈取影片作品數
@@ -253,7 +240,7 @@ class TagService extends GenerateService
         // 撈取熱門標籤
         $popular_tags = TagPopular::selectRaw('popular_tag_id as tag_id, popular_tag_name as tag_name')->where('tag_id', $tag_id)->get()->toArray();
         foreach ($popular_tags as $key => $popular_tag) {
-            if(trim($popular_tag['tag_name']) == trim($tag['name'])){
+            if (trim($popular_tag['tag_name']) == trim($tag['name'])) {
                 $popular_tags[$key]['tag_name'] = trans('api.tag_control.all');
             }
         }
@@ -277,109 +264,67 @@ class TagService extends GenerateService
         foreach ($tags as $key => $tag) {
             // video
             $video_ids = TagCorrespond::where('correspond_type', Video::class)
-                    ->where('tag_id', $tag->id)->pluck('correspond_id')->toArray();
+                ->where('tag_id', $tag->id)->pluck('correspond_id')->toArray();
             // 撈出該影片下所有標籤id與次數
             $video_all_ids = TagCorrespond::selectRaw('tag_corresponds.tag_id, tags.name, count(*) as count')
-                    ->join('tags', 'tags.id', 'tag_corresponds.tag_id')
-                    ->where('tag_corresponds.correspond_type', Video::class)
-                    ->whereIn('tag_corresponds.correspond_id', $video_ids)
-                    ->groupBy('tag_corresponds.tag_id')
-                    ->get()
-                    ->toArray();
-            //----------------------------------------------------------------------
+                ->join('tags', 'tags.id', 'tag_corresponds.tag_id')
+                ->where('tag_corresponds.correspond_type', Video::class)
+                ->whereIn('tag_corresponds.correspond_id', $video_ids)
+                ->groupBy('tag_corresponds.tag_id')
+                ->get()
+                ->toArray();
+            // ----------------------------------------------------------------------
             // image
             $image_ids = TagCorrespond::where('correspond_type', ImageGroup::class)
-                    ->where('tag_id', $tag->id)->pluck('correspond_id')->toArray();
+                ->where('tag_id', $tag->id)->pluck('correspond_id')->toArray();
             // 撈出該圖片下所有標籤id與次數
             $image_all_ids = TagCorrespond::selectRaw('tag_corresponds.tag_id, tags.name, count(*) as count')
-                    ->join('tags', 'tags.id', 'tag_corresponds.tag_id')
-                    ->where('tag_corresponds.correspond_type', ImageGroup::class)
-                    ->whereIn('tag_corresponds.correspond_id', $image_ids)
-                    ->groupBy('tag_corresponds.tag_id')
-                    ->get()
-                    ->toArray();
-            
-            $merge_arr = $this -> mergeArray($video_all_ids, $image_all_ids);
+                ->join('tags', 'tags.id', 'tag_corresponds.tag_id')
+                ->where('tag_corresponds.correspond_type', ImageGroup::class)
+                ->whereIn('tag_corresponds.correspond_id', $image_ids)
+                ->groupBy('tag_corresponds.tag_id')
+                ->get()
+                ->toArray();
+
+            $merge_arr = $this->mergeArray($video_all_ids, $image_all_ids);
 
             // 按照 count 值進行排序
-            usort($merge_arr, function($a, $b) {
+            usort($merge_arr, function ($a, $b) {
                 return $b['count'] - $a['count'];
             });
 
             // 取得前 6 個元素
-            if(count($merge_arr) < 6){
+            if (count($merge_arr) < 6) {
                 $top6_tags = $merge_arr;
-            }else{
+            } else {
                 $top6_tags = array_slice($merge_arr, 0, 6);
             }
 
             // insert DB
             foreach ($top6_tags as $key2 => $top6_tag) {
                 $model = new TagPopular();
-                $model -> tag_id = $tag -> id;
-                $model -> popular_tag_id = $top6_tag['tag_id'];
-                $model -> popular_tag_name = $top6_tag['name'];
-                $model -> popular_tag_count = $top6_tag['count'];
-                $model -> save();
-            }
-        }          
-    }
-
-    protected function mergeArray($array1, $array2){
-        // 建立用於儲存結果的陣列
-        $result = [];
-
-        // 將$array1的元素加入$result
-        foreach ($array1 as $item) {
-            $tagId = $item['tag_id'];
-            $count = $item['count'];
-
-            if (isset($result[$tagId])) {
-                $result[$tagId]['count'] += $count;
-            } else {
-                $result[$tagId] = [
-                    'tag_id' => $tagId, 
-                    'name' => trim($item['name']),
-                    'count' => $count
-                ];
+                $model->tag_id = $tag->id;
+                $model->popular_tag_id = $top6_tag['tag_id'];
+                $model->popular_tag_name = $top6_tag['name'];
+                $model->popular_tag_count = $top6_tag['count'];
+                $model->save();
             }
         }
-
-        // 將$array2的元素加入$result
-        foreach ($array2 as $item) {
-            $tagId = $item['tag_id'];
-            $count = $item['count'];
-
-            if (isset($result[$tagId])) {
-                $result[$tagId]['count'] += $count;
-            } else {
-                $result[$tagId] = [
-                    'tag_id' => $tagId, 
-                    'name' => trim($item['name']),
-                    'count' => $count
-                ];
-            }
-        }
-
-        // 將$result的值轉為索引陣列
-        $result = array_values($result);
-
-        return $result;
     }
 
     public function searchByTagId(array $params): array
-    {   
-        $cacheKeys = self::CACHE_KEY.":".$params['id'].":".$params['page'].":".$params['limit'].":".$params['limit'].":".$params['sort_by'].":".$params['is_asc'];
+    {
+        $cacheKeys = self::CACHE_KEY . ':' . $params['id'] . ':' . $params['page'] . ':' . $params['limit'] . ':' . $params['limit'] . ':' . $params['sort_by'] . ':' . $params['is_asc'];
         if ($this->redis->exists($cacheKeys)) {
             return json_decode($this->redis->get($cacheKeys), true);
         }
 
         $query = TagCorrespond::leftJoin('videos', function ($join) {
-                $join->on('tag_corresponds.correspond_id', '=', 'videos.id')
-                    ->where('tag_corresponds.correspond_type', Video::class)
-                    ->where('cover_witdh', '>', 0)
-                    ->where('cover_height', '>', 0);
-            })
+            $join->on('tag_corresponds.correspond_id', '=', 'videos.id')
+                ->where('tag_corresponds.correspond_type', Video::class)
+                ->where('cover_witdh', '>', 0)
+                ->where('cover_height', '>', 0);
+        })
             ->leftJoin('image_groups', function ($join) {
                 $join->on('tag_corresponds.correspond_id', '=', 'image_groups.id')
                     ->where('tag_corresponds.correspond_type', ImageGroup::class)
@@ -387,16 +332,8 @@ class TagService extends GenerateService
                     ->where('weight', '>', 0);
             })
             ->where('tag_corresponds.tag_id', $params['id'])
-            ->where(function ($query) {
-                $query->whereNotNull('videos.cover_height')
-                    ->orWhereNotNull('image_groups.height');
-            })
             ->offset($params['page'] * $params['limit'])
             ->limit($params['limit']);
-
-        // $query = TagCorrespond::where('tag_id', $params['id'])
-        //     ->offset($params['page'] * $params['limit'])
-        //     ->limit($params['limit']);
 
         if (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['click']) {
             if ($params['is_asc'] == 1) {
@@ -416,21 +353,38 @@ class TagService extends GenerateService
             $query = $query->where('correspond_type', $params['filter']);
             $hideIds = ReportService::getHideIds($params['filter']);
             $query = $query->whereNotIn('correspond_id', $hideIds);
+            $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds($params['filter']);
+            $query = $query->whereIn('correspond_id', $enableIds);
         } else {
             $videoHideIds = ReportService::getHideIds(Video::class);
             $imageGroupHideIds = ReportService::getHideIds(ImageGroup::class);
+            $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(Video::class);
             $actorVideoHideIds = TagCorrespond::where('correspond_type', Video::class)
                 ->whereIn('correspond_id', $videoHideIds)
                 ->get()
                 ->pluck('id')
                 ->toArray();
+            $actorVideoEnableIds = TagCorrespond::where('correspond_type', Video::class)
+                ->whereIn('correspond_id', $enableIds)
+                ->get()
+                ->pluck('id')
+                ->toArray();
+
+            $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(ImageGroup::class);
             $actorImageGroupHideIds = TagCorrespond::where('correspond_type', ImageGroup::class)
                 ->whereIn('correspond_id', $imageGroupHideIds)
                 ->get()
                 ->pluck('id')
                 ->toArray();
 
-            $query = $query->whereNotIn('id', array_merge($actorImageGroupHideIds, $actorVideoHideIds));
+            $actorImageGroupEnableIds = TagCorrespond::where('correspond_type', ImageGroup::class)
+                ->whereIn('correspond_id', $enableIds)
+                ->get()
+                ->pluck('id')
+                ->toArray();
+
+            $query = $query->whereNotIn('tag_corresponds.id', array_merge($actorImageGroupHideIds, $actorVideoHideIds))
+                ->whereIn('tag_corresponds.id', array_merge($actorImageGroupEnableIds, $actorVideoEnableIds));
         }
 
         $models = $query->get();
@@ -458,41 +412,68 @@ class TagService extends GenerateService
             }
         }
 
-        $arr = [];
-        foreach ($collect->toArray() as $key => $value) {
-            $res = array(
-                'id' => $value['id'],
-                'name' => $value['title'],
-                'description' => $value['description'],
-                'type' => $value['model_type'],
-                'thumbnail' => $value['cover_thumb'] ?? $value['thumbnail'],
-                'height' => $value['cover_height'] ?? ($value['height'] ?? 0),
-                'width' => $value['cover_witdh'] ?? ($value['weight'] ?? 0),
-                'price' => $value['point'],
-                'image_count' => $value['image_count'] ?? 0
-            );
-            if(!empty($value['duration'])){
-                // 將秒數轉換為分鐘和秒
-                $minutes = floor($value['duration'] / 60);
-                $seconds = $value['duration'] % 60;
-                $res['video_duration'] = sprintf('%02d:%02d', $minutes, $seconds);   
-            }else{
-                $res['video_duration'] = null;
-            }
-
-            if($value['model_type'] == 'video'){
-                $res['pay_type'] = $value['is_free'];
-            }else{
-                $res['pay_type'] = $value['pay_type'];
-            }
-           
-            array_push($arr, $res);
+        $rows = [];
+        foreach ($collect->toArray() as $row) {
+            $rows[] = $row;
         }
 
-        $this->redis->set($cacheKeys, json_encode($arr));
-        $this->redis->expire($cacheKeys, self::TTL_ONE_DAY);
+        return $rows;
 
-        return $arr;
+    }
+
+    protected function generatePopularTags(array $tags)
+    {
+        $result = [];
+        foreach ($tags as $tag) {
+            $result[] = [
+                'tag_id' => $tag['id'],
+                'count' => PHP_INT_MAX,
+                'name' => $tag['name'],
+            ];
+        }
+
+        return $result;
+    }
+
+    protected function mergeArray($array1, $array2)
+    {
+        // 建立用於儲存結果的陣列
+        $result = [];
+
+        // 將$array1的元素加入$result
+        foreach ($array1 as $item) {
+            $tagId = $item['tag_id'];
+            $count = $item['count'];
+
+            if (isset($result[$tagId])) {
+                $result[$tagId]['count'] += $count;
+            } else {
+                $result[$tagId] = [
+                    'tag_id' => $tagId,
+                    'name' => trim($item['name']),
+                    'count' => $count,
+                ];
+            }
+        }
+
+        // 將$array2的元素加入$result
+        foreach ($array2 as $item) {
+            $tagId = $item['tag_id'];
+            $count = $item['count'];
+
+            if (isset($result[$tagId])) {
+                $result[$tagId]['count'] += $count;
+            } else {
+                $result[$tagId] = [
+                    'tag_id' => $tagId,
+                    'name' => trim($item['name']),
+                    'count' => $count,
+                ];
+            }
+        }
+
+        // 將$result的值轉為索引陣列
+        return array_values($result);
     }
 
     protected function getVideoDetail(array $models, array $data): array
