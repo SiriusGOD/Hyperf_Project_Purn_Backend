@@ -36,14 +36,8 @@ class ChannelTask
         }
         $this->logger->info('渠道註冊計算任務-開始'.date("YmdH"));
         foreach ($models as $model) {
-            $parsedUrl = parse_url($model->url);
-            $domain = isset($parsedUrl['host'])?$parsedUrl['host']:"";
-            if(!empty($domain)){
-                $this->channelService->calcChannelCount2DB($domain ,$model->id,"member");
-                $this->channelService->calcChannelCount2DB($domain ,$model->id,"member");
-            }else{
-                errLog("DB channel url error!!");
-            }
+            $this->channelService->calcChannelCount2DB($model->url ,$model->id,"member");
+            $this->channelService->calcChannelCount2DB($model->url ,$model->id,"achievement");
         }
         $this->logger->info('渠道註冊計算任務-開始'.date("YmdH"));
     }

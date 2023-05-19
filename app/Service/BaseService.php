@@ -155,6 +155,12 @@ class BaseService
         }
     }
 
+    // 計算數量
+    public function getCount($model)
+    {
+      return $model->count();
+    }
+
     // 是否存在
     public function isExists($model,  $key, $val)
     {
@@ -169,8 +175,10 @@ class BaseService
     // 共用清單
     public function list($model, array $where, int $page, int $limit)
     {
-        foreach ($where as $key => $val) {
-            $model = $model->where($key, $val);
+        if(!empty( $where) ){
+            foreach ($where as $key => $val) {
+                $model = $model->where($key, $val);
+            }
         }
         if ($page == 1) {
             $page = 0;

@@ -18,6 +18,7 @@ namespace App\Model;
  */
 class Channel extends Model
 {
+    public const PAGE_PER = 10;
     /**
      * The table associated with the model.
      */
