@@ -148,19 +148,24 @@ class ImageGroupController extends AbstractController
         $id = (int) $request->input('id');
         $memberId = auth()->user()->getId();
 
+        $product = Product::where('type', ImageGroup::class)
+            ->where('correspond_id', $id)
+            ->first();
+
         $member = Member::find($memberId);
 
         return $this->success([
             'models' => [
                 'diamond' => [
-                    'price' => "1",
+                    'price' => '1',
                     'member_diamond_coin' => (string) $member->diamond_coins,
                 ],
                 'coin' => [
                     'price' => null,
                     'member_coin' => (string) $member->coins,
                 ],
-            ]
+                'product_id' => $product->id,
+            ],
         ]);
     }
 }
