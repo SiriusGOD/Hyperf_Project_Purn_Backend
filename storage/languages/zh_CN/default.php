@@ -21,6 +21,9 @@ return [
     |
     */
     'titles' => [
+        'channel' =>'渠道',
+        'proxy' =>'代理',
+        'withdraw' =>'提現',
         'role' => '角色',
         'roles' => '角色',
         'actor' => '演员',
@@ -193,11 +196,18 @@ return [
     ],
 
     'channels'=>[
-        'title' => '渠道 ',
+        'duration' =>'日期區間',
+        'search'=>'搜尋',
+        'title' => '渠道',
         'name' => '列表',
         'url' => '網址',
         'params' => '參數',
         'amount' => '说明',
+        'name'=>'名稱',
+        'url'=>'網址',
+        'total_amount'=>'總業積',
+        'register_count'=>'總共註冊人數',
+        'detail'=>'詳情',
     ],
     'user-step'=>[
         'index' => '列表',
@@ -267,6 +277,7 @@ return [
     ],
     // left box
     'leftbox' => [
+        'channel' =>'渠道管理',  
         'withdraw' =>'提現管理',
         'tittle' => '入口网站后台控制',
         'manager' => '使用者管理',

@@ -25,21 +25,23 @@
                                             colspan="1" aria-sort="ascending"
                                             aria-label="Rendering engine: activate to sort column descending">{{trans('default.id') ?? '序號'}}
                                         </th>
+                                        <th class="sorting sorting_asc" tabindex="0" aria-controls="example2"
+                                            rowspan="1"
+                                            colspan="1" aria-sort="ascending"
+                                            aria-label="Rendering engine: activate to sort column descending">{{trans('default.name') ?? '序號'}}
+                                        </th>
+                                        
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.type') ?? '類型'}}
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.channels.url') ?? '名稱'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.name') ?? '名稱'}}
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.channels.total_amount') ?? '總業積'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.coin_control.points') ?? '點數'}}
-                                        </th>
-                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1"
-                                            aria-label="Browser: activate to sort column ascending">{{trans('default.coin_control.bonus') ?? '贈與點數'}}
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.channels.register_count') ?? '註冊人數'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
@@ -52,14 +54,14 @@
                                     @foreach($datas as $model)
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $model->id }}</td>
-                                            <td class="sorting_1 dtr-control">{{ trans('default.coin_control.coin_type')[$model->type] }}</td>
+                                            <td class="sorting_1 dtr-control">{{ $model->url}}</td>
                                             <td>{{ $model->name }}</td>
-                                            <td>{{ $model->points }}</td>
-                                            <td>{{ $model->bonus }}</td>
+                                            <td>{{ $model->amount }}</td>
+                                            <td>{{ $model->register_total }}</td>
                                             <td>
-                                            @if(authPermission('coin-edit'))
+                                            @if(authPermission('channels-detail'))
                                                 <div class="row mb-1">
-                                                <a href="/admin/coin/edit?id={{$model->id}}" class="btn btn-primary">{{trans('default.edit') ?? '編輯'}}</a>
+                                                <a href="/admin/channel/detail?id={{$model->id}}" class="btn btn-primary">{{trans('default.channels.detail') ?? '詳情'}}</a>
                                                 </div>
                                             @endif
                                             </td>
@@ -69,11 +71,11 @@
                                     <tfoot>
                                     <tr>
                                         <th rowspan="1" colspan="1">{{trans('default.id') ?? '序號'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.type') ?? '類型'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.name') ?? '名稱'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.coin_control.points') ?? '點數'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.coin_control.bonus') ?? '贈與點數'}}</th>
-                                        <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.channels.name') ?? '類型'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.channels.url') ?? '名稱'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.channels.total_amount') ?? '總業積'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.channels.register_count') ?? '註冊人數'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.action') ?? '註冊人數'}}</th>
                                     </tr>
                                     </tfoot>
                                 </table>
