@@ -250,7 +250,7 @@ class PayService
                             $member->member_level_status = MemberLevel::TYPE_VALUE[$level];
                             $member->save();
 
-                            var_dump('新增');
+                            errLog('新增');
                         } else {
                             // 有會員資格
                             $buy_member_level = BuyMemberLevel::where('member_id', $member->id)

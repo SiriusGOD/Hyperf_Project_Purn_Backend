@@ -240,7 +240,7 @@ class MemberController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'verification/register_check')]
-    public function checkRegisterVerificationCode(RequestInterface $request)
+    public function checkRegisterVerificationCode(RequestInterface $request, MemberService $memberService)
     {
         $member = auth()->user();
         $now = Carbon::now()->toDateTimeString();
@@ -253,6 +253,9 @@ class MemberController extends AbstractController
             $member->status = Member::STATUS['VERIFIED'];
             $member->email = $request->input('email') ?? $member->email;
             $member->save();
+            if($member->invited_by != ""){
+              $memberService->affUpgradeVIP( $member->id);
+            }
             $model->delete();
             return $this->success();
         }

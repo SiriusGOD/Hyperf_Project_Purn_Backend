@@ -35,6 +35,8 @@ class MemberService extends BaseService
     public const CACHE_KEY = 'member:token:';
 
     public const KEY = 'member:';
+    //推薦優惠
+    public const AFF = 'aff';
 
     public const DEVICE_CACHE_KEY = 'member:device:';
 
@@ -58,6 +60,29 @@ class MemberService extends BaseService
         $this->memberInviteLogService = $memberInviteLogService;
         $this->channelService = $channelService;
         $this->logger = $loggerFactory->get('reply');
+    }
+    //推薦會員 推薦的人會有二天VIP 
+    public function affUpgradeVIP(int $member_id)
+    {
+      $member = self::getMemberSimple($member_id ,"*");
+      $member->member_level_status = MemberLevel::TYPE_VALUE['vip'];
+      $member->save();
+      $mlevel = MemberLevel::where('type','vip')->where('duration',1)->first(); 
+      $obj = BuyMemberLevel::where('member_id', $member_id)->where('order_number',self::AFF)->first();
+      if(!$obj){
+        $insert['member_id'] = $member_id; 
+        $insert['member_level_type'] = $mlevel->type;  
+        $insert['member_level_id'] = $mlevel->id; 
+        $insert['order_number'] = self::AFF;//如果是推薦 免費送的 
+        $insert['start_time'] = Carbon::now()->toDateTimeString();
+        $insert['end_time'] = Carbon::now()->addDay(1)->toDateTimeString();
+        $this->modelStore(BuyMemberLevel::class , $insert);
+      }else{
+        $obj->end_time = Carbon::parse($obj->end_time)->addDay()->toDateTimeString();
+        $obj->save();
+      }
+
+      errLog('新增會員VIP 一天');
     }
 
     public function apiGetUser(array $userInfo)
