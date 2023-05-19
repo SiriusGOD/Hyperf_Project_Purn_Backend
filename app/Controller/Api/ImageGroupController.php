@@ -151,14 +151,16 @@ class ImageGroupController extends AbstractController
         $member = Member::find($memberId);
 
         return $this->success([
-            'diamond' => [
-                'price' => "1",
-                'member_diamond_coin' => (string) $member->diamond_coins,
-            ],
-            'coin' => [
-                'price' => null,
-                'member_coin' => (string) $member->coins,
-            ],
+            'models' => [
+                'diamond' => [
+                    'price' => "1",
+                    'member_diamond_coin' => (string) $member->diamond_coins,
+                ],
+                'coin' => [
+                    'price' => null,
+                    'member_coin' => (string) $member->coins,
+                ],
+            ]
         ]);
     }
 }
