@@ -16,7 +16,7 @@ use App\Service\ChannelService;
 use Hyperf\Crontab\Annotation\Crontab;
 use Hyperf\Logger\LoggerFactory;
 
-#[Crontab(name: 'ChannelTask', rule: '* 1 * * *', callback: 'execute', memo: '渠道註冊計算任務')]
+#[Crontab(name: 'ChannelTask', rule: '1 * * * *', callback: 'execute', memo: '渠道註冊計算任務')]
 class ChannelTask
 {
     protected $channelService;
@@ -36,14 +36,8 @@ class ChannelTask
         }
         $this->logger->info('渠道註冊計算任務-開始'.date("YmdH"));
         foreach ($models as $model) {
-            $parsedUrl = parse_url($model->url);
-            $domain = isset($parsedUrl['host'])?$parsedUrl['host']:"";
-            if(!empty($domain)){
-                $this->channelService->calcChannelCount2DB($domain ,$model->id,"member");
-                $this->channelService->calcChannelCount2DB($domain ,$model->id,"member");
-            }else{
-                errLog("DB channel url error!!");
-            }
+            $this->channelService->calcChannelCount2DB($model->url ,$model->id,"member");
+            $this->channelService->calcChannelCount2DB($model->url ,$model->id,"achievement");
         }
         $this->logger->info('渠道註冊計算任務-開始'.date("YmdH"));
     }

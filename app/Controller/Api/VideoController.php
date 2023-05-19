@@ -217,8 +217,9 @@ class VideoController extends AbstractController
         $price = null;
 
         $video = Video::find($id);
+        $isFree = $video->is_free ?? 0;
 
-        if ($video->is_free == Video::VIDEO_TYPE['diamond']) {
+        if ($isFree == Video::VIDEO_TYPE['diamond']) {
             $price = (string) $product->selling_price;
         }
 
@@ -233,7 +234,8 @@ class VideoController extends AbstractController
                 'coin' => [
                     'price' => $price,
                     'member_coin' => (string) $member->coins,
-                ]
+                ],
+                'product_id' => $product->id,
             ]
         ]);
     }
