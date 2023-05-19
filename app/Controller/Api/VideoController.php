@@ -16,6 +16,8 @@ use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Middleware\ApiEncryptMiddleware;
 use App\Middleware\Auth\ApiAuthMiddleware;
+use App\Model\ImageGroup;
+use App\Model\Member;
 use App\Model\Product;
 use App\Model\Video;
 use App\Request\VideoApiSearchRequest;
@@ -194,6 +196,38 @@ class VideoController extends AbstractController
         return $this->success([
             'url' => $url,
             'product_id' => $product->id,
+        ]);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'pay_method')]
+    public function getPayMethod(RequestInterface $request)
+    {
+        $id = (int) $request->input('id');
+        $memberId = auth()->user()->getId();
+
+        $product = Product::where('type', Video::class)
+            ->where('correspond_id', $id)
+            ->first();
+
+        $price = null;
+
+        $video = Video::find($id);
+
+        if ($video->is_free == Video::VIDEO_TYPE['diamond']) {
+            $price = (string) $product->selling_price;
+        }
+
+        $member = Member::find($memberId);
+
+        return $this->success([
+            'diamond' => [
+                'price' => "1",
+                'member_diamond_coin' => (string) $member->diamond_coins,
+            ],
+            'coin' => [
+                'price' => $price,
+                'member_coin' => (string) $member->coins,
+            ]
         ]);
     }
 }

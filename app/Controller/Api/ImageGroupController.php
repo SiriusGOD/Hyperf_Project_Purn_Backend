@@ -17,8 +17,8 @@ use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\CustomerService;
 use App\Model\Image;
 use App\Model\ImageGroup;
+use App\Model\Member;
 use App\Model\Product;
-use App\Model\Video;
 use App\Service\ClickService;
 use App\Service\GenerateService;
 use App\Service\ImageGroupService;
@@ -136,6 +136,26 @@ class ImageGroupController extends AbstractController
         return $this->success([
             'is_pay' => 1,
             'product_id' => $product->id,
+        ]);
+    }
+
+    #[RequestMapping(methods: ['POST'], path: 'pay_method')]
+    public function getPayMethod(RequestInterface $request)
+    {
+        $id = (int) $request->input('id');
+        $memberId = auth()->user()->getId();
+
+        $member = Member::find($memberId);
+
+        return $this->success([
+            'diamond' => [
+                'price' => "1",
+                'member_diamond_coin' => (string) $member->diamond_coins,
+            ],
+            'coin' => [
+                'price' => null,
+                'member_coin' => (string) $member->coins,
+            ],
         ]);
     }
 }
