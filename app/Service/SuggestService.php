@@ -56,7 +56,7 @@ class SuggestService
     {
         $result = [];
         $key = self::MEMBER_TAG_CACHE_KEY . $memberId;
-        if ($this->redis->exists($key)) {
+        if (\Hyperf\Support\env('APP_ENV') == 'product' and $this->redis->exists($key)) {
             return json_decode($this->redis->get($key), true);
         }
 
@@ -93,7 +93,7 @@ class SuggestService
     {
         $key = self::MEMBER_CATEGORIZATION_CACHE_KEY . $memberCategorizationId;
 
-        if ($this->redis->exists($key)) {
+        if (\Hyperf\Support\env('APP_ENV') == 'product' and $this->redis->exists($key)) {
             return json_decode($this->redis->get($key), true);
         }
 
