@@ -122,8 +122,8 @@ class ImageGroupService
 
         $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(ImageGroup::class);
         if (! empty($enableIds)) {
-            $diff = \Hyperf\Collection\collect($enableIds)->diff(\Hyperf\Collection\collect($imageIds));
-            $query = $query->whereIn('id', $imageIds)->whereNotIn('id', $diff);
+            $diff = \Hyperf\Collection\collect($enableIds)->intersect(\Hyperf\Collection\collect($imageIds));
+            $query = $query->whereIn('id', $diff);
         } else {
             $query = $query->whereIn('id', $imageIds);
         }

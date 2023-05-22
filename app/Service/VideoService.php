@@ -292,8 +292,8 @@ class VideoService
 
         $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(Video::class);
         if (! empty($enableIds)) {
-            $diff = \Hyperf\Collection\collect($enableIds)->diff(\Hyperf\Collection\collect($ids));
-            $model = $model->whereIn('id', $ids)->whereNotIn('id', $diff);
+            $diff = \Hyperf\Collection\collect($enableIds)->intersect(\Hyperf\Collection\collect($ids));
+            $model = $model->whereIn('id', $diff);
         } else {
             $model = $model->whereIn('id', $ids);
         }
