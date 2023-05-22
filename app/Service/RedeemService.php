@@ -288,7 +288,7 @@ class RedeemService extends BaseService
                   $model->updated_at = date('Y-m-d H:i:s');
                   $model->created_at = date('Y-m-d H:i:s');
                   $model->save();
-                  return ["msg"=>"兌換成功"];
+                  return ["msg"=>"兌換成功",'vip_days'=>$redeemDetail['vip_days']];
               }
           } else {
               return ["msg"=>"己過期"];
