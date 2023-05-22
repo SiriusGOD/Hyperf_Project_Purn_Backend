@@ -316,11 +316,6 @@ class TagService extends GenerateService
 
     public function searchByTagId(array $params): array
     {
-        $cacheKeys = self::CACHE_KEY . ':' . $params['id'] . ':' . $params['page'] . ':' . $params['limit'] . ':' . $params['limit'] . ':' . $params['sort_by'] . ':' . $params['is_asc'];
-        if ($this->redis->exists($cacheKeys)) {
-            return json_decode($this->redis->get($cacheKeys), true);
-        }
-
         $query = TagCorrespond::leftJoin('videos', function ($join) {
             $join->on('tag_corresponds.correspond_id', '=', 'videos.id')
                 ->where('tag_corresponds.correspond_type', Video::class)
@@ -333,7 +328,7 @@ class TagService extends GenerateService
                     ->where('height', '>', 0)
                     ->where('weight', '>', 0);
             })
-            ->where('tag_corresponds.tag_id', $params['id'])
+            ->whereIn('tag_corresponds.tag_id', $params['ids'])
             ->offset($params['page'] * $params['limit'])
             ->limit($params['limit']);
 

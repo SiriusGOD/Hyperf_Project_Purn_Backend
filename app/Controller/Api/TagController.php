@@ -61,7 +61,7 @@ class TagController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'getTagDetail')]
     public function getTagDetail(RequestInterface $request, TagService $service)
     {
-        $tag_id = $request->input('tag_id');
+        $tag_id = (int) $request->input('tag_id');
         $data = $service->getTagDetail($tag_id);
         return $this->success(['models' => $data]);
     }
@@ -69,12 +69,12 @@ class TagController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'search')]
     public function search(RequestInterface $request, TagService $service)
     {
-        $id = $request->input('tag_id', 0);
-        $page = $request->input('page', 0);
-        $limit = $request->input('limit', Constants::DEFAULT_PAGE_PER);
+        $ids = $request->input('tag_ids', [0]);
+        $page = (int) $request->input('page', 0);
+        $limit = (int) $request->input('limit', Constants::DEFAULT_PAGE_PER);
         $filter = Constants::FEED_TYPES[$request->input('filter')] ?? null;
         $result = $service->searchByTagId([
-            'id' => $id,
+            'ids' => $ids,
             'page' => $page,
             'limit' => $limit,
             'sort_by' => $request->input('sort_by'),
