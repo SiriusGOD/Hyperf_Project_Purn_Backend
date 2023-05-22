@@ -60,11 +60,12 @@ class ChannelController extends AbstractController
     #[RequestMapping(methods: ['GET'], path: 'detail')]
     public function detail(RequestInterface $request, ChannelService $channelService)
     {
-        $request->input('date');
+        $duration = $request->input('duration');
         $id = $request->input('id');
         $data['model'] = $channelService->getChannel((int) $id);
+        $data['calcs'] =(!empty($duration)) ?  $channelService->calcTotal($duration) : null;
         $data['navbar'] = trans('default.channels.detail');
-        $data['redeem_active'] = 'active';
+        $data['channel_active'] = 'active';
         $data['calc'] = 'active';
         return $this->render->render('admin.channel.form', $data);
     }

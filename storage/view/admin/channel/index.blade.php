@@ -8,11 +8,6 @@
                     <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                         <div class="row">
 
-                            @if(authPermission('coin-create'))
-                                <div class="col-sm-12 col-md-12 mb-1">
-                                    <a class="btn badge-info" href="/admin/coin/create">{{trans('default.coin_control.coin_insert') ?? '新增點數類別'}}</a>
-                                </div>
-                            @endif
                         </div>
                         <div class="row">
                             <div class="col-sm-12">

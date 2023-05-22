@@ -133,6 +133,23 @@ class ChannelService extends BaseService
         }
     }
 
+    // 統計查詢
+    public function calcTotal(string $date) : array
+    {
+      $ex_date = explode(" - ",$date);
+      $sDate = \Carbon\Carbon::parse(trim($ex_date[0]));
+      $eDate = \Carbon\Carbon::parse(trim($ex_date[1]));
+      $wheres = [
+          ['date',">=",$sDate->toDateString()],
+          ['date',"<=",$eDate->toDateString()],
+          ['hour',">=",$sDate->format('H')],
+          ['hour',"<=",$eDate->format('H')],
+      ];
+      $reg_total = $this->channelRegister->where($wheres )->sum("total");
+      $ach_total = $this->channelAchievement->where($wheres )->sum("pay_amount");
+      return ['register_total'=>$reg_total , 'ach_total'=>$ach_total]; 
+    }
+
     // 產生新的渠道
     public function parseDomain(string $url)
     {

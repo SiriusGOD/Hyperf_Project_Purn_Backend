@@ -35,6 +35,7 @@ class BaseRepository
         $model->save();
         return $model;
     }
+
     //共用
     public function sample(string $tableName, $where, $select, $whereFlag = false)
     {

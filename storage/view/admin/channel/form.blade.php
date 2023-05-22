@@ -27,26 +27,21 @@
                         </div>
 
                         <div class="row">
-                            <form action="" method="post" class="col-md-12">
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.channels.url') ?? '使用者統計'}}</label>
-                                    <input type="text" class="form-control" name="account" id="account" value="{{$model->url}}">
-                                </div>
-                                @if(isset($calc))
+                             
+                                 
+                                @if(isset($calcs))
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.channels.total_amount') ?? '使用者統計'}}</label>
-                                    <input type="text" class="form-control" name="account" id="account" value="{{$calc['amount']}}">
+                                    <input type="text" class="form-control" name="account" id="account" value="{{$calcs['ach_total']}}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.channels.register_count') ?? '使用者統計'}}</label>
-                                    <input type="text" class="form-control" name="account" id="account" value="{{$calc['register_count']}}">
+                                    <input type="text" class="form-control" name="account" id="account" value="{{$calcs['register_total']}}">
                                 </div>
                                 @endif
 
                                  
-                                <button type="submit"
-                                        class="btn btn-primary">{{trans('default.search') ?? '送出'}}</button>
-                            </form>
+                              
                         </div>
                     </div>
                 </div>
@@ -68,9 +63,12 @@ $(document).ready(function() {
     opens: 'left',
     // 其他选项和回调函数可以根据您的需求进行设置
     "locale": {
-      "format": "YYYY-MM-DD HH:mm:ss", // 设置日期格式
+      "format": "YYYY-MM-DD HH:00:00", // 设置日期格式
       // 可以根据需要设置其他本地化选项
-    }
+    },
+    timePicker: true, // 启用时间选择器
+    timePicker24Hour: true, // 使用24小时制显示时间
+    timePickerIncrement: 1 // 时间间隔的分钟数
   });
 });
 
