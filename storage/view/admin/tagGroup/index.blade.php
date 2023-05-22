@@ -47,7 +47,7 @@
                                     @foreach($datas as $model)
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $model->id }}</td>
-                                            <td class="sorting_1 dtr-control">{{ $model->user->name }}</td>
+                                            <td class="sorting_1 dtr-control">{{ $model->user->name ?? 'system' }}</td>
                                             <td>{{ $model->name }}</td>
                                             <td>{{ $model->is_hide == 0 ? trans('default.tag_group_control.not_hide') : trans('default.tag_group_control.hide')}}</td>
                                             <td>

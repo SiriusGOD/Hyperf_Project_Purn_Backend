@@ -56,7 +56,7 @@
                                     @foreach($datas as $model)
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $model->id }}</td>
-                                            <td class="sorting_1 dtr-control">{{ $model->user->name }}</td>
+                                            <td class="sorting_1 dtr-control">{{ $model->user->name ?? 'system' }}</td>
                                             <td>{{ $model->name }}</td>
                                             <td>
                                                 @if(!empty($model->img))
