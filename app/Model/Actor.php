@@ -14,16 +14,20 @@ namespace App\Model;
 use Carbon\Carbon;
 
 /**
- * @property int $id
- * @property int $user_id
- * @property int $sex
- * @property string $name
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property int $id 
+ * @property int $user_id 
+ * @property int $sex 
+ * @property string $name 
+ * @property string $avatar 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property-read User $user 
  */
 class Actor extends Model
 {
     public const PAGE_PER = 10;
+
+    public const SEX = ['female' => 1, 'male' => 0];
 
     /**
      * The table associated with the model.

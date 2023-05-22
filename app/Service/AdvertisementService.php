@@ -47,13 +47,17 @@ class AdvertisementService
 
     public function getAdvertisementBySearch(int $page, int $limit = 1): array
     {
-        $now = Carbon::now()->toDateTimeString();
-        return Advertisement::where('start_time', '<=', $now)
-            ->where('end_time', '>=', $now)
-            ->offset($page * $limit)
-            ->limit($limit)
-            ->get()
-            ->toArray();
+        $models = $this->getAdvertisements();
+        if(empty($models)) {
+            return [];
+        }
+        $count = count($models);
+        if ($limit >= $count) {
+            return $models;
+        }
+
+        $key = ($page * $limit) % $count;
+        return $models[$key];
     }
 
     // 更新快取

@@ -14,12 +14,11 @@ namespace App\Model;
 use Carbon\Carbon;
 
 /**
- * @property int $id
- * @property int $user_id
- * @property string $name
- * @property int $is_hide
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property int $id 
+ * @property int $tag_id 
+ * @property int $tag_group_id 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
  */
 class TagHasGroup extends Model
 {
