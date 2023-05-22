@@ -56,9 +56,21 @@ class AdvertisementService
             return $models;
         }
 
-        return $models;
-//        $key = ($page * $limit) % $count;
+        $key = ($page * $limit) % $count;
 
+        $result = [];
+
+        for($i = 0; $i<$limit; $i++) {
+            $data = $models[$key] ?? null;
+            if ($data == null) {
+                $key = 0;
+                $data = $models[$key];
+            }
+            $result[] = $data;
+            $key++;
+        }
+
+        return $result;
     }
 
     // 更新快取
