@@ -4,7 +4,7 @@ use Hyperf\Database\Schema\Schema;
 use Hyperf\Database\Schema\Blueprint;
 use Hyperf\Database\Migrations\Migration;
 
-class CreateDriveHasGroups extends Migration
+class CreateDriveGroupHasGroups extends Migration
 {
     /**
      * Run the migrations.
