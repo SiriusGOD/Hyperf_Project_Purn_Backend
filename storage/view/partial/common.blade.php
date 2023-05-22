@@ -349,6 +349,26 @@
                         </a>
                     </li>
                 @endif
+                @if(authPermission('driveClass-index'))
+                    <li class="nav-item">
+                        <a href="/admin/drive_class/index" class="nav-link {{$drive_class_active ?? ''}}">
+                            <i class="nav-icon fab fa-telegram"></i>
+                            <p>
+                                {{trans('default.leftbox.driveClass') ?? '車群類別管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
+                @if(authPermission('driveGroup-index'))
+                    <li class="nav-item">
+                        <a href="/admin/drive_group/index" class="nav-link {{$drive_group_active ?? ''}}">
+                            <i class="nav-icon fab fa-twitter"></i>
+                            <p>
+                                {{trans('default.leftbox.driveGroup') ?? '車群管理'}}
+                            </p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->
