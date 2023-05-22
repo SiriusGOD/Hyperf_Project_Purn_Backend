@@ -98,7 +98,7 @@ class MemberInviteLogService extends BaseService
            WHEN 3 THEN '".trans("default.member.disable")."'
            WHEN 4 THEN '".trans("default.member.delete")."'
            ELSE ''
-       END AS `bank_type`";
+       END AS `user_status`";
       $select = ["id",DB::raw($createDate),DB::raw($sqlStatus),"name"];
       $model = $this->member->select($select)
                   ->without('is_selected_tag')
