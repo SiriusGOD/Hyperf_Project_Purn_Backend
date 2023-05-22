@@ -56,8 +56,9 @@ class AdvertisementService
             return $models;
         }
 
-        $key = ($page * $limit) % $count;
-        return $models[$key];
+        return $models;
+//        $key = ($page * $limit) % $count;
+
     }
 
     // 更新快取
