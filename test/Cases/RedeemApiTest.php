@@ -12,6 +12,7 @@ namespace HyperfTest\Cases;
 
 use App\Model\Member;
 use App\Model\Redeem;
+use App\Model\BuyMemberLevel;
 use App\Service\RedeemService;
 use App\Service\MemberRedeemService;
 use App\Service\MemberService;
@@ -88,11 +89,12 @@ class RedeemApiTest extends HttpTestCase
     //取可用兌換卷
     public function testRedeemCode()
     {
-      $user = Member::where('id',3)->first();
+      $memberId = 9;
+      $user = Member::where('id',$memberId)->first();
       $token = auth()->login($user);
       $this->token = $token; 
       make(MemberService::class)->saveToken($user->id, $token);
-      $redeem=Redeem::where("status",0)->first();
+      $redeem = Redeem::where("vip_days",'>',0)->first();
       $data = $this->client->post('/api/redeem/redeemCode',
       [
         "code" => $redeem->code
@@ -100,7 +102,9 @@ class RedeemApiTest extends HttpTestCase
       [
           'Authorization' => 'Bearer ' . $token,
       ]);
-      print_r([$data ,'1232']);
+      $buy = BuyMemberLevel::where('member_id',$memberId)->first();
+      print_r([$data ,'redeemcode']);
+      $this->assertSame($buy->member_id , $memberId);
       $this->assertSame(200, $data['code']);
     }
 

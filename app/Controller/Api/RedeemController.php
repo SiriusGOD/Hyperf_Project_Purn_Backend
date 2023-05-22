@@ -18,6 +18,7 @@ use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\MemberRedeem;
 use App\Model\MemberRedeemVideo;
 use App\Service\MemberRedeemService;
+use App\Service\MemberService;
 use App\Service\MemberRedeemVideoService;
 use App\Service\RedeemService;
 use App\Util\SimplePaginator;
@@ -66,9 +67,9 @@ class RedeemController extends AbstractController
         return $this->success(['models' => $result]);
     }
   
-    // 兌換影片
+    // 兌換代碼
     #[RequestMapping(methods: ['POST'], path: 'redeemCode')]
-    public function redeemCode(RequestInterface $request, RedeemService $redeemService)
+    public function redeemCode(RequestInterface $request, MemberService $memberService, RedeemService $redeemService)
     {
         $memberId = auth('jwt')->user()->getId();
         $code = $request->input('code');
@@ -76,6 +77,9 @@ class RedeemController extends AbstractController
             return $this->error(trans('default.redeem.code_required'), ErrorCode::BAD_REQUEST);
         }
         $result = $redeemService->executeRedeemCode($code, $memberId);
+        //更新vip
+        $memberService->affUpgradeVIP($memberId ,(int)$result['vip_days'] ,MemberService::REDEEM);
+        unset($result['vip_days']);
         return $this->success($result);
     }
     // 使用者的兌換卷列表
