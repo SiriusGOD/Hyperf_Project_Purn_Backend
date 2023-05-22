@@ -12,13 +12,12 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
-use App\Model\Tag;
-use App\Model\TagHasGroup;
-use App\Request\TagRequest;
-use App\Service\TagService;
+use App\Model\DriveGroup;
+use App\Model\DriveGroupHasClass;
 use Hyperf\DbConnection\Db;
-use Hyperf\Di\Annotation\Inject;
+use App\Service\DriveGroupService;
 use App\Util\General;
+use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
@@ -31,7 +30,7 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
 #[Controller]
 #[Middleware(middleware: 'App\\Middleware\\PermissionMiddleware')]
-class TagController extends AbstractController
+class DriveGroupController extends AbstractController
 {
     protected RenderInterface $render;
 
@@ -45,46 +44,55 @@ class TagController extends AbstractController
     }
 
     #[RequestMapping(methods: ['GET'], path: 'index')]
-    public function index(RequestInterface $request)
+    public function index(RequestInterface $request, ResponseInterface $response)
     {
         // 顯示幾筆
-        $step = Tag::PAGE_PER;
+        $step = DriveGroup::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
-        $models = Tag::with('user')->leftjoin('tag_has_groups', 'tags.id', 'tag_has_groups.tag_id')
-            ->leftjoin('tag_groups', 'tag_has_groups.tag_group_id', 'tag_groups.id')
-            ->select('tags.*', Db::raw("GROUP_CONCAT(tag_groups.name SEPARATOR ' , ') as group_name "))
-            ->groupBy('tags.id')
-            ->offset(($page - 1) * $step)->limit($step)->get();
-        $total = Tag::count();
+        $models = DriveGroup::with('user')->leftjoin('drive_group_has_class', 'drive_groups.id', 'drive_group_has_class.drive_group_id')
+                ->leftjoin('drive_class', 'drive_class.id', 'drive_group_has_class.drive_class_id')
+                ->select('drive_groups.*', Db::raw("GROUP_CONCAT(drive_class.name SEPARATOR ' , ') as class_name "))
+                ->groupBy('drive_groups.id')
+                ->whereNull('drive_groups.deleted_at')->offset(($page - 1) * $step)->limit($step)->get();
+        $total = DriveGroup::count();
         $data['last_page'] = ceil($total / $step);
         if ($total == 0) {
             $data['last_page'] = 1;
         }
-        $data['navbar'] = trans('default.tag_control.tag_control');
-        $data['tag_active'] = 'active';
+        $data['navbar'] = trans('default.drive_group_control.drive_group_control');
+        $data['drive_group_active'] = 'active';
         $data['total'] = $total;
         $data['datas'] = $models;
         $data['page'] = $page;
         $data['step'] = $step;
-        $path = '/admin/tag/index';
+        $path = '/admin/drive_group/index';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . ($page - 1);
         $paginator = new Paginator($models, $step, $page);
         $data['paginator'] = $paginator->toArray();
-        return $this->render->render('admin.tag.index', $data);
+        return $this->render->render('admin.driveGroup.index', $data);
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'create')]
+    public function create()
+    {
+        $data['navbar'] = trans('default.drive_group_control.drive_group_insert');
+        $data['drive_group_active'] = 'active';
+        $data['drive_class_ids'] = '';
+        return $this->render->render('admin.driveGroup.form', $data);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'store')]
-    public function store(TagRequest $request, ResponseInterface $response, TagService $service): PsrResponseInterface
+    public function store(RequestInterface $request, ResponseInterface $response, DriveGroupService $service): PsrResponseInterface
     {
         $data['user_id'] = auth('session')->user()->getId();
         $data['id'] = $request->input('id');
         $data['name'] = $request->input('name');
         $data['groups'] = $request->input('groups', []);
-        $data['hot_order'] = $request->input('hot_order');
+        $data['url'] = $request->input('url');
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $dataArr = General::uploadImage($file, 'tag');
+            $dataArr = General::uploadImage($file, 'icons');
             $imageUrl = $dataArr['url'];
             // $data['height'] = $dataArr['height'];
             // $data['weight'] = $dataArr['weight'];
@@ -92,27 +100,18 @@ class TagController extends AbstractController
         if (! empty($imageUrl)) {
             $data['image_url'] = $imageUrl;
         }
-        $service->createTag($data);
-        return $response->redirect('/admin/tag/index');
-    }
-
-    #[RequestMapping(methods: ['GET'], path: 'create')]
-    public function create()
-    {
-        $data['navbar'] = trans('default.tag_control.tag_insert');
-        $data['tag_active'] = 'active';
-        $data['tag_group_ids'] = '';
-        return $this->render->render('admin.tag.form', $data);
+        $service->storeDriveGroup($data);
+        return $response->redirect('/admin/drive_group/index');
     }
 
     #[RequestMapping(methods: ['GET'], path: 'edit')]
     public function edit(RequestInterface $request)
     {
         $id = $request->input('id');
-        $data['navbar'] = trans('default.tag_control.tag_edit');
-        $data['tag_active'] = 'active';
-        $data['tag_group_ids'] = TagHasGroup::where('tag_id', $id)->get()->pluck('tag_group_id');
-        $data['model'] = Tag::find($id);
-        return $this->render->render('admin.tag.form', $data);
+        $data['model'] = DriveGroup::findOrFail($id);
+        $data['navbar'] = trans('default.drive_class_control.drive_class_edit');
+        $data['drive_group_active'] = 'active';
+        $data['drive_class_ids'] = DriveGroupHasClass::where('drive_group_id', $id)->get()->pluck('drive_class_id');
+        return $this->render->render('admin.driveGroup.form', $data);
     }
 }

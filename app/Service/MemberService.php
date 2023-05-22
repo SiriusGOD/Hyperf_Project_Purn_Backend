@@ -575,6 +575,8 @@ class MemberService extends BaseService
         // 顯示幾筆
         $step = $pageSize ?? Order::FRONTED_PAGE_PER;
 
+        $generateService = make(GenerateService::class);
+
         $query = Order::join('order_details', 'order_details.order_id', 'orders.id')
             ->join('products', 'products.id', 'order_details.product_id')
             ->select('products.id', 'products.type', 'products.correspond_id', 'products.name', 'products.expire', 'orders.currency', 'orders.created_at')
@@ -622,33 +624,40 @@ class MemberService extends BaseService
                 }
 
                 if ($value->type == Product::TYPE_CORRESPOND_LIST['image']) {
-                    // $image = ImageGroup::findOrFail($value->correspond_id);
-                    $image = ImageGroup::leftJoin('images', 'image_groups.id', 'images.group_id')
-                        ->selectRaw('image_groups.thumbnail, count(*) as count')
-                        ->groupBy('image_groups.id')
-                        ->first();
-
-                    array_push($arr, [
-                        'product_id' => $value->id,
-                        'source_id' => $value->correspond_id,
-                        'name' => $value->name,
-                        'thumbnail' => env('IMAGE_GROUP_ENCRYPT_URL') . $image->thumbnail ?? '',
-                        'expire' => $value->expire,
-                        'num' => $image->count ?? 0,
-                    ]);
+                    $image = ImageGroup::with('imagesLimit')->where('id', $value->correspond_id)->get()->toArray();
+                    // $image = ImageGroup::leftJoin('images', 'image_groups.id', 'images.group_id')
+                    //     ->selectRaw('image_groups.thumbnail, count(*) as count')
+                    //     ->where('image_groups.id', $value->correspond_id)
+                    //     ->groupBy('image_groups.id')
+                    //     ->get()
+                    //     ->toArray();
+                    $result = $generateService->generateImageGroups([], $image);
+                    
+                    array_push($arr, $result[0]);
+                    // array_push($arr, [
+                    //     'product_id' => $value->id,
+                    //     'source_id' => $value->correspond_id,
+                    //     'name' => $value->name,
+                    //     'thumbnail' => env('IMAGE_GROUP_ENCRYPT_URL') . $image->thumbnail ?? '',
+                    //     'expire' => $value->expire,
+                    //     'num' => $image->count ?? 0,
+                    // ]);
                 }
                 
                 if ($value->type == Product::TYPE_CORRESPOND_LIST['video']) {
                     
-                    $video = Video::findOrFail($value->correspond_id);
-                    array_push($arr, [
-                        'product_id' => $value->id,
-                        'source_id' => $value->correspond_id,
-                        'name' => $value->name,
-                        'thumbnail' => env('IMAGE_GROUP_ENCRYPT_URL') . $video->cover_thumb ?? '',
-                        'expire' => $value->expire,
-                        'duration' => $value->duration ?? 0,
-                    ]);
+                    $video = Video::where('id', $value->correspond_id)->get()->toArray();
+                    $result = $generateService->generateVideos([], $video);
+
+                    array_push($arr, $result[0]);
+                    // array_push($arr, [
+                    //     'product_id' => $value->id,
+                    //     'source_id' => $value->correspond_id,
+                    //     'name' => $value->name,
+                    //     'thumbnail' => env('IMAGE_GROUP_ENCRYPT_URL') . $video->cover_thumb ?? '',
+                    //     'expire' => $value->expire,
+                    //     'duration' => $value->duration ?? 0,
+                    // ]);
                 }
             }
             // $data['image'] = $image_arr;

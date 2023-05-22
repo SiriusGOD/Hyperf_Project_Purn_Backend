@@ -303,6 +303,8 @@ return [
         'proxy' => '代理管理',
         'navigation' => '導航管理',
         'report' => '檢舉管理',
+        'driveClass' => '車群類別管理',
+        'driveGroup' => '車群管理'
     ],
     // -------------------------------------------------------------------
     // UserController
@@ -658,4 +660,24 @@ return [
             3 => '取消',
         ],
     ],
+    // -------------------------------------------------------------------
+    // driveClassController
+    'drive_class_control' => [
+        'drive_class_control' => '車群類別管理',
+        'drive_class_insert' => '新增車群類別',
+        'drive_class_name' => '車群類別名稱',
+        'drive_class_description' => '車群類別描述',
+        'drive_class_edit' => '編輯車群類別'
+    ],
+    // -------------------------------------------------------------------
+    // driveGroupController
+    'drive_group_control' => [
+        'drive_group_control' => '車群管理',
+        'drive_group_insert' => '新增車群',
+        'drive_group_name' => '車群名稱',
+        'drive_group_edit' => '編輯車群',
+        'drive_group_has_class' => '所屬車群類別',
+        
+    ],
+    // -------------------------------------------------------------------
 ];
