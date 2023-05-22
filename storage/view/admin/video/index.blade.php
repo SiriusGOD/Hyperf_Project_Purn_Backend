@@ -99,7 +99,7 @@
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $video->id}}</td>
                                             <td> {{ $video->title}}</td>
-                                            <td> {{ $const::CATEGORY[$video->category]}}</td>
+                                            <td> {{ $const::CATEGORY[$video->category] ?? ''}}</td>
                                             <td> {{ $const::IS_FREE[$video->is_free]}}</td>
                                             <td> {{ $video->click_count ?? 0 }}</td>
                                             <td> {{ $video->like_count ?? 0 }}</td>
