@@ -45,6 +45,13 @@ return [
         'userstep'=>'操作日誌',
         'customer_service' => '客服系统',
     ],
+    'member'=>[
+       "visitors"=>"遊客",
+       "not_verified"=>"未驗證",
+       "verified"=>"己驗證",
+       "disable"=>"禁用",
+       "delete"=>"己刪除",
+    ],
     'user_name' => '使用者名称',
     'list' => '列表',
     'index' => '列表',

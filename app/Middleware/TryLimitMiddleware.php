@@ -69,7 +69,12 @@ class TryLimitMiddleware implements MiddlewareInterface
         } elseif (! empty($params['http_x_forwarded_for'])) {
             $ip = $params['http_x_forwarded_for'];
         } else {
+          if(isset($params['remote_addr'])){
             $ip = $params['remote_addr'];
+          }else{
+            $ip = '127.0.0.1';
+
+          }
         }
 
         return $ip;

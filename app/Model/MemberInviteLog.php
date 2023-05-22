@@ -22,6 +22,7 @@ namespace App\Model;
  */
 class MemberInviteLog extends Model
 {
+    public const PAGE_PER =10;
     /**
      * The table associated with the model.
      */
