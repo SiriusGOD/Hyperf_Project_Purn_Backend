@@ -72,6 +72,9 @@ class ImportTagSeed implements BaseInterface
 
     public function down(): void
     {
+        \App\Model\TagGroup::truncate();
+        \App\Model\Tag::truncate();
+        \App\Model\TagHasGroup::truncate();
         \App\Model\ImportTag::truncate();
         \App\Model\MemberTag::truncate();
     }
