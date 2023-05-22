@@ -90,7 +90,7 @@ class RedeemApiTest extends HttpTestCase
     public function testRedeemCode()
     {
       $memberId = 9;
-      $user = Member::where('id',$memberId)->first();
+      $user = Member::orderBy('id','desc')->first();
       $token = auth()->login($user);
       $this->token = $token; 
       make(MemberService::class)->saveToken($user->id, $token);
@@ -104,7 +104,7 @@ class RedeemApiTest extends HttpTestCase
       ]);
       $buy = BuyMemberLevel::where('member_id',$memberId)->first();
       print_r([$data ,'redeemcode']);
-      $this->assertSame($buy->member_id , $memberId);
+      $this->assertSame($buy->member_id , $user->id);
       $this->assertSame(200, $data['code']);
     }
 

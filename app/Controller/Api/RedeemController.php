@@ -78,8 +78,10 @@ class RedeemController extends AbstractController
         }
         $result = $redeemService->executeRedeemCode($code, $memberId);
         //更新vip
-        $memberService->affUpgradeVIP($memberId ,(int)$result['vip_days'] ,MemberService::REDEEM);
-        unset($result['vip_days']);
+        if(isset($result['vip_days'])){
+          $memberService->affUpgradeVIP($memberId ,(int)$result['vip_days'] ,MemberService::REDEEM);
+          unset($result['vip_days']);
+        }
         return $this->success($result);
     }
     // 使用者的兌換卷列表
