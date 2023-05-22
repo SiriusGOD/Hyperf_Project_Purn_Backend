@@ -424,7 +424,7 @@ class TagService extends GenerateService
         foreach ($tags as $tag) {
             $result[] = [
                 'tag_id' => $tag['id'],
-                'count' => PHP_INT_MAX,
+                'total' => PHP_INT_MAX,
                 'name' => $tag['name'],
             ];
         }
