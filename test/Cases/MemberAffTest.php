@@ -81,7 +81,6 @@ class MemberAffTest extends HttpTestCase
         $data = $this->client->post('/api/member/update', $insertArray ,[
             'Authorization' => 'Bearer ' . $token,
         ]);
-
         $this->assertSame(200, (int)$data['code']);
     }
 
@@ -101,7 +100,16 @@ class MemberAffTest extends HttpTestCase
         $data = $this->client->post('/api/member/verification/register_check', ['code'=>$v->code] ,[
             'Authorization' => 'Bearer ' . $token,
         ]);
-
+        $this->assertSame(200, (int)$data['code']);
+    }
+    //邀請紀錄
+    public function testMemberAffList(){
+        $user = Member::where('id',84)->first();
+        $token = auth()->login($user);
+        make(MemberService::class)->saveToken($user->id, $token);
+        $data = $this->client->post('/api/member/affList', ['page'=>1] ,[
+            'Authorization' => 'Bearer ' . $token,
+        ]);
         print_r([  'qwe',$data]);
         $this->assertSame(200, (int)$data['code']);
     }

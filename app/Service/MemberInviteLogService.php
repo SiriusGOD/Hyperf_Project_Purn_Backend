@@ -15,17 +15,14 @@ use App\Model\Member;
 use App\Model\MemberInviteLog;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
+use Hyperf\DbConnection\Db;
 
 class MemberInviteLogService extends BaseService
 {
     protected $loggerFactory;
-
     protected $redis;
-
     protected $redeem;
-
     protected $member;
-
     protected $memberInviteLog;
 
     public function __construct(
@@ -83,5 +80,33 @@ class MemberInviteLogService extends BaseService
             $wg->done();
         });
         $wg->wait();
+    }
+
+    //邀請紀錄
+    //STATUS = ['VISITORS' => 0, 'NOT_VERIFIED' => 1, 'VERIFIED' => 2, 'DISABLE' => 3, 'DELETE' => 4];
+    public function invitedList(int $memberId ,int $page=0 ){
+      $wheres = ['invited_by' => $memberId ];
+      $model = $this->memberInviteLog->select("member_id");
+      $res = $this->list($model , $wheres, $page, MemberInviteLog::PAGE_PER);
+      $memberWhere = $res->pluck( 'member_id' )->toArray(); 
+      //where member
+      $createDate = " DATE_FORMAT(created_at, '%Y-%m-%d') AS reg_day";
+      $sqlStatus = "CASE `status`
+           WHEN 0 THEN '".trans("default.member.visitors")."'
+           WHEN 1 THEN '".trans("default.member.not_verified")."'
+           WHEN 2 THEN '".trans("default.member.verified")."'
+           WHEN 3 THEN '".trans("default.member.disable")."'
+           WHEN 4 THEN '".trans("default.member.delete")."'
+           ELSE ''
+       END AS `bank_type`";
+      $select = ["id",DB::raw($createDate),DB::raw($sqlStatus),"name"];
+      $model = $this->member->select($select)
+                  ->without('is_selected_tag')
+                  ->whereIn('id',$memberWhere);
+      if ($page == 1) {
+        $page = 0;
+      }
+      $model = $model->offset($page * MemberInviteLog::PAGE_PER)->limit(MemberInviteLog::PAGE_PER)->get();
+      return $this->removeCol( $model->toArray(), 'is_selected_tag');
     }
 }
