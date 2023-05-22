@@ -80,6 +80,9 @@ class RedeemController extends AbstractController
         //更新vip
         if(isset($result['vip_days'])){
           $memberService->affUpgradeVIP($memberId ,(int)$result['vip_days'] ,MemberService::REDEEM);
+          //更新member裝態
+          $memberService->delRedis($memberId);
+          $memberService->getMember($memberId);
           unset($result['vip_days']);
         }
         return $this->success($result);
