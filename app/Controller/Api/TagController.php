@@ -53,7 +53,7 @@ class TagController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'searchGroupTags')]
     public function searchGroupTags(RequestInterface $request, TagGroupService $service)
     {
-        $group_id = $request->input('group_id');
+        $group_id = (int) $request->input('group_id');
         $data = $service->searchGroupTags($group_id);
         return $this->success(['models' => $data]);
     }
