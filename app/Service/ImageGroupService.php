@@ -22,7 +22,6 @@ use App\Model\Order;
 use App\Model\Product;
 use App\Model\Tag;
 use App\Model\TagCorrespond;
-use App\Model\Video;
 use Carbon\Carbon;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Database\Model\Collection;
@@ -109,23 +108,7 @@ class ImageGroupService
         }
 
         $query = ImageGroup::where('title', 'like', '%' . $keyword . '%')
-            ->where('height', '>', 0)
-            ->offset($limit * $page)
-            ->limit($limit);
-
-        if (! empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
-            if ($isAsc == 1) {
-                $query = $query->orderBy('total_click');
-            } else {
-                $query = $query->orderByDesc('total_click');
-            }
-        } elseif (! empty($sortBy) and $sortBy == Constants::SORT_BY['created_time']) {
-            if ($isAsc == 1) {
-                $query = $query->orderBy('id');
-            } else {
-                $query = $query->orderByDesc('id');
-            }
-        }
+            ->where('height', '>', 0);
 
         $models = $query->get();
         $imageIds = array_merge($models->pluck('id')->toArray(), $imageIds);
@@ -249,20 +232,20 @@ class ImageGroupService
         $member = Member::find($memberId);
         $imageGroup = ImageGroup::find($id);
         $product = Product::where('expire', Product::EXPIRE['no'])
-                ->where('type', ImageGroup::class)
-                ->where('correspond_id', $id)
-                ->first();
+            ->where('type', ImageGroup::class)
+            ->where('correspond_id', $id)
+            ->first();
 
         // 判定影片等級與會員等級
-        if($imageGroup->pay_type <= $member->member_level_status){
+        if ($imageGroup->pay_type <= $member->member_level_status) {
             $data['user_id'] = $memberId;
-            $data['prod_id'] = $product -> id;
+            $data['prod_id'] = $product->id;
             $data['payment_type'] = 0;
             $data['pay_proxy'] = 'online';
             $data['ip'] = $ip;
             $data['product'] = $product->toArray();
             $data['user'] = $member->toArray();
-            $data['oauth_type'] = $member -> device ?? '';
+            $data['oauth_type'] = $member->device ?? '';
 
             switch ($member->member_level_status) {
                 // 免費會員
@@ -270,9 +253,9 @@ class ImageGroupService
                     // 確認是否購買過
                     $is_buy = $this->orderCheck($id, $memberId);
                     $service = make(OrderService::class);
-                    if(!$is_buy){
+                    if (! $is_buy) {
                         // 未購買過 -> 使用免費次數購買
-                        if($member->free_quota > 0){
+                        if ($member->free_quota > 0) {
                             // 購買
                             $data['pay_method'] = 'free_quota';
                             // 建立訂單
@@ -292,23 +275,23 @@ class ImageGroupService
                                     $order->save();
                                 }
                             }
-                        }else{
+                        } else {
                             // 次數不足
                             return false;
                         }
                     }
                     // 刪除會員快取
-                    $service -> delMemberRedis($memberId);
+                    $service->delMemberRedis($memberId);
                     return true;
                     break;
-                // Vip會員
+                    // Vip會員
                 case MemberLevel::TYPE_VALUE['vip']:
                     // 確認是否購買過
                     $is_buy = $this->orderCheck($id, $memberId);
                     $service = make(OrderService::class);
-                    if(!$is_buy){
+                    if (! $is_buy) {
                         // 未購買過 -> 使用Vip次數購買
-                        if($member->vip_quota > 0){
+                        if ($member->vip_quota > 0) {
                             // 購買
                             $data['pay_method'] = 'vip_quota';
                             // 建立訂單
@@ -333,27 +316,26 @@ class ImageGroupService
                                     $order->save();
                                 }
                             }
-                        }else if($member->vip_quota === 0){
+                        } elseif ($member->vip_quota === 0) {
                             // 次數不足
                             return false;
-                        }else{
+                        } else {
                             // 次數為Null -> 可以直接看
                             return true;
                         }
                     }
                     // 刪除會員快取
-                    $service -> delMemberRedis($memberId);
+                    $service->delMemberRedis($memberId);
                     return true;
                     break;
-
-                // 鑽石會員
+                    // 鑽石會員
                 case MemberLevel::TYPE_VALUE['diamond']:
                     // 確認是否購買過
                     $is_buy = $this->orderCheck($id, $memberId);
                     $service = make(OrderService::class);
-                    if(!$is_buy){
+                    if (! $is_buy) {
                         // 未購買過 -> 使用鑽石次數購買
-                        if($member->diamond_quota > 0){
+                        if ($member->diamond_quota > 0) {
                             // 購買
                             $data['pay_method'] = 'diamond_quota';
                             // 建立訂單
@@ -378,20 +360,20 @@ class ImageGroupService
                                     $order->save();
                                 }
                             }
-                        }else if($member->diamond_quota === 0){
+                        } elseif ($member->diamond_quota === 0) {
                             // 次數不足
                             return false;
-                        }else{
+                        } else {
                             // 次數為Null -> 可以直接看
                             return true;
                         }
                     }
                     // 刪除會員快取
-                    $service -> delMemberRedis($memberId);
+                    $service->delMemberRedis($memberId);
                     return true;
                     break;
             }
-        }else{
+        } else {
             return $this->orderCheck($id, $memberId);
         }
 
@@ -462,7 +444,9 @@ class ImageGroupService
             $date1 = Carbon::parse($order->created_at);
             $date2 = Carbon::now();
             $diff = $date1->diffInDays($date2);
-            if(abs($diff) > 0)return false;
+            if (abs($diff) > 0) {
+                return false;
+            }
         }
         return true;
     }
