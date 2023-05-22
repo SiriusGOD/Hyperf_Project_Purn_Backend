@@ -196,7 +196,7 @@ class VideoController extends AbstractController
         }
 
         $model = $service->getPayVideo($id)->toArray();
-        $url = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $model['m3u8'];
+        $url = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $model['source'];
 
         return $this->success([
             'url' => $url,
