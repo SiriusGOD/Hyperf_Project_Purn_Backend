@@ -45,8 +45,8 @@ class RedeemController extends AbstractController
           return $this->success(['product_name'=>$result['model']->title ,'is_used'=>0]);
         }
         if($result['status']==1){
-          //不存在
-          $trans=trans('default.redeem.not_exists');
+          //不存在或己過期
+          $trans=trans('default.redeem.not_exists_or_expire');
         }else{
           //status =2己使用過
           $trans=trans('default.redeem.is_used');

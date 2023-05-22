@@ -218,7 +218,7 @@ return [
     ],
     // redeem
     'redeem' => [
-        'not_exists'=>'优惠卷不存在',
+        'not_exists_or_expire'=>'优惠卷不存在或己過期',
         'is_used'=>'己使用過',
         'insert' => '新增优惠卷',
         'can' => '可兌換',

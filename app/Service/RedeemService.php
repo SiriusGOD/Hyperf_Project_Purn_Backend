@@ -97,16 +97,14 @@ class RedeemService extends BaseService
             return ["is_used"=>1 ,'status'=>2];
           }
 
-          $model = $this->redeem->where('code', $code)->first(); 
-          if(!$model){
-            return ["is_used"=>0,'status'=>1];
-          } 
-
-          $end = Carbon::now()->toDateTimeString();  
+          $today = Carbon::now()->toDateTimeString();  
           $model = $this->redeem->where('status', RedeemCode::ABLE)
                                 ->where('code', $code)
-                                ->where('end','>=', $end)->first();
-          return ["is_used"=>0,'status'=>0 ,'model'=>$model] ;
+                                ->where('end','>=', $today)->first();
+          if($model){
+            return ["is_used"=>0,'status'=>0 ,'model'=>$model] ;
+          }
+          return ["is_used"=>0,'status'=>1 ] ;
       }
       // 使用者兌換卷 by code
       public function getMemberRedeemByCode(string $code, int $page)
