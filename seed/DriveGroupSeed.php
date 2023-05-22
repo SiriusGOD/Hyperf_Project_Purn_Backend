@@ -33,18 +33,21 @@ class DriveGroupSeed implements BaseInterface
         $model = new \App\Model\DriveGroup();
         $model->name = 'Pornterest 官方頻道';
         $model->user_id = 1;
+        $model->img = '/upload/icons/20230522/2023052218010760108.png';
         $model->url = 'https://t.me/Pornterest_Official';
         $model->save();
 
         $model = new \App\Model\DriveGroup();
         $model->name = 'Pornterest TG交流群';
         $model->user_id = 1;
+        $model->img = '/upload/icons/20230522/2023052218012929149.png';
         $model->url = 'https://t.me/PornterestOfficial';
         $model->save();
 
         $model = new \App\Model\DriveGroup();
         $model->name = 'Pornterest 推特群';
         $model->user_id = 1;
+        $model->img = '/upload/icons/20230522/2023052218014851032.png';
         $model->url = 'https://twitter.com/pornterest69';
         $model->save();
 
