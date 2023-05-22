@@ -62,8 +62,10 @@ class ChannelController extends AbstractController
     {
         $duration = $request->input('duration');
         $id = $request->input('id');
+        $data['id'] = $id;
+        $data['name'] = $request->input('name');
         $data['model'] = $channelService->getChannel((int) $id);
-        $data['calcs'] =(!empty($duration)) ?  $channelService->calcTotal($duration) : null;
+        $data['calcs'] =(!empty($duration)) ?  $channelService->calcTotal($duration,(int)$id) : null;
         $data['navbar'] = trans('default.channels.detail');
         $data['channel_active'] = 'active';
         $data['calc'] = 'active';

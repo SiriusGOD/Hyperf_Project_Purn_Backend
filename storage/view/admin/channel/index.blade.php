@@ -56,7 +56,7 @@
                                             <td>
                                             @if(authPermission('channels-detail'))
                                                 <div class="row mb-1">
-                                                <a href="/admin/channel/detail?id={{$model->id}}" class="btn btn-primary">{{trans('default.channels.detail') ?? '詳情'}}</a>
+                                                <a href="/admin/channel/detail?id={{$model->id}}&name={{$model->name}}" class="btn btn-primary">{{trans('default.channels.detail') ?? '詳情'}}</a>
                                                 </div>
                                             @endif
                                             </td>

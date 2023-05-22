@@ -11,9 +11,10 @@
                         <div class="row">
                             <form action="/admin/channel/detail?id={{$model->id}}" method="get" class="col-md-12">
                                     <div class="form-row">
-                                         
+                                        <input type="hidden" name="id" value="{{$id}}">
+                                        <input type="hidden" name="name" value="{{$name}}">
                                         <div class="form-group col-md-5">
-                                            <label>{{trans('default.channels.duration') ?? '日期區間'}}</label>
+                                            <label>{{$name}} - {{trans('default.channels.duration') ?? '日期區間'}}</label>
                                             <input type="duration"  
                                              class="form-control" name="duration" id="daterange" aria-describedby="title" value="{{$start_duration ?? ''}}">
                                         </div>
@@ -30,13 +31,13 @@
                              
                                  
                                 @if(isset($calcs))
-                                <div class="form-group">
+                                <div class="form-group col-md-6">
                                     <label for="exampleInputEmail1">{{trans('default.channels.total_amount') ?? '使用者統計'}}</label>
-                                    <input type="text" class="form-control" name="account" id="account" value="{{$calcs['ach_total']}}">
+                                    <input type="text" class="form-control" name="account" id="account" value="{{$calcs['ach_total']}}" disabled="true">
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group col-md-6">
                                     <label for="exampleInputEmail1">{{trans('default.channels.register_count') ?? '使用者統計'}}</label>
-                                    <input type="text" class="form-control" name="account" id="account" value="{{$calcs['register_total']}}">
+                                    <input type="text" class="form-control" name="account" id="account" value="{{$calcs['register_total']}}" disabled="true">
                                 </div>
                                 @endif
 

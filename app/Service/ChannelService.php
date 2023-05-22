@@ -134,7 +134,7 @@ class ChannelService extends BaseService
     }
 
     // 統計查詢
-    public function calcTotal(string $date) : array
+    public function calcTotal(string $date,int $channel_id) : array
     {
       $ex_date = explode(" - ",$date);
       $sDate = \Carbon\Carbon::parse(trim($ex_date[0]));
@@ -144,6 +144,7 @@ class ChannelService extends BaseService
           ['date',"<=",$eDate->toDateString()],
           ['hour',">=",$sDate->format('H')],
           ['hour',"<=",$eDate->format('H')],
+          ['channel_id',"=",$channel_id],
       ];
       $reg_total = $this->channelRegister->where($wheres )->sum("total");
       $ach_total = $this->channelAchievement->where($wheres )->sum("pay_amount");
