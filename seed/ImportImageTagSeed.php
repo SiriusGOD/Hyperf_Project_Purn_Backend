@@ -25,7 +25,7 @@ class ImportImageTagSeed implements BaseInterface
         if($data[1] == '尚未分類') {
             return;
         }
-        $imageGroup = \App\Model\ImageGroup::where('id', $data[0])->first();
+        $imageGroup = \App\Model\ImageGroup::where('sync_id', $data[0])->first();
         if (empty($imageGroup)) {
             return;
         }
