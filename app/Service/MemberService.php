@@ -67,26 +67,35 @@ class MemberService extends BaseService
     public function affUpgradeVIP(int $member_id ,int $days = 1 ,string $cate='aff')
     {
       $member = self::getMemberSimple($member_id ,"*");
-      $member->member_level_status = MemberLevel::TYPE_VALUE['vip'];
-      $member->save();
+      //VIP 1 天50次 ， 二天以上NULL
       $mlevel = MemberLevel::where('type','vip')->where('duration',1)->first(); 
-      if($cate == "redeem"){
+      if($cate == self::REDEEM){
         $obj = BuyMemberLevel::where('member_id', $member_id)->where('order_number',self::REDEEM)->first();
       }else{
         $obj = BuyMemberLevel::where('member_id', $member_id)->where('order_number',self::AFF)->first();
       }
-      if(!$obj){
+      
+      if($obj){
+        $member->vip_quota = Member::VIP_QUOTA['UP_TWO'];
+        $obj->end_time = Carbon::parse($obj->end_time)->addDay($days)->toDateTimeString();
+        $obj->save();
+      }else{
         $insert['member_id'] = $member_id; 
         $insert['member_level_type'] = $mlevel->type;  
         $insert['member_level_id'] = $mlevel->id; 
-        $insert['order_number'] = self::AFF;//如果是推薦 免費送的 
+        $insert['order_number'] = $cate; 
         $insert['start_time'] = Carbon::now()->toDateTimeString();
         $insert['end_time'] = Carbon::now()->addDay($days)->toDateTimeString();
         $this->modelStore(BuyMemberLevel::class , $insert);
-      }else{
-        $obj->end_time = Carbon::parse($obj->end_time)->addDay()->toDateTimeString();
-        $obj->save();
+        //更新使用者
+        if($days>=2){
+          $member->vip_quota = Member::VIP_QUOTA['UP_TWO'];
+        }elseif($days==1){
+          $member->vip_quota = Member::VIP_QUOTA['DAY'];
+        }
       }
+      $member->member_level_status = MemberLevel::TYPE_VALUE['vip'];
+      $member->save();
 
       errLog('新增會員VIP 一天');
     }
