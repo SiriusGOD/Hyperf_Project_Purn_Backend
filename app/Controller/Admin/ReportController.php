@@ -66,7 +66,7 @@ class ReportController extends AbstractController
         $data['datas'] = $models;
         $data['page'] = $page;
         $data['step'] = $step;
-        $path = '/admin/reprot/index';
+        $path = '/admin/report/index';
         $data['next'] = $path . '?page=' . ($page + 1);
         $data['prev'] = $path . '?page=' . ($page - 1);
         $paginator = new Paginator($models, $step, $page);

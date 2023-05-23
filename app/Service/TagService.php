@@ -407,8 +407,6 @@ class TagService extends GenerateService
             $videoIds = \Hyperf\Collection\collect($videoIds)->intersect($row)->toArray();
         }
 
-        $videoIds = array_unique($videoIds);
-
         $imageGroupIds = [];
         foreach ($result[ImageGroup::class] as $row) {
             if (empty($imageGroupIds)) {
@@ -417,8 +415,6 @@ class TagService extends GenerateService
             }
             $imageGroupIds = \Hyperf\Collection\collect($imageGroupIds)->intersect($row)->toArray();
         }
-
-        $imageGroupIds = array_unique($imageGroupIds);
 
         $query = TagCorrespond::offset($params['page'] * $params['limit'])
             ->limit($params['limit'])
@@ -543,16 +539,7 @@ class TagService extends GenerateService
 
         $videos = Video::with('tags')->whereIn('id', $ids)->get()->toArray();
 
-        $result = [];
-        foreach ($videos as $video) {
-            foreach ($models as $model) {
-                if ($model['correspond_id'] == $video['id'] and $model['correspond_type'] == Video::class) {
-                    $result[] = $video;
-                }
-            }
-        }
-
-        return $this->generateVideos($data, $result);
+        return $this->generateVideos($data, $videos);
     }
 
     protected function getImageGroupsDetail(array $models, array $data): array
@@ -566,15 +553,6 @@ class TagService extends GenerateService
 
         $imageGroups = ImageGroup::with(['imagesLimit', 'tags'])->whereIn('id', $ids)->get()->toArray();
 
-        $result = [];
-        foreach ($imageGroups as $imageGroup) {
-            foreach ($models as $model) {
-                if ($model['correspond_id'] == $imageGroup['id'] and $model['correspond_type'] == ImageGroup::class) {
-                    $result[] = $imageGroup;
-                }
-            }
-        }
-
-        return $this->generateImageGroups($data, $result);
+        return $this->generateImageGroups($data, $imageGroups);
     }
 }
