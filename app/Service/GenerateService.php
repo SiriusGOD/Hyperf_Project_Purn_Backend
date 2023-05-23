@@ -55,6 +55,10 @@ class GenerateService
 
         $actors = Actor::whereIn('id', $actorIds)->get()->toArray();
 
+        if (empty($actors)) {
+            return [Constants::DEFAULT_ACTOR];
+        }
+
         $result = [];
         $baseUrl = $this->getBaseUrl();
         foreach ($actors as $actor) {
