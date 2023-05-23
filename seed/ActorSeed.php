@@ -55,7 +55,7 @@ class ActorSeed implements BaseInterface
             
             fclose($file);
         }else{
-            var_dump('查無檔案')
+            var_dump('查無檔案');
         }
     }
 
