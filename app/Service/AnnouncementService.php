@@ -58,7 +58,8 @@ class AnnouncementService
             ->where('end_time', '>=', $now)
             ->where('status', Announcement::STATUS['enable'])
             ->orderByDesc('updated_at')
-            ->first()
+            ->limit(1)
+            ->get()
             ->toArray();
 
         $this->redis->set(self::CACHE_KEY, json_encode($result));
