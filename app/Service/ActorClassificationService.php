@@ -161,7 +161,7 @@ class ActorClassificationService
             //     ->groupBy('actor_corresponds.actor_id')
             //     ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
             $query = ActorHasClassification::join('actors', 'actors.id', 'actor_has_classifications.actor_id')
-                                        ->where('actor_has_classifications.actor_classifications_id', $classify_id)
+                                        ->where('actor_has_classifications.actor_classifications_id', $type_id)
                                         ->select('actors.id', 'actors.name', 'actors.avatar');
             $total = $query->get()->count();
             $query = $query->get();
