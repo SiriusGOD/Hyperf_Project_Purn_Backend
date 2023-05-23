@@ -26,6 +26,7 @@ class ImportImageTagSeed implements BaseInterface
 
     public function createActor(array $data): void
     {
+        var_dump('actor run');
         if($data[2] == '尚未分類') {
             return;
         }
@@ -74,6 +75,7 @@ class ImportImageTagSeed implements BaseInterface
 
     public function getTagId(string $name) : int
     {
+        var_dump('get tag id run');
         $tag = \App\Model\ImportTag::where('name', $name)->first();
         if (empty($tag)) {
             return 0;
