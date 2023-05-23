@@ -105,12 +105,14 @@ class ActorClassificationService
                                         ->join('actor_corresponds', 'actor_has_classifications.actor_id', 'actor_corresponds.actor_id')
                                         ->leftJoin('clicks', function ($join) {
                                             $join->on('clicks.type', '=', 'actor_corresponds.correspond_type')
-                                                ->where('clicks.type_id', '=', 'actor_corresponds.correspond_id');
+                                                ->on('clicks.type_id', '=', 'actor_corresponds.correspond_id');
                                         })
                                         ->select('actors.id', 'actors.name', 'actors.avatar')
-                                        ->groupBy('actor_corresponds.actor_id')
+                                        ->where('actor_has_classifications.actor_classifications_id', $classify_id)
+                                        ->whereNull('actor_corresponds.deleted_at')
+                                        ->groupBy('actors.id')
                                         ->orderBy('clicks.count', 'desc');
-                $total = $query->count();
+                $total = $query->get()->count();
                 $query = $query->limit(self::GET_ACTOR_COUNT)->get();
                 if (!empty($query)) {
                     $query = $query->toArray();
@@ -159,9 +161,9 @@ class ActorClassificationService
             //     ->groupBy('actor_corresponds.actor_id')
             //     ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
             $query = ActorHasClassification::join('actors', 'actors.id', 'actor_has_classifications.actor_id')
-                                        ->where('actor_has_classifications.actor_classifications_id', $type_id)
+                                        ->where('actor_has_classifications.actor_classifications_id', $classify_id)
                                         ->select('actors.id', 'actors.name', 'actors.avatar');
-            $total = $query->count();
+            $total = $query->get()->count();
             $query = $query->get();
             if (!empty($query)) {
                 $query = $query->toArray();
