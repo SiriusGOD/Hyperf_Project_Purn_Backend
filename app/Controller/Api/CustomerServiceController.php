@@ -62,6 +62,10 @@ class CustomerServiceController extends AbstractController
         $result = [];
         $url = \Hyperf\Support\env('IMAGE_GROUP_ENCRYPT_URL', 'https://new.eewwwn.cn');
         foreach ($models as $model) {
+            if (empty($model['image_url'])) {
+                $model['image_url'] = "";
+                continue;
+            }
             $model['image_url'] = $url . $model['image_url'];
             $result[] = $model;
         }

@@ -73,7 +73,7 @@ class TagController extends AbstractController
         $page = (int) $request->input('page', 0);
         $limit = (int) $request->input('limit', Constants::DEFAULT_PAGE_PER);
         $filter = Constants::FEED_TYPES[$request->input('filter')] ?? null;
-        $result = $service->searchByTagId([
+        $result = $service->searchByTagIds([
             'ids' => $ids,
             'page' => $page,
             'limit' => $limit,

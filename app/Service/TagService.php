@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Constants\Constants;
-use App\Model\ActorCorrespond;
 use App\Model\ImageGroup;
 use App\Model\MemberTag;
 use App\Model\Tag;
@@ -314,9 +313,9 @@ class TagService extends GenerateService
         }
     }
 
-    public function searchByTagId(array $params): array
+    public function searchByTagId(int $id, array $params): array
     {
-        $query = TagCorrespond::leftJoin('videos', function ($join) {
+        $query = TagCorrespond::select(['tag_corresponds.correspond_type as need_type', 'tag_corresponds.correspond_id as need_id'])->leftJoin('videos', function ($join) {
             $join->on('tag_corresponds.correspond_id', '=', 'videos.id')
                 ->where('tag_corresponds.correspond_type', Video::class)
                 ->where('cover_witdh', '>', 0)
@@ -328,23 +327,7 @@ class TagService extends GenerateService
                     ->where('height', '>', 0)
                     ->where('weight', '>', 0);
             })
-            ->whereIn('tag_corresponds.tag_id', $params['ids'])
-            ->offset($params['page'] * $params['limit'])
-            ->limit($params['limit']);
-
-        if (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['click']) {
-            if ($params['is_asc'] == 1) {
-                $query = $query->orderBy('tag_corresponds.total_click');
-            } else {
-                $query = $query->orderByDesc('tag_corresponds.total_click');
-            }
-        } elseif (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['created_time']) {
-            if ($params['is_asc'] == 1) {
-                $query = $query->orderBy('tag_corresponds.id');
-            } else {
-                $query = $query->orderByDesc('tag_corresponds.id');
-            }
-        }
+            ->where('tag_corresponds.tag_id', $id);
 
         if (! empty($params['filter'])) {
             $query = $query->where('correspond_type', $params['filter']);
@@ -384,6 +367,44 @@ class TagService extends GenerateService
                 ->whereIn('tag_corresponds.id', array_merge($actorImageGroupEnableIds, $actorVideoEnableIds));
         }
 
+        return $query->get()->toArray();
+    }
+
+    public function searchByTagIds(array $params): array
+    {
+        $rows = [
+            Video::class => [],
+            ImageGroup::class => [],
+        ];
+        foreach ($params['ids'] as $id) {
+            $rows[$id] = $this->searchByTagId((int) $id, $params);
+        }
+
+        $result =[
+            Video::class => [],
+            ImageGroup::class => [],
+        ];
+        foreach ($rows as $key => $row) {
+
+        }
+
+        $query = TagCorrespond::offset($params['page'] * $params['limit'])
+            ->limit($params['limit'])
+            ->whereIn('id', $result);
+        if (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['click']) {
+            if ($params['is_asc'] == 1) {
+                $query = $query->orderBy('tag_corresponds.total_click');
+            } else {
+                $query = $query->orderByDesc('tag_corresponds.total_click');
+            }
+        } elseif (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['created_time']) {
+            if ($params['is_asc'] == 1) {
+                $query = $query->orderBy('tag_corresponds.id');
+            } else {
+                $query = $query->orderByDesc('tag_corresponds.id');
+            }
+        }
+
         $models = $query->get();
         if (empty($models)) {
             return [];
@@ -415,7 +436,6 @@ class TagService extends GenerateService
         }
 
         return $rows;
-
     }
 
     protected function generatePopularTags(array $tags)
