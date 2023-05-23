@@ -86,6 +86,11 @@ class ImageGroupSyncTask
             }
 
             $id = $this->createImageGroup($result['data']);
+            if (empty($id)) {
+                $this->logger->info('讀不到封面 ： ' . $result['data']['id']);
+                $count++;
+                continue;
+            }
             $this->createProductGroup([
                 'id' => $id,
                 'title' => $result['data']['title'],
@@ -114,10 +119,13 @@ class ImageGroupSyncTask
         ]);
     }
 
-    protected function createImageGroup(array $params): int
+    protected function createImageGroup(array $params): ?int
     {
         $url = env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live');
         $imageInfo = getimagesize($url . $params['thumb']);
+        if ($imageInfo === false) {
+            return null;
+        }
         $model = new ImageGroup();
         $model->user_id = self::ADMIN_ID;
         $model->title = $params['title'];
@@ -169,7 +177,11 @@ class ImageGroupSyncTask
 
     protected function createImage(array $image, int $imageGroupId): void
     {
-
+        $url = env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live');
+        $imageInfo = getimagesize($url . $image['img_url']);
+        if ($imageInfo === false) {
+            return;
+        }
         $model = new Image();
         $model->user_id = self::ADMIN_ID;
         $model->title = '';
@@ -178,8 +190,6 @@ class ImageGroupSyncTask
         $model->description = '';
         $model->group_id = $imageGroupId;
         $model->sync_id = $image['id'];
-        $url = env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live');
-        $imageInfo = getimagesize($url . $model->url);
         $model->thumbnail_height = $imageInfo[1] ?? 0;
         $model->thumbnail_weight = $imageInfo[0] ?? 0;
         $model->height = $imageInfo[1] ?? 0;
