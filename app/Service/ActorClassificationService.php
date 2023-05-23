@@ -15,6 +15,7 @@ use App\Model\ActorClassification;
 use App\Model\ActorCorrespond;
 use App\Model\MemberFollow;
 use App\Model\Actor;
+use App\Model\ActorHasClassification;
 use App\Model\Click;
 use App\Model\ImageGroup;
 use App\Model\Video;
@@ -79,10 +80,10 @@ class ActorClassificationService
     {
         // redis
         $checkRedisKey = self::CACHE_KEY.":".Carbon::now()->toDateString().":".$type_id;
-        if ($this->redis->exists($checkRedisKey)) {
-            $jsonResult = $this->redis->get($checkRedisKey);
-            return json_decode($jsonResult, true);
-        }
+        // if ($this->redis->exists($checkRedisKey)) {
+        //     $jsonResult = $this->redis->get($checkRedisKey);
+        //     return json_decode($jsonResult, true);
+        // }
 
         $res_arr = [];
         if (empty($type_id)) {
@@ -90,16 +91,25 @@ class ActorClassificationService
             // 撈取每個分類總影片點擊率前四
             foreach ($type_arr as $key => $value) {
                 $classify_id = $value['id'];
-                $query = ActorCorrespond::join('videos', function ($join) {
-                    $join->on('actor_corresponds.correspond_id', '=', 'videos.id')
-                        ->where('actor_corresponds.correspond_type', '=', Video::class);
-                })
-                    ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
-                    ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
-                    ->select('actors.id', 'actors.name', 'actors.avatar')
-                    ->where('actor_has_classifications.actor_classifications_id', $classify_id)
-                    ->groupBy('actor_corresponds.actor_id')
-                    ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
+                // $query = ActorCorrespond::join('videos', function ($join) {
+                //     $join->on('actor_corresponds.correspond_id', '=', 'videos.id')
+                //         ->where('actor_corresponds.correspond_type', '=', Video::class);
+                // })
+                //     ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
+                //     ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
+                //     ->select('actors.id', 'actors.name', 'actors.avatar')
+                //     ->where('actor_has_classifications.actor_classifications_id', $classify_id)
+                //     ->groupBy('actor_corresponds.actor_id')
+                //     ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
+                $query = ActorHasClassification::join('actors', 'actors.id', 'actor_has_classifications.actor_id')
+                                        ->join('actor_corresponds', 'actor_has_classifications.actor_id', 'actor_corresponds.actor_id')
+                                        ->leftJoin('clicks', function ($join) {
+                                            $join->on('clicks.type', '=', 'actor_corresponds.correspond_type')
+                                                ->where('clicks.type_id', '=', 'actor_corresponds.correspond_id');
+                                        })
+                                        ->select('actors.id', 'actors.name', 'actors.avatar')
+                                        ->groupBy('actor_corresponds.actor_id')
+                                        ->orderBy('clicks.count', 'desc');
                 $total = $query->count();
                 $query = $query->limit(self::GET_ACTOR_COUNT)->get();
                 if (!empty($query)) {
@@ -138,16 +148,19 @@ class ActorClassificationService
             }
         } else {
             $type = ActorClassification::find($type_id)->toArray();
-            $query = ActorCorrespond::join('videos', function ($join) {
-                $join->on('actor_corresponds.correspond_id', '=', 'videos.id')
-                    ->where('actor_corresponds.correspond_type', '=', Video::class);
-            })
-                ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
-                ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
-                ->select('actors.id', 'actors.name', 'actors.avatar')
-                ->where('actor_has_classifications.actor_classifications_id', $type_id)
-                ->groupBy('actor_corresponds.actor_id')
-                ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
+            // $query = ActorCorrespond::join('videos', function ($join) {
+            //     $join->on('actor_corresponds.correspond_id', '=', 'videos.id')
+            //         ->where('actor_corresponds.correspond_type', '=', Video::class);
+            // })
+            //     ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
+            //     ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
+            //     ->select('actors.id', 'actors.name', 'actors.avatar')
+            //     ->where('actor_has_classifications.actor_classifications_id', $type_id)
+            //     ->groupBy('actor_corresponds.actor_id')
+            //     ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
+            $query = ActorHasClassification::join('actors', 'actors.id', 'actor_has_classifications.actor_id')
+                                        ->where('actor_has_classifications.actor_classifications_id', $type_id)
+                                        ->select('actors.id', 'actors.name', 'actors.avatar');
             $total = $query->count();
             $query = $query->get();
             if (!empty($query)) {
