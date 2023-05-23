@@ -165,7 +165,11 @@ class ActorClassificationService
                     }
 
                     // avatar加上網域
-                    if(!empty($value['avatar']))$query[$key]['avatar'] = env('IMG_DOMAIN').$value['avatar'];
+                    if(!empty($value['avatar'])){
+                        $query[$key]['avatar'] = env('IMAGE_GROUP_ENCRYPT_URL').$value['avatar'];
+                    }else{
+                        $query[$key]['avatar'] = '';
+                    }
 
                     // 查詢作品數
                     $numberOfWorks = ActorCorrespond::where('actor_id', $actor_id)->count();

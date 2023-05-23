@@ -60,6 +60,8 @@ class GenerateService
         foreach ($actors as $actor) {
             if (! empty($actor['avatar'])) {
                 $actor['avatar'] = $baseUrl . $actor['avatar'];
+            }else{
+                $actor['avatar'] = "";
             }
             $result[] = $actor;
         }
