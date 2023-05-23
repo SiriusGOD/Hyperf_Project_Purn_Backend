@@ -293,7 +293,7 @@ class TagService extends GenerateService
             usort($merge_arr, function ($a, $b) {
                 return $b['count'] - $a['count'];
             });
-            
+
             // 取得前 6 個元素
             if (count($merge_arr) < 6) {
                 $top6_tags = $merge_arr;
@@ -302,16 +302,16 @@ class TagService extends GenerateService
             }
 
             // 把位置交換
-            if($top6_tags[0]['tag_id'] != $tag->id){
+            if ($top6_tags[0]['tag_id'] != $tag->id) {
                 $item = $top6_tags[0];
                 foreach ($top6_tags as $key => $top6_tag) {
-                    if($top6_tag['tag_id'] == $tag->id){
+                    if ($top6_tag['tag_id'] == $tag->id) {
                         $top6_tags[0] = $top6_tag;
                         $top6_tags[$key] = $item;
                     }
                 }
             }
-            
+
             // insert DB
             foreach ($top6_tags as $key2 => $top6_tag) {
                 $model = new TagPopular();
@@ -383,25 +383,49 @@ class TagService extends GenerateService
 
     public function searchByTagIds(array $params): array
     {
-        $rows = [
-            Video::class => [],
-            ImageGroup::class => [],
-        ];
+        $rows = [];
         foreach ($params['ids'] as $id) {
             $rows[$id] = $this->searchByTagId((int) $id, $params);
         }
 
-        $result =[
+        $result = [
             Video::class => [],
             ImageGroup::class => [],
         ];
         foreach ($rows as $key => $row) {
+            foreach ($row as $value) {
+                $result[$value['need_type']][$key][] = $value['need_id'];
+            }
+        }
 
+        $videoIds = [];
+        foreach ($result[Video::class] as $row) {
+            if (empty($videoIds)) {
+                $videoIds = $row;
+                continue;
+            }
+            $videoIds = \Hyperf\Collection\collect($videoIds)->intersect($row)->toArray();
+        }
+
+        $imageGroupIds = [];
+        foreach ($result[ImageGroup::class] as $row) {
+            if (empty($imageGroupIds)) {
+                $imageGroupIds = $row;
+                continue;
+            }
+            $imageGroupIds = \Hyperf\Collection\collect($imageGroupIds)->intersect($row)->toArray();
         }
 
         $query = TagCorrespond::offset($params['page'] * $params['limit'])
             ->limit($params['limit'])
-            ->whereIn('id', $result);
+            ->where(function ($query) use ($videoIds) {
+                $query->where('correspond_type', Video::class)
+                    ->whereIn('correspond_id', $videoIds);
+            })
+            ->orWhere(function ($query) use ($imageGroupIds) {
+                $query->where('correspond_type', ImageGroup::class)
+                    ->whereIn('correspond_id', $imageGroupIds);
+            });
         if (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['click']) {
             if ($params['is_asc'] == 1) {
                 $query = $query->orderBy('tag_corresponds.total_click');
