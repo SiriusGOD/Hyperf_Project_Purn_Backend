@@ -181,7 +181,6 @@ class NavigationService extends GenerateService
 
     protected function navigationDetailImageGroups(array $suggest, int $navId, array $tagIds, int $page, int $limit): array
     {
-        $otherLimit = 0;
         $percent = self::DETAIL_PERCENTS[$navId] ?? [0.2, 0.8];
         $typeLimit = (int) floor($percent[1] * $limit);
         $hideIds = ReportService::getHideIds(ImageGroup::class);
@@ -214,11 +213,9 @@ class NavigationService extends GenerateService
 
         $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $userLimit);
         $remain = $userLimit - count($suggestModels);
-        if ($remain >= 1) {
-            $otherLimit += $remain;
-        }
 
-        $models = $this->imageGroupService->getImageGroups(null, $page, $otherLimit)->toArray();
+
+        $models = $this->imageGroupService->getImageGroups(null, $page, $remain)->toArray();
 
         return array_merge($models, $suggestModels, $imageGroups);
     }
@@ -255,11 +252,8 @@ class NavigationService extends GenerateService
 
         $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $userLimit);
         $remain = $userLimit - count($suggestModels);
-        if ($remain >= 1) {
-            $otherLimit += $remain;
-        }
 
-        $models = $this->videoService->getVideos(null, $page, 9, $otherLimit)->toArray();
+        $models = $this->videoService->getVideos(null, $page, 9, $remain)->toArray();
 
         return array_merge($models, $suggestModels, $videos);
     }
@@ -269,12 +263,10 @@ class NavigationService extends GenerateService
         $otherLimit = self::OTHER_LIMIT;
         $suggestLimit = $limit - $otherLimit;
         $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit);
-        $remain = $suggestLimit - count($suggestModels);
-        if ($remain >= 1) {
-            $otherLimit += $remain;
-        }
+        $remain = $limit - count($suggestModels);
 
-        $models = $this->imageGroupService->getImageGroups(null, $page, $otherLimit)->toArray();
+
+        $models = $this->imageGroupService->getImageGroups(null, $page, $remain)->toArray();
 
         $result = array_merge($suggestModels, $models);
         $collect = \Hyperf\Collection\collect($result);
@@ -293,12 +285,9 @@ class NavigationService extends GenerateService
         $otherLimit = self::OTHER_LIMIT;
         $suggestLimit = $limit - $otherLimit;
         $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $suggestLimit);
-        $remain = $suggestLimit - count($suggestModels);
-        if ($remain >= 1) {
-            $otherLimit += $remain;
-        }
+        $remain = $limit - count($suggestModels);
 
-        $models = $this->videoService->getVideos(null, $page, 9, $otherLimit)->toArray();
+        $models = $this->videoService->getVideos(null, $page, 9, $remain)->toArray();
 
         $result = array_merge($suggestModels, $models);
 
