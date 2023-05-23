@@ -101,8 +101,9 @@ class ActorClassificationService
                     ->groupBy('actor_corresponds.actor_id')
                     ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
                 $total = $query->count();
-                $query = $query->limit(self::GET_ACTOR_COUNT)->get()->toArray();
-                if (count($query) > 0) {
+                $query = $query->limit(self::GET_ACTOR_COUNT)->get();
+                if (!empty($query)) {
+                    $query = $query->toArray();
                     // 查詢是否追隨與作品數
                     foreach ($query as $key => $value2) {
                         $actor_id = $value2['id'];
@@ -148,8 +149,9 @@ class ActorClassificationService
                 ->groupBy('actor_corresponds.actor_id')
                 ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
             $total = $query->count();
-            $query = $query->get()->toArray();
-            if (count($query) > 0) {
+            $query = $query->get();
+            if (!empty($query)) {
+                $query = $query->toArray();
                 // 查詢是否追隨與作品數
                 $popular_arr = [];
                 foreach ($query as $key => $value) {
