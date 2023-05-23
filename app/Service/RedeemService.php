@@ -289,7 +289,7 @@ class RedeemService extends BaseService
                   return ["msg"=>"兌換成功",'vip_days'=>$redeemDetail['vip_days']];
               }
           } else {
-              return ["msg"=>"己過期"];
+              return ["msg"=>trans("default.redeem.not_exists_or_expire")];
           }
       }
 
