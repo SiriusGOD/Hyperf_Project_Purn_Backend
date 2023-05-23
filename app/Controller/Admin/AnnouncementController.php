@@ -77,6 +77,11 @@ class AnnouncementController extends AbstractController
         $startTime = $request->input('start_time');
         $endTime = $request->input('end_time');
         $status = $request->input('status');
+        if (!empty($status) and $status == Announcement::STATUS['enable']) {
+            Announcement::where('status', $status)->update([
+                'status' => Announcement::STATUS['disable'],
+            ]);
+        }
         $service->store([
             'id' => $id,
             'user_id' => $userId,
