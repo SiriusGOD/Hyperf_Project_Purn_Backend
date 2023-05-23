@@ -335,8 +335,10 @@ class NavigationService extends GenerateService
         $hotOrderModels = $this->imageGroupService->getImageGroupsByHotOrder($page, $hotOrderLimit);
         $otherLimit = self::OTHER_LIMIT;
         $suggestLimit = $limit - $hotOrderLimit - $otherLimit;
+
         $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit);
-        $remain = $suggestLimit - count($suggestModels) - count($hotOrderModels);
+
+        $remain = $limit - count($suggestModels) - count($hotOrderModels);
 
         $models = $this->imageGroupService->getImageGroups(null, $page, $remain)->toArray();
 
