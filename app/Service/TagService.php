@@ -302,7 +302,7 @@ class TagService extends GenerateService
             }
 
             // 把位置交換
-            if ($top6_tags[0]['tag_id'] != $tag->id) {
+            if (!empty($top6_tags) && $top6_tags[0]['tag_id'] != $tag->id) {
                 $item = $top6_tags[0];
                 foreach ($top6_tags as $key => $top6_tag) {
                     if ($top6_tag['tag_id'] == $tag->id) {
