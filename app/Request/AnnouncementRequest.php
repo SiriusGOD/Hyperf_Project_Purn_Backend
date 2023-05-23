@@ -22,7 +22,6 @@ class AnnouncementRequest extends AuthBaseRequest
     {
         $statusTypes = Announcement::STATUS;
         $statusStr = implode(',', array_values($statusTypes));
-        var_dump($statusStr);
         return [
             'title' => 'required|string|between:1,50',
             'content' => 'required|string',
