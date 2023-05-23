@@ -418,6 +418,7 @@ class TagService extends GenerateService
 
         $query = TagCorrespond::offset($params['page'] * $params['limit'])
             ->limit($params['limit'])
+            ->select(['correspond_type', 'correspond_id'])
             ->where(function ($query) use ($videoIds) {
                 $query->where('correspond_type', Video::class)
                     ->whereIn('correspond_id', $videoIds);
