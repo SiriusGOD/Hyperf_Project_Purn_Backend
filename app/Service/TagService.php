@@ -407,6 +407,8 @@ class TagService extends GenerateService
             $videoIds = \Hyperf\Collection\collect($videoIds)->intersect($row)->toArray();
         }
 
+        $videoIds = array_unique($videoIds);
+
         $imageGroupIds = [];
         foreach ($result[ImageGroup::class] as $row) {
             if (empty($imageGroupIds)) {
@@ -415,6 +417,8 @@ class TagService extends GenerateService
             }
             $imageGroupIds = \Hyperf\Collection\collect($imageGroupIds)->intersect($row)->toArray();
         }
+
+        $imageGroupIds = array_unique($imageGroupIds);
 
         $query = TagCorrespond::offset($params['page'] * $params['limit'])
             ->limit($params['limit'])

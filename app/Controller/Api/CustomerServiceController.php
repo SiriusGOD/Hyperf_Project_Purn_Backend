@@ -64,6 +64,7 @@ class CustomerServiceController extends AbstractController
         foreach ($models as $model) {
             if (empty($model['image_url'])) {
                 $model['image_url'] = "";
+                $result[] = $model;
                 continue;
             }
             $model['image_url'] = $url . $model['image_url'];
