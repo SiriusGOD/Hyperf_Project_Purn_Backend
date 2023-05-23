@@ -247,7 +247,7 @@ class MemberController extends AbstractController
       $page = $request->input('page', 0);
       $memberId = auth('jwt')->user()->getId();
       $res = $memberInviteLogService->invitedList((int)$memberId, $page);
-      return $this->success($res);
+      return $this->success(["models"=>$res]);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'verification/register_check')]
