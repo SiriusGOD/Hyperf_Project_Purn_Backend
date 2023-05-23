@@ -294,7 +294,7 @@ class TagService extends GenerateService
             usort($merge_arr, function ($a, $b) {
                 return $b['count'] - $a['count'];
             });
-
+            
             // 取得前 6 個元素
             if (count($merge_arr) < 6) {
                 $top6_tags = $merge_arr;
@@ -302,6 +302,17 @@ class TagService extends GenerateService
                 $top6_tags = array_slice($merge_arr, 0, 6);
             }
 
+            // 把位置交換
+            if($top6_tags[0]['tag_id'] != $tag->id){
+                $item = $top6_tags[0];
+                foreach ($top6_tags as $key => $top6_tag) {
+                    if($top6_tag['tag_id'] == $tag->id){
+                        $top6_tags[0] = $top6_tag;
+                        $top6_tags[$key] = $item;
+                    }
+                }
+            }
+            
             // insert DB
             foreach ($top6_tags as $key2 => $top6_tag) {
                 $model = new TagPopular();
