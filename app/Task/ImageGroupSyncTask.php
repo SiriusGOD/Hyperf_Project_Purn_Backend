@@ -105,6 +105,7 @@ class ImageGroupSyncTask
 
         $systemParam->param = $count;
         $systemParam->save();
+        $this->productService->updateCache();
 
         return '';
     }
