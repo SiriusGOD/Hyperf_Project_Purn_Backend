@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Model\DriveClass;
 use App\Model\DriveGroup;
 use App\Model\DriveGroupHasClass;
 use Hyperf\DbConnection\Db;
@@ -83,5 +84,32 @@ class DriveGroupService
         $model = DriveGroup::where('id', $id)->first();
         $model->delete();
         $this->updateCache();
+    }
+
+    public function getList()
+    {
+        $res = [];
+        $drive_class = DriveClass::whereNull('deleted_at')->get();
+        foreach ($drive_class as $key => $value) {
+            $datas = DriveGroupHasClass::join('drive_groups', 'drive_groups.id', 'drive_group_has_class.drive_group_id')
+                                        ->whereNull('drive_groups.deleted_at')
+                                        ->where('drive_group_has_class.drive_class_id', $value -> id)
+                                        ->select('name', 'img', 'url')
+                                        ->get()
+                                        ->toArray();
+            if(!empty($datas)){
+                // 整理
+                foreach ($datas as $key2 => $data) {
+                    $datas[$key]['img'] = env('IMAGE_GROUP_ENCRYPT_URL').$data['img'];
+                }
+                array_push($res, array(
+                    'class_name' => $value -> name,
+                    'description' => $value -> description,
+                    'groups' => $datas
+                ));
+            }
+        }
+
+        return $res;
     }
 }
