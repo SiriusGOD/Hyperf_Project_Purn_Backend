@@ -164,7 +164,7 @@ class VideoService
             $data['cover_height'] = isset($imgSize['heigh']) ?$imgSize['heigh'] :0;
             $this->logger->info("video_info ". var_export($data, true));
             foreach ($data as $key => $val) {
-                $model->{$key} = "{$val}";
+                $model->{$key} = !empty($val)? "{$val}" : 0;
             }
             $model->description = '';
             $model->refreshed_at = date('Y-m-d H:i:s');
