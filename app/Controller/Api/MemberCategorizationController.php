@@ -161,20 +161,23 @@ class MemberCategorizationController extends AbstractController
             ->offset($page * $limit)
             ->get()
             ->toArray();
+        $result = $models;
+
+        if ($isMain) {
+            $result = $service->isMain($memberId, $models);
+        }
+
         $rows = [];
-        foreach ($models as $model) {
+        foreach ($result as $model) {
+            if($model['id'] == 0) {
+                continue;
+            }
             $model['id'] = $model['id'] + NavigationController::DEFAULT_MATCH_COUNT;
             $rows[] = $model;
         }
 
-        $result = $rows;
-
-        if ($isMain) {
-            $result = $service->isMain($memberId, $rows);
-        }
-
         $data = [
-            'models' => $result,
+            'models' => $rows,
         ];
 
         $path = '/api/member_categorization/list';
