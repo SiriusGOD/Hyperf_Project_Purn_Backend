@@ -335,16 +335,10 @@ class NavigationService extends GenerateService
         $hotOrderModels = $this->imageGroupService->getImageGroupsByHotOrder($page, $hotOrderLimit);
         $otherLimit = self::OTHER_LIMIT;
         $suggestLimit = $limit - $hotOrderLimit - $otherLimit;
-        if ($suggestLimit <= 0) {
-            return $hotOrderModels;
-        }
         $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit);
-        $remain = $suggestLimit - count($suggestModels);
-        if ($remain >= 1) {
-            $otherLimit += $remain;
-        }
+        $remain = $suggestLimit - count($suggestModels) - count($hotOrderModels);
 
-        $models = $this->imageGroupService->getImageGroups(null, $page, $otherLimit)->toArray();
+        $models = $this->imageGroupService->getImageGroups(null, $page, $remain)->toArray();
 
         return array_merge($hotOrderModels, $suggestModels, $models);
     }
@@ -355,18 +349,12 @@ class NavigationService extends GenerateService
         $hotOrderModels = $this->videoService->getVideosByHotOrder($page, $hotOrderLimit);
         $otherLimit = self::OTHER_LIMIT;
         $suggestLimit = $limit - $hotOrderLimit - $otherLimit;
-        if ($suggestLimit <= 0) {
-            return $hotOrderModels;
-        }
 
-        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $limit);
+        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $suggestLimit);
 
-        $remain = $suggestLimit - count($suggestModels);
-        if ($remain >= 1) {
-            $otherLimit += $remain;
-        }
+        $remain = $limit - count($suggestModels) - count($hotOrderModels);
 
-        $models = $this->videoService->getVideos(null, $page, 9, $otherLimit)->toArray();
+        $models = $this->videoService->getVideos(null, $page, 9, $remain)->toArray();
 
         return array_merge($hotOrderModels, $suggestModels, $models);
     }

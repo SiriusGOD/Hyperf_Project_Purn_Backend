@@ -86,7 +86,7 @@ class ImageController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'click/popular')]
-    public function getClickPopular(RequestInterface $service)
+    public function getClickPopular(ClickService $service)
     {
         $result = $service->getPopularClick(Image::class);
 

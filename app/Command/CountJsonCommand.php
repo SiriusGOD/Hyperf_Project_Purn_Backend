@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Command;
 
+use App\Model\Video;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use Hyperf\Command\Annotation\Command;
@@ -45,10 +46,22 @@ class CountJsonCommand extends HyperfCommand
             'Authorization' => 'Bearer eyJ0eXAiOiJqd3QifQ.eyJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvOiIsImV4cCI6MTY4NDg5ODkxNiwiaWF0IjoxNjg0ODEyNTE2LCJuYmYiOjE2ODQ4MTI1MTYsInVpZCI6ODcsInMiOiJLRG93dFAiLCJqdGkiOiJjN2ZkZmVhNTY4YWQ1NTNkYzdmMzdjYWVlZWRkOTUzMSJ9.NzY5ODQ1Y2I3OGE1ZmFkOTgxMzU5ZjJjMzc4NmU5ZjgwMTVlOWRjMA',
             'Cookie' => 'HYPERF_SESSION_ID=x6NT7l77slhalXKfetMlu1x5s1T72Wky9WNFo0N0'
         ];
-        $request = new Request('POST', '172.104.46.27/api/navigation/search?id=1&page=1&limit=10', $headers);
+        $request = new Request('POST', '172.104.46.27/api/navigation/search?id=3&page=1&limit=20', $headers);
         $res = $client->send($request);
         $result = json_decode($res->getBody()->getContents(), true);
-        $this->info('models count : ' . count($result['data']['models']));
+        $videoCount = 0;
+        $imageGroupCount = 0;
+        foreach ($result['data']['models'] as $model) {
+            if ($model['model_type'] == 'video') {
+                $videoCount++;
+            }
+
+            if($model['model_type'] == 'image_group') {
+                $imageGroupCount++;
+            }
+        }
+        $this->info('image group models count : ' . $imageGroupCount);
+        $this->info('video models count : ' . $videoCount);
     }
 
     protected function getArguments()
