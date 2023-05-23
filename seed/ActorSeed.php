@@ -36,16 +36,25 @@ class ActorSeed implements BaseInterface
                 $parts = explode(',', $line);
                 var_dump($parts);
                 
-                // insert to actor table
-                $model = new Actor();
-                $model -> user_id = 1;
-                $model -> sex = 1;
-                $model -> name = trim($parts[0]);
-                $model -> save();
+                // 是否已有重複值
+                $actor_name = trim($parts[0]);
+                $actor = Actor::where('name', $actor_name)->first();
+                if(empty($actor)){
+                    // insert to actor table
+                    $model = new Actor();
+                    $model -> user_id = 1;
+                    $model -> sex = 1;
+                    $model -> name = trim($parts[0]);
+                    $model -> save();
+
+                    $actor_id = $model -> id;
+                }else{
+                    $actor_id = $actor -> id;
+                }
                 
                 // insert to actor_has_classifications
                 $ahc = new ActorHasClassification();
-                $ahc -> actor_id = $model -> id;
+                $ahc -> actor_id = $actor_id;
                 $ahc -> actor_classifications_id = (int)trim($parts[1]);
                 $ahc -> save();
                 
