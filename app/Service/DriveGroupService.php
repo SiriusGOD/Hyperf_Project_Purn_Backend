@@ -22,6 +22,8 @@ use function Hyperf\Support\env;
 class DriveGroupService
 {
     public const CACHE_KEY = 'drive_group';
+    
+    public const CACHE_KEY_HAS_CLASS = 'drive_group_has_class';
 
     public const TTL_ONE_DAY = 86400;
     public const TTL_30_MIN = 1800;
@@ -100,7 +102,11 @@ class DriveGroupService
             if(!empty($datas)){
                 // 整理
                 foreach ($datas as $key2 => $data) {
-                    $datas[$key]['img'] = env('IMAGE_GROUP_ENCRYPT_URL').$data['img'];
+                    if(empty($data['img'])){
+                        $datas[$key]['img'] = '';
+                    }else{
+                        $datas[$key]['img'] = env('IMAGE_GROUP_ENCRYPT_URL').$data['img'];
+                    }
                 }
                 array_push($res, array(
                     'class_name' => $value -> name,
