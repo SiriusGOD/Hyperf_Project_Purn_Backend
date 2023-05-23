@@ -233,9 +233,9 @@ class TagService extends GenerateService
             $tag['img'] = env('IMAGE_GROUP_ENCRYPT_URL') . $tag['img'];
         }
         // 撈取影片作品數
-        $video_num = TagCorrespond::where('tag_id', $tag_id)->where('tag_corresponds.correspond_type', Video::class)->get()->count();
+        $video_num = TagCorrespond::where('tag_id', $tag_id)->where('tag_corresponds.correspond_type', Video::class)->count();
         // 撈取套圖作品數
-        $image_num = TagCorrespond::where('tag_id', $tag_id)->where('tag_corresponds.correspond_type', ImageGroup::class)->get()->count();
+        $image_num = TagCorrespond::where('tag_id', $tag_id)->where('tag_corresponds.correspond_type', ImageGroup::class)->count();
         // 撈取熱門標籤
         $popular_tags = TagPopular::selectRaw('popular_tag_id as tag_id, popular_tag_name as tag_name')->where('tag_id', $tag_id)->get()->toArray();
         foreach ($popular_tags as $key => $popular_tag) {
@@ -425,7 +425,7 @@ class TagService extends GenerateService
             ->orWhere(function ($query) use ($imageGroupIds) {
                 $query->where('correspond_type', ImageGroup::class)
                     ->whereIn('correspond_id', $imageGroupIds);
-            });
+            })->groupBy(['correspond_type', 'correspond_id']);
         if (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['click']) {
             if ($params['is_asc'] == 1) {
                 $query = $query->orderBy('tag_corresponds.total_click');

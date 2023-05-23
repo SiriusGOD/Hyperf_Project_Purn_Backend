@@ -46,7 +46,7 @@ class CountJsonCommand extends HyperfCommand
             'Authorization' => 'Bearer eyJ0eXAiOiJqd3QifQ.eyJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvOiIsImV4cCI6MTY4NDg5ODkxNiwiaWF0IjoxNjg0ODEyNTE2LCJuYmYiOjE2ODQ4MTI1MTYsInVpZCI6ODcsInMiOiJLRG93dFAiLCJqdGkiOiJjN2ZkZmVhNTY4YWQ1NTNkYzdmMzdjYWVlZWRkOTUzMSJ9.NzY5ODQ1Y2I3OGE1ZmFkOTgxMzU5ZjJjMzc4NmU5ZjgwMTVlOWRjMA',
             'Cookie' => 'HYPERF_SESSION_ID=x6NT7l77slhalXKfetMlu1x5s1T72Wky9WNFo0N0'
         ];
-        $request = new Request('POST', '172.104.46.27/api/navigation/search?id=3&page=0&limit=20', $headers);
+        $request = new Request('POST', '172.104.46.27/api/tag/search?tag_ids[]=1', $headers);
         $res = $client->send($request);
         $result = json_decode($res->getBody()->getContents(), true);
         $videoCount = 0;
