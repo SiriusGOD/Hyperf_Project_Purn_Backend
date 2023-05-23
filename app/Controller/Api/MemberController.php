@@ -31,6 +31,7 @@ use App\Request\MemberLoginRequest;
 use App\Request\RegisterVerificationRequest;
 use App\Request\ResetPasswordVerificationRequest;
 use App\Request\SendVerificationRequest;
+use App\Service\MemberInviteLogService;
 use App\Service\MemberCategorizationService;
 use App\Service\MemberFollowService;
 use App\Service\MemberService;
@@ -237,6 +238,16 @@ class MemberController extends AbstractController
         $driver->push(new EmailVerificationJob($request->input('email'), trans('email.reset_verification.subject'), $content));
 
         return $this->success();
+    }
+
+    //邀請紀錄
+    #[RequestMapping(methods: ['POST'], path: 'affList')]
+    public function affList(RequestInterface $request, MemberInviteLogService $memberInviteLogService)
+    {
+      $page = $request->input('page', 0);
+      $memberId = auth('jwt')->user()->getId();
+      $res = $memberInviteLogService->invitedList((int)$memberId, $page);
+      return $this->success(["models"=>$res]);
     }
 
     #[RequestMapping(methods: ['POST'], path: 'verification/register_check')]

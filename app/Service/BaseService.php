@@ -341,4 +341,13 @@ class BaseService
             return false;
         }
     }
+    
+    //不要特定 的COL
+    public function removeCol(array $datas ,string $colName):array
+    {
+      return array_map(function ($item) use ($colName) {
+          unset($item[$colName]);
+          return $item;
+      }, $datas);
+    }
 }

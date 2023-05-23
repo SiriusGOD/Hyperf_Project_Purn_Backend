@@ -82,7 +82,6 @@ class ImageGroupSyncTask
 
             if (ImageGroup::where('sync_id', $result['data']['id'])->exists() or count($result['data']['resources']) < 8) {
                 $count++;
-                sleep(1);
                 continue;
             }
 
@@ -97,7 +96,6 @@ class ImageGroupSyncTask
             }
             $this->createImages($result['data']['resources'], $id);
             $count++;
-            sleep(1);
         }
 
         $systemParam->param = $count;

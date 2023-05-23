@@ -13,28 +13,32 @@ class ImportImageTagSeed implements BaseInterface
 {
     public function up(): void
     {
-        $handle = fopen(BASE_PATH . '/storage/import/import_image_tags.csv', 'r');
+        $handle = fopen(BASE_PATH . '/storage/import/import_image_tag.csv', 'r');
         while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
             $this->createTags($data);
+            $this->createActor($data);
+            \App\Model\ImageGroup::where('sync_id', $data[0])->update([
+                'title' => $data[1]
+            ]);
         }
         fclose($handle);
     }
 
     public function createActor(array $data): void
     {
-        if($data[1] == '尚未分類') {
+        if($data[2] == '尚未分類') {
             return;
         }
         $imageGroup = \App\Model\ImageGroup::where('sync_id', $data[0])->first();
         if (empty($imageGroup)) {
             return;
         }
-        $actor = \App\Model\Actor::where('name', $data[1])->first();
+        $actor = \App\Model\Actor::where('name', $data[2])->first();
         if(empty($actor)) {
             $actor = new \App\Model\Actor();
             $actor->user_id = 0;
             $actor->sex = \App\Model\Actor::SEX['female'];
-            $actor->name = $data[1];
+            $actor->name = $data[2];
             $actor->avatar = '';
             $actor->save();
         }
@@ -47,11 +51,11 @@ class ImportImageTagSeed implements BaseInterface
 
     public function createTags(array $data): void
     {
-        if(empty($data[2])) {
+        if(empty($data[3])) {
             return;
         }
-        $tagNames = explode(',', $data[2]);
-        $imageGroup = \App\Model\ImageGroup::where('id', $data[0])->first();
+        $tagNames = explode(',', $data[3]);
+        $imageGroup = \App\Model\ImageGroup::where('sync_id', $data[0])->first();
         if (empty($imageGroup)) {
             return;
         }
@@ -70,12 +74,12 @@ class ImportImageTagSeed implements BaseInterface
 
     public function getTagId(string $name) : int
     {
-        $tag = \App\Model\Tag::where('name', $name)->first();
+        $tag = \App\Model\ImportTag::where('name', $name)->first();
         if (empty($tag)) {
             return 0;
         }
 
-        return $tag->id;
+        return $tag->tag_id;
     }
 
     public function down(): void
