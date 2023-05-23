@@ -170,6 +170,7 @@ class MemberCategorizationController extends AbstractController
         $rows = [];
         foreach ($result as $model) {
             if($model['id'] == 0) {
+                $rows[] = $model;
                 continue;
             }
             $model['id'] = $model['id'] + NavigationController::DEFAULT_MATCH_COUNT;
