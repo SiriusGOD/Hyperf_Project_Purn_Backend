@@ -214,7 +214,9 @@ class ActorService extends GenerateService
         $data['name'] = $actor['name'];
         $data['avatar'] = $actor['avatar'];
         if (! empty($actor['avatar'])) {
-            $data['avatar'] = env('IMG_DOMAIN') . $actor['avatar'];
+            $data['avatar'] = env('IMAGE_GROUP_ENCRYPT_URL') . $actor['avatar'];
+        }else{
+            $data['avatar'] = "";
         }
         // 撈取作品數
         $works = ActorCorrespond::selectRaw('correspond_type, count(*) as count')->where('actor_id', $actor_id)->groupBy('correspond_type')->get();
