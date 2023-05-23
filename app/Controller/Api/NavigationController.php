@@ -11,11 +11,13 @@ declare(strict_types=1);
  */
 namespace App\Controller\Api;
 
+use App\Constants\Constants;
 use App\Controller\AbstractController;
 use App\Middleware\Auth\ApiAuthMiddleware;
 use App\Model\MemberCategorization;
 use App\Model\Navigation;
 use App\Request\NavigationDetailRequest;
+use App\Service\ClickService;
 use App\Service\NavigationService;
 use App\Service\SuggestService;
 use App\Service\VideoService;
@@ -85,7 +87,7 @@ class NavigationController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'detail')]
-    public function detail(RequestInterface $request, NavigationService $service, SuggestService $suggestService)
+    public function detail(RequestInterface $request, NavigationService $service, SuggestService $suggestService, ClickService $clickService)
     {
         $data = [];
         $page = (int) $request->input('page', 0);
@@ -103,6 +105,7 @@ class NavigationController extends AbstractController
         $path = '/api/navigation/detail?id=' . $id . '&';
         $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
+        $clickService->addClick(Constants::FEED_TYPES[$type], $id);
 
         return $this->success($data);
     }
