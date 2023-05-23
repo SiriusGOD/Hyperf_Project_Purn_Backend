@@ -265,7 +265,9 @@ class MemberController extends AbstractController
             $member->email = $request->input('email') ?? $member->email;
             $member->save();
             if($member->invited_by != ""){
-              $memberService->affUpgradeVIP( $member->id);
+              //被推廌送VIP 2天
+              $vipDays = 2;
+              $memberService->affUpgradeVIP( $member->id ,$vipDays);
             }
             $model->delete();
             return $this->success();
