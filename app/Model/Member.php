@@ -56,6 +56,8 @@ class Member extends Model implements Authenticatable
     public const PAGE_PER = 10;
 
     public const VISITOR_NAME = '遊客';
+    //VIP次數 
+    public const VIP_QUOTA = ['DAY'=>50,'UP_TWO'=>NULL];
 
     /**
      * The table associated with the model.
