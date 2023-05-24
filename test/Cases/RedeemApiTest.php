@@ -162,21 +162,21 @@ class RedeemApiTest extends HttpTestCase
       $this->assertSame(200, $data['code']);
     }
 
-    ////取可用兌換卷
-    //public function testUsedMemberRedeemApiList()
-    //{
-    //  $memberId = 1;
-    //  $user = Member::where('id',$memberId)->first();
-    //  $token = auth()->login($user);
-    //  $this->token = $token; 
-    //  make(MemberService::class)->saveToken($user->id, $token);
-    //  $data = $this->client->get('/api/redeem/usedVideoRedeemList',
-    //  [
-    //    "page" => 0
-    //  ], 
-    //  [
-    //      'Authorization' => 'Bearer ' . $token,
-    //  ]);
-    //  $this->assertSame($memberId, (int)$data['data']['models'][0]["member_id"]);
-    //}
+    //取可用兌換卷亂輸入
+    public function testUsedErrorCode()
+    {
+      self::creatMmember();
+      $user = Member::orderBy('id','desc')->first();
+      $token = auth()->login($user);
+      $this->token = $token; 
+      make(MemberService::class)->saveToken($user->id, $token);
+      $data = $this->client->post('/api/redeem/redeemCode',
+      [
+        "code" => Str::random(10)
+      ], 
+      [
+          'Authorization' => 'Bearer ' . $token,
+      ]);
+      $this->assertSame('优惠卷不存在或己過期', $data['data']['msg'] );
+    }
 }
