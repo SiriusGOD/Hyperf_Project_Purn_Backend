@@ -91,31 +91,15 @@ class ActorClassificationService
             // 撈取每個分類總影片點擊率前四
             foreach ($type_arr as $key => $value) {
                 $classify_id = $value['id'];
-                $query = ActorCorrespond::join('videos', function ($join) {
-                    $join->on('actor_corresponds.correspond_id', '=', 'videos.id')
-                        ->where('actor_corresponds.correspond_type', '=', Video::class);
-                })
-                    ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
-                    ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
-                    ->select('actors.id', 'actors.name', 'actors.avatar')
-                    ->where('actor_has_classifications.actor_classifications_id', $classify_id)
-                    ->groupBy('actor_corresponds.actor_id')
-                    ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
-                // $query = ActorHasClassification::join('actors', 'actors.id', 'actor_has_classifications.actor_id')
-                //                         ->join('actor_corresponds', 'actor_has_classifications.actor_id', 'actor_corresponds.actor_id')
-                //                         ->leftJoin('clicks', function ($join) {
-                //                             $join->on('clicks.type', '=', 'actor_corresponds.correspond_type')
-                //                                 ->on('clicks.type_id', '=', 'actor_corresponds.correspond_id');
-                //                         })
-                //                         ->select('actors.id', 'actors.name', 'actors.avatar')
-                //                         ->where('actor_has_classifications.actor_classifications_id', $classify_id)
-                //                         ->whereNull('actor_corresponds.deleted_at')
-                //                         ->groupBy('actors.id')
-                //                         ->orderBy('clicks.count', 'desc');
+                $query = ActorHasClassification::join('actors', 'actors.id', 'actor_has_classifications.actor_id')
+                                        ->join('actor_corresponds', 'actor_has_classifications.actor_id', 'actor_corresponds.actor_id')
+                                        ->select('actors.id', 'actors.name', 'actors.avatar')
+                                        ->where('actor_has_classifications.actor_classifications_id', $classify_id)
+                                        ->whereNull('actor_corresponds.deleted_at')
+                                        ->groupBy('actors.id');
                 $total = $query->get()->count();
-                $query = $query->limit(self::GET_ACTOR_COUNT)->get();
+                $query = $query->get()->toArray();
                 if (!empty($query)) {
-                    $query = $query->toArray();
                     // 查詢是否追隨與作品數
                     foreach ($query as $key => $value2) {
                         $actor_id = $value2['id'];
@@ -131,14 +115,38 @@ class ActorClassificationService
                         if(!empty($value2['avatar']))$query[$key]['avatar'] = env('TEST_IMG_URL').$value2['avatar'];
 
                         // 查詢作品數
-                        $numberOfWorks = ActorCorrespond::where('actor_id', $actor_id)->count();
+                        $works_query = ActorCorrespond::where('actor_id', $actor_id)->whereNull('deleted_at')->get();
+                        $numberOfWorks = $works_query -> count();
                         $query[$key]['numberOfWorks'] = $numberOfWorks;
 
                         // 擷取名稱第一個字
                         $letter =  mb_substr($name, 0, 1, 'UTF-8');
                         $query[$key]['letter'] = $letter;
+
+                        // 查詢該演員的點擊數 最多取4位
+                        $clicks = ActorCorrespond::join('clicks', function ($join) {
+                                                    $join->on('clicks.type', 'actor_corresponds.correspond_type')
+                                                        ->on('clicks.type_id', 'actor_corresponds.correspond_id');
+                                                })
+                                                ->select(DB::raw('sum(clicks.count) as count'))
+                                                ->where('actor_corresponds.actor_id', $actor_id)
+                                                ->first();
+                        if(empty($clicks -> count)){
+                            $query[$key]['click_num'] = 0;
+                        }else{
+                            $query[$key]['click_num'] = $clicks -> count;
+                        }
                     }
 
+                    // 排序
+                    usort($query, function($a, $b) {
+                        return $b['click_num'] - $a['click_num'];
+                    });
+                    if(count($query) > 4)$query = array_slice($query, 0, 4);
+                    
+                    foreach ($query as $key => $value) {
+                        unset($query[$key]['click_num']);
+                    }
 
                     array_push($res_arr, [
                         'type_id' => $classify_id,
@@ -150,16 +158,6 @@ class ActorClassificationService
             }
         } else {
             $type = ActorClassification::find($type_id)->toArray();
-            // $query = ActorCorrespond::join('videos', function ($join) {
-            //     $join->on('actor_corresponds.correspond_id', '=', 'videos.id')
-            //         ->where('actor_corresponds.correspond_type', '=', Video::class);
-            // })
-            //     ->join('actors', 'actor_corresponds.actor_id', 'actors.id')
-            //     ->join('actor_has_classifications', 'actors.id', 'actor_has_classifications.actor_id')
-            //     ->select('actors.id', 'actors.name', 'actors.avatar')
-            //     ->where('actor_has_classifications.actor_classifications_id', $type_id)
-            //     ->groupBy('actor_corresponds.actor_id')
-            //     ->orderBy(DB::raw('sum(videos.rating)'), 'desc');
             $query = ActorHasClassification::join('actors', 'actors.id', 'actor_has_classifications.actor_id')
                                         ->where('actor_has_classifications.actor_classifications_id', $type_id)
                                         ->select('actors.id', 'actors.name', 'actors.avatar');
@@ -187,7 +185,7 @@ class ActorClassificationService
                     }
 
                     // 查詢作品數
-                    $numberOfWorks = ActorCorrespond::where('actor_id', $actor_id)->count();
+                    $numberOfWorks = ActorCorrespond::where('actor_id', $actor_id)->whereNull('deleted_at')->count();
                     $query[$key]['numberOfWorks'] = $numberOfWorks;
 
                     // 擷取名稱第一個字
@@ -198,7 +196,7 @@ class ActorClassificationService
                     $actor_arr = $query[$key];
                     $click_num = 0;
                     $seven_days = Carbon::now()->subDays(7)->toDateString();
-                    $clicks = ActorCorrespond::where('actor_id', $actor_id)->get();
+                    $clicks = ActorCorrespond::where('actor_id', $actor_id)->whereNull('deleted_at')->get();
                     foreach ($clicks as $key => $value) {
                         switch ($value -> correspond_type) {
                             case ImageGroup::class:
