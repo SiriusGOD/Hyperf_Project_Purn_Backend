@@ -80,10 +80,10 @@ class ActorClassificationService
     {
         // redis
         $checkRedisKey = self::CACHE_KEY.":".Carbon::now()->toDateString().":".$type_id;
-        if ($this->redis->exists($checkRedisKey)) {
-            $jsonResult = $this->redis->get($checkRedisKey);
-            return json_decode($jsonResult, true);
-        }
+        // if ($this->redis->exists($checkRedisKey)) {
+        //     $jsonResult = $this->redis->get($checkRedisKey);
+        //     return json_decode($jsonResult, true);
+        // }
 
         $res_arr = [];
         if (empty($type_id)) {
@@ -236,12 +236,17 @@ class ActorClassificationService
                 foreach ($popular_arr as $key => $value) {
                     unset($popular_arr[$key]['click_num']);
                 }
-                
+
+                // 移除作品數為0的演員
+                $array = array_filter($query, function($item) {
+                    return $item['numberOfWorks'] != 0;
+                });
+
                 array_push($res_arr, [
                     'type_id' => $type_id,
                     'type_name' => $type['name'],
                     'type_total' => $total,
-                    'type_data' => $query,
+                    'type_data' => $array,
                     'popular_data' => $popular_arr
                 ]);
             }
