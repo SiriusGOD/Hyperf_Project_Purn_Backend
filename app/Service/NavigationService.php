@@ -323,7 +323,7 @@ class NavigationService extends GenerateService
         $hotOrderLimit = $this->getHotOrderPerLimit(ImageGroup::class, $limit);
         $hotOrderModels = $this->imageGroupService->getImageGroupsByHotOrder($page, $hotOrderLimit);
         $otherLimit = self::OTHER_LIMIT;
-        $suggestLimit = $limit - $hotOrderLimit - $otherLimit;
+        $suggestLimit = $limit - count($hotOrderModels) - $otherLimit;
 
         $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit);
 
@@ -339,7 +339,7 @@ class NavigationService extends GenerateService
         $hotOrderLimit = $this->getHotOrderPerLimit(Video::class, $limit);
         $hotOrderModels = $this->videoService->getVideosByHotOrder($page, $hotOrderLimit);
         $otherLimit = self::OTHER_LIMIT;
-        $suggestLimit = $limit - $hotOrderLimit - $otherLimit;
+        $suggestLimit = $limit - count($hotOrderModels) - $otherLimit;
 
         $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $suggestLimit);
 

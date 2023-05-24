@@ -428,16 +428,18 @@ class TagService extends GenerateService
                     ->whereIn('correspond_id', $imageGroupIds);
             })->groupBy(['correspond_type', 'correspond_id']);
         if (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['click']) {
+            $query = $query->addSelect(DB::raw('max(tag_corresponds.total_click) as click'));
             if ($params['is_asc'] == 1) {
-                $query = $query->orderBy('tag_corresponds.total_click');
+                $query = $query->orderBy('click');
             } else {
-                $query = $query->orderByDesc('tag_corresponds.total_click');
+                $query = $query->orderByDesc('click');
             }
         } elseif (! empty($params['sort_by']) and $params['sort_by'] == Constants::SORT_BY['created_time']) {
+            $query = $query->addSelect(DB::raw('max(tag_corresponds.id) as need_id'));
             if ($params['is_asc'] == 1) {
-                $query = $query->orderBy('tag_corresponds.id');
+                $query = $query->orderBy('need_id');
             } else {
-                $query = $query->orderByDesc('tag_corresponds.id');
+                $query = $query->orderByDesc('need_id');
             }
         }
 

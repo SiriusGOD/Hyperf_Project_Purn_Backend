@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Task;
 
 use App\Model\Image;
+use App\Model\ImageGroup;
 use App\Model\Video;
 use App\Service\ClickService;
 use Hyperf\Crontab\Annotation\Crontab;
@@ -33,7 +34,7 @@ class PopularClickTask
     public function execute()
     {
         $this->logger->info('開始執行熱門點擊定時任務');
-        $this->service->calculatePopularClick(Image::class);
+        $this->service->calculatePopularClick(ImageGroup::class);
         $this->service->calculatePopularClick(Video::class);
         $this->logger->info('結束執行熱門點擊定時任務');
     }
