@@ -18,8 +18,7 @@ class ActorSeed implements BaseInterface
     public function up(): void
     {
         // 讀檔
-        $filePath = './public/actor/actors.csv'; // 檔案路徑
-
+        $filePath = BASE_PATH . '/storage/import/actors.csv';
         $file = fopen($filePath, 'r');
 
         if ($file) {
