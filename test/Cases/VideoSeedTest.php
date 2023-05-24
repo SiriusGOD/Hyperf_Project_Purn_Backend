@@ -14,6 +14,8 @@ use Hyperf\Testing\Client;
 use HyperfTest\HttpTestCase;
 use App\Service\VideoService;
 use App\Model\ImportVideo;
+use App\Service\TagService;
+use App\Service\ActorService;
 /**
  * @internal
  * @coversNothing
@@ -31,41 +33,8 @@ class VideoSeedTest extends HttpTestCase
         $this->client = make(Client::class);
         $this->videoService = make(VideoService::class);
     }
-    //寫入DB
-    public function insertData($model)
-    {
-        $wg = new \Hyperf\Utils\WaitGroup();
-        $wg->add(1);
-        $data= $model->toArray();
-        $service = make(VideoService::class);
-        co(function () use ($wg, $data, $service) {
-          unset($data['is_calc']);
-          $service->storeVideo($data);
-          $wg->done();
-        });
-        $wg->wait();
-    }
-    // Video計算任務-       
-    public function testDatatVideo()
-    {
-        $limit = 4;
-        $totalIterations = 50;
-        for ($i = 0; $i < $totalIterations; $i++) {
-            $models = ImportVideo::where('is_calc', 0)->orderBy('id', 'desc')->limit($limit)->get();
-            if (count($models) > 0) {
-                foreach ($models as $model) {
-                    self::insertData($model);
-                    $model->is_calc =1;
-                    $model->save();
-                }
-                errLog('Video计算任务'.$i.'次');
-                sleep(1);
-            }
-        }
-        errLog('Video计算任务-end');
-    }
     //vidoe csv匯入 
-    public function mportdata()
+    public function testInsertCsvdata()
     {
         $handle = fopen(BASE_PATH . '/storage/import/videos.csv', 'r');
         $key = 0;
@@ -157,5 +126,44 @@ class VideoSeedTest extends HttpTestCase
         $this->assertSame(200, 200);
     }
 
+    //寫入DB
+    public function insertData($model)
+    {
+        $wg = new \Hyperf\Utils\WaitGroup();
+        $wg->add(1);
+        $data= $model->toArray();
+        $service = make(VideoService::class);
+        $tagService = make(TagService::class);
+        $actorService = make(ActorService::class);
+        co(function () use ($wg, $data, $service,$tagService, $actorService) {
+          unset($data['is_calc']);
+          $video = $service->storeVideo($data);
+          $tagService->videoCorrespondTag($data, $video->id);
+          $actorService->videoCorrespondActor($data, $video->id);
+          $wg->done();
+        });
+        $wg->wait();
+    }
+
+    // Video計算任務-       
+    public function testDatatVideo()
+    {
+        $limit = 4;
+        $count =ImportVideo::count();
+        $totalIterations = ceil($count/$limit);
+        for ($i = 0; $i < $totalIterations; $i++) {
+            $models = ImportVideo::where('is_calc', 0)->orderBy('id', 'desc')->limit($limit)->get();
+            if (count($models) > 0) {
+                foreach ($models as $model) {
+                    self::insertData($model);
+                    $model->is_calc =1;
+                    $model->save();
+                }
+                errLog('Video计算任务'.$i.'次');
+                sleep(1);
+            }
+        }
+        errLog('Video计算任务-end');
+    }
 
 }
