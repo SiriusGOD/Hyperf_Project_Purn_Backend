@@ -137,6 +137,7 @@ class VideoSeedTest extends HttpTestCase
         $actorService = make(ActorService::class);
         co(function () use ($wg, $data, $service,$tagService, $actorService) {
           unset($data['is_calc']);
+          unset($data['id']);
           $video = $service->storeVideo($data);
           $tagService->videoCorrespondTag($data, $video->id);
           $actorService->videoCorrespondActor($data, $video->id);
