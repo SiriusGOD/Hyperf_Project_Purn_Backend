@@ -144,8 +144,8 @@ class ActorClassificationService
                     });
                     if(count($query) > 4)$query = array_slice($query, 0, 4);
                     
-                    foreach ($query as $key => $value) {
-                        unset($query[$key]['click_num']);
+                    foreach ($query as $key3 => $value3) {
+                        unset($query[$key3]['click_num']);
                     }
 
                     array_push($res_arr, [
