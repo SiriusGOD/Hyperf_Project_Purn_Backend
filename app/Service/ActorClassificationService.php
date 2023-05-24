@@ -112,7 +112,11 @@ class ActorClassificationService
                         }
 
                         // avatar加上網域
-                        if(!empty($value2['avatar']))$query[$key]['avatar'] = env('TEST_IMG_URL').$value2['avatar'];
+                        if(!empty($value2['avatar'])){
+                            $query[$key]['avatar'] = env('IMAGE_GROUP_ENCRYPT_URL').$value2['avatar'];
+                        }else{
+                            $query[$key]['avatar'] = "";
+                        };
 
                         // 查詢作品數
                         $works_query = ActorCorrespond::where('actor_id', $actor_id)->whereNull('deleted_at')->get();
