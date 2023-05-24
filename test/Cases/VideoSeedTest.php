@@ -34,7 +34,7 @@ class VideoSeedTest extends HttpTestCase
         $this->videoService = make(VideoService::class);
     }
     //vidoe csv匯入 
-    public function testInsertCsvdata()
+    public function ansertCsvdata()
     {
         $handle = fopen(BASE_PATH . '/storage/import/videos.csv', 'r');
         $key = 0;
@@ -129,22 +129,22 @@ class VideoSeedTest extends HttpTestCase
     //寫入DB
     public function insertData($model)
     {
-        //$wg = new \Hyperf\Utils\WaitGroup();
-        //$wg->add(1);
+        $wg = new \Hyperf\Utils\WaitGroup();
+        $wg->add(1);
         $data= $model->toArray();
         $service = make(VideoService::class);
         $tagService = make(TagService::class);
         $actorService = make(ActorService::class);
-        //co(function () use ($wg, $data, $service,$tagService, $actorService) {
+        co(function () use ($wg, $data, $service,$tagService, $actorService) {
           unset($data['is_calc']);
           unset($data['id']);
           $video = $service->storeVideo($data);
           $tagService->videoCorrespondTag($data, $video->id);
           $actorService->videoCorrespondActor($data, $video->id);
-          //$wg->done();
+          $wg->done();
           usleep(100);
-        //});
-        //$wg->wait();
+        });
+        $wg->wait();
     }
 
     // Video計算任務-       
