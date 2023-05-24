@@ -241,6 +241,7 @@ class ActorClassificationService
                 $array = array_filter($query, function($item) {
                     return $item['numberOfWorks'] != 0;
                 });
+                $array = array_values($array);
 
                 array_push($res_arr, [
                     'type_id' => $type_id,
