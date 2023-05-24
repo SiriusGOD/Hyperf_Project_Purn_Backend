@@ -80,10 +80,10 @@ class ActorClassificationService
     {
         // redis
         $checkRedisKey = self::CACHE_KEY.":".Carbon::now()->toDateString().":".$type_id;
-        // if ($this->redis->exists($checkRedisKey)) {
-        //     $jsonResult = $this->redis->get($checkRedisKey);
-        //     return json_decode($jsonResult, true);
-        // }
+        if ($this->redis->exists($checkRedisKey)) {
+            $jsonResult = $this->redis->get($checkRedisKey);
+            return json_decode($jsonResult, true);
+        }
 
         $res_arr = [];
         if (empty($type_id)) {
