@@ -129,21 +129,22 @@ class VideoSeedTest extends HttpTestCase
     //寫入DB
     public function insertData($model)
     {
-        $wg = new \Hyperf\Utils\WaitGroup();
-        $wg->add(1);
+        //$wg = new \Hyperf\Utils\WaitGroup();
+        //$wg->add(1);
         $data= $model->toArray();
         $service = make(VideoService::class);
         $tagService = make(TagService::class);
         $actorService = make(ActorService::class);
-        co(function () use ($wg, $data, $service,$tagService, $actorService) {
+        //co(function () use ($wg, $data, $service,$tagService, $actorService) {
           unset($data['is_calc']);
           unset($data['id']);
           $video = $service->storeVideo($data);
           $tagService->videoCorrespondTag($data, $video->id);
           $actorService->videoCorrespondActor($data, $video->id);
-          $wg->done();
-        });
-        $wg->wait();
+          //$wg->done();
+          usleep(100);
+        //});
+        //$wg->wait();
     }
 
     // Video計算任務-       
@@ -161,7 +162,7 @@ class VideoSeedTest extends HttpTestCase
                     $model->save();
                 }
                 errLog('Video计算任务'.$i.'次');
-                sleep(1);
+                usleep(200);
             }
         }
         errLog('Video计算任务-end');
