@@ -46,7 +46,7 @@ class CustomerServiceController extends AbstractController
     }
 
     #[RequestMapping(methods: ['POST'], path: 'detail')]
-    public function detail(RequestInterface $request)
+    public function detail(RequestInterface $request, CustomerServiceService $service)
     {
         $page = (int) $request->input('page', 0);
         $limit = (int) $request->input('limit', CustomerService::PAGE_PER);
@@ -74,6 +74,7 @@ class CustomerServiceController extends AbstractController
         $path = '/api/customer_service/detail';
         $simplePaginator = new SimplePaginator($page, $limit, $path);
         $data = array_merge($data, $simplePaginator->render());
+        $service->setApiDetailRead($id);
         return $this->success($data);
     }
 

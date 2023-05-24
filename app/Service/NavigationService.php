@@ -185,15 +185,15 @@ class NavigationService extends GenerateService
         $typeLimit = (int) floor($percent[1] * $limit);
         $hideIds = ReportService::getHideIds(ImageGroup::class);
 
-        $imageGroupIds = $this->tagService->getTypeIdsByTagIds($tagIds, ImageGroup::class, $page, $typeLimit);
+        $imageGroupIds = $this->tagService->getTypeIdsByTagIds($tagIds, ImageGroup::class, $page, $limit);
         $query = ImageGroup::with([
             'tags', 'imagesLimit',
         ])
             ->whereIn('id', $imageGroupIds)
             ->whereNotIn('id', $hideIds)
             ->where('height', '>', 0)
-            ->offset($limit * $page)
-            ->limit($limit);
+            ->offset($typeLimit * $page)
+            ->limit($typeLimit);
 
         if (! empty($hideIds)) {
             $query = $query->whereNotIn('id', $hideIds);
@@ -202,7 +202,7 @@ class NavigationService extends GenerateService
         $enableIds = \Hyperf\Support\make(ProductService::class)->getEnableIds(ImageGroup::class);
 
         if (! empty($enableIds)) {
-            $query = $query->whereIn('id', $hideIds);
+            $query = $query->whereIn('id', $enableIds);
         }
 
         $imageGroups = $query
@@ -222,18 +222,17 @@ class NavigationService extends GenerateService
 
     protected function navigationDetailVideos(array $suggest, int $navId, array $tagIds, int $page, int $limit): array
     {
-        $otherLimit = 0;
         $percent = self::DETAIL_PERCENTS[$navId] ?? [0.2, 0.8];
         $typeLimit = (int) floor($percent[1] * $limit);
         $hideIds = ReportService::getHideIds(Video::class);
 
-        $ids = $this->tagService->getTypeIdsByTagIds($tagIds, Video::class, $page, $typeLimit);
+        $ids = $this->tagService->getTypeIdsByTagIds($tagIds, Video::class, $page, $limit);
         $query = Video::with([
             'tags',
         ])
             ->whereIn('id', $ids)
-            ->offset($limit * $page)
-            ->limit($limit)
+            ->offset($typeLimit * $page)
+            ->limit($typeLimit)
             ->where('cover_height', '>', 0);
 
         if (! empty($hideIds)) {
