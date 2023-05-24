@@ -64,7 +64,7 @@ class CustomerService extends Model
 
     public function getDetailCountAttribute()
     {
-        return $this->details()->where('is_read', 0)->count();
+        return $this->details()->where('is_read', 0)->whereNotNull('user_id')->count();
     }
 
     public function customerServiceCovers()

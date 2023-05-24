@@ -18,7 +18,6 @@ use App\Model\CustomerService;
 use App\Model\CustomerServiceCover;
 use App\Model\CustomerServiceDetail;
 use App\Service\CustomerServiceService;
-use App\Service\ImageService;
 use App\Util\General;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -63,7 +62,7 @@ class CustomerServiceController extends AbstractController
         $url = \Hyperf\Support\env('IMAGE_GROUP_ENCRYPT_URL', 'https://new.eewwwn.cn');
         foreach ($models as $model) {
             if (empty($model['image_url'])) {
-                $model['image_url'] = "";
+                $model['image_url'] = '';
                 $result[] = $model;
                 continue;
             }
