@@ -155,6 +155,9 @@ class MemberService extends BaseService
         if (! empty($data['phone'])) {
             $model->phone = $data['phone'];
         }
+        if (! empty($data['free_quota'])) {
+            $model->free_quota = $data['free_quota'];
+        }
 
         // $model->email = $data['email'];
         // $model->phone = $data['phone'];

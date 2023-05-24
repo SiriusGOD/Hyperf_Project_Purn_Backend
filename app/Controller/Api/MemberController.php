@@ -75,6 +75,7 @@ class MemberController extends AbstractController
                 'name' => $request->input('name', ''),
                 'aff_url'=> $request->input('aff_url', ''),
                 'invited_code' => $request->input('invited_code', ''),
+                'free_quota' => $request->input('free_quota', 1),
             ]);
 
             if (empty($user)) {
