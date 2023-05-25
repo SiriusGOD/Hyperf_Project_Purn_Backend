@@ -89,20 +89,6 @@ class GenerateService
         return $result;
     }
 
-    public function generateImage(int $id, array $images): array
-    {
-        $imageGroup = ImageGroup::find($id)->toArray();
-        $url = $this->getImageUrl($imageGroup);
-        $result = [];
-        foreach ($images as $key => $image) {
-            $image['thumbnail'] = $url . $image['thumbnail'];
-            $image['url'] = $url . $image['url'];
-            $result[] = $image;
-        }
-
-        return $result;
-    }
-
     protected function getBaseUrl()
     {
         return env('IMAGE_GROUP_ENCRYPT_URL');

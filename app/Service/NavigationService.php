@@ -67,7 +67,7 @@ class NavigationService extends GenerateService
         $returnResult = $this->generateImageGroups([], $imageGroups);
         $returnResult = $this->generateVideos($returnResult, $videos);
 
-        $returnResult = \Hyperf\Collection\collect($returnResult)->shuffle();
+        shuffle($returnResult);
 
         $items = [];
         foreach ($returnResult as $value) {
@@ -94,7 +94,10 @@ class NavigationService extends GenerateService
 
         $result = $this->generateImageGroups($result, $imageGroups);
         $result = $this->generateVideos($result, $videos);
-        return $this->generateAdvertisements($result, $advertisements);
+        $models = $this->generateAdvertisements($result, $advertisements);
+        shuffle($models);
+
+        return $models;
     }
 
     public function navigationSuggestByMemberCategorization(array $suggest, int $page, int $limit, int $memberId): array
@@ -309,14 +312,17 @@ class NavigationService extends GenerateService
     {
         $hotOrderLimit = $this->getHotOrderPerLimit(ImageGroup::class, $limit);
         $hotOrderModels = $this->imageGroupService->getImageGroupsByHotOrder($page, $hotOrderLimit);
+        $ids = $this->getIds($hotOrderModels);
         $otherLimit = self::OTHER_LIMIT;
         $suggestLimit = $limit - count($hotOrderModels) - $otherLimit;
 
-        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit);
+        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit, $ids, true);
 
         $remain = $limit - count($suggestModels) - count($hotOrderModels);
 
-        $models = $this->imageGroupService->getImageGroups(null, $page, $remain)->toArray();
+        $ids = array_merge($ids, $this->getIds($suggestModels));
+
+        $models = $this->imageGroupService->getImageGroups(null, $page, $remain, $ids, true)->toArray();
 
         return array_merge($hotOrderModels, $suggestModels, $models);
     }
@@ -327,12 +333,15 @@ class NavigationService extends GenerateService
         $hotOrderModels = $this->videoService->getVideosByHotOrder($page, $hotOrderLimit);
         $otherLimit = self::OTHER_LIMIT;
         $suggestLimit = $limit - count($hotOrderModels) - $otherLimit;
+        $ids = $this->getIds($hotOrderModels);
 
-        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $suggestLimit);
+        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $suggestLimit, $ids, true);
 
         $remain = $limit - count($suggestModels) - count($hotOrderModels);
 
-        $models = $this->videoService->getVideos(null, $page, 9, $remain)->toArray();
+        $ids = array_merge($ids, $this->getIds($suggestModels));
+
+        $models = $this->videoService->getVideos(null, $page, 9, $remain, $ids, true)->toArray();
 
         return array_merge($hotOrderModels, $suggestModels, $models);
     }
