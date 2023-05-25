@@ -34,7 +34,7 @@ class ActorService extends GenerateService
     public const TTL_ONE_DAY = 86400;
 
     protected Redis $redis;
-
+    protected $model;
     public function __construct(Redis $redis, Actor $actor)
     {
         $this->redis = $redis;
@@ -46,7 +46,7 @@ class ActorService extends GenerateService
     {
         if ($data['tags'] != '') {
             $ids = [];
-            $tags = explode(',', $data['tags']);
+            $tags = explode(',', $data['actors']);
             foreach ($tags as $v) {
                 $d['name'] = $v;
                 $d['user_id'] = 1;
@@ -143,7 +143,8 @@ class ActorService extends GenerateService
     public function storeActor(array $data)
     {
         if (Actor::where('name', $data['name'])->exists()) {
-            $model = Actor::where('name', $data['name'])->first();
+            $name = $data['name'];
+            $model = Actor::where('name', 'like', "%{$name}%" )->first();
         } else {
             $model = new Actor();
         }
