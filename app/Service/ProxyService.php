@@ -178,6 +178,7 @@ class ProxyService extends BaseService
         $result = $this->memberInviteReceiveLog
             ->select( 'member_invite_receive_log.product_name',DB::raw($payDate),DB::raw($levelSql), 'member_invite_receive_log.reach_amount',  'members.name as member_name')
             ->leftJoin('members', 'member_invite_receive_log.member_id', '=', 'members.id')
+            ->where('member_invite_receive_log.member_id', $memberId)
             ->offset(($page - 1) * $limit)
             ->limit($limit)
             ->get();
