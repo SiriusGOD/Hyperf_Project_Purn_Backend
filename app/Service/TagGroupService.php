@@ -91,9 +91,6 @@ class TagGroupService
             if(!empty($value['img'])){
                 $tags[$key]['img'] = env('IMAGE_GROUP_ENCRYPT_URL') . $value['img'];
             }
-            else{
-                $tags[$key]['img'] = "";
-            }
             // 作品數大於０才顯示 
             if($value['product_num'] > 0){
                 array_push($result, array(
