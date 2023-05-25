@@ -43,10 +43,18 @@ class CountJsonCommand extends HyperfCommand
     {
         $client = new Client();
         $headers = [
-            'Authorization' => 'Bearer eyJ0eXAiOiJqd3QifQ.eyJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvOiIsImV4cCI6MTY4NDg5ODkxNiwiaWF0IjoxNjg0ODEyNTE2LCJuYmYiOjE2ODQ4MTI1MTYsInVpZCI6ODcsInMiOiJLRG93dFAiLCJqdGkiOiJjN2ZkZmVhNTY4YWQ1NTNkYzdmMzdjYWVlZWRkOTUzMSJ9.NzY5ODQ1Y2I3OGE1ZmFkOTgxMzU5ZjJjMzc4NmU5ZjgwMTVlOWRjMA',
-            'Cookie' => 'HYPERF_SESSION_ID=x6NT7l77slhalXKfetMlu1x5s1T72Wky9WNFo0N0'
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer eyJ0eXAiOiJqd3QifQ.eyJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvOiIsImV4cCI6MTY4NTA4NDM0NiwiaWF0IjoxNjg0OTk3OTQ2LCJuYmYiOjE2ODQ5OTc5NDYsInVpZCI6MjQsInMiOiJpTUFRYWoiLCJqdGkiOiJhYmZmZDZmNmEzYmM0YmFiNzkyYTU4MmYzYjk0MTZmMiJ9.NjkxZGYyYjBmYTAxNTc4MWNiYjFhOGExMzFjOTExMWZmOTgwMmU1ZQ',
+            'Cookie' => 'HYPERF_SESSION_ID=yabq4CdDzYtgxKMVUskStTb8jsqLW7jpfGVOvJBZ'
         ];
-        $request = new Request('POST', '172.104.46.27/api/tag/search?tag_ids[]=1', $headers);
+        $body = '{
+  "type": "video",
+  "id": 1,
+  "type_id": 684,
+  "nav_id": 18,
+  "limit" : 20
+}';
+        $request = new Request('POST', '172.104.46.27/api/navigation/detail', $headers, $body);
         $res = $client->send($request);
         $result = json_decode($res->getBody()->getContents(), true);
         $videoCount = 0;

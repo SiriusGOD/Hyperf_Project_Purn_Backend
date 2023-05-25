@@ -207,10 +207,20 @@ class TagService extends GenerateService
             return [];
         }
 
-        return match ($type) {
-            'image_group' => ImageGroup::find($id)->tags()->pluck('tags.id')->toArray() ?? [],
-            default => Video::find($id)->tags()->pluck('tags.id')->toArray() ?? [],
-        };
+        switch ($type) {
+            case 'image_group' :
+                $imageGroup = ImageGroup::find($id);
+                if (!empty($imageGroup) and !empty($imageGroup->tags())) {
+                    return ImageGroup::find($id)->tags()->pluck('tags.id')->toArray();
+                }
+                return [];
+            default :
+                $video = Video::find($id);
+                if(!empty($video) and !empty($video->tags())) {
+                    return Video::find($id)->tags()->pluck('tags.id')->toArray();
+                }
+                return [];
+        }
     }
 
     public function getTypeIdsByTagIds(array $tagIds, string $type, int $limit, int $typeId): array
