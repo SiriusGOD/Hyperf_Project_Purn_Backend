@@ -300,6 +300,8 @@ class MemberService extends BaseService
             // 遊客 -> 會員未驗證
             if ($model->status == Member::STATUS['VISITORS']) {
                 $model->status = Member::STATUS['NOT_VERIFIED'];
+                $model->free_quota = $model->free_quota + MemberLevel::ADD_QUOTA;
+                $model->free_quota_limit = $model->free_quota_limit + MemberLevel::ADD_QUOTA;
             }
         }
 

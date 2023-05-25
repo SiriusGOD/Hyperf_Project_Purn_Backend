@@ -23,6 +23,7 @@ use App\Model\Member;
 use App\Model\MemberFollow;
 use App\Model\MemberTag;
 use App\Model\MemberVerification;
+use App\Model\MemberLevel;
 use App\Request\AddFollowerRequest;
 use App\Request\AddMemberFollowRequest;
 use App\Request\AddMemberTagRequest;
@@ -263,6 +264,8 @@ class MemberController extends AbstractController
 
         if (! empty($model)) {
             $member->status = Member::STATUS['VERIFIED'];
+            $member->free_quota = $member->free_quota + MemberLevel::ADD_QUOTA;
+            $member->free_quota_limit = $member->free_quota_limit + MemberLevel::ADD_QUOTA;
             $member->email = $request->input('email') ?? $member->email;
             $member->save();
             if($member->invited_by != ""){
