@@ -15,7 +15,7 @@ class CreateCustomerServiceCovers extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('customer_service_id')->comment('客服 id');
             $table->string('url')->comment('圖片網址');
-            $table->datetimes();
+            $table->timestamps();
         });
     }
 
