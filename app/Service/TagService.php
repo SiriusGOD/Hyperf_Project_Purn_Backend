@@ -244,6 +244,8 @@ class TagService extends GenerateService
         $tag = Tag::select('id', 'name', 'img')->where('id', $tag_id)->first()->toArray();
         if (! empty($tag['img'])) {
             $tag['img'] = env('IMAGE_GROUP_ENCRYPT_URL') . $tag['img'];
+        }else{
+            $tag['img'] = "";
         }
         // 撈取影片作品數
         $video_num = TagCorrespond::where('tag_id', $tag_id)->where('tag_corresponds.correspond_type', Video::class)->count();
