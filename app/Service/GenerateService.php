@@ -79,7 +79,7 @@ class GenerateService
             $video['cover_thumb'] = env('IMAGE_GROUP_ENCRYPT_URL', 'https://new.cnzuqiu.mobi') . $video['cover_thumb'];
             $video['full_m3u8'] = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $video['full_m3u8'];
             $video['m3u8'] = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $video['m3u8'];
-            $video['source'] = env('VIDEO_SOURCE_URL', 'https://video.iwanna.tv') . $video['source'];
+            $video['source'] = env('VIDEO_SOURCE_URL_10S', 'https://10play.riyufanyi.wang') . $video['source'];
             $video['actors'] = $this->getActorsByType(Video::class, $video['id']);
             unset($video['coins']);
 
