@@ -537,13 +537,17 @@ class MemberService extends BaseService
                       ->toArray();
             
             if($value == 'actor'){
-              foreach ($query as $key2 => $value2) {
-                  // avatar加上網域
-                  if(!empty($value2['avatar']))$query[$key2]['avatar'] = env('TEST_IMG_URL').$value2['avatar'];
-                  // 查詢作品數
-                  $numberOfWorks = ActorCorrespond::where('actor_id', $value2['id'])->count();
-                  $query[$key2]['numberOfWorks'] = $numberOfWorks;
-              }
+                foreach ($query as $key2 => $value2) {
+                    // avatar加上網域
+                    if(!empty($value2['avatar'])){
+                        $query[$key2]['avatar'] = env('TEST_IMG_URL').$value2['avatar'];
+                    }else{
+                        $query[$key2]['avatar'] = '';
+                    }
+                    // 查詢作品數
+                    $numberOfWorks = ActorCorrespond::where('actor_id', $value2['id'])->count();
+                    $query[$key2]['numberOfWorks'] = $numberOfWorks;
+                }
             }
             $result[$value] = $query;
         }
