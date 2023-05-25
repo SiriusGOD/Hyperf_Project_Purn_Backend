@@ -69,7 +69,8 @@ class ActorSeed implements BaseInterface
 
     public function down(): void
     {
-        \App\Model\ActorClassification::truncate();
+        \App\Model\Actor::truncate();
+        \App\Model\ActorHasClassification::truncate();
     }
 
     public function base(): bool
