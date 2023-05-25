@@ -7,12 +7,26 @@
                 <div class="card-body">
                     <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                         <div class="row">
-
-                            @if(authPermission('tag-create'))
-                                <div class="col-sm-12 col-md-12 mb-1">
-                                    <a class="btn badge-info" href="/admin/tag/create">{{trans('default.tag_control.tag_insert') ?? '新增標籤'}}</a>
+                            <div class="col-sm-2">
+                              @if(authPermission('tag-create'))
+                                  <div class="col-sm-12 col-md-12 mb-1">
+                                      <a class="btn badge-info" href="/admin/tag/create">{{trans('default.tag_control.tag_insert') ?? '新增標籤'}}</a>
+                                  </div>
+                              @endif
+                            </div>
+                            <div class="col-sm-8">
+                                  
+                            <form action="/admin/tag/index" method="get" style="display: flex;" class="col-md-12">
+                                <div class="form-group col-md-3">
+                                    <input type="text" class="form-control" name="tag_name" aria-describedby="title" value="{{$tag_name ?? ''}}">
                                 </div>
-                            @endif
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">search</button>
+                                </div>
+                            </form>
+
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">

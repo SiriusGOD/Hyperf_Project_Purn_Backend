@@ -47,14 +47,18 @@ class TagController extends AbstractController
     #[RequestMapping(methods: ['GET'], path: 'index')]
     public function index(RequestInterface $request)
     {
+        $tag_name = $request->input('tag_name');
         // 顯示幾筆
         $step = Tag::PAGE_PER;
         $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
         $models = Tag::with('user')->leftjoin('tag_has_groups', 'tags.id', 'tag_has_groups.tag_id')
             ->leftjoin('tag_groups', 'tag_has_groups.tag_group_id', 'tag_groups.id')
             ->select('tags.*', Db::raw("GROUP_CONCAT(tag_groups.name SEPARATOR ' , ') as group_name "))
-            ->groupBy('tags.id')
-            ->offset(($page - 1) * $step)->limit($step)->get();
+            ->groupBy('tags.id');
+        if($tag_name){
+          $models = $models->where('tags.name' ,'like' , "%{$tag_name}%");
+        }
+        $models = $models->offset(($page - 1) * $step)->limit($step)->get();
         $total = Tag::count();
         $data['last_page'] = ceil($total / $step);
         if ($total == 0) {
@@ -62,13 +66,14 @@ class TagController extends AbstractController
         }
         $data['navbar'] = trans('default.tag_control.tag_control');
         $data['tag_active'] = 'active';
+        $data['tag_name'] = isset($tag_name) ? $tag_name : "";
         $data['total'] = $total;
         $data['datas'] = $models;
         $data['page'] = $page;
         $data['step'] = $step;
         $path = '/admin/tag/index';
-        $data['next'] = $path . '?page=' . ($page + 1);
-        $data['prev'] = $path . '?page=' . ($page - 1);
+        $data['next'] = $path . '?page=' . ($page + 1)."&tag_name=".$tag_name;
+        $data['prev'] = $path . '?page=' . ($page - 1)."&tag_name=".$tag_name;
         $paginator = new Paginator($models, $step, $page);
         $data['paginator'] = $paginator->toArray();
         return $this->render->render('admin.tag.index', $data);
