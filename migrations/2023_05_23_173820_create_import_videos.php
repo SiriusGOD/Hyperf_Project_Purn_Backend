@@ -66,7 +66,7 @@ class CreateImportVideos extends Migration
             $table->integer('cover_height')->nullable()->comment('封面高');
             $table->bigInteger('total_click')->notNull()->default(0)->comment('30天內總點擊數');
             $table->bigInteger('is_calc')->notNull()->default(0)->comment('0:未算過  ,1:己算過 是否算過');
-            $table->datetimes();
+            $table->timestamps();
         });
     }
 

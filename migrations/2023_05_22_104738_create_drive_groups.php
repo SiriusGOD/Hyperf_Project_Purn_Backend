@@ -17,7 +17,7 @@ class CreateDriveGroups extends Migration
             $table->string('name')->comment('群組名稱');
             $table->string('img')->nullable()->comment('圖片位置');
             $table->string('url')->comment('網址');
-            $table->datetimes();
+            $table->timestamps();
             $table->softDeletes();
         });
     }

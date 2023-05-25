@@ -16,7 +16,7 @@ class CreateDriveClass extends Migration
             $table->bigInteger('user_id')->comment('會員id')->unsigned();
             $table->string('name')->comment('類別名稱');
             $table->string('description')->comment('類別描述');
-            $table->datetimes();
+            $table->timestamps();
             $table->softDeletes();
         });
     }

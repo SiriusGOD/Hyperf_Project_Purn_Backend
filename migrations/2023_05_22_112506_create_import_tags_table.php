@@ -15,7 +15,7 @@ class CreateImportTagsTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('tag_id')->comment('標籤id');
             $table->string('name')->comment('對應名稱');
-            $table->datetimes();
+            $table->timestamps();
         });
     }
 

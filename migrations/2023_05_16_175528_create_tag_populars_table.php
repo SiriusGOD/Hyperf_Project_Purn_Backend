@@ -17,7 +17,7 @@ class CreateTagPopularsTable extends Migration
             $table->integer('popular_tag_id')->comment("該tag_id下，所有作品的top6標籤");
             $table->string('popular_tag_name')->comment("該tag_id下，所有作品的top6標籤名稱");
             $table->integer('popular_tag_count')->comment("該tag_id下，所有作品的top6標籤出現次數");
-            $table->datetimes();
+            $table->timestamps();
         });
     }
 

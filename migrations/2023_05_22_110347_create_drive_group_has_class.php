@@ -15,7 +15,7 @@ class CreateDriveGroupHasClass extends Migration
             $table->bigIncrements('id');
             $table->integer('drive_class_id')->comment('類別ID');
             $table->integer('drive_group_id')->comment('群組ID');
-            $table->datetimes();
+            $table->timestamps();
         });
     }
 

@@ -18,7 +18,7 @@ class CreateChannelRegister extends Migration
             $table->date('date')->comment('日期');
             $table->integer('hour')->comment('時,24小時制');
             $table->integer('total')->default(0)->comment('人數');
-            $table->datetimes();
+            $table->timestamps();
         });
         Schema::table('channels', function (Blueprint $table) {
             $table->integer('register_total')->comment('註冊總數')->default(0);

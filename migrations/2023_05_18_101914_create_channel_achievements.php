@@ -19,7 +19,7 @@ class CreateChannelAchievements extends Migration
             $table->integer('hour')->comment('小時,24小時制');
             $table->decimal('pay_amount', 8, 2)->comment('今日業積')->nullable()->index();
             $table->string('currency')->comment('幣別')->nullable();
-            $table->datetimes();
+            $table->timestamps();
         });
     }
 
