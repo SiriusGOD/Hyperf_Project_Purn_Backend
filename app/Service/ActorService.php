@@ -142,9 +142,14 @@ class ActorService extends GenerateService
     // 新增或更新演員
     public function storeActor(array $data)
     {
-        if (Actor::where('name', $data['name'])->exists()) {
-            $name = $data['name'];
-            $model = Actor::where('name', 'like', "%{$name}%" )->first();
+        $name = $data['name'];
+        $data['classifications'] = 12;
+        if (Actor::where('name', $name)->exists()) {
+            $model = Actor::where('name', $name )->first();
+              $ahc = ActorHasClassification::where('actor_id',$model->id)->first(); 
+            if($ahc){
+              $data['classifications'] = $ahc->actor_classifications_id;
+            }
         } else {
             $model = new Actor();
         }
@@ -156,7 +161,7 @@ class ActorService extends GenerateService
 
         // 新增或更新演員分類關係
         $model = Actor::where('name', $data['name'])->first();
-        $arr_classify = $data['classifications'] ?? [];
+        $arr_classify['actor_classifications_id'] = $data['classifications'];
         $this->createActorClassificationRelationship($arr_classify, $model->id);
         $this->delFrontCache();
 
