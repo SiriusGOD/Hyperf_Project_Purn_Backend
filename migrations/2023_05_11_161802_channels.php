@@ -18,7 +18,7 @@ class Channels extends Migration
             $table->string('params')->comment('參數');
             $table->string('image')->comment('圖片');
             $table->decimal('amount', 10, 2)->default(0)->comment('總收益');
-            $table->datetimes();
+            $table->timestamps();
         });
     }
 
