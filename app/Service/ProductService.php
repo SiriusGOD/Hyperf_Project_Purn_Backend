@@ -57,7 +57,7 @@ class ProductService
         $model = Product::findOrNew($data['id']);
         $model->user_id = $data['user_id'];
         $model->type = $data['type'];
-        if ($data['type'] == Product::TYPE_LIST[0] || $data['type'] == Product::TYPE_LIST[1]) {
+        if ($data['type'] == Product::TYPE_CORRESPOND_LIST['image'] || $data['type'] == Product::TYPE_CORRESPOND_LIST['video'] ) {
             $model->diamond_price = Product::DIAMOND_PRICE;
         }
         $model->correspond_id = $data['correspond_id'];
