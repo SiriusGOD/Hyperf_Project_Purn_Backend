@@ -47,7 +47,7 @@ class ImageGroupService
         return $model;
     }
 
-    public function getImageGroups(?array $tagIds, int $page, $limit = ImageGroup::PAGE_PER, array $withoutIds = []): Collection
+    public function getImageGroups(?array $tagIds, int $page, $limit = ImageGroup::PAGE_PER, array $withoutIds = [], bool $isRandom = false): Collection
     {
         $imageIds = [];
         if (! empty($tagIds)) {
@@ -63,7 +63,6 @@ class ImageGroupService
         $query = ImageGroup::with([
             'tags', 'imagesLimit',
         ])
-            ->offset($limit * $page)
             ->limit($limit);
 
         if (! empty($imageIds)) {
@@ -80,6 +79,12 @@ class ImageGroupService
 
         if (! empty($enableIds)) {
             $query = $query->whereIn('id', $enableIds);
+        }
+
+        if ($isRandom) {
+            $query = $query->orderByRaw('rand()');
+        } else {
+            $query = $query->offset($limit * $page);
         }
 
         return $query->where('height', '>', 0)->orderByDesc('id')->get();
@@ -149,7 +154,7 @@ class ImageGroupService
         return $query->get();
     }
 
-    public function getImageGroupsBySuggest(array $suggest, int $page, int $inputLimit, array $withoutIds = []): array
+    public function getImageGroupsBySuggest(array $suggest, int $page, int $inputLimit, array $withoutIds = [], bool $isRandom = false): array
     {
         $result = [];
         $useImageIds = [];
@@ -175,7 +180,6 @@ class ImageGroupService
                 'tags', 'imagesLimit',
             ])
                 ->whereIn('id', $imageIds)
-                ->offset($limit * $page)
                 ->where('height', '>', 0)
                 ->orderByDesc('id')
                 ->limit($limit);
@@ -186,6 +190,12 @@ class ImageGroupService
 
             if (! empty($enableIds)) {
                 $query->whereIn('id', $enableIds);
+            }
+
+            if ($isRandom) {
+                $query = $query->orderByRaw('rand()');
+            } else {
+                $query = $query->offset($limit * $page);
             }
 
             $models = $query->get()->toArray();

@@ -61,25 +61,13 @@ class NavigationService extends GenerateService
     {
         $imageLimit = (int) floor($limit / 2);
         $tagIds = $this->tagService->getTagsByModelType($type, $id);
-        $imageGroups = $this->navigationDetailImageGroups($suggest, $navId, $tagIds, $page, $imageLimit);
+        $imageGroups = $this->navigationDetailImageGroups($suggest, $navId, $tagIds, $page, $imageLimit, $id);
         $videoLimit = $limit - $imageLimit;
-        $videos = $this->navigationDetailVideos($suggest, $navId, $tagIds, $page, $videoLimit);
+        $videos = $this->navigationDetailVideos($suggest, $navId, $tagIds, $page, $videoLimit, $id);
         $returnResult = $this->generateImageGroups([], $imageGroups);
         $returnResult = $this->generateVideos($returnResult, $videos);
 
-        switch ($navId) {
-            case 1:
-                $collect = \Hyperf\Collection\collect($returnResult);
-                $collect = $collect->sortByDesc('total_click');
-
-                $returnResult = $collect->toArray();
-                break;
-            default:
-                $collect = \Hyperf\Collection\collect($returnResult);
-                $collect = $collect->sortByDesc('created_at');
-
-                $returnResult = $collect->toArray();
-        }
+        $returnResult = \Hyperf\Collection\collect($returnResult)->shuffle();
 
         $items = [];
         foreach ($returnResult as $value) {
@@ -179,13 +167,13 @@ class NavigationService extends GenerateService
         $model->save();
     }
 
-    protected function navigationDetailImageGroups(array $suggest, int $navId, array $tagIds, int $page, int $limit): array
+    protected function navigationDetailImageGroups(array $suggest, int $navId, array $tagIds, int $page, int $limit, int $typeId): array
     {
         $percent = self::DETAIL_PERCENTS[$navId] ?? [0.2, 0.8];
         $typeLimit = (int) floor($percent[1] * $limit);
         $hideIds = ReportService::getHideIds(ImageGroup::class);
 
-        $imageGroupIds = $this->tagService->getTypeIdsByTagIds($tagIds, ImageGroup::class, $page, $limit);
+        $imageGroupIds = $this->tagService->getTypeIdsByTagIds($tagIds, ImageGroup::class, $limit, $typeId);
         $query = ImageGroup::with([
             'tags', 'imagesLimit',
         ])
@@ -211,22 +199,22 @@ class NavigationService extends GenerateService
 
         $userLimit = $limit - count($imageGroups);
 
-        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $userLimit);
+        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $userLimit, [$typeId], true);
         $remain = $userLimit - count($suggestModels);
 
 
-        $models = $this->imageGroupService->getImageGroups(null, $page, $remain)->toArray();
+        $models = $this->imageGroupService->getImageGroups(null, $page, $remain, [$typeId], true)->toArray();
 
         return array_merge($models, $suggestModels, $imageGroups);
     }
 
-    protected function navigationDetailVideos(array $suggest, int $navId, array $tagIds, int $page, int $limit): array
+    protected function navigationDetailVideos(array $suggest, int $navId, array $tagIds, int $page, int $limit, int $typeId): array
     {
         $percent = self::DETAIL_PERCENTS[$navId] ?? [0.2, 0.8];
         $typeLimit = (int) floor($percent[1] * $limit);
         $hideIds = ReportService::getHideIds(Video::class);
 
-        $ids = $this->tagService->getTypeIdsByTagIds($tagIds, Video::class, $page, $limit);
+        $ids = $this->tagService->getTypeIdsByTagIds($tagIds, Video::class, $limit, $typeId);
         $query = Video::with([
             'tags',
         ])
@@ -249,10 +237,10 @@ class NavigationService extends GenerateService
 
         $userLimit = $limit - count($videos);
 
-        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $userLimit);
+        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $userLimit, [$typeId], true);
         $remain = $userLimit - count($suggestModels);
 
-        $models = $this->videoService->getVideos(null, $page, 9, $remain)->toArray();
+        $models = $this->videoService->getVideos(null, $page, 9, $remain, [$typeId], true)->toArray();
 
         return array_merge($models, $suggestModels, $videos);
     }

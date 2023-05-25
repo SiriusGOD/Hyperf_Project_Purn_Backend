@@ -213,13 +213,16 @@ class TagService extends GenerateService
         };
     }
 
-    public function getTypeIdsByTagIds(array $tagIds, string $type, int $page, int $limit): array
+    public function getTypeIdsByTagIds(array $tagIds, string $type, int $limit, int $typeId): array
     {
-        return TagCorrespond::where('correspond_type', $type)
+        $query = TagCorrespond::where('correspond_type', $type)
             ->whereIn('tag_id', $tagIds)
-            ->offset($page * $limit)
-            ->limit($limit)
-            ->get()
+            ->where('correspond_id', '<>', $typeId)
+            ->limit($limit);
+
+        $query = $query->orderByRaw('rand()');
+
+        return $query->get()
             ->pluck('correspond_id')
             ->toArray();
     }

@@ -80,14 +80,14 @@ class VideoService
     }
 
     // 影片列表
-    public function getVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER, array $withoutIds = []): Collection
+    public function getVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER, array $withoutIds = [], bool $isRandom = false): Collection
     {
-        $query = self::baseVideos($tagIds, $page, $status, $limit, $withoutIds);
+        $query = self::baseVideos($tagIds, $page, $status, $limit, $withoutIds, $isRandom);
         return $query->orderByDesc('id')->get();
     }
 
     // 影片
-    public function baseVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER, array $withoutIds = [])
+    public function baseVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER, array $withoutIds = [], bool $isRandom)
     {
         $videoIds = [];
         $query = $this->model->where('cover_height', '>', 0);
@@ -101,7 +101,14 @@ class VideoService
         if ($status != 9) {
             $query->where('status', $status);
         }
-        $query = $query->offset($limit * $page)->limit($limit);
+        $query = $query->limit($limit);
+
+        if($isRandom) {
+            $query = $query->orderByRaw('rand()');
+        } else {
+            $query = $query->offset($limit * $page);
+        }
+
         if (! empty($videoIds)) {
             $query = $query->whereIn('id', $videoIds);
         }
@@ -331,7 +338,7 @@ class VideoService
         $this->redis->set(self::CACHE_KEY . '0,0', json_encode($result), self::EXPIRE);
     }
 
-    public function getVideosBySuggest(array $suggest, int $page, int $inputLimit, array $withoutIds = []): array
+    public function getVideosBySuggest(array $suggest, int $page, int $inputLimit, array $withoutIds = [], bool $isRandom = false): array
     {
         $result = [];
         $useIds = [];
@@ -359,7 +366,6 @@ class VideoService
                 ->whereIn('id', $ids)
                 ->where('release_time', '<=', Carbon::now()->toDateTimeString())
                 ->where('cover_height', '>', 0)
-                ->offset($limit * $page)
                 ->limit($limit);
 
             if(! empty($hideIds)) {
@@ -368,6 +374,12 @@ class VideoService
 
             if (! empty($enableIds)) {
                 $query = $query->whereIn('id', $enableIds);
+            }
+
+            if ($isRandom) {
+                $query = $query->orderByRaw('rand()');
+            } else {
+                $query = $query->offset($limit * $page);
             }
 
             $models = $query->get()->toArray();
