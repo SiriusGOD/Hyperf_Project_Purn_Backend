@@ -157,7 +157,17 @@ class NavigationService extends GenerateService
 
         $result = $this->generateImageGroups($result, $imageGroups);
         $result = $this->generateVideos($result, $videos);
-        return $this->generateAdvertisements($result, $advertisements);
+        $result = $this->generateAdvertisements($result, $advertisements);
+
+        $collect = \Hyperf\Collection\collect($result);
+        $arr = $collect->sortByDesc('total_click');
+
+        $returnResult = [];
+        foreach ($arr as $value) {
+            $returnResult[] = $value;
+        }
+
+        return $returnResult;
     }
 
     public function navigationLatest(array $suggest, int $page, int $limit): array
@@ -275,11 +285,9 @@ class NavigationService extends GenerateService
         $models = $this->imageGroupService->getImageGroups(null, $page, $remain, $ids, false, Constants::SORT_BY['click'])->toArray();
 
         $result = array_merge($suggestModels, $models);
-        $collect = \Hyperf\Collection\collect($result);
-        $arr = $collect->sortByDesc('total_click');
 
         $returnResult = [];
-        foreach ($arr as $value) {
+        foreach ($result as $value) {
             $returnResult[] = $value;
         }
 
@@ -298,15 +306,7 @@ class NavigationService extends GenerateService
 
         $result = array_merge($suggestModels, $models);
 
-        $collect = \Hyperf\Collection\collect($result);
-        $arr = $collect->sortByDesc('total_click');
-
-        $returnResult = [];
-        foreach ($arr as $value) {
-            $returnResult[] = $value;
-        }
-
-        return $returnResult;
+        return $result;
     }
 
     protected function calculateNavigationPopularClick(string $type, array $ids): array
