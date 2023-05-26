@@ -42,6 +42,7 @@ return [
         'update_success' => '訂單狀態更新成功',
         'no_order' => '該會員下查無此訂單或該訂單已取消',
         'parameter_error' => '參數錯誤',
+        'time_30_error' => '每30秒可建立一次支付，请勿频繁请求'
     ],
     'pay_control' => [
         'search_no_order' => '查無對應系統訂單',

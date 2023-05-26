@@ -33,6 +33,7 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Annotation\Middleware;
 use App\Middleware\ApiEncryptMiddleware;
 use App\Model\Pay;
+use Carbon\Carbon;
 
 #[Controller]
 #[Middleware(ApiEncryptMiddleware::class)]
@@ -69,16 +70,7 @@ class OrderController extends AbstractController
         if (empty($data['prod_id'])) {
             return $this->error(trans('validation.filled', ['attribute' => 'product id']), ErrorCode::BAD_REQUEST);
         }
-        // $data['id'] = $request->input('id', 0);
-        // if($request->input('type') == 'imageGroup'){
-        //     $type_class = ImageGroup::class;
-        // }else{
-        //     $type_class = Video::class;
-        // }
-        
-        // if (empty($data['id'])) {
-        //     return $this->error(trans('validation.filled', ['attribute' => 'product id']), ErrorCode::BAD_REQUEST);
-        // }
+
         $payment_type = $request->input('payment_type', 0);
         $data['payment_type'] = $payment_type;
         // $data['oauth_type'] = $request->input('oauth_type', 'web');
@@ -128,6 +120,14 @@ class OrderController extends AbstractController
         switch ($data['pay_method']) {
             case 'cash':
                 // 現金
+                // 確認跟前一筆訂單是否有相隔30秒
+                $last_order_time = Order::select('created_at')->where('user_id', $data['user_id'])->orderByDesc('created_at')->first()->toArray();
+                $now = Carbon::now();
+                $order_time = Carbon::parse($last_order_time['created_at']);
+                if(!empty($last_order_time) && $now->diffInSeconds($order_time) < 30){
+                    return $this->error(trans('api.order_control.time_30_error'), ErrorCode::BAD_REQUEST);
+                }
+
                 // 確認商品是否為現金
                 if ($product['currency'] == Product::CURRENCY[2]) {
                     return $this->error(trans('api.order_control.not_buy_with_cash'), ErrorCode::BAD_REQUEST);
@@ -155,7 +155,7 @@ class OrderController extends AbstractController
                     $pay_res['data']['pay_order_id'] = $pay_res['data']['order_id'];
                     unset($pay_res['data']['order_id']);
                     $pay_res['data']['pay_proxy'] = $pay_type;
-                    
+
                     return $this->success($pay_res['data'], trans('api.order_control.create_success'));
                 }
                 return $this->error(trans('api.order_control.create_failed'), ErrorCode::BAD_REQUEST);
