@@ -241,12 +241,12 @@ class ActorService extends GenerateService
             $data['avatar'] = env('IMAGE_GROUP_ENCRYPT_URL') . $actor['avatar'];
         }else{
             // 沒大頭貼時撈取作品封面圖
-            switch ($works[0]['correspond_type']) {
+            switch ($works[0] -> correspond_type) {
                 case ImageGroup::class:
-                    $thumb = ImageGroup::selectRaw('thumbnail as thumb')->where('id', $works[0]['correspond_id'])->first();
+                    $thumb = ImageGroup::selectRaw('thumbnail as thumb')->where('id', $works[0]->correspond_id)->first();
                     break;
                 case Video::class:
-                    $thumb = Video::selectRaw('cover_thumb as thumb')->where('id', $works[0]['correspond_id'])->first();
+                    $thumb = Video::selectRaw('cover_thumb as thumb')->where('id', $works[0]->correspond_id)->first();
                     break;
             }
             if(empty($thumb)){
