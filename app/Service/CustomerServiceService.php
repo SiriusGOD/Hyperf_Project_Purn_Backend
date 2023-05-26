@@ -73,7 +73,7 @@ class CustomerServiceService
         foreach ($models as $model) {
             foreach ($model['customer_service_covers'] as $key => $row) {
                 $model['customer_service_covers'][$key]['url'] = $url . $row['url'];
-                $imageInfo = getimagesize($url . $row['url']);
+                $imageInfo = getimagesize(env('IMAGE_GROUP_DECRYPT_URL') . $row['url']);
                 $model['customer_service_covers'][$key]['height'] = $imageInfo[1] ?? 0;
                 $model['customer_service_covers'][$key]['weight'] = $imageInfo[0] ?? 0;
             }
