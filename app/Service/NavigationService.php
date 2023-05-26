@@ -112,6 +112,12 @@ class NavigationService extends GenerateService
         if ($advertisementLimitArr['limit'] > 0) {
             $limit = $limit - $advertisementLimitArr['limit'];
         }
+        $advertisements = $this->advertisementService->getAdvertisementBySearch($advertisementLimitArr['last_page'], $advertisementLimitArr['limit']);
+
+        if (count($advertisements) < $advertisementLimitArr['limit']) {
+            $limit = $limit + ($advertisementLimitArr['limit'] - count($advertisements));
+        }
+
         $imageGroupLimit = (int) floor($limit / 2);
         $videoLimit = $limit - $imageGroupLimit;
 
@@ -123,16 +129,18 @@ class NavigationService extends GenerateService
         }
 
         $hideIds = \Hyperf\Support\make(MemberCategorizationService::class)->getTypeIdByMemberIdAndType($memberId, ImageGroup::class);
-        $imageGroups = $this->navigationSuggestImageGroupsByMemberCategorization($suggest, $page, $imageGroupLimit, $hideIds);
+        $imageGroups = $this->navigationSuggestImageGroupsByMemberCategorization($suggest, $page, $imageGroupLimit, $hideIds, $memberId);
 
         $hideIds = \Hyperf\Support\make(MemberCategorizationService::class)->getTypeIdByMemberIdAndType($memberId, Video::class);
-        $videos = $this->navigationSuggestVideosWithMemberCategorization($suggest, $page, $videoLimit, $hideIds);
+        $videos = $this->navigationSuggestVideosWithMemberCategorization($suggest, $page, $videoLimit, $hideIds, $memberId);
 
         $result = [];
 
         $result = $this->generateImageGroups($result, $imageGroups);
         $result = $this->generateVideos($result, $videos);
-        return $this->generateAdvertisements($result, $advertisements);
+        $result = $this->generateAdvertisements($result, $advertisements);
+        shuffle($result);
+        return $result;
     }
 
     public function navigationPopular(array $suggest, int $page, int $limit): array
@@ -314,14 +322,20 @@ class NavigationService extends GenerateService
         return $clickService->calculatePopularClickByTypeIds($type, $ids);
     }
 
-    protected function navigationSuggestImageGroupsByMemberCategorization(array $suggest, int $page, int $limit, array $hideIds): array
+    protected function navigationSuggestImageGroupsByMemberCategorization(array $suggest, int $page, int $limit, array $hideIds, int $memberId): array
     {
-        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $limit, $hideIds);
+        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $limit, $hideIds, true);
         $remain = $limit - count($suggestModels);
+        $hideIds = array_merge($hideIds, $this->getIds($suggestModels));
 
-        $models = $this->imageGroupService->getImageGroups(null, $page, $remain, $hideIds)->toArray();
+        $userSuggest = \Hyperf\Support\make(SuggestService::class)->getTagProportionByMemberTag($memberId);
+        $memberSuggestModels = $this->imageGroupService->getImageGroupsBySuggest($userSuggest, $page, $remain, $hideIds, true);
+        $remain = $remain - count($memberSuggestModels);
+        $hideIds = array_merge($hideIds, $this->getIds($memberSuggestModels));
 
-        return array_merge($suggestModels, $models);
+        $models = $this->imageGroupService->getImageGroups(null, $page, $remain, $hideIds, true)->toArray();
+
+        return array_merge($suggestModels, $memberSuggestModels, $models);
     }
 
     protected function navigationSuggestImageGroups(array $suggest, int $page, int $limit, bool $isRandom): array
@@ -362,15 +376,20 @@ class NavigationService extends GenerateService
         return array_merge($hotOrderModels, $suggestModels, $models);
     }
 
-    protected function navigationSuggestVideosWithMemberCategorization(array $suggest, int $page, int $limit, array $hideIds): array
+    protected function navigationSuggestVideosWithMemberCategorization(array $suggest, int $page, int $limit, array $hideIds, int $memberId): array
     {
-        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $limit, $hideIds);
-
+        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $limit, $hideIds, true);
+        $hideIds = array_merge($hideIds, $this->getIds($suggestModels));
         $remain = $limit - count($suggestModels);
 
-        $models = $this->videoService->getVideos(null, $page, 9, $remain, $hideIds)->toArray();
+        $userSuggest = \Hyperf\Support\make(SuggestService::class)->getTagProportionByMemberTag($memberId);
+        $memberSuggestModels = $this->videoService->getVideosBySuggest($userSuggest, $page, $remain, $hideIds, true);
+        $remain = $remain - count($memberSuggestModels);
+        $hideIds = array_merge($hideIds, $this->getIds($memberSuggestModels));
 
-        return array_merge($suggestModels, $models);
+        $models = $this->videoService->getVideos(null, $page, 9, $remain, $hideIds, true)->toArray();
+
+        return array_merge($suggestModels, $memberSuggestModels, $models);
     }
 
     protected function getHotOrderPerLimit(string $type, int $limit): int
