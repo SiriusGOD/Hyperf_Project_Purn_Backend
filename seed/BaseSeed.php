@@ -16,6 +16,7 @@ class BaseSeed implements BaseInterface
 {
     public function up(): void
     {
+        \Hyperf\Support\make(ImageGroupSeed::class)->up();
         \Hyperf\Support\make(ImportTagSeed::class)->up();
         \Hyperf\Support\make(ImportImageTagSeed::class)->up();
         \Hyperf\Support\make(CoinSeed::class)->up();

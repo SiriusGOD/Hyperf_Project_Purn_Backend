@@ -82,7 +82,7 @@
                                     @foreach($datas as $model)
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $model->id }}</td>
-                                            <td>{{ $model->user->name }}</td>
+                                            <td>{{ $model->user->name ?? 'system' }}</td>
                                             <td>{{ $model->title }}</td>
                                             <td>
                                                 <img src="{{ $model->getAdminBaseUrl() . $model->thumbnail }}" alt="">

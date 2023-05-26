@@ -26,7 +26,7 @@ use Hyperf\Redis\Redis;
 #[Crontab(name: 'ImageGroupSyncTask', rule: '5 * * * *', callback: 'execute', memo: '圖片同步定時任務')]
 class ImageGroupSyncTask
 {
-    public const ADMIN_ID = 1;
+    public const ADMIN_ID = 0;
 
     public const SYNC_KEY = 'image_group_sync';
 
@@ -72,11 +72,6 @@ class ImageGroupSyncTask
             $result = json_decode($res->getBody()->getContents(), true);
             if (empty($result['data'])) {
                 $this->logger->info('無資料');
-                $forever = false;
-            }
-
-            if ($count - ((int) $systemParam->param) >= 100) {
-                $this->logger->info('筆數過多 下次繼續同步 ： ' . $count);
                 $forever = false;
             }
 
