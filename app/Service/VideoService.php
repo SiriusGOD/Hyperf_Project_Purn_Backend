@@ -80,14 +80,14 @@ class VideoService
     }
 
     // 影片列表
-    public function getVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER, array $withoutIds = [], bool $isRandom = false): Collection
+    public function getVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER, array $withoutIds = [], bool $isRandom = false, int $sortBy = 0): Collection
     {
-        $query = self::baseVideos($tagIds, $page, $status, $limit, $withoutIds, $isRandom);
+        $query = self::baseVideos($tagIds, $page, $status, $limit, $withoutIds, $isRandom, $sortBy);
         return $query->orderByDesc('id')->get();
     }
 
     // 影片
-    public function baseVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER, array $withoutIds = [], bool $isRandom)
+    public function baseVideos(?array $tagIds, int $page = 0, int $status = 9, int $limit = Video::PAGE_PER, array $withoutIds = [], bool $isRandom = false, int $sortBy = 0)
     {
         $videoIds = [];
         $query = $this->model->where('cover_height', '>', 0);
@@ -123,6 +123,10 @@ class VideoService
 
         if (! empty($hideIds)) {
             $withoutIds = array_merge($withoutIds, $hideIds);
+        }
+
+        if (!empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
+            $query = $query->orderByDesc('total_click');
         }
 
         if (! empty($withoutIds)) {
@@ -338,7 +342,7 @@ class VideoService
         $this->redis->set(self::CACHE_KEY . '0,0', json_encode($result), self::EXPIRE);
     }
 
-    public function getVideosBySuggest(array $suggest, int $page, int $inputLimit, array $withoutIds = [], bool $isRandom = false): array
+    public function getVideosBySuggest(array $suggest, int $page, int $inputLimit, array $withoutIds = [], bool $isRandom = false, int $sortBy = 0): array
     {
         $result = [];
         $useIds = [];
@@ -380,6 +384,10 @@ class VideoService
                 $query = $query->orderByRaw('rand()');
             } else {
                 $query = $query->offset($limit * $page);
+            }
+
+            if (!empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
+                $query = $query->orderByDesc('total_click');
             }
 
             $models = $query->get()->toArray();

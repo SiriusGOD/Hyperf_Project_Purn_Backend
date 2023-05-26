@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Constants\Constants;
 use App\Model\ImageGroup;
 use App\Model\Navigation;
 use App\Model\Video;
@@ -267,11 +268,11 @@ class NavigationService extends GenerateService
     {
         $otherLimit = self::OTHER_LIMIT;
         $suggestLimit = $limit - $otherLimit;
-        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit);
+        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit, [], false, Constants::SORT_BY['click']);
         $remain = $limit - count($suggestModels);
 
-
-        $models = $this->imageGroupService->getImageGroups(null, $page, $remain)->toArray();
+        $ids = $this->getIds($suggestModels);
+        $models = $this->imageGroupService->getImageGroups(null, $page, $remain, $ids, false, Constants::SORT_BY['click'])->toArray();
 
         $result = array_merge($suggestModels, $models);
         $collect = \Hyperf\Collection\collect($result);
@@ -289,10 +290,11 @@ class NavigationService extends GenerateService
     {
         $otherLimit = self::OTHER_LIMIT;
         $suggestLimit = $limit - $otherLimit;
-        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $suggestLimit);
+        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $suggestLimit, [], false, Constants::SORT_BY['click']);
         $remain = $limit - count($suggestModels);
 
-        $models = $this->videoService->getVideos(null, $page, 9, $remain)->toArray();
+        $ids = $this->getIds($suggestModels);
+        $models = $this->videoService->getVideos(null, $page, 9, $remain, $ids, false, Constants::SORT_BY['click'])->toArray();
 
         $result = array_merge($suggestModels, $models);
 
