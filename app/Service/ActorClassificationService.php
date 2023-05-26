@@ -111,17 +111,30 @@ class ActorClassificationService
                             $query[$key]['is_follow'] = 0;
                         }
 
-                        // avatar加上網域
-                        if(!empty($value2['avatar'])){
-                            $query[$key]['avatar'] = env('IMAGE_GROUP_ENCRYPT_URL').$value2['avatar'];
-                        }else{
-                            $query[$key]['avatar'] = "";
-                        };
-
                         // 查詢作品數
                         $works_query = ActorCorrespond::where('actor_id', $actor_id)->whereNull('deleted_at')->get();
                         $numberOfWorks = $works_query -> count();
                         $query[$key]['numberOfWorks'] = $numberOfWorks;
+
+                        // avatar加上網域
+                        if(!empty($value2['avatar'])){
+                            $query[$key]['avatar'] = env('IMAGE_GROUP_ENCRYPT_URL').$value2['avatar'];
+                        }else{
+                            // 撈取作品封面圖
+                            switch ($works_query[0]['correspond_type']) {
+                                case ImageGroup::class:
+                                    $thumb = ImageGroup::selectRaw('thumbnail as thumb')->where('id', $works_query[0]['correspond_id'])->first();
+                                    break;
+                                case Video::class:
+                                    $thumb = Video::selectRaw('cover_thumb as thumb')->where('id', $works_query[0]['correspond_id'])->first();
+                                    break;
+                            }
+                            if(empty($thumb)){
+                                $query[$key]['avatar'] = "";
+                            }else{
+                                $query[$key]['avatar'] = env('IMAGE_GROUP_ENCRYPT_URL').$thumb->thumb;
+                            }
+                        };
 
                         // 擷取名稱第一個字
                         $letter =  mb_substr($name, 0, 1, 'UTF-8');
