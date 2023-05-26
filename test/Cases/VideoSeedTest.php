@@ -62,7 +62,7 @@ class VideoSeedTest extends HttpTestCase
         $count =ImportVideo::count();
         $totalIterations = ceil($count/$limit);
         for ($i = 0; $i < $totalIterations; $i++) {
-            $models = ImportVideo::where('is_calc', 0)->orderBy('id', 'desc')->limit($limit)->get();
+            $models = ImportVideo::where('cover_full',"!-", 1)->where('created_at',"!=", NULL)->where('is_calc', 0)->orderBy('id', 'desc')->limit($limit)->get();
             if (count($models) > 0) {
                 foreach ($models as $model) {
                     self::insertData($model);
