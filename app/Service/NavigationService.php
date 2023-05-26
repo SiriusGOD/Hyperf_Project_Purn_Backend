@@ -121,13 +121,6 @@ class NavigationService extends GenerateService
         $imageGroupLimit = (int) floor($limit / 2);
         $videoLimit = $limit - $imageGroupLimit;
 
-        $advertisements = $this->advertisementService->getAdvertisementBySearch($advertisementLimitArr['last_page'], $advertisementLimitArr['limit']);
-        $count = count($advertisements);
-
-        if ($count < $advertisementLimitArr['limit']) {
-            $videoLimit = $videoLimit + ($advertisementLimitArr['limit'] - $count);
-        }
-
         $hideIds = \Hyperf\Support\make(MemberCategorizationService::class)->getTypeIdByMemberIdAndType($memberId, ImageGroup::class);
         $imageGroups = $this->navigationSuggestImageGroupsByMemberCategorization($suggest, $page, $imageGroupLimit, $hideIds, $memberId);
 
