@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Service;
 
+use App\Constants\Constants;
 use App\Model\ImageGroup;
 use App\Model\Navigation;
 use App\Model\Video;
@@ -156,7 +157,17 @@ class NavigationService extends GenerateService
 
         $result = $this->generateImageGroups($result, $imageGroups);
         $result = $this->generateVideos($result, $videos);
-        return $this->generateAdvertisements($result, $advertisements);
+        $result = $this->generateAdvertisements($result, $advertisements);
+
+        $collect = \Hyperf\Collection\collect($result);
+        $arr = $collect->sortByDesc('total_click');
+
+        $returnResult = [];
+        foreach ($arr as $value) {
+            $returnResult[] = $value;
+        }
+
+        return $returnResult;
     }
 
     public function navigationLatest(array $suggest, int $page, int $limit): array
@@ -267,18 +278,16 @@ class NavigationService extends GenerateService
     {
         $otherLimit = self::OTHER_LIMIT;
         $suggestLimit = $limit - $otherLimit;
-        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit);
+        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit, [], false, Constants::SORT_BY['click']);
         $remain = $limit - count($suggestModels);
 
-
-        $models = $this->imageGroupService->getImageGroups(null, $page, $remain)->toArray();
+        $ids = $this->getIds($suggestModels);
+        $models = $this->imageGroupService->getImageGroups(null, $page, $remain, $ids, false, Constants::SORT_BY['click'])->toArray();
 
         $result = array_merge($suggestModels, $models);
-        $collect = \Hyperf\Collection\collect($result);
-        $arr = $collect->sortByDesc('total_click');
 
         $returnResult = [];
-        foreach ($arr as $value) {
+        foreach ($result as $value) {
             $returnResult[] = $value;
         }
 
@@ -289,22 +298,15 @@ class NavigationService extends GenerateService
     {
         $otherLimit = self::OTHER_LIMIT;
         $suggestLimit = $limit - $otherLimit;
-        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $suggestLimit);
+        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $suggestLimit, [], false, Constants::SORT_BY['click']);
         $remain = $limit - count($suggestModels);
 
-        $models = $this->videoService->getVideos(null, $page, 9, $remain)->toArray();
+        $ids = $this->getIds($suggestModels);
+        $models = $this->videoService->getVideos(null, $page, 9, $remain, $ids, false, Constants::SORT_BY['click'])->toArray();
 
         $result = array_merge($suggestModels, $models);
 
-        $collect = \Hyperf\Collection\collect($result);
-        $arr = $collect->sortByDesc('total_click');
-
-        $returnResult = [];
-        foreach ($arr as $value) {
-            $returnResult[] = $value;
-        }
-
-        return $returnResult;
+        return $result;
     }
 
     protected function calculateNavigationPopularClick(string $type, array $ids): array

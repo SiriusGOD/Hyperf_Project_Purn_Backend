@@ -47,7 +47,7 @@ class ImageGroupService
         return $model;
     }
 
-    public function getImageGroups(?array $tagIds, int $page, $limit = ImageGroup::PAGE_PER, array $withoutIds = [], bool $isRandom = false): Collection
+    public function getImageGroups(?array $tagIds, int $page, $limit = ImageGroup::PAGE_PER, array $withoutIds = [], bool $isRandom = false, int $sortBy = 0): Collection
     {
         $imageIds = [];
         if (! empty($tagIds)) {
@@ -85,6 +85,10 @@ class ImageGroupService
             $query = $query->orderByRaw('rand()');
         } else {
             $query = $query->offset($limit * $page);
+        }
+
+        if (!empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
+            $query = $query->orderByDesc('total_click');
         }
 
         return $query->where('height', '>', 0)->orderByDesc('id')->get();
@@ -154,7 +158,7 @@ class ImageGroupService
         return $query->get();
     }
 
-    public function getImageGroupsBySuggest(array $suggest, int $page, int $inputLimit, array $withoutIds = [], bool $isRandom = false): array
+    public function getImageGroupsBySuggest(array $suggest, int $page, int $inputLimit, array $withoutIds = [], bool $isRandom = false, int $sortBy = 0): array
     {
         $result = [];
         $useImageIds = [];
@@ -196,6 +200,10 @@ class ImageGroupService
                 $query = $query->orderByRaw('rand()');
             } else {
                 $query = $query->offset($limit * $page);
+            }
+
+            if (!empty($sortBy) and $sortBy == Constants::SORT_BY['click']) {
+                $query = $query->orderByDesc('total_click');
             }
 
             $models = $query->get()->toArray();
