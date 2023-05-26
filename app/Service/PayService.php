@@ -78,7 +78,7 @@ class PayService
             $data['type'] = isset($arr['pay_proxy']) ? $arr['pay_proxy'] : 'online';
             $data['sign'] = $sign;
             $data['is_sdk'] = 0; // 未知欄位
-            $data['product'] = 'vip'; // vip or coins
+            $data['product'] = $product['type'] == Product::TYPE_CORRESPOND_LIST['member'] ? 'vip' : 'coins'; // vip or coins
 
             $result = $this->curlPost(env('PAY_URL'), $data);
             if (! isset($result['success']) && $result['success'] != true) {
