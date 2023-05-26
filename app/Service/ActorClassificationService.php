@@ -163,7 +163,9 @@ class ActorClassificationService
         } else {
             $type = ActorClassification::find($type_id)->toArray();
             $query = ActorHasClassification::join('actors', 'actors.id', 'actor_has_classifications.actor_id')
+                                        ->join('actor_corresponds', 'actor_has_classifications.actor_id', 'actor_corresponds.actor_id')
                                         ->where('actor_has_classifications.actor_classifications_id', $type_id)
+                                        ->whereNull('actor_corresponds.deleted_at')
                                         ->select('actors.id', 'actors.name', 'actors.avatar');
             $total = $query->get()->count();
             $query = $query->get();
@@ -197,33 +199,31 @@ class ActorClassificationService
                     $query[$key]['letter'] = $letter;
 
                     // 查詢該演員的點擊數 最多取８位
-                    if($numberOfWorks > 0){
-                        $actor_arr = $query[$key];
-                        $click_num = 0;
-                        $seven_days = Carbon::now()->subDays(7)->toDateString();
-                        $clicks = ActorCorrespond::where('actor_id', $actor_id)->whereNull('deleted_at')->get();
-                        foreach ($clicks as $key => $value) {
-                            switch ($value -> correspond_type) {
-                                case ImageGroup::class:
-                                    $count = Click::join('click_details', 'clicks.id', 'click_details.click_id')
-                                                ->where('click_details.created_at', '>=', $seven_days)
-                                                ->where('clicks.type', ImageGroup::class)
-                                                ->where('clicks.type_id', $value -> correspond_id)
-                                                ->count();
-                                    break;
-                                case Video::class:
-                                    $count = Click::join('click_details', 'clicks.id', 'click_details.click_id')
-                                                ->where('click_details.created_at', '>=', $seven_days)
-                                                ->where('clicks.type', Video::class)
-                                                ->where('clicks.type_id', $value -> correspond_id)
-                                                ->count();
-                                    break;
-                                default:
-                                    $count = 0;
-                                    break;
-                            }
-                            $click_num += $count;
+                    $actor_arr = $query[$key];
+                    $click_num = 0;
+                    $seven_days = Carbon::now()->subDays(7)->toDateString();
+                    $clicks = ActorCorrespond::where('actor_id', $actor_id)->whereNull('deleted_at')->get();
+                    foreach ($clicks as $key => $value) {
+                        switch ($value -> correspond_type) {
+                            case ImageGroup::class:
+                                $count = Click::join('click_details', 'clicks.id', 'click_details.click_id')
+                                            ->where('click_details.created_at', '>=', $seven_days)
+                                            ->where('clicks.type', ImageGroup::class)
+                                            ->where('clicks.type_id', $value -> correspond_id)
+                                            ->count();
+                                break;
+                            case Video::class:
+                                $count = Click::join('click_details', 'clicks.id', 'click_details.click_id')
+                                            ->where('click_details.created_at', '>=', $seven_days)
+                                            ->where('clicks.type', Video::class)
+                                            ->where('clicks.type_id', $value -> correspond_id)
+                                            ->count();
+                                break;
+                            default:
+                                $count = 0;
+                                break;
                         }
+                        $click_num += $count;
                     }
                     
                     $actor_arr['click_num'] = $click_num;
