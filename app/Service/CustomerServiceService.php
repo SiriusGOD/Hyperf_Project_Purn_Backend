@@ -75,7 +75,7 @@ class CustomerServiceService
                 $model['customer_service_covers'][$key]['url'] = $url . $row['url'];
                 $imageInfo = getimagesize(env('IMAGE_GROUP_DECRYPT_URL') . $row['url']);
                 $model['customer_service_covers'][$key]['height'] = $imageInfo[1] ?? 0;
-                $model['customer_service_covers'][$key]['weight'] = $imageInfo[0] ?? 0;
+                $model['customer_service_covers'][$key]['width'] = $imageInfo[0] ?? 0;
             }
             $result[] = $model;
         }
