@@ -148,7 +148,14 @@ class OrderController extends AbstractController
                 // 建立訂單
                 $result = $service->createOrder($data);
                 if ($result != false) {
+                    // 整理
                     $pay_res['data']['order_num'] = $result;
+                    unset($pay_res['data']['channel']);
+                    unset($pay_res['data']['type']);
+                    $pay_res['data']['pay_order_id'] = $pay_res['data']['order_id'];
+                    unset($pay_res['data']['order_id']);
+                    $pay_res['data']['pay_proxy'] = $pay_type;
+                    
                     return $this->success($pay_res['data'], trans('api.order_control.create_success'));
                 }
                 return $this->error(trans('api.order_control.create_failed'), ErrorCode::BAD_REQUEST);

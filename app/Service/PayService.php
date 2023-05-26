@@ -84,6 +84,7 @@ class PayService
             if (! isset($result['success']) && $result['success'] != true) {
                 $this->logger->error('生成支付鏈接失敗', $result);
             }
+            $result['data']['pay_way'] = $pay_way['pronoun'];
         }
         return $result;
     }
