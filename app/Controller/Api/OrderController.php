@@ -137,7 +137,14 @@ class OrderController extends AbstractController
                 if($pay_res['success'] != true)return $this->error(trans('api.order_control.create_pay_url_error'), ErrorCode::BAD_REQUEST);
                 $data['pay_order_id'] = isset($pay_res['data']['pay_order_id']) ? $pay_res['data']['pay_order_id'] : '';
                 $data['pay_url'] = str_replace('&amp;', '&', $pay_res['data']['pay_url']);
-
+                $data['channel'] = $pay_res['data']['channel'] ?? '';
+                if ($pay_res['data']['channel'] == 'AgentPay') {
+                    $pay_type = "agent";
+                } else {
+                    $pay_type = "online";
+                }
+                $data['pay_proxy'] = $pay_type;
+                
                 // 建立訂單
                 $result = $service->createOrder($data);
                 if ($result != false) {
