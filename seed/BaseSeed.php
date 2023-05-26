@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use HyperfExt\Hashing\Hash;
-
 /**
  * This file is part of Hyperf.
  *
@@ -16,39 +14,39 @@ class BaseSeed implements BaseInterface
 {
     public function up(): void
     {
-        \Hyperf\Support\make(ImageGroupSeed::class)->up();
-        \Hyperf\Support\make(ImportTagSeed::class)->up();
-        \Hyperf\Support\make(ImportImageTagSeed::class)->up();
-        \Hyperf\Support\make(CoinSeed::class)->up();
-        \Hyperf\Support\make(MemberLevelSeed::class)->up();
-        \Hyperf\Support\make(NavigationSeed::class)->up();
-        \Hyperf\Support\make(PaySeed::class)->up();
-        \Hyperf\Support\make(ProductSeed::class)->up();
-        \Hyperf\Support\make(PayCorrespondSeed::class)->up();
-        \Hyperf\Support\make(DriveGroupSeed::class)->up();
-        \Hyperf\Support\make(ActorClassificationSeed::class)->up();
-        \Hyperf\Support\make(ActorSeed::class)->up();
-        \Hyperf\Support\make(PermissionAnnouncementSeed::class)->up();
-        \Hyperf\Support\make(PermissionClassGroupSeed::class)->up();
-        \Hyperf\Support\make(PermissionCustomerServiceSeed::class)->up();
-        \Hyperf\Support\make(PermissionDriveGroupSeed::class)->up();
-        \Hyperf\Support\make(PermissionImageGroupSeed::class)->up();
-        \Hyperf\Support\make(PermissionImageSeed::class)->up();
-        \Hyperf\Support\make(PermissionMemberLevelSeed::class)->up();
-        \Hyperf\Support\make(PermissionMemberSeed::class)->up();
-        \Hyperf\Support\make(PermissionNavigationSeed::class)->up();
-        \Hyperf\Support\make(PermissionOrderSeed::class)->up();
-        \Hyperf\Support\make(PermissionPaySeed::class)->up();
-        \Hyperf\Support\make(PermissionProductSeed::class)->up();
-        \Hyperf\Support\make(PermissionProxySeed::class)->up();
-        \Hyperf\Support\make(PermissionRedeemSeed::class)->up();
-        \Hyperf\Support\make(PermissionReportSeed::class)->up();
-        \Hyperf\Support\make(PermissionSeed::class)->up();
-        \Hyperf\Support\make(PermissionTagGroupSeed::class)->up();
-        \Hyperf\Support\make(PermissionTagSeed::class)->up();
-        \Hyperf\Support\make(PermissionUserStepSeed::class)->up();
-        \Hyperf\Support\make(RoleSeed::class)->up();
-        \Hyperf\Support\make(UserSeed::class)->up();
+        (new ImageGroupSeed)->up();
+        (new ImportTagSeed)->up();
+        (new ImportImageTagSeed)->up();
+        (new CoinSeed)->up();
+        (new MemberLevelSeed)->up();
+        (new NavigationSeed)->up();
+        (new PaySeed)->up();
+        (new ProductSeed)->up();
+        (new PayCorrespondSeed)->up();
+        (new DriveGroupSeed)->up();
+        (new ActorClassificationSeed)->up();
+        (new ActorSeed)->up();
+        (new PermissionAnnouncementSeed)->up();
+        (new PermissionClassGroupSeed)->up();
+        (new PermissionCustomerServiceSeed)->up();
+        (new PermissionDriveGroupSeed)->up();
+        (new PermissionImageGroupSeed)->up();
+        (new PermissionImageSeed)->up();
+        (new PermissionMemberLevelSeed)->up();
+        (new PermissionMemberSeed)->up();
+        (new PermissionNavigationSeed)->up();
+        (new PermissionOrderSeed)->up();
+        (new PermissionPaySeed)->up();
+        (new PermissionProductSeed)->up();
+        (new PermissionProxySeed)->up();
+        (new PermissionRedeemSeed)->up();
+        (new PermissionReportSeed)->up();
+        (new PermissionSeed)->up();
+        (new PermissionTagGroupSeed)->up();
+        (new PermissionTagSeed)->up();
+        (new PermissionUserStepSeed)->up();
+        (new RoleSeed)->up();
+        (new UserSeed)->up();
     }
 
     public function down(): void

@@ -74,7 +74,8 @@
         },
         "files": [
             "app/Common/Functions.php"
-        ]
+        ],
+        "classmap": ["seed/"]
     },
     "autoload-dev": {
         "psr-4": {
