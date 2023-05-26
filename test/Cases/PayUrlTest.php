@@ -38,21 +38,20 @@ class PayUrlTest extends HttpTestCase
     public function testPayUrl()
     {
         $url = "http://pay.hyys.info/v1/payments";
-        $key = "d3cb757121f725fe825a1176031a1c14";
+        $key = "d2bf7126723ea8f6005ba141ea3c3e2c";
         $data = array(
-            "app_name" => "pornterest",
+            "app_name" => "sexfun",
             "app_type" => "ios",
-            "aff" => "DyA11:18",
-            "amount" => "30.00",
-            "ip" => "143.42.65.93",
-            "pay_type" => "wechat",
-            "type" => "online",
-            "is_sdk" => 0,
-            "product" => "vip"
+            "aff" => "CwT7z:18",
+            "amount" => "30.00"
         );
-
         $sign = $this->payService->make_sign_pay($data, $key);
         $data['sign'] = $sign;
+        $data['ip'] = "143.42.65.93";
+        $data['pay_type'] = "alipay";
+        $data['type'] = "online";
+        $data['is_sdk'] = '0';
+        $data['product'] = "vip";
         $result = $this->payService->curlPost($url, $data);
         print_r($result);
         $this->assertSame(true, $result['success']);

@@ -129,6 +129,7 @@ class OrderService
             'pay_url' => $arr['pay_url'] ?? '',
             'pay_proxy' => $arr['pay_proxy'],
             'pay_order_id' => $arr['pay_order_id'] ?? '',
+            'channel' => $arr['channel'] ?? '',
         ];
         switch ($arr['pay_method']) {
             case 'cash':
@@ -181,6 +182,7 @@ class OrderService
             $model->pay_way = $data['order']['pay_way'];
             $model->pay_url = $data['order']['pay_url'];
             $model->pay_proxy = $data['order']['pay_proxy'];
+            $model->channel = $data['order']['channel'];
             $model->save();
 
             $this -> delMemberListCache($data['order']['user_id']);
