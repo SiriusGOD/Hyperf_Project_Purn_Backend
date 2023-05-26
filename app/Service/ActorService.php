@@ -218,14 +218,9 @@ class ActorService extends GenerateService
         // 撈取基本資料
         $actor = Actor::select('name', 'avatar')->where('id', $actor_id)->first()->toArray();
         $data['name'] = $actor['name'];
-        $data['avatar'] = $actor['avatar'];
-        if (! empty($actor['avatar'])) {
-            $data['avatar'] = env('IMAGE_GROUP_ENCRYPT_URL') . $actor['avatar'];
-        }else{
-            $data['avatar'] = "";
-        }
+        
         // 撈取作品數
-        $works = ActorCorrespond::selectRaw('correspond_type, count(*) as count')->where('actor_id', $actor_id)->groupBy('correspond_type')->get();
+        $works = ActorCorrespond::selectRaw('correspond_type, correspond_id, count(*) as count')->where('actor_id', $actor_id)->groupBy('correspond_type')->get();
         foreach ($works as $key => $value) {
             if ($value->correspond_type == Video::class) {
                 $data['video_num'] = $value->count;
@@ -239,6 +234,26 @@ class ActorService extends GenerateService
         }
         if (empty($data['image_num'])) {
             $data['image_num'] = 0;
+        }
+
+        // 處理大頭貼
+        if (! empty($actor['avatar'])) {
+            $data['avatar'] = env('IMAGE_GROUP_ENCRYPT_URL') . $actor['avatar'];
+        }else{
+            // 沒大頭貼時撈取作品封面圖
+            switch ($works[0]['correspond_type']) {
+                case ImageGroup::class:
+                    $thumb = ImageGroup::selectRaw('thumbnail as thumb')->where('id', $works[0]['correspond_id'])->first();
+                    break;
+                case Video::class:
+                    $thumb = Video::selectRaw('cover_thumb as thumb')->where('id', $works[0]['correspond_id'])->first();
+                    break;
+            }
+            if(empty($thumb)){
+                $data['avatar'] = "";
+            }else{
+                $data['avatar'] = env('IMAGE_GROUP_ENCRYPT_URL').$thumb->thumb;
+            }
         }
 
         // 查詢是否追隨
