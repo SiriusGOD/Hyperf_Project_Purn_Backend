@@ -48,6 +48,9 @@ class AdvertisementService
 
     public function getAdvertisementBySearch(int $page, int $limit = 1): array
     {
+        if ($limit == 0) {
+            return [];
+        }
         $models = $this->getAdvertisements();
         if(empty($models)) {
             return [];

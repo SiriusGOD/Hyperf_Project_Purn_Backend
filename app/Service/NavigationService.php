@@ -114,9 +114,7 @@ class NavigationService extends GenerateService
         }
         $advertisements = $this->advertisementService->getAdvertisementBySearch($advertisementLimitArr['last_page'], $advertisementLimitArr['limit']);
 
-        if (count($advertisements) < $advertisementLimitArr['limit']) {
-            $limit = $limit + ($advertisementLimitArr['limit'] - count($advertisements));
-        }
+        $limit = $limit + ($advertisementLimitArr['limit'] - count($advertisements));
 
         $imageGroupLimit = (int) floor($limit / 2);
         $videoLimit = $limit - $imageGroupLimit;
