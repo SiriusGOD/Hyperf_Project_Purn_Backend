@@ -166,7 +166,8 @@ class ActorClassificationService
                                         ->join('actor_corresponds', 'actor_has_classifications.actor_id', 'actor_corresponds.actor_id')
                                         ->where('actor_has_classifications.actor_classifications_id', $type_id)
                                         ->whereNull('actor_corresponds.deleted_at')
-                                        ->select('actors.id', 'actors.name', 'actors.avatar');
+                                        ->select('actors.id', 'actors.name', 'actors.avatar')
+                                        ->groupBy('actors.id');
             $total = $query->get()->count();
             $query = $query->get();
             if (!empty($query)) {
