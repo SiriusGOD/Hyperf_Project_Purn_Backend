@@ -37,6 +37,7 @@ class AdvertisementService
         $now = Carbon::now()->toDateTimeString();
         $result = Advertisement::where('start_time', '<=', $now)
             ->where('end_time', '>=', $now)
+            ->where('expire', Advertisement::EXPIRE['no'])
             ->get()
             ->toArray();
 
