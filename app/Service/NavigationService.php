@@ -77,7 +77,7 @@ class NavigationService extends GenerateService
         return $items;
     }
 
-    public function navigationSuggest(array $suggest, int $page, int $limit): array
+    public function navigationSuggest(array $suggest, int $page, int $limit, bool $isRandom): array
     {
         $advertisementLimitArr = $this->getAdvertisementsLimit($page, $limit);
         if ($advertisementLimitArr['limit'] > 0) {
@@ -86,8 +86,8 @@ class NavigationService extends GenerateService
         $imageGroupLimit = (int) floor($limit / 2);
         $videoLimit = $limit - $imageGroupLimit;
 
-        $imageGroups = $this->navigationSuggestImageGroups($suggest, $page, $imageGroupLimit);
-        $videos = $this->navigationSuggestVideos($suggest, $page, $videoLimit);
+        $imageGroups = $this->navigationSuggestImageGroups($suggest, $page, $imageGroupLimit, $isRandom);
+        $videos = $this->navigationSuggestVideos($suggest, $page, $videoLimit, $isRandom);
         $advertisements = $this->advertisementService->getAdvertisementBySearch($advertisementLimitArr['last_page'], $advertisementLimitArr['limit']);
 
         $result = [];
@@ -144,9 +144,9 @@ class NavigationService extends GenerateService
         return $this->generateAdvertisements($result, $advertisements);
     }
 
-    public function navigationSuggestSortById(array $suggest, int $page, int $limit): array
+    public function navigationLatest(array $suggest, int $page, int $limit): array
     {
-        $result = $this->navigationSuggest($suggest, $page, $limit);
+        $result = $this->navigationSuggest($suggest, $page, $limit, false);
         $collect = \Hyperf\Collection\collect($result);
         $collect = $collect->sortByDesc('created_at');
         $result = [];
@@ -308,7 +308,7 @@ class NavigationService extends GenerateService
         return array_merge($suggestModels, $models);
     }
 
-    protected function navigationSuggestImageGroups(array $suggest, int $page, int $limit): array
+    protected function navigationSuggestImageGroups(array $suggest, int $page, int $limit, bool $isRandom): array
     {
         $hotOrderLimit = $this->getHotOrderPerLimit(ImageGroup::class, $limit);
         $hotOrderModels = $this->imageGroupService->getImageGroupsByHotOrder($page, $hotOrderLimit);
@@ -316,18 +316,18 @@ class NavigationService extends GenerateService
         $otherLimit = self::OTHER_LIMIT;
         $suggestLimit = $limit - count($hotOrderModels) - $otherLimit;
 
-        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit, $ids, true);
+        $suggestModels = $this->imageGroupService->getImageGroupsBySuggest($suggest, $page, $suggestLimit, $ids, $isRandom);
 
         $remain = $limit - count($suggestModels) - count($hotOrderModels);
 
         $ids = array_merge($ids, $this->getIds($suggestModels));
 
-        $models = $this->imageGroupService->getImageGroups(null, $page, $remain, $ids, true)->toArray();
+        $models = $this->imageGroupService->getImageGroups(null, $page, $remain, $ids, $isRandom)->toArray();
 
         return array_merge($hotOrderModels, $suggestModels, $models);
     }
 
-    protected function navigationSuggestVideos(array $suggest, int $page, int $limit): array
+    protected function navigationSuggestVideos(array $suggest, int $page, int $limit, bool $isRandom): array
     {
         $hotOrderLimit = $this->getHotOrderPerLimit(Video::class, $limit);
         $hotOrderModels = $this->videoService->getVideosByHotOrder($page, $hotOrderLimit);
@@ -335,13 +335,13 @@ class NavigationService extends GenerateService
         $suggestLimit = $limit - count($hotOrderModels) - $otherLimit;
         $ids = $this->getIds($hotOrderModels);
 
-        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $suggestLimit, $ids, true);
+        $suggestModels = $this->videoService->getVideosBySuggest($suggest, $page, $suggestLimit, $ids, $isRandom);
 
         $remain = $limit - count($suggestModels) - count($hotOrderModels);
 
         $ids = array_merge($ids, $this->getIds($suggestModels));
 
-        $models = $this->videoService->getVideos(null, $page, 9, $remain, $ids, true)->toArray();
+        $models = $this->videoService->getVideos(null, $page, 9, $remain, $ids, $isRandom)->toArray();
 
         return array_merge($hotOrderModels, $suggestModels, $models);
     }

@@ -75,8 +75,8 @@ class NavigationController extends AbstractController
         }
         $data['models'] = match ($id) {
             1 => $service->navigationPopular($suggest, $page, $limit),
-            2 => $service->navigationSuggest($suggest, $page, $limit),
-            3 => $service->navigationSuggestSortById($suggest, $page, $limit),
+            2 => $service->navigationSuggest($suggest, $page, $limit, true),
+            3 => $service->navigationLatest($suggest, $page, $limit),
             default => $service->navigationSuggestByMemberCategorization($suggest, $page, $limit, $userId)
         };
         $path = '/api/navigation/search?id=' . $id . '&';

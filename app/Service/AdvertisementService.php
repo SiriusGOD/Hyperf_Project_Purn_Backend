@@ -60,7 +60,7 @@ class AdvertisementService
 
         $result = [];
 
-        for($i = 0; $i<$limit; $i++) {
+        for($i = 0; $i<=$limit; $i++) {
             $data = $models[$key] ?? null;
             if ($data == null) {
                 $key = 0;
