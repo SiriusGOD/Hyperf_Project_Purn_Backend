@@ -39,6 +39,6 @@ class NavigationSeed implements BaseInterface
 
     public function base(): bool
     {
-        return true;
+        return false;
     }
 }

@@ -41,6 +41,6 @@ class PermissionNavigationSeed implements BaseInterface
 
     public function base(): bool
     {
-        return true;
+        return false;
     }
 }
