@@ -58,6 +58,6 @@ class BaseSeed implements BaseInterface
 
     public function base(): bool
     {
-        return false;
+        return true;
     }
 }
