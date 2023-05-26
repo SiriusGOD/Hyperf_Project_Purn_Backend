@@ -35,7 +35,7 @@ class PermissionActivitySeed implements BaseInterface
 
     public function down(): void
     {
-        \App\Model\Permission::where('main', 'tag')
+        \App\Model\Permission::where('main', 'activity')
             ->delete();
     }
 
