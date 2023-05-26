@@ -135,7 +135,7 @@ class OrderController extends AbstractController
                 // 生成支付鏈接(測試) -> 現金相關才需生成
                 $pay_res = $pay_service->getPayUrl($data);
                 if($pay_res['success'] != true)return $this->error(trans('api.order_control.create_pay_url_error'), ErrorCode::BAD_REQUEST);
-                $data['pay_order_id'] = isset($pay_res['data']['pay_order_id']) ? $pay_res['data']['pay_order_id'] : '';
+                $data['pay_order_id'] = isset($pay_res['data']['order_id']) ? $pay_res['data']['order_id'] : '';
                 $data['pay_url'] = str_replace('&amp;', '&', $pay_res['data']['pay_url']);
                 $data['channel'] = $pay_res['data']['channel'] ?? '';
                 if ($pay_res['data']['channel'] == 'AgentPay') {
