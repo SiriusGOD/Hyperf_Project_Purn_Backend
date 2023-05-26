@@ -21,8 +21,12 @@ class BaseSeed implements BaseInterface
         \Hyperf\Support\make(CoinSeed::class)->up();
         \Hyperf\Support\make(MemberLevelSeed::class)->up();
         \Hyperf\Support\make(NavigationSeed::class)->up();
-        \Hyperf\Support\make(PayCorrespondSeed::class)->up();
         \Hyperf\Support\make(PaySeed::class)->up();
+        \Hyperf\Support\make(ProductSeed::class)->up();
+        \Hyperf\Support\make(PayCorrespondSeed::class)->up();
+        \Hyperf\Support\make(DriveGroupSeed::class)->up();
+        \Hyperf\Support\make(ActorClassificationSeed::class)->up();
+        \Hyperf\Support\make(ActorSeed::class)->up();
         \Hyperf\Support\make(PermissionAnnouncementSeed::class)->up();
         \Hyperf\Support\make(PermissionClassGroupSeed::class)->up();
         \Hyperf\Support\make(PermissionCustomerServiceSeed::class)->up();
