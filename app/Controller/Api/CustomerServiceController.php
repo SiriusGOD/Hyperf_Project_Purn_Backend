@@ -100,6 +100,8 @@ class CustomerServiceController extends AbstractController
             $model = new CustomerServiceCover();
             $model->customer_service_id = $customServiceModel->id;
             $model->url = $result['url'];
+            $model->height = $result['height'];
+            $model->width = $result['weight'];
             $model->save();
             $models[] = $model;
         }
@@ -115,6 +117,8 @@ class CustomerServiceController extends AbstractController
             $model = new CustomerServiceCover();
             $model->customer_service_id = $customServiceModel->id;
             $model->url = $result['url'];
+            $model->height = $result['height'];
+            $model->width = $result['weight'];
             $model->save();
             $models[] = $model;
         }
@@ -130,6 +134,8 @@ class CustomerServiceController extends AbstractController
             $model = new CustomerServiceCover();
             $model->customer_service_id = $customServiceModel->id;
             $model->url = $result['url'];
+            $model->height = $result['height'];
+            $model->width = $result['weight'];
             $model->save();
         }
 
