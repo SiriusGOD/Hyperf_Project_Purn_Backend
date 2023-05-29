@@ -42,6 +42,21 @@
                                     </select>
                                 </div>
 
+                                <div class="form-group" style="display: flex;">
+                                  <div class="col-md-4">
+                                    <label for="exampleInputEmail1">{{ trans('default.redeem.vip_days') ?? '可以次數'}}</label>
+                                    <input type="text" class="form-control" name="vip_days" id="title" placeholder="" value="{{$model->vip_days ?? ''}}">
+                                  </div>
+                                  <div class="col-md-4">
+                                    <label for="exampleInputEmail1">{{ trans('default.redeem.free_watch') ?? '可以次數'}}</label>
+                                    <input type="text" class="form-control" name="free_watch" id="title" placeholder="" value="{{$model->free_watch ?? ''}}">
+                                  </div>
+                                  <div class="col-md-4">
+                                    <label for="exampleInputEmail1">{{ trans('default.redeem.diamond_point') ?? '可以次數'}}</label>
+                                    <input type="text" class="form-control" name="diamond_point" id="title" placeholder="" value="{{$model->diamond_point ?? ''}}">
+                                  </div>
+                                </div>
+
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{ trans('default.redeem.status') ?? '狀態'}}</label>
                                     <select class="form-control form-control-lg" name="status">
