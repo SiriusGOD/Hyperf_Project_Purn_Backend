@@ -95,11 +95,20 @@ class MemberController extends AbstractController
         
         if($data['member_level_status'] == MemberLevel::TYPE_VALUE['vip']){
             $data['diamond_quota'] = $request->input('diamond_quota', 0);
-            $data['vip_quota'] = null;
+            if(empty($request->input('vip_quota'))){
+                $data['vip_quota'] = null;
+            }else{
+                $data['vip_quota'] = $request->input('vip_quota');
+            }
+            
         }
         if($data['member_level_status'] == MemberLevel::TYPE_VALUE['diamond']){
-            $data['diamond_quota'] = null;
             $data['vip_quota'] = $request->input('vip_quota', 0);
+            if(empty($request->input('diamond_quota'))){
+                $data['diamond_quota'] = null;
+            }else{
+                $data['diamond_quota'] = $request->input('diamond_quota');
+            }
         }
 
         $service->storeUser($data);
