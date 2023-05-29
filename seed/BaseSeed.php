@@ -14,7 +14,6 @@ class BaseSeed implements BaseInterface
 {
     public function up(): void
     {
-        (new ImageGroupSeed)->up();
         (new ImportTagSeed)->up();
         (new ImportImageTagSeed)->up();
         (new CoinSeed)->up();
