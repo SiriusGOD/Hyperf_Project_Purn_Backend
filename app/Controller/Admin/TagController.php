@@ -87,6 +87,7 @@ class TagController extends AbstractController
         $data['name'] = $request->input('name');
         $data['groups'] = $request->input('groups', []);
         $data['hot_order'] = $request->input('hot_order');
+        $data['is_init'] = empty($request->input('is_init')) ? 0 : 1;
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $dataArr = General::uploadImage($file, 'tag');

@@ -53,6 +53,17 @@ class TagService extends GenerateService
         return $list;
     }
 
+    public function getIsInitTags(): Collection
+    {
+        $list = Tag::where('is_init',1)->get();
+        foreach ($list as $key => $value) {
+            if (! empty($value->img)) {
+                $list[$key]->img = env('IMAGE_GROUP_ENCRYPT_URL') . $value->img;
+            }
+        }
+        return $list;
+    }
+
     public function createTag(array $params): void
     {
         $model = new Tag();
@@ -61,12 +72,11 @@ class TagService extends GenerateService
         }
         if (! empty($params['image_url'])) {
             $model->img = $params['image_url'];
-            // $model->height = $data['height'];
-            // $model->weight = $data['weight'];
         }
         $model->name = $params['name'];
         $model->user_id = $params['user_id'];
         $model->hot_order = $params['hot_order'];
+        $model->is_init = $params['is_init'];
         $model->save();
 
         if (count($params['groups']) > 0) {

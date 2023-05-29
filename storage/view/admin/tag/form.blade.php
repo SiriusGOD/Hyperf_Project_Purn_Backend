@@ -27,11 +27,15 @@
                                     @endif
                                 </div>
                                 <div class="form-group" id="selectedFiles"></div>
-
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{ trans('default.tag_control.tag_hot_order') ?? '熱門標籤排序'}} {{ trans('default.tag_control.tag_hot_order_desc') ?? '0不排序'}}</label>
                                     <input type="text" class="form-control" name="hot_order" id="hot_order" placeholder="{{ trans('default.web_name_def') ?? '請輸入名稱'}}" value="{{$model->hot_order ?? ''}}">
                                 </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">
+                                        <input type="checkbox" name="is_init" onclick=""> 是否出現在初始標籤選擇<br>
+                                    </label>
+                                </div> 
                                 @include('partial.tagGroupSelect')
                                 <button type="submit" class="btn btn-primary">{{ trans('default.submit') ?? '送出'}}</button>
                             </form>
@@ -67,7 +71,11 @@
                 }
             });
         });
-
+        var checkbox = document.getElementsByName('is_init');
+        if ({{$model->is_init}} > 0) {
+            checkbox[0].checked = true;
+        };
+        
         var selDiv = "";
         document.addEventListener("DOMContentLoaded", init, false);
         function init() {

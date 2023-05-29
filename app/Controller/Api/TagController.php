@@ -32,7 +32,8 @@ class TagController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'list')]
     public function list(RequestInterface $request, TagService $service)
     {
-        $data = $service->getTags();
+        // $data = $service->getTags();
+        $data = $service->getIsInitTags();
         return $this->success(['models' => $data->toArray()]);
     }
 

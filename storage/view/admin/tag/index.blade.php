@@ -58,6 +58,10 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.tag_control.tag_is_init_show') ?? '是否顯示於初始化標籤'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
                                             aria-label="Browser: activate to sort column ascending">{{trans('default.tag_group_control.tag_group_name') ?? '標籤群組名稱'}}
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
@@ -78,6 +82,7 @@
                                                 @endif
                                             </td>
                                             <td>{{ $model->hot_order }}</td>
+                                            <td>{{ $model->is_init ? '是' : '否' }}</td>
                                             <td>{{ $model->group_name }}</td>
                                             <td>
                                                 @if(authPermission('tag-edit'))
