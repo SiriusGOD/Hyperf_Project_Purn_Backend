@@ -64,13 +64,9 @@ class ImportVideoTest extends HttpTestCase
             'uuid',
             'created_at',
             'updated_at',
-            'backtag',
-            'tags2'
         );
 
         $result = array_combine($keys, $data);
-        $result['tags2'] = str_replace('.', ',', $result['tags2']);
-        $result['tags'] = $result['tags2'];
         // 添加新的字段
         $result['music_id'] = 1;
         $result['refreshed_at'] = date("Y-m-d H:i:s");
@@ -95,7 +91,7 @@ class ImportVideoTest extends HttpTestCase
         $result['count_pay'] = 0;
         $result['club_id'] = 0;
         $result['user_id'] = 1;
-        unset($result['uuid'],$result['id'],$result['tags2'], $result['comments'], $result['sales'], $result['views'], $result['backtag']);
+        unset($result['uuid'],$result['id'],$result['tags2'], $result['comments'], $result['sales'], $result['views']);
         //$video = make(VideoService::class)->storeVideo($result);
         $model = new ImportVideo();
         foreach($result as $k =>$v){
@@ -103,6 +99,8 @@ class ImportVideoTest extends HttpTestCase
             $model->$k = !empty($v) ? $v:date('Y-m-d H:i:s');
           }elseif($k == 'mod'){
             $model->$k = !empty($v) ? $v:1;
+          }elseif($k == 'created_at'){
+            $model->$k = !empty($v) ? $v :date("Y-m-d H:i:s");
           }elseif($k == 'cover_full'){
             $model->$k = !empty($v) ? $v:1;
           }elseif($k == '_id'){
@@ -115,7 +113,9 @@ class ImportVideoTest extends HttpTestCase
             $model->$k = !empty($v) ? $v:null;
           }
         }
-        $model->save(); 
+
+          $model->save(); 
+
         if($key%5==0){
             usleep(500);
         }
