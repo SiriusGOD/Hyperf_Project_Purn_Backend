@@ -71,12 +71,10 @@ class RedeemService extends BaseService
       // store兌換卷
       public function store(array $datas)
       {
-          if (empty($datas['id'])) {
-              unset($datas['id']);
-          }
           if (Redeem::where('id', $datas['id'])->exists()) {
               $model = Redeem::where('id', $datas['id'])->first();
           } else {
+              unset($datas['id']);
               $model = new Redeem();
           }
           foreach ($datas as $key => $val) {
