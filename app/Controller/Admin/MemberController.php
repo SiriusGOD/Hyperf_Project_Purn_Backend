@@ -13,6 +13,7 @@ namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Model\Member;
+use App\Model\MemberLevel;
 use App\Model\User;
 use App\Request\MemberUpdateRequest;
 use App\Service\MemberService;
@@ -87,10 +88,20 @@ class MemberController extends AbstractController
         $data['end_time'] = $request->input('end_time');
         $data['coins'] = $request->input('coins', 0);
         $data['diamond_coins'] = $request->input('diamond_coins', 0);
-        $data['diamond_quota'] = $request->input('diamond_quota', 0);
-        $data['vip_quota'] = $request->input('vip_quota', 0);
         $data['free_quota'] = $request->input('free_quota', 1);
         $data['free_quota_limit'] = $request->input('free_quota_limit', 1);
+        $data['diamond_quota'] = $request->input('diamond_quota', 0);
+        $data['vip_quota'] = $request->input('vip_quota', 0);
+        
+        if($data['member_level_status'] == MemberLevel::TYPE_VALUE['vip']){
+            $data['diamond_quota'] = $request->input('diamond_quota', 0);
+            $data['vip_quota'] = null;
+        }
+        if($data['member_level_status'] == MemberLevel::TYPE_VALUE['diamond']){
+            $data['diamond_quota'] = null;
+            $data['vip_quota'] = $request->input('vip_quota', 0);
+        }
+
         $service->storeUser($data);
         return $response->redirect('/admin/member/index');
     }
