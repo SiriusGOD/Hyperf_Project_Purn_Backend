@@ -82,6 +82,17 @@ class RedeemService extends BaseService
           foreach ($datas as $key => $val) {
               $model->{$key} = $val;
           }
+          //分類ID , 1.VIP 天數,2.鑽石點數,3.免費觀看次數
+          if($model->category_id==RedeemCode::VIP){
+              $model->free_watch = 0;
+              $model->diamond_point = 0;
+          }elseif($model->category_id==RedeemCode::DIAMOND){
+              $model->vip_days = 0;
+              $model->free_watch = 0;
+          }elseif($model->category_id==RedeemCode::FREE){
+              $model->diamond_point = 0;
+              $model->vip_days = 0;
+          }
           $model->category_name = RedeemCode::CATEGORY[$model->category_id];
 
           if ($model->save()) {
