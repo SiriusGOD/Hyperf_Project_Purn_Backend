@@ -35,24 +35,20 @@ class VideoTask
 
     public function execute()
     {
-        $limit = 10;
-        $count = ImportVideo::count();
-        $totalIterations = ceil($count/$limit);
-        for ($i = 0; $i < $totalIterations; $i++) {
-            $models = ImportVideo::where('is_calc', 0)->orderBy('id', 'desc')->limit($limit)->get();
-            if (count($models) > 0) {
-                foreach ($models as $model) {
-                    if($model->created_at != NULL){
-                      self::insertData($model);
-                      $model->is_calc =1;
-                      $model->save();
-                    }
+        $limit = 30;
+        $models = ImportVideo::where('is_calc', 0)->orderBy('id', 'desc')->limit($limit)->get();
+        if (count($models) > 0) {
+            foreach ($models as $model) {
+                if($model->created_at != NULL){
+                  self::insertData($model);
+                  $model->is_calc =1;
+                  $model->save();
                 }
-                $this->logger->info('有商品過期');
-                usleep(200);
             }
+            $this->logger->info('有video');
+            usleep(200);
         }
-        $this->logger->info('有商品過期');
+        $this->logger->info('video task done');
     }
   
     //寫入DB
