@@ -225,6 +225,9 @@ return [
     // redeem
     'redeem' => [
         'not_exists_or_expire'=>'优惠卷不存在或己過期',
+        'vip_days'=>'VIP天數',
+        'diamond_point'=>'鑽石點數',
+        'free_watch'=>'免費觀看次數',
         'is_used'=>'己使用過',
         'insert' => '新增優惠卷',
         'can' => '可兌換',
