@@ -159,7 +159,7 @@ return [
 
     'authorize' => '尚未登入，或權限不足',
     'device_authorize' => '一天只能登入一個裝置',
-    'try_limit' => '請稍後重新嘗試',
+    'try_limit' => '請於1分鐘後重新嘗試',
     'expire_code' => '驗證碼過期',
     'change_device_limit' => '已超過當日可變更設備次數',
     'is_not_pay' => '尚未購買本商品',
@@ -185,4 +185,6 @@ return [
 
     'password_error' => '密碼錯誤',
     'image_upload_error' => '圖片上傳錯誤',
+
+    'email_error' => '填寫的信箱與註冊信箱不符'
 ];
