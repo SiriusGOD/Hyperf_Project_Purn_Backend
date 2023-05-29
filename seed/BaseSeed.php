@@ -25,6 +25,7 @@ class BaseSeed implements BaseInterface
         (new DriveGroupSeed)->up();
         (new ActorClassificationSeed)->up();
         (new ActorSeed)->up();
+        (new ImportInitTagSeed)->up();
         (new PermissionAnnouncementSeed)->up();
         (new PermissionClassGroupSeed)->up();
         (new PermissionCustomerServiceSeed)->up();
