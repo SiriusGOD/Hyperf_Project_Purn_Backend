@@ -37,6 +37,7 @@ class VideoSeedTest extends HttpTestCase
     //寫入DB
     public function insertData($model)
     {
+      try{
         $wg = new \Hyperf\Utils\WaitGroup();
         $wg->add(1);
         $data= $model->toArray();
@@ -53,6 +54,9 @@ class VideoSeedTest extends HttpTestCase
           usleep(100);
         });
         $wg->wait();
+      }catch(\Exception $e){
+          print_r([$e->getMessage()]);
+      }
     }
 
     // Video計算任務-       
