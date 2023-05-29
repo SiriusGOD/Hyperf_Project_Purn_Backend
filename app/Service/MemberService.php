@@ -599,7 +599,7 @@ class MemberService extends BaseService
             case 'all':
                 $query = $query->whereIn('products.type', [ImageGroup::class, Video::class]);
                 break;
-            case 'image':
+            case 'image_group':
                 $query = $query->where('products.type', ImageGroup::class);
                 break;
             case 'video':
@@ -626,10 +626,7 @@ class MemberService extends BaseService
         }
         $model = $query->get();
         if (! empty($model)) {
-            $image_arr = [];
-            $video_arr = [];
             $arr = [];
-            // ActorClassification::findOrFail($id);
             foreach ($model as $key => $value) {
                 // 用免費次數購買的免費商品 過隔天五點就不顯示在已購買項目中
                 if($value -> currency == Order::PAY_CURRENCY['free_quota']){
@@ -638,47 +635,18 @@ class MemberService extends BaseService
 
                 if ($value->type == Product::TYPE_CORRESPOND_LIST['image']) {
                     $image = ImageGroup::with('imagesLimit')->where('id', $value->correspond_id)->get()->toArray();
-                    // $image = ImageGroup::leftJoin('images', 'image_groups.id', 'images.group_id')
-                    //     ->selectRaw('image_groups.thumbnail, count(*) as count')
-                    //     ->where('image_groups.id', $value->correspond_id)
-                    //     ->groupBy('image_groups.id')
-                    //     ->get()
-                    //     ->toArray();
-                    $result = $generateService->generateImageGroups([], $image);
-                    
+                    $result = $generateService->generateImageGroups([], $image);     
                     array_push($arr, $result[0]);
-                    // array_push($arr, [
-                    //     'product_id' => $value->id,
-                    //     'source_id' => $value->correspond_id,
-                    //     'name' => $value->name,
-                    //     'thumbnail' => env('IMAGE_GROUP_ENCRYPT_URL') . $image->thumbnail ?? '',
-                    //     'expire' => $value->expire,
-                    //     'num' => $image->count ?? 0,
-                    // ]);
                 }
                 
-                if ($value->type == Product::TYPE_CORRESPOND_LIST['video']) {
-                    
+                if ($value->type == Product::TYPE_CORRESPOND_LIST['video']) {            
                     $video = Video::where('id', $value->correspond_id)->get()->toArray();
                     $result = $generateService->generateVideos([], $video);
-
                     array_push($arr, $result[0]);
-                    // array_push($arr, [
-                    //     'product_id' => $value->id,
-                    //     'source_id' => $value->correspond_id,
-                    //     'name' => $value->name,
-                    //     'thumbnail' => env('IMAGE_GROUP_ENCRYPT_URL') . $video->cover_thumb ?? '',
-                    //     'expire' => $value->expire,
-                    //     'duration' => $value->duration ?? 0,
-                    // ]);
                 }
             }
-            // $data['image'] = $image_arr;
-            // $data['video'] = $video_arr;
             $data = $arr;
         } else {
-            // $data['image'] = [];
-            // $data['video'] = [];
             $data = [];
         }
         return $data;
