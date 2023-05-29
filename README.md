@@ -49,7 +49,7 @@ ex. php bin/hyperf.php swagger:gen -f json
 
 https://adminlte.io/docs/3.2/dependencies.html
 
-### 前端套件
+### 影片網址
 
 資源中心 過來的m3u8 影片加上 
 
