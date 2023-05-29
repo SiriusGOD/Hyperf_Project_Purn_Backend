@@ -111,7 +111,7 @@ class MemberController extends AbstractController
     public function edit(RequestInterface $request, MemberService $service, RoleService $roleService)
     {
         $id = $request->input('id');
-        $user = Member::rightJoin('buy_member_levels', function ($join) {
+        $user = Member::leftJoin('buy_member_levels', function ($join) {
             $join->on('members.id', '=', 'buy_member_levels.member_id')
                 ->orWhereNull('buy_member_levels.member_id')
                 ->whereNull('buy_member_levels.deleted_at');
@@ -119,6 +119,7 @@ class MemberController extends AbstractController
             ->select('members.*', 'buy_member_levels.start_time', 'buy_member_levels.end_time')
             ->where('members.id', $id)
             ->first();
+
         $data['user'] = $user;
         $data['navbar'] = trans('default.member_control.member_update');
         $data['member_active'] = 'active';

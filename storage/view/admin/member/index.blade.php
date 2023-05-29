@@ -31,6 +31,10 @@
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
+                                            aria-label="Browser: activate to sort column ascending">{{trans('default.name') ?? '名稱'}}
+                                        </th>
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1"
                                             aria-label="Engine version: activate to sort column ascending">
                                             {{trans('default.enable_user') ?? '啟用'}}
                                         </th>
@@ -44,6 +48,7 @@
                                     @foreach($datas as $user)
                                         <tr class="odd">
                                             <td class="sorting_1 dtr-control">{{ $user->id}}</td>
+                                            <td>{{ $user->account}}</td>
                                             <td>{{ $user->name}}</td>
                                             <td>{{ $user->status}}</td>
                                             <td>
@@ -68,6 +73,7 @@
                                     <tfoot>
                                     <tr>
                                         <th rowspan="1" colspan="1">{{trans('default.id') ?? '序號'}}</th>
+                                        <th rowspan="1" colspan="1">{{trans('default.name') ?? '名稱'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.account') ?? '帳號'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.enable_user')?? '啟用'}}</th>
                                         <th rowspan="1" colspan="1">{{trans('default.action') ?? '動作'}}</th>

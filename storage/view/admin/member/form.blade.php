@@ -19,6 +19,13 @@
                                            value="{{$user->name}}">
                                 </div>
                                 <div class="form-group">
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_acc') ?? '管理者帳號'}}</label>
+                                    <input type="text" class="form-control" name="account" id="account"
+                                           @if(!empty($user->account)) disabled="true" @endif
+                                           placeholder="{{trans('default.account_def') ?? 'name'}}"
+                                           value="{{$user->account}}">
+                                </div>
+                                <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.member_control.member_pass') ?? '密碼'}}</label>
                                     <input type="password" class="form-control" name="password" id="password"
                                            placeholder="{{trans('default.pass_def') ?? 'password'}}" value="">
