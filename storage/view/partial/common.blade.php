@@ -77,7 +77,7 @@
             <ul id="sidebar" class="nav nav-pills nav-sidebar nav-child-indent flex-column" data-widget="treeview" role="menu"
                 data-accordion="false">
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link {{$navigation_active ?? ''}}">
                         <p>
                             {{ trans('sidebar.navigation_manager') }}
                             <i class="right fas fa-angle-left"></i>
@@ -97,7 +97,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link {{$advertisement_active ?? $announcement_active ?? ''}}">
                         <p>
                             {{ trans('sidebar.advertisements_announcements_manager') }}
                             <i class="right fas fa-angle-left"></i>
@@ -127,7 +127,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link {{$member_active ?? $member_level_active ?? $coin_active ?? ''}}">
                         <p>
                             {{ trans('sidebar.member_coin_manager') }}
                             <i class="right fas fa-angle-left"></i>
@@ -177,7 +177,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link {{$video_active ?? $image_active ?? $image_group_active ?? ''}}">
                         <p>
                             {{ trans('sidebar.image_group_video_manager') }}
                             <i class="right fas fa-angle-left"></i>
@@ -217,7 +217,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link {{$tag_group_active ?? $tag_active ?? $actor_classification_active ?? $actor_active ??''}}">
                         <p>
                             {{ trans('sidebar.tag_actor_manager') }}
                             <i class="right fas fa-angle-left"></i>
@@ -267,7 +267,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link {{$product_active ?? $order_active ?? $pay_active ?? ''}}">
                         <p>
                             {{ trans('sidebar.product_order_manager') }}
                             <i class="right fas fa-angle-left"></i>
@@ -307,7 +307,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link {{$customer_service_active ?? $report_active ?? ''}}">
                         <p>
                             {{ trans('sidebar.customer_service_manager') }}
                             <i class="right fas fa-angle-left"></i>
@@ -338,7 +338,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link {{$channel_active ?? $proxy_active ?? $withdraw_active ?? ''}}">
                         <p>
                             {{ trans('sidebar.channel_proxy_manager') }}
                             <i class="right fas fa-angle-left"></i>
@@ -380,7 +380,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link {{$drive_class_active ?? $drive_group_active ?? ''}}">
                         <p>
                             {{ trans('sidebar.drive_manager') }}
                             <i class="right fas fa-angle-left"></i>
@@ -410,7 +410,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link {{$user_active ?? $role_active ?? $user_step_active ?? $activity_active ?? ''}}">
                         <p>
                             {{ trans('sidebar.backend_manager') }}
                             <i class="right fas fa-angle-left"></i>
