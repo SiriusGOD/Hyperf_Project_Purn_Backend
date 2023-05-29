@@ -55,7 +55,7 @@ class TagService extends GenerateService
 
     public function getIsInitTags(): Collection
     {
-        $list = Tag::where('is_init',1)->get();
+        $list = Tag::where('is_init',1)->orderByDesc('id')->get();
         foreach ($list as $key => $value) {
             if (! empty($value->img)) {
                 $list[$key]->img = env('IMAGE_GROUP_ENCRYPT_URL') . $value->img;
