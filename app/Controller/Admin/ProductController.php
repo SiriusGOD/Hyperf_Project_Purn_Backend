@@ -479,9 +479,9 @@ class ProductController extends AbstractController
                 $query = $query->where('name', 'like', '%' . $product_name . '%');
                 $query_total = $query_total->where('name', 'like', '%' . $product_name . '%');
             }
+            $total = $query_total->count();
             $query = $query->offset(($page - 1) * $step)->limit($step);
             $products = $query->get();
-            $total = $query_total->count();
             $data['last_page'] = ceil($total / $step);
         } else {
             $query = Product::select('*');
@@ -490,9 +490,9 @@ class ProductController extends AbstractController
                 $query = $query->where('name', 'like', '%' . $product_name . '%');
                 $query_total = $query_total->where('name', 'like', '%' . $product_name . '%');
             }
+            $total = $query_total->count();
             $query = $query->offset(($page - 1) * $step)->limit($step);
             $products = $query->get();
-            $total = $query_total->count();
             $data['last_page'] = ceil($total / $step);
         }
         if ($total == 0) {
