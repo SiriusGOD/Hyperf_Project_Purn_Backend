@@ -132,7 +132,9 @@ class OrderController extends AbstractController
             case 'cash':
                 // 現金
                 // 確認跟前一筆訂單是否有相隔30秒
-                $last_order_time = Order::select('created_at')->where('user_id', $data['user_id'])->orderByDesc('created_at')->first()->toArray();
+                $last_order_time = Order::select('created_at')->where('user_id', $data['user_id'])->orderByDesc('created_at')->first();
+                $last_order_time = $last_order_time->toArray();
+                $this->logger->info("cash data _". __LINE__ .json_encode($last_order_time));
                 $now = Carbon::now();
                 $order_time = Carbon::parse($last_order_time['created_at']);
                 if(!empty($last_order_time) && $now->diffInSeconds($order_time) < 30){
