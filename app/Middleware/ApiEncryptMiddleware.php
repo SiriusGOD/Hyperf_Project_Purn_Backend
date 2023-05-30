@@ -33,11 +33,32 @@ class ApiEncryptMiddleware implements MiddlewareInterface
     
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if(env('PARAMS_ENCRYPT_FLAG')){
+        $attrs = $request->getAttribute('Hyperf\HttpServer\Router\Dispatched');
+        $apis = $attrs->handler->callback;          
+        $check = self::exception($apis); 
+        
+        if(env('PARAMS_ENCRYPT_FLAG') && $check==false ){
             $parsedBody = $request->getParsedBody();
             $data = CRYPT::decrypt($parsedBody['data']);
             $request = $request->withParsedBody(json_decode($data,true)); // 將解密後的數據存儲到請求對象中
         }
         return $handler->handle($request);
     }
+    
+    //例外URL || API
+    public function exception(array $data){
+      //自己加QQ
+      $exps = [ 
+                ['App\Controller\Api\OrderController' ,'list' ],
+                ['App\Controller\Api\VideoController' ,'data' ],
+               ]; 
+      $flag = false;
+      foreach($exps as $exp){
+        if($data[0] == $exp[0] && $data[1] == $exp[1] ){
+          $flag = true; 
+        }
+      }
+      return $flag;
+    } 
+
 }
