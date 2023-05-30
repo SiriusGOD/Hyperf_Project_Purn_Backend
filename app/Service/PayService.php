@@ -48,7 +48,7 @@ class PayService
     public function getPayUrl($arr): bool|array|string
     {
         // 測試
-        if (env('APP_ENV') != 'production') {
+        if (env('APP_ENV') != 'prod' && env('APP_ENV') != 'production') {
             $result['success'] = true;
             $result['data']['pay_url'] = 'http://test.pay/' . $this->randomURL();
             $result['data']['pay_way'] = 'test';
