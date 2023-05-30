@@ -376,6 +376,17 @@ class PayService
         $model->name = $params['name'];
         $model->expire = $params['expire'];
         $model->save();
+
+        $this->delMemberProductKey();
+    }
+
+    public function delMemberProductKey()
+    {
+        $checkRedisKey = "product:";
+        $keys = $this->redis->keys( $checkRedisKey.'*');
+        foreach ($keys as $key) {
+            $this->redis->del($key);
+        }
     }
 
     public function getPayList()
