@@ -26,7 +26,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{ trans('default.member_level_control.member_level_title') ?? '會員卡資訊'}}</label>
-                                    <textarea id="title" name="title" class="form-control" value="{{$model->title ?? ''}}"></textarea>
+                                    <textarea id="title" name="title" class="form-control" value="{{$model->title ?? ''}}">{{$model->title ?? ''}}</textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{ trans('default.member_level_control.member_level_description') ?? '會員卡描述'}}</label>

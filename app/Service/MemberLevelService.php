@@ -39,5 +39,16 @@ class MemberLevelService
         $model->remark = $params['remark'];
         $model->duration = $params['duration'];
         $model->save();
+
+        $this->delMemberProductKey();
+    }
+
+    public function delMemberProductKey()
+    {
+        $checkRedisKey = "product:member:";
+        $keys = $this->redis->keys( $checkRedisKey.'*');
+        foreach ($keys as $key) {
+            $this->redis->del($key);
+        }
     }
 }
