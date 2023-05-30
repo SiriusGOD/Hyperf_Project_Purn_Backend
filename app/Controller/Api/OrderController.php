@@ -28,7 +28,7 @@ use App\Service\PayService;
 use App\Util\SimplePaginator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
-
+use Hyperf\Logger\LoggerFactory;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Annotation\Middleware;
 use App\Middleware\ApiEncryptMiddleware;
@@ -40,6 +40,13 @@ use Carbon\Carbon;
 #[Middleware(ApiAuthMiddleware::class)]
 class OrderController extends AbstractController
 {
+    protected $logger;
+
+    public function __construct(LoggerFactory $loggerFactory)
+    {
+        $this->logger = $loggerFactory->get('order');
+    }
+
     /**
      * 獲取使用者訂單.
      */
@@ -65,6 +72,9 @@ class OrderController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'create')]
     public function create(RequestInterface $request, OrderService $service, PayService $pay_service ,ProxyService $proxyService)
     {
+        $all = $request->all();
+        $this->logger->info("post_order ". var_export($all, true));
+
         $data['user_id'] = auth('jwt')->user()->getId();
         $data['prod_id'] = $request->input('product_id', 0);
         if (empty($data['prod_id'])) {
