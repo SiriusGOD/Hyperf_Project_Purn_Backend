@@ -202,9 +202,7 @@ class MemberController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'verification')]
     public function sendVerification(RequestInterface $request, MemberService $service, DriverFactory $factory)
     {
-        if(! empty($request->input('email'))){
-            $member = $service->getUserFromAccountOrEmail(null, $request->input('email'));
-        } else if (auth()->check()) {
+        if (auth()->check()) {
             $member = auth()->user();
         } else {
             $member = $service->getUserFromAccountOrEmail($request->input('device_id'));
@@ -217,11 +215,12 @@ class MemberController extends AbstractController
         $code = $service->getVerificationCode($member->id);
         $driver = $factory->get('default');
         $content = trans('email.verification.content', ['code' => $code]);
-        if($request->input('email') == $member->email || empty($member->email)){
-            $driver->push(new EmailVerificationJob($request->input('email'), trans('email.verification.subject'), $content));
-        }else{
-            return $this->error(trans('validation.email_error'), 400);
-        }
+        $driver->push(new EmailVerificationJob($request->input('email'), trans('email.verification.subject'), $content));
+        // if($request->input('email') == $member->email || empty($member->email)){
+        //     $driver->push(new EmailVerificationJob($request->input('email'), trans('email.verification.subject'), $content));
+        // }else{
+        //     return $this->error(trans('validation.email_error'), 400);
+        // }
         return $this->success();
     }
 
