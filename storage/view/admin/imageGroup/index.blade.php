@@ -85,7 +85,7 @@
                                             <td>{{ $model->user->name ?? 'system' }}</td>
                                             <td>{{ $model->title }}</td>
                                             <td>
-                                                <img src="{{ $model->getAdminBaseUrl() . $model->thumbnail }}" alt="">
+                                                <img src="{{ $model->getAdminBaseUrl() . $model->thumbnail }}" alt="" width="500" height="600">
                                             </td>
                                             <td>
                                                 <a href="{{ $model->getAdminBaseUrl() . $model->url }}" target="_blank">link</a>

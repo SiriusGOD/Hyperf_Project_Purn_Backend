@@ -218,7 +218,7 @@ class ImageGroupService
     {
         $step = ImageGroup::PAGE_PER;
         $page = $params['page'];
-        $query = ImageGroup::withTrashed()->with(['user'])->offset(($page - 1) * $step)
+        $query = ImageGroup::with(['user'])->offset(($page - 1) * $step)
             ->limit($step)
             ->leftJoin('clicks', function ($join) {
                 $join->on('image_groups.id', '=', 'clicks.type_id')->where('clicks.type', ImageGroup::class);
