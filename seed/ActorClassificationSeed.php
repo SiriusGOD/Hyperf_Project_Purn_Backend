@@ -81,6 +81,12 @@ class ActorClassificationSeed implements BaseInterface
         $model->user_id = 1;
         $model->sort = 11;
         $model->save();
+
+        $model = new \App\Model\ActorClassification();
+        $model->name = '未分類';
+        $model->user_id = 1;
+        $model->sort = 12;
+        $model->save();
     }
 
     public function down(): void
