@@ -116,14 +116,14 @@ class OrderController extends AbstractController
         $data['product'] = $data['product']->toArray();
         $product = $data['product'];
         // 撈取會員資料
+        $this->logger->info("post_order check userid ". var_export($data, true));
         $member = Member::where('id', $data['user_id'])->where('status', '<', Member::STATUS['DISABLE'])->first();
-        $data['user'] = $member;
+        $data['user'] = $member->toArray();
         if (empty($data['user'])) {
             return $this->error(trans('api.order_control.no_member_data'), ErrorCode::BAD_REQUEST);
         }
         $this->logger->info("post_order data ". var_export($data, true));
-        $data['user'] = $data['user']->toArray();
-        $user = $data['user'];
+        $user = $member->toArray();
         $data['oauth_type'] = $user['device'];
 
         $this->logger->info("post_order switch ". var_export($data, true));
