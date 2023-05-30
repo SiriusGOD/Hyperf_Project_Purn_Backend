@@ -11,7 +11,6 @@ declare(strict_types=1);
  */
 namespace App\Task;
 
-use App\Model\Image;
 use App\Model\ImageGroup;
 use App\Model\Video;
 use App\Service\ClickService;

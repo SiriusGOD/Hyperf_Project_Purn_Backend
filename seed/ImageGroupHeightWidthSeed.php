@@ -38,8 +38,8 @@ class ImageGroupHeightWidthSeed implements BaseInterface
     {
         $url = env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live');
         $imageInfo = getimagesize($url . $model->thumbnail);
-        $model->height = $imageInfo[1] ?? null;
-        $model->weight = $imageInfo[0] ?? null;
+        $model->height = $imageInfo[1] ?? 0;
+        $model->weight = $imageInfo[0] ?? 0;
         $model->save();
     }
 

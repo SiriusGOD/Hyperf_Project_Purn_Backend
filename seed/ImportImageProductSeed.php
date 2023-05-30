@@ -46,6 +46,9 @@ class ImportImageProductSeed implements BaseInterface
             }
 
             $id = $this->createImageGroup($data, $result['data']['thumb']);
+            if($id == 0) {
+                continue;
+            }
             $this->createImages($result['data']['resources'], $id);
             $this->createActor($data);
             $this->createTags($data);
@@ -121,11 +124,7 @@ class ImportImageProductSeed implements BaseInterface
 
     public function down(): void
     {
-        $num = env('START_NUM_IMAGE_SYNC', PHP_INT_MAX);
-        \App\Model\TagCorrespond::where('correspond_type', \App\Model\ImageGroup::class)->where('correspond_id', '>=', $num)->delete();
-        \App\Model\ActorCorrespond::where('correspond_type', \App\Model\ImageGroup::class)->where('correspond_id', '>=', $num)->delete();
-        \App\Model\ImageGroup::where('sync_id', '>=', $num)->delete();
-        Product::where('type', \App\Model\ImageGroup::class)->where('correspond_id', $num)->delete();
+
     }
 
     public function base(): bool
@@ -135,11 +134,9 @@ class ImportImageProductSeed implements BaseInterface
 
     protected function createImageGroup(array $data, string $thumb): ?int
     {
-        $url = env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live');
-//        $imageInfo = getimagesize($url . $thumb);
-//        if ($imageInfo === false) {
-//            return null;
-//        }
+        if (ImageGroup::where('sync_id', $data[0])->exists()) {
+            return 0;
+        }
         $model = new ImageGroup();
         $model->user_id = 0;
         $model->title = $data[1];
@@ -164,11 +161,9 @@ class ImportImageProductSeed implements BaseInterface
 
     protected function createImage(array $image, int $imageGroupId): void
     {
-        $url = env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live');
-//        $imageInfo = getimagesize($url . $image['img_url']);
-//        if ($imageInfo === false) {
-//            return;
-//        }
+        if (Image::where('sync_id', $image['id']) == 0) {
+            return;
+        }
         $model = new Image();
         $model->user_id = 0;
         $model->title = '';
@@ -177,15 +172,19 @@ class ImportImageProductSeed implements BaseInterface
         $model->description = '';
         $model->group_id = $imageGroupId;
         $model->sync_id = $image['id'];
-        $model->thumbnail_height = $imageInfo[1] ?? 0;
-        $model->thumbnail_weight = $imageInfo[0] ?? 0;
-        $model->height = $imageInfo[1] ?? 0;
-        $model->weight = $imageInfo[0] ?? 0;
+        $model->thumbnail_height = 0;
+        $model->thumbnail_weight = 0;
+        $model->height = 0;
+        $model->weight = 0;
         $model->save();
     }
 
     protected function createProductGroup(array $params) : void
     {
+        $exist = Product::where('type', Product::TYPE_CORRESPOND_LIST['image'])->where('correspond_id')->exists();
+        if($exist) {
+            return;
+        }
         $data['id'] = null;
         $data['type'] = Product::TYPE_CORRESPOND_LIST['image'];
         $data['correspond_id'] = $params['id'];

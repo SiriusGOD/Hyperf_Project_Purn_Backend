@@ -55,19 +55,19 @@ class CalculateTotalClickTask
             MemberCategorizationDetail::where('type', Video::class)
                 ->where('type_id', $model->id)
                 ->update([
-                    'total_click' => $model->total
+                    'total_click' => $model->total,
                 ]);
 
             ActorCorrespond::where('type', Video::class)
                 ->where('type_id', $model->id)
                 ->update([
-                    'total_click' => $model->total
+                    'total_click' => $model->total,
                 ]);
 
             TagCorrespond::where('type', Video::class)
                 ->where('type_id', $model->id)
                 ->update([
-                    'total_click' => $model->total
+                    'total_click' => $model->total,
                 ]);
         }
 
@@ -85,19 +85,19 @@ class CalculateTotalClickTask
             MemberCategorizationDetail::where('type', ImageGroup::class)
                 ->where('type_id', $model->id)
                 ->update([
-                    'total_click' => $model->total
+                    'total_click' => $model->total,
                 ]);
 
             ActorCorrespond::where('type', ImageGroup::class)
                 ->where('type_id', $model->id)
                 ->update([
-                    'total_click' => $model->total
+                    'total_click' => $model->total,
                 ]);
 
             TagCorrespond::where('type', Video::class)
                 ->where('type_id', $model->id)
                 ->update([
-                    'total_click' => $model->total
+                    'total_click' => $model->total,
                 ]);
         }
 

@@ -19,11 +19,9 @@ use App\Model\Tag;
 use App\Service\ImageGroupService;
 use App\Service\ProductService;
 use App\Service\TagService;
-use Hyperf\Crontab\Annotation\Crontab;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Redis\Redis;
 
-#[Crontab(name: 'ImageGroupSyncTask', rule: '5 * * * *', callback: 'execute', memo: '圖片同步定時任務')]
 class ImageGroupSyncTask
 {
     public const ADMIN_ID = 0;
@@ -41,6 +39,7 @@ class ImageGroupSyncTask
     protected string $syncUrl;
 
     private \Psr\Log\LoggerInterface $logger;
+
     private ProductService $productService;
 
     public function __construct(ImageGroupService $service, LoggerFactory $loggerFactory, Redis $redis, TagService $tagService, ProductService $productService)
@@ -66,7 +65,7 @@ class ImageGroupSyncTask
                 $res = $client->get($url);
             } catch (\Exception $exception) {
                 $this->logger->info('套圖錯誤 id : ' . $count);
-                $count++;
+                ++$count;
                 continue;
             }
             $result = json_decode($res->getBody()->getContents(), true);
@@ -76,14 +75,14 @@ class ImageGroupSyncTask
             }
 
             if (ImageGroup::where('sync_id', $result['data']['id'])->exists() or count($result['data']['resources']) < 8) {
-                $count++;
+                ++$count;
                 continue;
             }
 
             $id = $this->createImageGroup($result['data']);
             if (empty($id)) {
                 $this->logger->info('讀不到封面 ： ' . $result['data']['id']);
-                $count++;
+                ++$count;
                 continue;
             }
             $this->createProductGroup([
@@ -95,7 +94,7 @@ class ImageGroupSyncTask
                 $this->tagService->createTagRelationshipArr(ImageGroup::class, $id, $tagsIds);
             }
             $this->createImages($result['data']['resources'], $id);
-            $count++;
+            ++$count;
         }
 
         $systemParam->param = $count;
@@ -111,7 +110,7 @@ class ImageGroupSyncTask
             'description' => self::SYNC_KEY,
         ], [
             'description' => self::SYNC_KEY,
-            'param' => 1
+            'param' => 1,
         ]);
     }
 
@@ -137,7 +136,7 @@ class ImageGroupSyncTask
         return $model->id;
     }
 
-    protected function createProductGroup(array $params) : void
+    protected function createProductGroup(array $params): void
     {
         $data['id'] = null;
         $data['type'] = Product::TYPE_CORRESPOND_LIST['image'];

@@ -20,8 +20,9 @@ use Hyperf\Logger\LoggerFactory;
 class ChannelTask
 {
     protected $channelService;
+
     private \Psr\Log\LoggerInterface $logger;
-    
+
     public function __construct(ChannelService $channelService, LoggerFactory $loggerFactory)
     {
         $this->logger = $loggerFactory->get('crontab', 'crontab');
@@ -34,12 +35,11 @@ class ChannelTask
         if (count($models) == 0) {
             return;
         }
-        $this->logger->info('渠道註冊計算任務-開始'.date("YmdH"));
+        $this->logger->info('渠道註冊計算任務-開始' . date('YmdH'));
         foreach ($models as $model) {
-            $this->channelService->calcChannelCount2DB($model->url ,$model->id,"member");
-            $this->channelService->calcChannelCount2DB($model->url ,$model->id,"achievement");
+            $this->channelService->calcChannelCount2DB($model->url, $model->id, 'member');
+            $this->channelService->calcChannelCount2DB($model->url, $model->id, 'achievement');
         }
-        $this->logger->info('渠道註冊計算任務-開始'.date("YmdH"));
+        $this->logger->info('渠道註冊計算任務-開始' . date('YmdH'));
     }
-
 }

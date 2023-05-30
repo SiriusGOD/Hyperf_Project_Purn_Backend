@@ -22,6 +22,7 @@ class PopularTagTask
     protected $service;
 
     private \Psr\Log\LoggerInterface $logger;
+
     private Redis $redis;
 
     public function __construct(TagService $service, LoggerFactory $loggerFactory, Redis $redis)

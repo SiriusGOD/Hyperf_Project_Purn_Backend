@@ -37,14 +37,14 @@ class OrderTask
     {
         // 獲得 30 分鐘前的時間
         $thirtyMinutesAgo = Carbon::now()->subMinutes(30)->toDateTimeString();
-        
+
         // 查詢建立時間小於30分鐘前的訂單 狀態變更為付款失敗 31
         $orders = Order::where('status', Order::ORDER_STATUS['create'])->where('created_at', '<', $thirtyMinutesAgo)->select('id')->get();
-        if(!empty($orders)){
+        if (! empty($orders)) {
             foreach ($orders as $key => $value) {
-                $model = Order::findOrFail($value -> id);
-                $model -> status = Order::ORDER_STATUS['failure'];
-                $model -> save();
+                $model = Order::findOrFail($value->id);
+                $model->status = Order::ORDER_STATUS['failure'];
+                $model->save();
             }
         }
     }
