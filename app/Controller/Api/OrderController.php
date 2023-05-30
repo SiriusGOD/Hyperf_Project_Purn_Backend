@@ -73,7 +73,7 @@ class OrderController extends AbstractController
     public function create(RequestInterface $request, OrderService $service, PayService $pay_service ,ProxyService $proxyService)
     {
         $all = $request->all();
-        $this->logger->info("post_order ". var_export($all, true));
+        $this->logger->info("post_order ". json_encode($all));
 
         $data['user_id'] = auth('jwt')->user()->getId();
         $data['prod_id'] = $request->input('product_id', 0);
@@ -116,17 +116,17 @@ class OrderController extends AbstractController
         $data['product'] = $data['product']->toArray();
         $product = $data['product'];
         // 撈取會員資料
-        $this->logger->info("post_order check userid ". var_export($data, true));
+        $this->logger->info("post_order check userid -".__LINE__. json_encode($data));
         $member = Member::where('id', $data['user_id'])->where('status', '<', Member::STATUS['DISABLE'])->first();
         $data['user'] = $member->toArray();
         if (empty($data['user'])) {
             return $this->error(trans('api.order_control.no_member_data'), ErrorCode::BAD_REQUEST);
         }
-        $this->logger->info("post_order data ". var_export($data, true));
+        $this->logger->info("post_order data -".__LINE__. json_encode($data));
         $user = $member->toArray();
         $data['oauth_type'] = $user['device'];
 
-        $this->logger->info("post_order switch ". var_export($data, true));
+        $this->logger->info("post_order switch ". json_encode($data));
 
         switch ($data['pay_method']) {
             case 'cash':
