@@ -204,6 +204,8 @@ class MemberController extends AbstractController
     {
         if (auth()->check()) {
             $member = auth()->user();
+        } else if(! empty($request->input('email'))){
+            $member = $service->getUserFromAccountOrEmail(null, $request->input('email'));
         } else {
             $member = $service->getUserFromAccountOrEmail($request->input('device_id'));
         }
@@ -220,8 +222,6 @@ class MemberController extends AbstractController
         }else{
             return $this->error(trans('validation.email_error'), 400);
         }
-       
-
         return $this->success();
     }
 
