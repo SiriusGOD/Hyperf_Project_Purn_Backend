@@ -272,6 +272,7 @@ class MemberController extends AbstractController
             $member->free_quota_limit = $member->free_quota_limit + MemberLevel::ADD_QUOTA;
             $member->email = $request->input('email') ?? $member->email;
             $member->save();
+            $memberService -> delRedis($member->id);
             if($member->invited_by != ""){
               //被推廌送VIP 2天
               $vipDays = 2;
