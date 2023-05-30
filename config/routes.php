@@ -13,6 +13,8 @@ use Hyperf\HttpServer\Router\Router;
 
 Router::addRoute(['GET', 'POST', 'HEAD'], '/', [\App\Controller\Admin\UserController::class, 'loginPage'], ['middleware' => [\App\Middleware\AllowIPMiddleware::class]]);
 
-Router::get('/favicon.ico', function () {
-    return '';
+Router::get('/metrics', function(){
+    $registry = Hyperf\Context\ApplicationContext::getContainer()->get(Prometheus\CollectorRegistry::class);
+    $renderer = new Prometheus\RenderTextFormat();
+    return $renderer->render($registry->getMetricFamilySamples());
 });
