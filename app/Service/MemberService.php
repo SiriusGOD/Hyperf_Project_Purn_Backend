@@ -381,6 +381,13 @@ class MemberService extends BaseService
                 $buy_model->end_time = $data['end_time'];
                 $buy_model->save();
             }
+        }else{
+            // 移除會員等級的持續時間
+            $buy_models = BuyMemberLevel::select('id')->where('member_id', $data['id'])->whereNull('deleted_at')->get();
+            foreach ($buy_models as $key => $buy_model) {
+                $model = BuyMemberLevel::where('id', $buy_model->id)->first();
+                $model -> delete();
+            }
         }
     }
 

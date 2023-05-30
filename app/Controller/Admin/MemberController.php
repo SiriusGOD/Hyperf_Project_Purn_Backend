@@ -18,6 +18,7 @@ use App\Model\User;
 use App\Request\MemberUpdateRequest;
 use App\Service\MemberService;
 use App\Service\RoleService;
+use Carbon\Carbon;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -89,26 +90,51 @@ class MemberController extends AbstractController
         $data['coins'] = $request->input('coins', 0);
         $data['diamond_coins'] = $request->input('diamond_coins', 0);
         $data['free_quota'] = $request->input('free_quota', 1);
-        $data['free_quota_limit'] = $request->input('free_quota_limit', 1);
-        $data['diamond_quota'] = $request->input('diamond_quota', 0);
-        $data['vip_quota'] = $request->input('vip_quota', 0);
+        // $data['free_quota_limit'] = $request->input('free_quota_limit', 1);
+        $data['diamond_quota'] = empty($request->input('diamond_quota')) ? 0 : $request->input('diamond_quota');
+        $data['vip_quota'] = empty($request->input('vip_quota')) ? 0 : $request->input('vip_quota');
         
-        if($data['member_level_status'] == MemberLevel::TYPE_VALUE['vip']){
-            $data['diamond_quota'] = $request->input('diamond_quota', 0);
+        // 修改會員等級時 如果要改非體驗會員則會員等級須設定大於１天
+        $start_time = Carbon::parse($data['start_time']);
+        $end_time = Carbon::parse($data['end_time']);
+        $diff_days = $end_time->diffInDays($start_time);
+        if($data['member_level_status'] == MemberLevel::TYPE_VALUE['vip'] && $diff_days > 1){
+            $data['diamond_quota'] = empty($request->input('diamond_quota')) ? 0 : $request->input('diamond_quota');
             if(empty($request->input('vip_quota'))){
-                $data['vip_quota'] = null;
+                $data['vip_quota'] = Member::VIP_QUOTA['UP_TWO'];
             }else{
                 $data['vip_quota'] = $request->input('vip_quota');
-            }
-            
+            }  
         }
-        if($data['member_level_status'] == MemberLevel::TYPE_VALUE['diamond']){
-            $data['vip_quota'] = $request->input('vip_quota', 0);
+        if($data['member_level_status'] == MemberLevel::TYPE_VALUE['diamond'] && $diff_days > 1){
+            $data['vip_quota'] = empty($request->input('vip_quota')) ? 0 : $request->input('vip_quota');
             if(empty($request->input('diamond_quota'))){
-                $data['diamond_quota'] = null;
+                $data['diamond_quota'] = Member::VIP_QUOTA['UP_TWO'];
             }else{
                 $data['diamond_quota'] = $request->input('diamond_quota');
             }
+        }
+
+        // 如果是設定體驗卡
+        if($data['member_level_status'] == MemberLevel::TYPE_VALUE['vip'] && $diff_days <= 1){
+            if(empty($data['vip_quota']))$data['vip_quota'] = Member::VIP_QUOTA['DAY'];
+        }
+        if($data['member_level_status'] == MemberLevel::TYPE_VALUE['diamond'] && $diff_days <= 1){
+            if(empty($data['diamond_quota']))$data['diamond_quota'] = Member::VIP_QUOTA['DAY'];
+        }
+
+        // 依照會員狀態設定免費觀看次數
+        $data['free_quota_limit'] = $data['status'] + 1;
+        if($data['free_quota'] > $data['free_quota_limit']){
+            $data['free_quota'] = $data['free_quota_limit'];
+        }
+
+        // 會員等級為０時
+        if($data['member_level_status'] == MemberLevel::NO_MEMBER_LEVEL){
+            $data['vip_quota'] = 0;
+            $data['diamond_quota'] = 0;
+            $data['free_quota'] = 1;
+            $data['free_quota_limit'] = 1;
         }
 
         $service->storeUser($data);

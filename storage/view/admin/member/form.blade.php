@@ -69,7 +69,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_level') ?? '會員等級'}}</label>
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_level') ?? '會員等級'}} ({{trans('default.member_control.member_level_msg')}})</label>
                                     <select class="form-control form-control-lg" name="member_level_status">
                                         @foreach(trans('select.level') as $key => $value)
                                             <option value="{{$key}}" @if($key == $user->member_level_status) selected=true @endif>{{$value}}</option>
@@ -102,12 +102,12 @@
                                     <input type="text" class="form-control" name="vip_quota" id="vip_quota" value="{{$user->vip_quota}}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_free_quota') ?? '免費觀看次數'}}</label>
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_free_quota') ?? '免費觀看次數'}} ({{trans('default.member_control.free_quota_msg')}})</label>
                                     <input type="text" class="form-control" name="free_quota" id="free_quota" value="{{$user->free_quota}}">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('default.member_control.member_free_quota_limit') ?? '免費觀看次數上限'}}</label>
-                                    <input type="text" class="form-control" name="free_quota_limit" id="free_quota_limit" value="{{$user->free_quota_limit}}">
+                                    <input type="text" class="form-control" name="free_quota_limit" id="free_quota_limit"  disabled="true" value="{{$user->free_quota_limit}}">
                                 </div>
                                 <button type="submit"
                                         class="btn btn-primary">{{trans('default.submit') ?? '送出'}}</button>
