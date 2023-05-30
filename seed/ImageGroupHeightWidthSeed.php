@@ -17,7 +17,7 @@ class ImageGroupHeightWidthSeed implements BaseInterface
         $limit = 100;
         $forever = true;
         while($forever) {
-            $imageGroups = \App\Model\ImageGroup::whereNull('height')
+            $imageGroups = \App\Model\ImageGroup::where('height', 0)
                 ->where('sync_id', '>=', 1)
                 ->offset($page * $limit)
                 ->limit($limit)
