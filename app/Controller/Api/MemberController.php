@@ -215,7 +215,7 @@ class MemberController extends AbstractController
         $code = $service->getVerificationCode($member->id);
         $driver = $factory->get('default');
         $content = trans('email.verification.content', ['code' => $code]);
-        if($request->input('email') == $member->email){
+        if($request->input('email') == $member->email || empty($member->email)){
             $driver->push(new EmailVerificationJob($request->input('email'), trans('email.verification.subject'), $content));
         }else{
             return $this->error(trans('validation.email_error'), 400);
