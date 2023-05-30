@@ -216,7 +216,11 @@ class ActorService extends GenerateService
     {
         $data = [];
         // 撈取基本資料
-        $actor = Actor::select('name', 'avatar')->where('id', $actor_id)->first()->toArray();
+        if($actor_id == 0){
+            $actor = Actor::select('name', 'avatar')->where('name', 'like', '未分%')->first()->toArray();
+        }else{
+            $actor = Actor::select('name', 'avatar')->where('id', $actor_id)->first()->toArray();
+        }   
         $data['name'] = $actor['name'];
         
         // 撈取作品數
