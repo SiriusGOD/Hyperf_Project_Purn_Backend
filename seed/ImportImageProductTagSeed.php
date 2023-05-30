@@ -27,9 +27,6 @@ class ImportImageProductTagSeed implements BaseInterface
 
     public function createActor(array $data): void
     {
-        if ($data[3] == '尚未分類') {
-            return;
-        }
         $imageGroup = \App\Model\ImageGroup::where('sync_id', $data[0])->first();
         if (empty($imageGroup)) {
             return;
