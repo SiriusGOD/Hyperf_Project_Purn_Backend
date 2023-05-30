@@ -124,7 +124,6 @@ class ImportImageProductSeed implements BaseInterface
         $num = env('START_NUM_IMAGE_SYNC', PHP_INT_MAX);
         \App\Model\TagCorrespond::where('correspond_type', \App\Model\ImageGroup::class)->where('correspond_id', '>=', $num)->delete();
         \App\Model\ActorCorrespond::where('correspond_type', \App\Model\ImageGroup::class)->where('correspond_id', '>=', $num)->delete();
-        \App\Model\Image::where('sync_id', '>=', $num)->delete();
         \App\Model\ImageGroup::where('sync_id', '>=', $num)->delete();
         Product::where('type', \App\Model\ImageGroup::class)->where('correspond_id', $num)->delete();
     }
