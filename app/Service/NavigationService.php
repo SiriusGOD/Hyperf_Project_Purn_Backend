@@ -404,9 +404,9 @@ class NavigationService extends GenerateService
 
     protected function getAdvertisementsLimit(int $page, int $limit): array
     {
-        if ($page == 0) {
+        if ($page == 0 and $limit >= self::ADVERTISEMENT_PAGE_PER) {
             return [
-                'limit' => 0,
+                'limit' => 1,
                 'last_page' => 0,
             ];
         }
