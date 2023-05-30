@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Model\Actor;
 use App\Model\ActorHasClassification;
-
+use Hyperf\DbConnection\Db;
 /**
  * This file is part of Hyperf.
  *
@@ -27,6 +27,14 @@ class ActorSeed implements BaseInterface
             Actor::truncate();
             // 清空 actor_has_classifications
             ActorHasClassification::truncate();
+            // 例外處理 未分類演員
+            Db::insert("INSERT INTO actors (id, user_id, sex, name, created_at, updated_at) VALUES (0, 1, 1, '未分類', now(), now())");
+            Db::update('update actors set id = 0 where id = 1');
+            $ahc = new ActorHasClassification();
+            $ahc -> actor_id = 0;
+            $ahc -> actor_classifications_id = 12;
+            $ahc -> save();
+            
             while (($line = fgets($file)) !== false) {
                 if($key == 0){
                     $key++;
@@ -65,6 +73,8 @@ class ActorSeed implements BaseInterface
         }else{
             var_dump('查無檔案');
         }
+
+        
     }
 
     public function down(): void
