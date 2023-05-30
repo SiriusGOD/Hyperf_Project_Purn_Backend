@@ -202,10 +202,10 @@ class MemberController extends AbstractController
     #[RequestMapping(methods: ['POST'], path: 'verification')]
     public function sendVerification(RequestInterface $request, MemberService $service, DriverFactory $factory)
     {
-        if (auth()->check()) {
-            $member = auth()->user();
-        } else if(! empty($request->input('email'))){
+        if(! empty($request->input('email'))){
             $member = $service->getUserFromAccountOrEmail(null, $request->input('email'));
+        } else if (auth()->check()) {
+            $member = auth()->user();
         } else {
             $member = $service->getUserFromAccountOrEmail($request->input('device_id'));
         }
