@@ -147,7 +147,7 @@ class PayService
     // 支付 回調函式
     public function notifyPayAction($data)
     {
-        errLog(var_export($data,true));
+        errLog(var_export($data,true),"notifyPayAction");
         $this->logger->info('呼叫回調函式', $data);
         $signdata = $data;
         if (isset($data['success']) && $data['success'] == 200) { // 付款成功

@@ -99,10 +99,10 @@ if (! function_exists('errLog')) {
     /**
      * @param mixed $str
      */
-    function errLog($str = 'log')
+    function errLog($str = 'log', string $label="default")
     {
         stdLog()->info($str);
-        return logger("errLog")->info($str);
+        return logger($label)->info($str);
     }
 }
 /*
