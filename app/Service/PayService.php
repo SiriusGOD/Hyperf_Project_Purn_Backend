@@ -81,6 +81,7 @@ class PayService
             $data['product'] = $product['type'] == Product::TYPE_CORRESPOND_LIST['member'] ? 'vip' : 'coins'; // vip or coins
 
             $this->logger->info("payurl ". __LINE__ .json_encode($data));
+            $this->logger->info("payurl ". __LINE__ .env('PAY_URL'));
             $result = $this->curlPost(env('PAY_URL'), $data);
             if (! isset($result['success']) && $result['success'] != true) {
                 $this->logger->error('生成支付鏈接失敗', $result);
