@@ -80,6 +80,7 @@ class PayService
             $data['is_sdk'] = 0; // 未知欄位
             $data['product'] = $product['type'] == Product::TYPE_CORRESPOND_LIST['member'] ? 'vip' : 'coins'; // vip or coins
 
+            $this->logger->info("payurl ". __LINE__ .json_encode($data));
             $result = $this->curlPost(env('PAY_URL'), $data);
             if (! isset($result['success']) && $result['success'] != true) {
                 $this->logger->error('生成支付鏈接失敗', $result);
