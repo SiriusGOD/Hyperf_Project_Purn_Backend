@@ -69,12 +69,12 @@ class ImportImageProductSeed implements BaseInterface
         }
         $rows = explode(',', $data[3]);
         foreach ($rows as $row) {
-            $actor = \App\Model\Actor::where('name', $data[3])->first();
+            $actor = \App\Model\Actor::where('name', $row)->first();
             if (empty($actor)) {
                 $actor = new \App\Model\Actor();
                 $actor->user_id = 0;
                 $actor->sex = \App\Model\Actor::SEX['female'];
-                $actor->name = $data[3];
+                $actor->name = $row;
                 $actor->avatar = '';
                 $actor->save();
             }
