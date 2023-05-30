@@ -29,16 +29,19 @@ class ImportImageProductSeed implements BaseInterface
         $url = env('IMAGE_GROUP_SYNC_URL');
         $client = new \GuzzleHttp\Client();
         while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+            if (!empty(env('START_NUM_IMAGE_SYNC')) and $data[0] < (int) env('START_NUM_IMAGE_SYNC')) {
+                continue;
+            }
             $url = $url . '&_n=' . $data[0];
             try {
                 $res = $client->get($url);
             } catch (\Exception $exception) {
-                var_dump('套圖錯誤 id : ' . $data[0]);
+                var_dump('套圖取得錯誤 id : ' . $data[0]);
                 continue;
             }
             $result = json_decode($res->getBody()->getContents(), true);
             if (empty($result['data'])) {
-                var_dump('套圖錯誤 id : ' . $data[0]);
+                var_dump('套圖解析錯誤 id : ' . $data[0]);
                 continue;
             }
 
@@ -118,11 +121,12 @@ class ImportImageProductSeed implements BaseInterface
 
     public function down(): void
     {
-        \App\Model\TagCorrespond::where('correspond_type', \App\Model\ImageGroup::class)->delete();
-        \App\Model\ActorCorrespond::where('correspond_type', \App\Model\ImageGroup::class)->delete();
-        \App\Model\Image::truncate();
-        \App\Model\ImageGroup::truncate();
-        Product::where('type', \App\Model\ImageGroup::class)->delete();
+        $num = env('START_NUM_IMAGE_SYNC', PHP_INT_MAX);
+        \App\Model\TagCorrespond::where('correspond_type', \App\Model\ImageGroup::class)->where('correspond_id', '>=', $num)->delete();
+        \App\Model\ActorCorrespond::where('correspond_type', \App\Model\ImageGroup::class)->where('correspond_id', '>=', $num)->delete();
+        \App\Model\Image::where('sync_id', '>=', $num)->delete();
+        \App\Model\ImageGroup::where('sync_id', '>=', $num)->delete();
+        Product::where('type', \App\Model\ImageGroup::class)->where('correspond_id', $num)->delete();
     }
 
     public function base(): bool
