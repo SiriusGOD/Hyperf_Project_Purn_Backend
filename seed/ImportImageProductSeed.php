@@ -64,20 +64,23 @@ class ImportImageProductSeed implements BaseInterface
         if (empty($imageGroup)) {
             return;
         }
-        $actor = \App\Model\Actor::where('name', $data[3])->first();
-        if (empty($actor)) {
-            $actor = new \App\Model\Actor();
-            $actor->user_id = 0;
-            $actor->sex = \App\Model\Actor::SEX['female'];
-            $actor->name = $data[3];
-            $actor->avatar = '';
-            $actor->save();
+        $rows = explode(',', $data[3]);
+        foreach ($rows as $row) {
+            $actor = \App\Model\Actor::where('name', $data[3])->first();
+            if (empty($actor)) {
+                $actor = new \App\Model\Actor();
+                $actor->user_id = 0;
+                $actor->sex = \App\Model\Actor::SEX['female'];
+                $actor->name = $data[3];
+                $actor->avatar = '';
+                $actor->save();
+            }
+            $model = new \App\Model\ActorCorrespond();
+            $model->correspond_type = \App\Model\ImageGroup::class;
+            $model->correspond_id = $imageGroup->id;
+            $model->actor_id = $actor->id;
+            $model->save();
         }
-        $model = new \App\Model\ActorCorrespond();
-        $model->correspond_type = \App\Model\ImageGroup::class;
-        $model->correspond_id = $imageGroup->id;
-        $model->actor_id = $actor->id;
-        $model->save();
     }
 
     public function createTags(array $data): void
@@ -130,10 +133,10 @@ class ImportImageProductSeed implements BaseInterface
     protected function createImageGroup(array $data, string $thumb): ?int
     {
         $url = env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live');
-        $imageInfo = getimagesize($url . $thumb);
-        if ($imageInfo === false) {
-            return null;
-        }
+//        $imageInfo = getimagesize($url . $thumb);
+//        if ($imageInfo === false) {
+//            return null;
+//        }
         $model = new ImageGroup();
         $model->user_id = 0;
         $model->title = $data[1];
@@ -141,8 +144,8 @@ class ImportImageProductSeed implements BaseInterface
         $model->url = $thumb;
         $model->description = $data[2];
         $model->sync_id = $data[0];
-        $model->height = $imageInfo[1];
-        $model->weight = $imageInfo[0];
+        $model->height = $imageInfo[1] ?? 0;
+        $model->weight = $imageInfo[0] ?? 0;
 
         $model->save();
 
@@ -159,10 +162,10 @@ class ImportImageProductSeed implements BaseInterface
     protected function createImage(array $image, int $imageGroupId): void
     {
         $url = env('IMAGE_GROUP_DECRYPT_URL', 'https://imgpublic.ycomesc.live');
-        $imageInfo = getimagesize($url . $image['img_url']);
-        if ($imageInfo === false) {
-            return;
-        }
+//        $imageInfo = getimagesize($url . $image['img_url']);
+//        if ($imageInfo === false) {
+//            return;
+//        }
         $model = new Image();
         $model->user_id = 0;
         $model->title = '';
