@@ -121,11 +121,12 @@ class OrderController extends AbstractController
         if (empty($data['user'])) {
             return $this->error(trans('api.order_control.no_member_data'), ErrorCode::BAD_REQUEST);
         }
+        $this->logger->info("post_order data ". var_export($data, true));
         $data['user'] = $data['user']->toArray();
         $user = $data['user'];
         $data['oauth_type'] = $user['device'];
 
-        errLog(var_export($data,true));
+        $this->logger->info("post_order switch ". var_export($data, true));
 
         switch ($data['pay_method']) {
             case 'cash':
