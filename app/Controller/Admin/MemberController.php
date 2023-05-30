@@ -133,8 +133,6 @@ class MemberController extends AbstractController
         if($data['member_level_status'] == MemberLevel::NO_MEMBER_LEVEL){
             $data['vip_quota'] = 0;
             $data['diamond_quota'] = 0;
-            $data['free_quota'] = 1;
-            $data['free_quota_limit'] = 1;
         }
 
         $service->storeUser($data);
