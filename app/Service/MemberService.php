@@ -340,6 +340,9 @@ class MemberService extends BaseService
         if (! empty($data['name']) and empty($model->name)) {
             $model->name = $data['name'];
         }
+        if (! empty($data['account']) and empty($model->account)) {
+            $model->account = $data['account'];
+        }
         if (! empty($data['password'])) {
             $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
         }
@@ -805,5 +808,18 @@ class MemberService extends BaseService
             return false;
         }
         return true;
+    }
+
+    // Admin Account Search
+    public function adminAccountSearch($account, $page, $pagePer)
+    {
+        // 撈取 
+        return Member::select('*')->where('account', 'like', '%'.$account.'%')->offset(($page - 1) * $pagePer)->limit($pagePer)->orderBy('id', 'desc')->get();
+    }
+
+    // Admin Account Search Count
+    public function adminAccountSearchCount($account): int
+    {
+        return Member::select('*')->where('account', 'like', '%'.$account.'%')->count();
     }
 }

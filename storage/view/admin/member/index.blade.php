@@ -7,12 +7,21 @@
                 <div class="card-body">
                     <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                         <div class="row">
+                            <div class="col-sm-12 col-md-10">
+                                <form action="/admin/member/search" method="get">
+                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_acc') ?? '名稱'}}: </label>
+                                    <input type="text" name="account" id="account" value="" placeholder="請輸入會員帳號">
+                                    
+                                    <button type="submit" class="btn btn-primary">查詢</button>
+                                </form>
+                            </div>
                             @if(authPermission('member-create'))
-                                <div class="col-sm-12 col-md-12">
+                                <div class="col-sm-12 col-md-2">
                                     <a class="btn badge-info"
                                        href="/admin/member/create">{{trans('default.member_control.member_insert') ?? '新增會員'}}</a>
                                 </div>
                             @endif
+                            
                         </div>
                         <div class="row">
                             <div class="col-sm-12">

@@ -12,7 +12,7 @@
                                     <input type="hidden" name="id" value="{{$user->id}}">
                                 @endif
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">{{trans('default.member_control.member_acc') ?? '管理者帳號'}}</label>
+                                    <label for="exampleInputEmail1">{{trans('default.name') ?? '管理者帳號'}}</label>
                                     <input type="text" class="form-control" name="name" id="name"
                                            @if(!empty($user->name)) disabled="true" @endif
                                            placeholder="{{trans('default.account_def') ?? 'name'}}"

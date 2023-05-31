@@ -77,6 +77,7 @@ class MemberController extends AbstractController
         }
         $data['avatar'] = $path;
         $data['name'] = $request->input('name');
+        $data['account'] = $request->input('account');
         $data['sex'] = $request->input('sex');
         $data['age'] = $request->input('age');
         $data['email'] = $request->input('email');
@@ -176,5 +177,31 @@ class MemberController extends AbstractController
     {
         $service->deleteUser($request->input('id'));
         return $response->redirect('/admin/member/index');
+    }
+
+    #[RequestMapping(methods: ['GET'], path: 'search')]
+    public function search(RequestInterface $request, MemberService $service, RoleService $roleService)
+    {
+        // 顯示幾筆
+        $step = Member::PAGE_PER;
+        $page = $request->input('page') ? intval($request->input('page'), 10) : 1;
+        $account = $request->input('account') ?? '';
+        $users = $service->adminAccountSearch($account, $page, $step);
+        $total = $service->adminAccountSearchCount($account);
+        $data['last_page'] = ceil($total / $step);
+        if ($total == 0) {
+            $data['last_page'] = 1;
+        }
+        $data['roles'] = $roleService->getAll()->toArray();
+        $data['total'] = $total;
+        $data['datas'] = $users;
+        $data['page'] = $page;
+        $data['step'] = $step;
+        $path = '/admin/member/search';
+        $data['next'] = $path . '?page=' . ($page + 1);
+        $data['prev'] = $path . '?page=' . ($page - 1);
+        $data['navbar'] = trans('default.member_control.member_control');
+        $data['member_active'] = 'active';
+        return $this->render->render('admin.member.index', $data);
     }
 }
