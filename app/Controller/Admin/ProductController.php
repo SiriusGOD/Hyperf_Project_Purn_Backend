@@ -468,7 +468,7 @@ class ProductController extends AbstractController
                             })->leftJoin('clicks', function ($join) {
                                 $join->on('clicks.type_id', '=', 'videos.id')
                                     ->where('clicks.type', Video::class);
-                            })->selectRaw('products.*, videos.cover_thumb as img_thumb, videos.m3u8, clicks.count');
+                            })->selectRaw('products.*, videos.cover_thumb as img_thumb, videos.source, clicks.count');
                     break;
                 default:
                     $query = Product::select('*')->where('type', Product::TYPE_CORRESPOND_LIST[$product_type]);

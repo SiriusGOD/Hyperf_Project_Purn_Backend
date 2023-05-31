@@ -122,8 +122,8 @@
                                                 @endif
                                                 @if($product_type == \App\Model\Product::TYPE_LIST[1])
                                                     <td>
-                                                        <video controls>
-                                                            <source src="{{$model->m3u8}}" type="application/x-mpegURL">
+                                                        <video  width="352" height="198" controls>
+                                                            <source src="{{env('VIDEO_SOURCE_URL_10S')}}{{$model->source}}" type="application/x-mpegURL">
                                                         </video>
                                                     </td>
                                                 @endif
