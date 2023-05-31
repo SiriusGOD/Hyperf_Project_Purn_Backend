@@ -49,8 +49,9 @@ class ApiEncryptMiddleware implements MiddlewareInterface
     public function exception(array $data){
       //自己加QQ
       $exps = [ 
-                ['App\Controller\Api\OrderController' ,'list' ],
                 ['App\Controller\Api\VideoController' ,'data' ],
+                ['App\Controller\Api\CustomerServiceController' ,'create' ],
+                ['App\Controller\Api\CustomerServiceController' ,'reply' ],
                ]; 
       $flag = false;
       foreach($exps as $exp){
