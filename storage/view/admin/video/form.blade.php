@@ -84,13 +84,13 @@
                                 <div class="form-group" style="display:flex;padding: 3px;">
                                     <div>
                                       <label for="exampleInputEmail1">{{trans('default.video.cover_thumb') ?? '封面圖'}}</label>
-                                      <img src="{{ env('IMG_URL').$video->cover_thumb }}" class="img-fluid mb-2" style="width: 228px; height: 250px;display: block;"/>
+                                      <img src="{{ env('IMAGE_GROUP_DECRYPT_URL').$video->cover_thumb }}" class="img-fluid mb-2" style="width: 228px; height: 250px;display: block;"/>
                                     </div>
 
-                                      @if($video->gif_thumb)
+                                      @if($video->cover_full)
                                         <div>
                                           <label for="exampleInputEmail1">{{trans('default.video.gif_thumb') ?? '封面圖'}}</label>
-                                             <img src="{{ env('IMG_URL').$video->gif_thumb }}" class="img-fluid mb-2" style="width: 228px; height: 250px;display: block;"/>
+                                             <img src="{{ env('IMAGE_GROUP_DECRYPT_URL').$video->cover_full }}" class="img-fluid mb-2" style="width: 228px; height: 250px;display: block;"/>
                                         </div>
                                       @endif  
                                 </div>
@@ -100,9 +100,10 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{ trans('default.video.pay_type') ?? '套圖描述'}}</label>
-                                    <select name="pay_type" class="form-control">
+                                    <select name="is_free" class="form-control">
                                         @foreach(trans('default.video.pay_type_types') as $key => $value)
-                                            <option value="{{ $key }}" @if($key == ($model->pay_type ?? null)) @endif>{{ $value }}</option>
+                                            <option value="{{$key}}" {{($video->is_free ?? '') == $key ? 'selected' : ''}}>{{$value}}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>

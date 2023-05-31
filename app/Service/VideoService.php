@@ -158,18 +158,19 @@ class VideoService
     {
         try {
             unset($data['user_id'], $data['uuid'], $data['release_at'], $data['refreshed_at']);
-
-            if (! empty($data['_id']) and Video::where('_id', $data['_id'])->exists()) {
-                $model = Video::withTrashed()->where('_id',$data['_id'])->first();
+            
+            if (! empty($data['id']) and Video::where('id', $data['id'])->exists()) {
+                $model = Video::withTrashed()->where('id',$data['id'])->first();
                 // del tvideo'tag
                 self::delVideoCorrespond($model->id, 'tags');
                 // del video'actor
                 self::delVideoCorrespond($model->id, 'actor');
+
+                $data['cover_full'] = $model->cover_full;
             } else {
                 $model = new Video();
             }
-            
-            $cover = env("COVER_URL").$data['cover_full'];
+            $cover = env("IMAGE_GROUP_DECRYPT_URL").$data['cover_full'];
             $imgSize = Calc::imgSize($cover); 
             $data['cover_witdh'] = isset($imgSize['width']) ?$imgSize['width'] :0;
             $data['cover_height'] = isset($imgSize['heigh']) ?$imgSize['heigh'] :0;
@@ -182,7 +183,14 @@ class VideoService
             $model->user_id = 1;
             $model->deleted_at = !empty($data['deleted_at']) ? $data['deleted_at'] : null;
             if ($model->save()) {
-                $data['id'] = null;
+                // 先查詢是否有現有商品
+                $product = Product::select('id')->where('type', Video::class)->where('correspond_id', $model->id)->where('expire', Product::EXPIRE['no'])->first();
+
+                if(empty($product)){
+                    $data['id'] = null;
+                }else{
+                    $data['id'] = $product -> id;
+                }
                 $data['type'] = Product::TYPE_CORRESPOND_LIST['video'];
                 $data['correspond_id'] = $model->id;
                 $data['name'] = $model->title;
@@ -192,13 +200,13 @@ class VideoService
                 $data['end_time'] = date('Y-m-d H:i:s', strtotime('+10 years'));
                 $data['currency'] = 'COIN';
                 $data['diamond_price'] = 1;
-                $data['selling_price'] = empty($model->coin) ? 0 : $model->coin;
+                $data['selling_price'] = empty($model->coins) ? 0 : $model->coins;
                 $this->productService->store($data);
             }
             return $model;
         } catch (\Exception $e) {
             $this->logger->info($e->getMessage());
-            echo $e->getMessage();
+            var_dump($e->getMessage());
         }
     }
 
