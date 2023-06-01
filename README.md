@@ -22,7 +22,7 @@ redis 在本地
 
 ### 連結網址
 
-[http://172.104.46.27:9501/](http://172.104.46.27:9501/)
+[http://127.0.0.1:9501/](http://127.0.0.1:9501/)
 
 
 [圖片上傳 先顯示在頁面](https://www.raymondcamden.com/2013/10/01/MultiFile-Uploads-and-Multiple-Selects)
@@ -49,11 +49,6 @@ ex. php bin/hyperf.php swagger:gen -f json
 
 https://adminlte.io/docs/3.2/dependencies.html
 
-### 影片網址
-
-資源中心 過來的m3u8 影片加上 
-
-https://video.iwanna.tv/
 
 ### ELK 安裝
 
